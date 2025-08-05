@@ -9,8 +9,6 @@ app_license = "mit"
 # ------------------
 
 fixtures = [
-    {"doctype": "Company", "filters": [["name", "=", "Trường An"]]},
-    {"doctype": "Global Defaults"},
     {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
@@ -34,7 +32,7 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/tahp/css/tahp.css"
+# app_include_css = "/assets/tahp/css/tahp.css"
 # app_include_js = "/assets/tahp/js/tahp.js"
 
 # include js, css files in header of web template
