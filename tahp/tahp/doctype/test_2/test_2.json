@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-05 09:05:40.153128",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "hi",
+  "test_56",
+  "test_78",
+  "test_89"
+ ],
+ "fields": [
+  {
+   "fieldname": "hi",
+   "fieldtype": "Data",
+   "label": "Test 34"
+  },
+  {
+   "fieldname": "test_56",
+   "fieldtype": "Data",
+   "label": "Test 56"
+  },
+  {
+   "fieldname": "test_78",
+   "fieldtype": "Data",
+   "label": "Test 78"
+  },
+  {
+   "fieldname": "test_89",
+   "fieldtype": "Data",
+   "label": "Test 89"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-05 09:09:29.436932",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Test 2",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

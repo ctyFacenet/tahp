@@ -8,6 +8,22 @@ app_license = "mit"
 # Apps
 # ------------------
 
+fixtures = [
+    {
+        "doctype": "Role",
+        "filters": [["is_custom", "=", 1]]
+    },
+    {
+        "doctype": "Workflow"
+    },
+    {
+        "doctype": "Workflow State"
+    },
+    {
+        "doctype": "Workflow Action"
+    }
+]
+
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
@@ -48,10 +64,17 @@ app_license = "mit"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+doctype_js = {
+    "ToDo": [
+        "public/js/to_do.js",
+        "public/js/to_do_2.js"
+    ]
+}
+
 # Svg Icons
 # ------------------
 # include app icons in desk
-# app_include_icons = "tahp/public/icons.svg"
+# app_include_icons = "tahp/public/images/tahp.svg"
 
 # Home Pages
 # ----------
@@ -90,6 +113,8 @@ app_license = "mit"
 
 # before_uninstall = "tahp.uninstall.before_uninstall"
 # after_uninstall = "tahp.uninstall.after_uninstall"
+
+after_install = "tahp.install.set_logo"
 
 # Integration Setup
 # ------------------
@@ -144,6 +169,15 @@ app_license = "mit"
 # 		"on_trash": "method"
 # 	}
 # }
+
+doc_events = {
+    "ToDo": {
+        "validate": [
+            "tahp.logic_hooks.validate_note",
+            "tahp.logic_hooks_2.validate_note"
+        ]
+    }
+}
 
 # Scheduled Tasks
 # ---------------
