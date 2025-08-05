@@ -9,19 +9,12 @@ app_license = "mit"
 # ------------------
 
 fixtures = [
-    {
-        "doctype": "Role",
-        "filters": [["is_custom", "=", 1]]
-    },
-    {
-        "doctype": "Workflow"
-    },
-    {
-        "doctype": "Workflow State"
-    },
-    {
-        "doctype": "Workflow Action"
-    }
+    {"doctype": "Company", "filters": [["name", "=", "Trường An"]]},
+    {"doctype": "Global Defaults"},
+    {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
+    {"doctype": "Workflow"},
+    {"doctype": "Workflow State"},
+    {"doctype": "Workflow Action"},
 ]
 
 # required_apps = []
@@ -41,7 +34,7 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/tahp/css/tahp.css"
+app_include_css = "/assets/tahp/css/tahp.css"
 # app_include_js = "/assets/tahp/js/tahp.js"
 
 # include js, css files in header of web template
@@ -114,7 +107,7 @@ doctype_js = {
 # before_uninstall = "tahp.uninstall.before_uninstall"
 # after_uninstall = "tahp.uninstall.after_uninstall"
 
-after_install = "tahp.install.set_logo"
+after_install = "tahp.set_logo.set_logo"
 
 # Integration Setup
 # ------------------

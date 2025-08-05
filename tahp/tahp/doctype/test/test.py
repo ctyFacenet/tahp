@@ -10,6 +10,7 @@ class Test(Document):
 		# Add validation logic here if needed
 		frappe.msgprint("Validation logic can be added here.")
 		print('Somthing')
+		print("Something SUper")
 
 	def before_save(self):
 		# This function is called before the document is saved

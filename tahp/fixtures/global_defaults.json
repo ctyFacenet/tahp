@@ -1,0 +1,16 @@
+[
+ {
+  "country": "Vietnam",
+  "default_company": "Trường An",
+  "default_currency": "VND",
+  "default_distance_unit": null,
+  "demo_company": null,
+  "disable_in_words": 0,
+  "disable_rounded_total": 0,
+  "docstatus": 0,
+  "doctype": "Global Defaults",
+  "hide_currency_symbol": "Yes",
+  "modified": "2025-08-05 21:43:01.074171",
+  "name": "Global Defaults"
+ }
+]
