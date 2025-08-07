@@ -32,7 +32,7 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/tahp/css/tahp.css"
+# app_include_css = []
 # app_include_js = "/assets/tahp/js/tahp.js"
 
 # include js, css files in header of web template
@@ -55,12 +55,12 @@ app_include_css = "/assets/tahp/css/tahp.css"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
-doctype_js = {
-    "ToDo": [
-        "public/js/to_do.js",
-        "public/js/to_do_2.js"
-    ]
-}
+# doctype_js = {
+#     "ToDo": [
+#         "public/js/to_do.js",
+#         "public/js/to_do_2.js"
+#     ]
+# }
 
 # Svg Icons
 # ------------------
@@ -161,14 +161,14 @@ after_install = "tahp.set_logo.set_logo"
 # 	}
 # }
 
-doc_events = {
-    "ToDo": {
-        "validate": [
-            "tahp.logic_hooks.validate_note",
-            "tahp.logic_hooks_2.validate_note"
-        ]
-    }
-}
+# doc_events = {
+#     "ToDo": {
+#         "validate": [
+#             "tahp.logic_hooks.validate_note",
+#             "tahp.logic_hooks_2.validate_note"
+#         ]
+#     }
+# }
 
 # Scheduled Tasks
 # ---------------
