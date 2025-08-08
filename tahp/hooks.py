@@ -108,7 +108,7 @@ app_include_js = [
 # before_uninstall = "tahp.uninstall.before_uninstall"
 # after_uninstall = "tahp.uninstall.after_uninstall"
 
-after_install = "tahp.set_logo.set_logo"
+after_install = "tahp.setup.setup_website"
 
 # Integration Setup
 # ------------------
