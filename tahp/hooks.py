@@ -34,6 +34,9 @@ fixtures = [
 # include js, css files in header of desk.html
 # app_include_css = []
 # app_include_js = "/assets/tahp/js/tahp.js"
+app_include_js = [
+    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js"
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/tahp/css/tahp.css"
