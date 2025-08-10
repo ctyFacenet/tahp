@@ -39,7 +39,8 @@ fixtures = [
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
-    "/assets/tahp/js/customize_form/fast_export.js"
+    "/assets/tahp/js/tahp/form/controls/date.js",
+    "/assets/tahp/js/customize_form/fast_export.js",
 ]
 
 # include js, css files in header of web template
