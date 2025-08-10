@@ -13,6 +13,9 @@ fixtures = [
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
     {"doctype": "Workflow Action"},
+    {"doctype": "Workspace"},
+    {"doctype": "Website Settings"},
+    {"doctype": "System Settings"}
 ]
 
 # required_apps = []
@@ -35,7 +38,8 @@ fixtures = [
 # app_include_css = []
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
-    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js"
+    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
+    "/assets/tahp/js/customize_form/fast_export.js"
 ]
 
 # include js, css files in header of web template
@@ -163,6 +167,14 @@ after_install = "tahp.setup.setup_website"
 # 		"on_trash": "method"
 # 	}
 # }
+
+doc_events = {
+    "Quality Inspection Template": {
+        "before_save": [
+            "tahp.doc_events.quality_inspection_template.before_save.before_save"
+        ]
+    }
+}
 
 # doc_events = {
 #     "ToDo": {
