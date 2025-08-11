@@ -442,7 +442,7 @@
             "Thg 11",
             "Thg 12",
         ],
-        today: "Hôm nay",
+        today: "Hôm nay :3",
         clear: "Xóa",
         dateFormat: "dd/mm/yyyy",
         timeFormat: "hh:ii aa",
