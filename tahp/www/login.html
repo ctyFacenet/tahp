@@ -7,7 +7,7 @@
 		<label class="form-label sr-only" for="login_email">{{ login_label or _("Email")}}</label>
 		<div class="email-field">
 			<input type="text" id="login_email" class="form-control"
-				placeholder="{% if login_name_placeholder %}{{ login_name_placeholder  }}{% else %}{{ _('jane@example.com') }}{% endif %}"
+				placeholder="{% if login_name_placeholder %}{{ login_name_placeholder  }}{% else %}{{ _('tahp@example.com') }}{% endif %}"
 				required autofocus autocomplete="username">
 
 			<svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
@@ -33,7 +33,7 @@
 
 	{% if not disable_user_pass_login %}
 	<p class="forgot-password-message">
-		<a href="#forgot">{{ _("Forgot Password?") }}</a>
+		<a href="#forgot">{{ _("Quên mật khẩu?") }}</a>
 	</p>
 	{% endif %}
 </div>
@@ -41,7 +41,7 @@
 <div class="page-card-actions">
 	{% if not disable_user_pass_login %}
 	<button class="btn btn-sm btn-primary btn-block btn-login" type="submit">
-		{{ _("Login") }}</button>
+		{{ _("Đăng nhập") }}</button>
 	{% endif %}
 	{% if ldap_settings and ldap_settings.enabled %}
 	<button class="btn btn-sm {{ "btn-primary" if disable_user_pass_login else "btn-default" }} btn-block btn-login btn-ldap-login">
@@ -88,7 +88,7 @@
 					</form>
 					<div class="social-logins text-center">
 						{% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
-						<p class="text-muted login-divider">{{ _("or") }}</p>
+						<p class="text-muted login-divider">{{ _("hoặc") }}</p>
 						{% endif %}
 						<div class="social-login-buttons">
 							{% for provider in provider_logins %}
@@ -137,8 +137,8 @@
 		</div>
 		{%- if not disable_signup and not disable_user_pass_login -%}
 		<div class="text-center sign-up-message">
-			{{ _("Don't have an account?") }}
-			<a href="#signup">{{ _("Sign up") }}</a>
+			{{ _("Bạn chưa có tài khoản?") }}
+			<a href="#signup">{{ _("Đăng ký") }}</a>
 		</div>
 		{%- endif -%}
 	</section>
@@ -153,8 +153,8 @@
 		</div>
 		{%- if not disable_signup and not disable_user_pass_login -%}
 		<div class="text-center sign-up-message">
-			{{ _("Don't have an account?") }}
-			<a href="#signup">{{ _("Sign up") }}</a>
+			{{ _("Bạn chưa có tài khoản?") }}
+			<a href="#signup">{{ _("Đăng ký") }}</a>
 		</div>
 		{%- endif -%}
 	</section>
@@ -199,9 +199,9 @@
 				</div>
 				<div class="page-card-actions">
 					<button class="btn btn-sm btn-primary btn-block btn-forgot"
-						type="submit">{{ _("Reset Password") }}</button>
+						type="submit">{{ _("Đặt lại mật khẩu") }}</button>
 					<p class="text-center sign-up-message">
-						<a href="#login">{{ _("Back to Login") }}</a>
+						<a href="#login">{{ _("Quay lại Đăng nhập") }}</a>
 					</p>
 				</div>
 
@@ -232,9 +232,9 @@
 				</div>
 				<div class="page-card-actions">
 					<button class="btn btn-sm btn-primary btn-block btn-login-with-email-link"
-						type="submit">{{ _("Send login link") }}</button>
+						type="submit">{{ _("Gửi liên kết đăng nhập") }}</button>
 					<p class="text-center sign-up-message">
-						<a href="#login">{{ _("Back to Login") }}</a>
+						<a href="#login">{{ _("Quay lại đăng nhập") }}</a>
 					</p>
 				</div>
 			</form>

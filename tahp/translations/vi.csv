@@ -1,4 +1,6 @@
 Load More,Xem thêm
+Login,Đăng nhập
+or, hoặc
 Cancelling documents,Đang hủy bỏ
 Cancel All,Hủy bỏ tất cả
 Do you want to cancel all linked documents?,Bạn chắc chắn muốn hủy bỏ toàn bộ bản ghi liên quan?
@@ -1286,7 +1288,7 @@ B9,B9
 BCC,BCC
 Back to Desk,Back to Desk
 Back to Home,Back to Home
-Back to Login,Back to Login
+Back to Login,Quay lại đăng nhập
 Background Color,Background Color
 Background Image,Background Image
 Background Jobs,Background Jobs
@@ -2478,7 +2480,7 @@ Force Show,Force Show
 Force Stop job,Force Stop job
 Force User to Reset Password,Force User to Reset Password
 Force Web Capture Mode for Uploads,Force Web Capture Mode for Uploads
-Forgot Password?,Forgot Password?
+Forgot Password?,Quên mật khẩu?
 Form,Form
 Form Builder,Form Builder
 Form Dict,Form Dict
@@ -4536,7 +4538,7 @@ Send an email reminder in the morning,Send an email reminder in the morning
 Send days before or after the reference date,Send days before or after the reference date
 Send email when document transitions to the state.,Send email when document transitions to the state.
 Send enquiries to this email address,Send enquiries to this email address
-Send login link,Send login link
+Send login link,Gửi liên kết đăng nhập
 Send now,Send now
 Send only if there is any data,Send only if there is any data
 Send unsubscribe message in email,Send unsubscribe message in email
