@@ -1214,7 +1214,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:28.872312",
+  "modified": "2025-08-22 23:54:07.359774",
   "module": "CRM",
   "name": "CRM",
   "number_cards": [],
@@ -1331,7 +1331,7 @@
   "hide_custom": 0,
   "icon": "sell",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Selling",
   "links": [
    {
@@ -2495,7 +2495,7 @@
   "hide_custom": 0,
   "icon": "buying",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Buying",
   "links": [
    {
@@ -3488,7 +3488,7 @@
   "hide_custom": 0,
   "icon": "website",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Website",
   "links": [
    {
@@ -3979,7 +3979,7 @@
   "hide_custom": 0,
   "icon": "tool",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Tools",
   "links": [
    {
@@ -4633,7 +4633,7 @@
   "hide_custom": 0,
   "icon": "users",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Users",
   "links": [
    {
@@ -5362,7 +5362,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:02.295901",
+  "modified": "2025-08-22 23:54:11.788851",
   "module": "Integrations",
   "name": "Integrations",
   "number_cards": [],
@@ -5393,7 +5393,7 @@
   "hide_custom": 0,
   "icon": "accounting",
   "indicator_color": "",
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Accounting",
   "links": [
    {
@@ -7140,7 +7140,7 @@
     "parent": "Stock",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Serial No",
     "type": "Link"
    },
    {
@@ -7158,7 +7158,7 @@
     "parent": "Stock",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Serial No",
     "type": "Link"
    },
    {
@@ -7176,7 +7176,7 @@
     "parent": "Stock",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Serial No",
     "type": "Link"
    },
    {
@@ -7590,7 +7590,7 @@
     "parent": "Stock",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Stock Ledger Entry",
     "type": "Link"
    },
    {
@@ -8010,7 +8010,7 @@
     "parent": "Stock",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Stock Ledger Entry",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -8027,7 +8027,7 @@
     "parent": "Stock",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Stock Ledger Entry",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -8359,7 +8359,7 @@
     "parent": "Assets",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Asset Maintenance",
     "type": "Link"
    },
    {
@@ -8377,7 +8377,7 @@
     "parent": "Assets",
     "parentfield": "links",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Asset Activity",
     "type": "Link"
    }
   ],
@@ -8437,7 +8437,7 @@
     "parent": "Assets",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Asset",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -8481,7 +8481,7 @@
   "hide_custom": 0,
   "icon": "project",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Projects",
   "links": [
    {
@@ -9209,7 +9209,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:33.409386",
+  "modified": "2025-08-22 23:54:00.975265",
   "module": "Support",
   "name": "Support",
   "number_cards": [],
@@ -10315,7 +10315,7 @@
     "parent": "Manufacturing",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Sales Order",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -10332,7 +10332,7 @@
     "parent": "Manufacturing",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "BOM",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -10349,7 +10349,7 @@
     "parent": "Manufacturing",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Work Order",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -11551,7 +11551,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:00.456878",
+  "modified": "2025-08-22 23:53:16.343707",
   "module": "Setup",
   "name": "ERPNext Settings",
   "number_cards": [],
@@ -11694,7 +11694,7 @@
   "hide_custom": 0,
   "icon": "arrow-left",
   "indicator_color": "",
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Payables",
   "links": [
    {
@@ -11968,7 +11968,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2024-01-18 22:09:46.221549",
+  "modified": "2025-08-22 23:53:45.761306",
   "module": "Accounts",
   "name": "Payables",
   "number_cards": [],
@@ -11990,7 +11990,7 @@
     "parent": "Payables",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Purchase Invoice",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -12060,7 +12060,7 @@
   "hide_custom": 0,
   "icon": "arrow-right",
   "indicator_color": "",
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Receivables",
   "links": [
    {
@@ -12388,7 +12388,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2024-01-18 22:11:51.474477",
+  "modified": "2025-08-22 23:53:49.595011",
   "module": "Accounts",
   "name": "Receivables",
   "number_cards": [],
@@ -12495,7 +12495,7 @@
     "parent": "Receivables",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
-    "report_ref_doctype": null,
+    "report_ref_doctype": "Sales Invoice",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -12514,7 +12514,7 @@
   "hide_custom": 0,
   "icon": "file",
   "indicator_color": "",
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Financial Reports",
   "links": [
    {
@@ -12932,7 +12932,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2024-01-18 22:13:07.596844",
+  "modified": "2025-08-22 23:51:41.098784",
   "module": "Accounts",
   "name": "Financial Reports",
   "number_cards": [],
@@ -13054,132 +13054,6 @@
     "hidden": 0,
     "icon": null,
     "is_query_report": 0,
-    "label": "Sản xuất",
-    "link_count": 6,
-    "link_to": null,
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Card Break"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Workstation Type",
-    "link_count": 0,
-    "link_to": "Workstation Type",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Workstation",
-    "link_count": 0,
-    "link_to": "Workstation",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Operation",
-    "link_count": 0,
-    "link_to": "Operation",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Routing",
-    "link_count": 0,
-    "link_to": "Routing",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "BOM",
-    "link_count": 0,
-    "link_to": "BOM",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
-    "label": "Downtime Reason",
-    "link_count": 0,
-    "link_to": "Downtime Reason",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": null,
-    "parent": "MDM",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   },
-   {
-    "dependencies": null,
-    "description": null,
-    "hidden": 0,
-    "icon": null,
-    "is_query_report": 0,
     "label": "Kiểm tra chất lượng",
     "link_count": 2,
     "link_to": null,
@@ -13281,9 +13155,135 @@
     "parenttype": "Workspace",
     "report_ref_doctype": null,
     "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Sản xuất",
+    "link_count": 6,
+    "link_to": null,
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Loại thiết bị",
+    "link_count": 0,
+    "link_to": "Workstation Type",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Thiết bị/Cụm thiết bị",
+    "link_count": 0,
+    "link_to": "Workstation",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Công đoạn",
+    "link_count": 0,
+    "link_to": "Operation",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Quy trình sản xuất",
+    "link_count": 0,
+    "link_to": "Routing",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Công thức sản xuất (BOM)",
+    "link_count": 0,
+    "link_to": "BOM",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Lý do dừng máy",
+    "link_count": 0,
+    "link_to": "Downtime Reason",
+    "link_type": "DocType",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "MDM",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
    }
   ],
-  "modified": "2025-08-09 18:27:41.858519",
+  "modified": "2025-08-21 16:52:35.485246",
   "module": null,
   "name": "MDM",
   "number_cards": [],
@@ -13306,7 +13306,7 @@
   "hide_custom": 0,
   "icon": "tool",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Build",
   "links": [
    {
