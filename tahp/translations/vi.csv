@@ -767,7 +767,7 @@ Rent Cost,Chi phí thuê
 Consumable Cost,Chi phí vật tư tiêu hao
 Electricity Cost,Chi phí tiêu thụ điện
 Status,Trạng thái
-Workstation Name,Tên thiết bị
+Workstation Name,Tên thiết bị/cụm thiết bị
 Description,Mô tả
 Parameter Group,Nhóm thông số
 Parameter,Thông số
@@ -799,7 +799,7 @@ BOM,Công thức sản xuất (BOM)
 Routing,Quy trình sản xuất
 Operation,Công đoạn
 Workstation Type,Loại thiết bị
-Workstation,Thiết bị
+Workstation,Thiết bị/Cụm thiết bị
 Quality Inspection Template,Mẫu QC
 Item,Mặt hàng
 Item Group,Nhóm mặt hàng

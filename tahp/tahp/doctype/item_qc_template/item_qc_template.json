@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-21 14:08:11.889080",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "stock_entry_type",
+  "qc_template"
+ ],
+ "fields": [
+  {
+   "fieldname": "stock_entry_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Lo\u1ea1i v\u1eadn chuy\u1ec3n",
+   "options": "Nh\u1eadp kho\nXu\u1ea5t kho\nChuy\u1ec3n kho\nXu\u1ea5t kho tr\u01b0\u1edbc s\u1ea3n xu\u1ea5t\nNh\u1eadp kho th\u00e0nh ph\u1ea9m"
+  },
+  {
+   "fieldname": "qc_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u1eabu QC",
+   "options": "Quality Inspection Template"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-21 14:14:09.874831",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Item QC Template",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
