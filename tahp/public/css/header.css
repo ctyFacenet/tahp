@@ -1,0 +1,29 @@
+/* Ẩn navbar gốc */
+.navbar.navbar-light {
+    display: none !important;
+}
+
+/* Style cho navbar mới */
+.custom-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Điều chỉnh body để tránh bị che */
+body {
+    padding-top: 60px;
+}
+
+.layout-main-section {
+    margin-top: 0;
+}

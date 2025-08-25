@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{student_name}-{class_name}",
+ "creation": "2025-08-19 08:40:57.135331",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_mwul",
+  "student_name",
+  "class_name",
+  "registration_date",
+  "graduation_status",
+  "column_break_vnmz",
+  "age",
+  "credit_price",
+  "gpa",
+  "section_break_zbje",
+  "subject"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_mwul",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "student_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean h\u1ecdc sinh",
+   "reqd": 1
+  },
+  {
+   "fieldname": "class_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "L\u1edbp",
+   "reqd": 1
+  },
+  {
+   "fieldname": "registration_date",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y nh\u1eadp h\u1ecdc"
+  },
+  {
+   "fieldname": "column_break_vnmz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "label": "Tu\u1ed5i"
+  },
+  {
+   "fieldname": "gpa",
+   "fieldtype": "Float",
+   "label": "gpa",
+   "read_only": 1
+  },
+  {
+   "fieldname": "graduation_status",
+   "fieldtype": "Data",
+   "label": "Tr\u1ea1ng th\u00e1i"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Table",
+   "label": "subject",
+   "options": "Student Registration Item"
+  },
+  {
+   "fieldname": "credit_price",
+   "fieldtype": "Currency",
+   "label": "H\u1ecdc ph\u00ed"
+  },
+  {
+   "fieldname": "section_break_zbje",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-20 09:49:30.145009",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Student Overview",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

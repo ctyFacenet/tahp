@@ -15,7 +15,7 @@ fixtures = [
     {"doctype": "Workflow Action"},
     {"doctype": "Workspace"},
     {"doctype": "Website Settings"},
-    {"doctype": "System Settings"}
+    {"doctype": "System Settings"},
 ]
 
 # required_apps = []
@@ -35,12 +35,17 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = []
+app_include_css = [
+    "/assets/tahp/css/customize.css",
+    "/assets/tahp/css/header.css",
+]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
+    "/assets/tahp/js/todo/to_do.js",
+    "/assets/tahp/js/customize_navbar/header.js",
 ]
 
 # include js, css files in header of web template
@@ -174,6 +179,17 @@ doc_events = {
         "before_save": [
             "tahp.doc_events.quality_inspection_template.before_save.before_save"
         ]
+    },
+    "ToDo": {
+        "before_save": [
+            "tahp.doc_events.todo.before_save.before_save",
+            "tahp.doc_events.todo.before_save.before_save_2",
+        ]
+    },
+    "Work Order": {
+        "before_submit": [
+            "tahp.doc_events.work_order.before_submit.before_submit"
+        ]
     }
 }
 
@@ -189,24 +205,28 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"tahp.tasks.all"
-# 	],
-# 	"daily": [
-# 		"tahp.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"tahp.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"tahp.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"tahp.tasks.monthly"
-# 	],
-# }
-
+scheduler_events = {
+	# "all": [
+	# 	"tahp.tasks.all"
+	# ],
+	# "daily": [
+	# 	"tahp.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"tahp.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"tahp.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"tahp.tasks.monthly"
+	# ],
+    "cron": {
+        "* * * * *": [
+            "tahp.tahp.jobs.leave_tracker.high_priority"
+        ]
+    }
+}
 # Testing
 # -------
 
@@ -224,6 +244,10 @@ doc_events = {
 # along with any modifications made in other Frappe apps
 # override_doctype_dashboards = {
 # 	"Task": "tahp.task.get_dashboard_data"
+# }
+
+# override_doctype_dashboards = {
+#     "navbar": "custom_navbar.templates.navbar"
 # }
 
 # exempt linked doctypes from being automatically cancelled

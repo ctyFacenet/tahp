@@ -1,1 +1,422 @@
-[]
+[
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:41:10.370323",
+  "name": "cnveepqkvd",
+  "permitted_roles": [
+   {
+    "parent": "cnveepqkvd",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "cntfu3gmhp",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "HR Manager",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:41:17.177860",
+  "name": "cq3aahbcj9",
+  "permitted_roles": [
+   {
+    "parent": "cq3aahbcj9",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "cntfu3gmhp",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:41:44.860248",
+  "name": "d2o9itaf43",
+  "permitted_roles": [
+   {
+    "parent": "d2o9itaf43",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "d2o8c43lhf",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "HR Manager",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:41:46.835940",
+  "name": "d3coi6d0fk",
+  "permitted_roles": [
+   {
+    "parent": "d3coi6d0fk",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "d2o8c43lhf",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:56:49.017166",
+  "name": "ltaa1788at",
+  "permitted_roles": [
+   {
+    "parent": "ltaa1788at",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "lt8ph1tmj8",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "HR Manager",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-20 11:56:55.981945",
+  "name": "lvftnqk0je",
+  "permitted_roles": [
+   {
+    "parent": "lvftnqk0je",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "lt8ph1tmj8",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 08:24:43.707433",
+  "name": "5clilsnpaq",
+  "permitted_roles": [
+   {
+    "parent": "5clilsnpaq",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "5cd1thui3o",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 08:35:53.889903",
+  "name": "bu20s14g2q",
+  "permitted_roles": [
+   {
+    "parent": "bu20s14g2q",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "bu2ug03sh3",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 08:35:58.801401",
+  "name": "bvkrgi9eeu",
+  "permitted_roles": [
+   {
+    "parent": "bvkrgi9eeu",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "bu2ug03sh3",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:04:04.357402",
+  "name": "sebl8636io",
+  "permitted_roles": [
+   {
+    "parent": "sebl8636io",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "sebb3c3jla",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:04:07.439611",
+  "name": "sfa56pvlt7",
+  "permitted_roles": [
+   {
+    "parent": "sfa56pvlt7",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "sebb3c3jla",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:09:18.071215",
+  "name": "vgcdn63si0",
+  "permitted_roles": [
+   {
+    "parent": "vgcdn63si0",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "vgcnshbdhe",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:09:19.380503",
+  "name": "vgpe49h0p5",
+  "permitted_roles": [
+   {
+    "parent": "vgpe49h0p5",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "vgcnshbdhe",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Pending"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:11:23.815752",
+  "name": "0nmoa0nas0",
+  "permitted_roles": [
+   {
+    "parent": "0nmoa0nas0",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "0nlopftj0e",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:13:06.706882",
+  "name": "1nrckg1vf8",
+  "permitted_roles": [
+   {
+    "parent": "1nrckg1vf8",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "1nqn2dpjip",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:15:02.527610",
+  "name": "2s1fhmh5tk",
+  "permitted_roles": [
+   {
+    "parent": "2s1fhmh5tk",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "2rm4sc2445",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 09:19:00.127829",
+  "name": "5695616jk4",
+  "permitted_roles": [
+   {
+    "parent": "5695616jk4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "561mpl8rne",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 10:53:21.990752",
+  "name": "sflpkt77qa",
+  "permitted_roles": [
+   {
+    "parent": "sflpkt77qa",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "seo1fop4uv",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 10:53:39.509104",
+  "name": "sl3igep0dm",
+  "permitted_roles": [
+   {
+    "parent": "sl3igep0dm",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "sl2liv6rh8",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 10:53:43.171693",
+  "name": "sm7ufmnes7",
+  "permitted_roles": [
+   {
+    "parent": "sm7ufmnes7",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "HR Manager"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "sl2liv6rh8",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Pending"
+ }
+]

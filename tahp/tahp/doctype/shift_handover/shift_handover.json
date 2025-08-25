@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-23 08:52:15.518118",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "creation_date",
+  "work_order",
+  "shift_leader_1",
+  "shift_leader_2",
+  "notes_1",
+  "notes_2",
+  "job_card_list"
+ ],
+ "fields": [
+  {
+   "allow_in_quick_entry": 1,
+   "default": "Today",
+   "fieldname": "creation_date",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "LSX Ca",
+   "options": "Work Order Test",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "lsx_ca.truong_ca",
+   "fieldname": "shift_leader_1",
+   "fieldtype": "Link",
+   "label": "Tr\u01b0\u1edfng ca s\u1ed1 1",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shift_leader_2",
+   "fieldtype": "Link",
+   "label": "Tr\u01b0\u1edfng ca s\u1ed1 2",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes_1",
+   "fieldtype": "Text",
+   "label": "Ghi ch\u00fa 1"
+  },
+  {
+   "fieldname": "notes_2",
+   "fieldtype": "Text",
+   "label": "Ghi ch\u00fa 2"
+  },
+  {
+   "fieldname": "job_card_list",
+   "fieldtype": "Table",
+   "label": "Danh s\u00e1ch Job Card",
+   "options": "Shift Handover Item",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-25 08:33:13.062281",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Shift Handover",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

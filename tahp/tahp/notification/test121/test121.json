@@ -1,0 +1,29 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "condition": "",
+ "creation": "2025-08-20 14:49:35.849876",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Employee Leave Tracker",
+ "enabled": 1,
+ "event": "New",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>\"Nh\u00e2n vi\u00ean {doc.employee} v\u1eeba t\u1ea1o phi\u1ebfu ngh\u1ec9 ph\u00e9p t\u1eeb {doc.from<em>date} \u0111\u1ebfn {doc.to</em>date}\"</p>\n",
+ "message_type": "Markdown",
+ "modified": "2025-08-21 08:11:16.665477",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Employee Leave Tracker",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_role": "HR Manager"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "subject": "{{ doc.name }} Delivered"
+}

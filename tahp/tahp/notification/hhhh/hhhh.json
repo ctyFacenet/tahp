@@ -1,0 +1,30 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "condition": "",
+ "creation": "2025-08-19 17:26:16.937836",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Student Overview",
+ "enabled": 1,
+ "event": "Value Change",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Add your message here</p>\n",
+ "message_type": "Markdown",
+ "modified": "2025-08-19 17:29:23.490786",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "hhhh",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_role": "All"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "subject": "gpa duoi 4 abhdajhf",
+ "value_changed": "gpa"
+}
