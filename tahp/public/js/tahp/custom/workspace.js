@@ -1,4 +1,4 @@
-frappe.ready(() => {
+document.addEventListener("DOMContentLoaded", () => {
   frappe.views.Workspace = class CustomWorkspace extends frappe.views.Workspace {
     constructor(wrapper) {
       super(wrapper);
@@ -35,6 +35,7 @@ frappe.ready(() => {
           ?.classList.add("d-none");
       }
 
+      // Gọi hàm show gốc
       super.show();
     }
   };
