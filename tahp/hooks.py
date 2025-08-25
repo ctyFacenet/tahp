@@ -50,6 +50,7 @@ app_include_js = [
     "/assets/tahp/js/operation/operation.js",
     "/assets/tahp/js/routing/routing.js",
     "/assets/tahp/js/bom/bom.js",
+    "/assets/tahp/js/warehouse/warehouse.js",
     "/assets/tahp/js/work_order/work_order.js",
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
