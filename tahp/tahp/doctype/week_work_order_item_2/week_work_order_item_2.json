@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-21 09:26:57.354097",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "wo",
+  "planned_start_time",
+  "shift",
+  "qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ph\u1ea9m",
+   "options": "Item"
+  },
+  {
+   "fieldname": "wo",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "LSX Ca",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "planned_start_time",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y d\u1ef1 ki\u1ebfn"
+  },
+  {
+   "fieldname": "shift",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ca",
+   "options": "Shift"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ea3n l\u01b0\u1ee3ng"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-21 12:01:15.750676",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Week Work Order Item 2",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

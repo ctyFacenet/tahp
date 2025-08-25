@@ -36,20 +36,30 @@ fixtures = [
 
 # include js, css files in header of desk.html
 app_include_css = [
-    "/assets/tahp/css/customize.css",
-    "/assets/tahp/css/header.css",
+    "/assets/tahp/css/desk.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
-    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
-    "/assets/tahp/js/tahp/form/controls/date.js",
+    "my_desk.bundle.js",
+    # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
+    # "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
-    "/assets/tahp/js/todo/to_do.js",
-    "/assets/tahp/js/customize_navbar/header.js",
+    "/assets/tahp/js/item/item.js",
+    "/assets/tahp/js/stock_entry/stock_entry.js",
+    "/assets/tahp/js/operation/operation.js",
+    "/assets/tahp/js/routing/routing.js",
+    "/assets/tahp/js/bom/bom.js",
+    "/assets/tahp/js/work_order/work_order.js",
+    "/assets/tahp/js/custom_utils/primary_action.js",
+    "/assets/tahp/js/custom_utils/checkbox_toggle.js",
 ]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/tahp/css/tahp.css"
+web_include_css = [
+    "/assets/tahp/css/web.css"
+]
 # web_include_js = "/assets/tahp/js/tahp.js"
 
 # include custom scss in every website theme (without file extension ".scss")
@@ -67,6 +77,9 @@ app_include_js = [
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+doctype_list_js = {
+    "Workstation": ["public/js/workstation/workstation_list.js"]
+}
 
 # doctype_js = {
 #     "ToDo": [
@@ -180,15 +193,14 @@ doc_events = {
             "tahp.doc_events.quality_inspection_template.before_save.before_save"
         ]
     },
-    "ToDo": {
-        "before_save": [
-            "tahp.doc_events.todo.before_save.before_save",
-            "tahp.doc_events.todo.before_save.before_save_2",
-        ]
+    "Stock Entry": {
+        "after_insert": [
+            "tahp.doc_events.stock_entry.after_insert.after_insert"
+        ],
     },
-    "Work Order": {
-        "before_submit": [
-            "tahp.doc_events.work_order.before_submit.before_submit"
+    "Operation": {
+        "before_save": [
+            "tahp.doc_events.operation.before_save.before_save"
         ]
     }
 }

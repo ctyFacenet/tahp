@@ -1,0 +1,49 @@
+frappe.ui.form.on('Stock Entry', {
+    onload: async function(frm) {
+        await set_code(frm);
+    },
+
+    stock_entry_type: async function(frm) {
+        await set_code(frm);
+    }
+});
+
+/**
+ * Sinh custom_code cho Stock Entry khi tạo mới.
+ * - Chỉ chạy nếu document là mới (is_new).
+ * - Không chạy nếu custom_code đã có hoặc stock_entry_type chưa được chọn.
+ * - Sinh số thứ tự dựa trên stock_entry_type, năm, tháng, và số chứng từ cùng loại đã Confirm (docstatus=1).
+ * - Format: CODE.YYYY.MM.#### (ví dụ: NK.2025.08.0001).
+ */
+async function set_code(frm) {
+    if (!frm.is_new()) return;
+    if (frm.doc.custom_code || !frm.doc.stock_entry_type) return;
+
+    const map = {
+        "Material Receipt": "NK",
+        "Material Issue": "XK",
+        "Manufacture": "SX"
+    };
+    const code = map[frm.doc.stock_entry_type] || "UNK";
+
+    const today = frappe.datetime.str_to_obj(frappe.datetime.get_today());
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    const start_date = `${year}-${month}-01`;
+    const end_date = `${year}-${month}-31`;
+
+    const entries = await frappe.db.get_list("Stock Entry", {
+        filters: [
+            ["docstatus", "=", 1],
+            ["stock_entry_type", "=", frm.doc.stock_entry_type],
+            ["posting_date", ">=", start_date],
+            ["posting_date", "<=", end_date]
+        ],
+        fields: ["name"]
+    });
+
+    const index = entries.length + 1;
+    const custom_code = `${code}.${year}.${month}.${String(index).padStart(4, '0')}`;
+    frm.set_value('custom_code', custom_code);
+}
