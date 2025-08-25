@@ -48,11 +48,7 @@ body .container {
   color: white;
 }
 
-.avatar-frame {
-  width: 2rem;
-  height: 2rem;
-}
-
+.avatar-frame,
 .dropdown-navbar-user {
   width: 2rem;
   height: 2rem;
@@ -72,17 +68,13 @@ body .container {
   overflow-y: hidden;
   white-space: nowrap;
   scrollbar-width: none;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE 10+ */
 }
 
 .workspace-wrapper::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari, Opera */
 }
 
-/* Mỗi block workspace */
 .workspace-block {
   display: inline-flex;
   align-items: center;
@@ -90,13 +82,33 @@ body .container {
   font-size: 18px;
 }
 
-/* Hover: mờ nhẹ trên/dưới */
 .workspace-block:hover,
 .workspace-block.active {
   background-color: rgb(255, 255, 255);
 }
 
-/* Không cần bold chữ */
 .workspace-block.active {
   font-weight: bold;
+}
+
+
+/* Responsive */
+@media (min-width: 992px) {
+  .layout-side-section {
+    display: none !important;
+  }
+
+  .workspace-navbar {
+    display: block !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .workspace-navbar {
+    display: none !important;
+  }
+
+  .layout-side-section {
+    display: block !important;
+  }
 }

@@ -1,51 +1,49 @@
-frappe.views.Workspace = class CustomWorkspace extends frappe.views.Workspace {
+frappe.ready(() => {
+  frappe.views.Workspace = class CustomWorkspace extends frappe.views.Workspace {
     constructor(wrapper) {
-        super(wrapper);
+      super(wrapper);
     }
+
     show() {
-        console.log('hi2');
-        // hide side bar for particular view
-        if (frappe.router?.current_route &&
-            frappe.router.current_route.length > 1 &&
-            frappe.router.current_route[0].toLowerCase() === "workspaces") {
-            // side bar
-            let elements = document.querySelectorAll('.layout-side-section');
-            elements.forEach(element => {
-                if (element) element.classList.add('hide-side-section');
-            });
+      const is_workspace =
+        frappe.router?.current_route &&
+        frappe.router.current_route.length > 1 &&
+        frappe.router.current_route[0].toLowerCase() === "workspaces";
 
-            // Toggle button
-            let elements2 = document.querySelectorAll('div[data-page-route]:not([data-page-route="menu"]) .sidebar-toggle-btn');
-            elements2.forEach(element2 => {
-                if (element2) element2.classList.add('hide-side-section');
-            });
+      if (is_workspace) {
+        if (window.innerWidth >= 992) {
+          // PC/Laptop: ẩn sidebar dọc, hiện thanh ngang
+          document.querySelectorAll(".layout-side-section")
+            .forEach(el => el.classList.add("hide-side-section"));
 
-            // button to navigate to menu
-            let elements3 = document.querySelectorAll('div[data-page-route]:not([data-page-route="menu"]) .menu-open-btn');
-            elements3.forEach(element3 => {
-                if (element3) element3.classList.remove('hide-side-section');
-            });
+          document.querySelector(".workspace-navbar")
+            ?.classList.remove("d-none");
         } else {
-            // side bar
-            let elements = document.querySelectorAll('.layout-side-section');
-            elements.forEach(element => {
-                if (element) element.classList.remove('hide-side-section');
-            });
+          // Mobile: giữ sidebar dọc, ẩn thanh ngang
+          document.querySelectorAll(".layout-side-section")
+            .forEach(el => el.classList.remove("hide-side-section"));
 
-            // Toggle button
-            let elements2 = document.querySelectorAll('div[data-page-route]:not([data-page-route="menu"]) .sidebar-toggle-btn');
-            elements2.forEach(element2 => {
-                if (element2) element2.classList.remove('hide-side-section');
-            });
-
-            // button to navigate to menu
-            let elements3 = document.querySelectorAll('div[data-page-route]:not([data-page-route="menu"]) .menu-open-btn');
-            elements3.forEach(element3 => {
-                if (element3) element3.classList.add('hide-side-section');
-            });
+          document.querySelector(".workspace-navbar")
+            ?.classList.add("d-none");
         }
+      } else {
+        // Không phải trang Workspace → reset
+        document.querySelectorAll(".layout-side-section")
+          .forEach(el => el.classList.remove("hide-side-section"));
 
-        // call the parent's show
-        super.show();
+        document.querySelector(".workspace-navbar")
+          ?.classList.add("d-none");
+      }
+
+      super.show();
     }
-}
+  };
+
+  // Lắng nghe resize để responsive
+  window.addEventListener("resize", () => {
+    const ws = frappe.container.page?.workspace;
+    if (ws && typeof ws.show === "function") {
+      ws.show();
+    }
+  });
+});
