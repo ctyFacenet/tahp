@@ -64,6 +64,8 @@ def generate_qc(doc):
                 })
                 qi.insert(ignore_permissions=True)
                 row.quality_inspection = qi.name
+        
+        doc.save(ignore_permissions=True)
 
 def set_code(doc):
     """

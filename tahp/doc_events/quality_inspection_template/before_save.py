@@ -1,37 +1,56 @@
+import frappe
+
 def before_save(doc, method):
-    """
-    Sinh công thức kiểm tra cho bản ghi dựa trên các điều kiện người dùng nhập.
+    generate_formula(doc)
 
-    - Nếu chỉ nhập một điều kiện (trái hoặc phải), công thức chỉ chứa điều kiện đó.
-    - Nếu nhập cả hai, công thức nối bằng "and".
-    - custom_left: toán tử so sánh bên trái (>, >=, <, <=, *)
-    - custom_left_value: giá trị ở bên trái (ví dụ 4 trong "4 < a")
-    - custom_right: toán tử so sánh bên phải
-    - custom_right_value: giá trị bên phải (ví dụ 5 trong "a < 5")
 
-    Ví dụ:
-        custom_left = "<"
-        custom_left_value = 4
-        custom_right = "<"
-        custom_right_value = 5
-    Kết quả:
-        acceptance_formula = "(4 < reading_1 and reading_1 < 5)"
-    """
+def generate_formula(doc):
+    FORMULAS = {
+        "Bằng": "{r} == {min}",
+        "Trong khoảng (a, b)": "{min} < {r} and {r} < {max}",
+        "Trong khoảng (a, b]":    "{min} < {r} and {r} <= {max}",
+        "Trong khoảng [a, b)":    "{min} <= {r} and {r} < {max}",
+        "Trong khoảng [a, b]":    "{min} <= {r} and {r} <= {max}",
+        "Ngoài khoảng (x < a hoặc x > b)":   "{r} < {min} or {r} > {max}",
+        "Ngoài khoảng (x ≤ a hoặc x ≥ b)":   "{r} <= {min} or {r} >= {max}",
+        "Ngoài khoảng (x ≤ a hoặc x > b)":   "{r} <= {min} or {r} > {max}",
+        "Ngoài khoảng (x < a hoặc x ≥ b)":   "{r} < {min} or {r} >= {max}",        
+    }
+
+    errors = []
+
     for row in doc.item_quality_inspection_parameter:
-        left = row.custom_left
-        right = row.custom_right
-        lvalue = row.custom_left_value
-        rvalue = row.custom_right_value
-        formula = []
+        adv = (row.custom_advance or "").strip()
+        min_v = row.min_value
+        max_v = row.max_value
         reading_no = 1
+        formula = ""
 
-        # Trái: 4 < a
-        if left != "*" and lvalue is not None:
-            formula.append(f"({lvalue} {left} reading_{reading_no})")
+        if adv in ("",) or adv.startswith("Trong khoảng"):
+            if min_v is not None and max_v is not None:
+                if min_v > max_v:
+                    errors.append(
+                        f"- {row.specification or '(không tên)'}: "
+                        f"GT tối thiểu phải nhỏ hơn hoặc bằng giá trị tối đa"
+                    )
 
-        # Phải: a < 5
-        if right != "*" and rvalue is not None:
-            formula.append(f"(reading_{reading_no} {right} {rvalue})")
+        if adv == "" and min_v is not None and max_v is not None:
+            adv = "Trong khoảng [a, b]"
 
-        # Gán lại công thức
-        row.acceptance_formula = " and ".join(formula) if formula else ""
+        template = FORMULAS.get(adv)
+        r = f"reading_{reading_no}"
+
+        if template and min_v is not None and max_v is not None:
+            formula = template.format(r=r, min=min_v, max=max_v)
+        elif adv == "Bằng" and min_v is not None:
+            formula = template.format(r=r, min=min_v, max="")
+        elif adv == "" and min_v is not None:
+            formula = f"{r} >= {min_v}"
+        elif adv == "" and max_v is not None:
+            formula = f"{r} <= {max_v}"
+
+
+    if errors:
+        frappe.throw("<br>".join(errors))
+        
+    row.acceptance_formula = formula
