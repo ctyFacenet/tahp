@@ -1,6 +1,9 @@
 body {
-    background-image: url("/assets/tahp/images/bgr.jpg");
-    background-size: cover;        /* phủ hết màn hình */
-    background-position: center;   /* căn giữa ảnh */
-    background-repeat: no-repeat;  /* không lặp lại */
+  background-image: url("/assets/tahp/images/bg_login.jpg");
+  background-size: cover;
+  /* phủ hết màn hình */
+  background-position: center;
+  /* căn giữa ảnh */
+  background-repeat: no-repeat;
+  /* không lặp lại */
 }

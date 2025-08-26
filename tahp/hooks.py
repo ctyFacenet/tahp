@@ -37,6 +37,7 @@ fixtures = [
 # include js, css files in header of desk.html
 app_include_css = [
     "/assets/tahp/css/desk.css",
+    "/assets/tahp/scss/login.bundle.scss",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
