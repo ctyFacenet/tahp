@@ -11,7 +11,7 @@ frappe.ui.form.on('BOM', {
         frm.set_df_property("routing", "only_select", 1);
         frm.set_df_property('custom_category_materials', 'read_only', 1);
 
-        if (frm.doc.docstatus === 0) {
+        if (frm.doc.docstatus === 0 && !frm.doc.custom_category) {
             const doc = await frappe.call('tahp.tahp.doctype.manufacturing_category.manufacturing_category.get');
             let categories = (doc.message.items || []).map(r => r.category).filter(c => c);
             frm.set_df_property('custom_category', 'options', ["\n"].concat(categories));

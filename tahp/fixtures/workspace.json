@@ -1214,7 +1214,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:54:07.359774",
+  "modified": "2025-08-26 08:32:55.091244",
   "module": "CRM",
   "name": "CRM",
   "number_cards": [],
@@ -1331,7 +1331,7 @@
   "hide_custom": 0,
   "icon": "sell",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Selling",
   "links": [
    {
@@ -2361,7 +2361,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:47:34.889486",
+  "modified": "2025-08-26 08:32:55.926411",
   "module": "Selling",
   "name": "Selling",
   "number_cards": [],
@@ -2495,7 +2495,7 @@
   "hide_custom": 0,
   "icon": "buying",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Buying",
   "links": [
    {
@@ -3345,7 +3345,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:47:33.196585",
+  "modified": "2025-08-26 08:32:56.069229",
   "module": "Buying",
   "name": "Buying",
   "number_cards": [],
@@ -3488,7 +3488,7 @@
   "hide_custom": 0,
   "icon": "website",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Website",
   "links": [
    {
@@ -3870,7 +3870,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:30.130467",
+  "modified": "2025-08-26 08:32:55.757662",
   "module": "Website",
   "name": "Website",
   "number_cards": [],
@@ -3979,7 +3979,7 @@
   "hide_custom": 0,
   "icon": "tool",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Tools",
   "links": [
    {
@@ -4541,7 +4541,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:40.269673",
+  "modified": "2025-08-26 08:32:55.543683",
   "module": "Automation",
   "name": "Tools",
   "number_cards": [],
@@ -4633,7 +4633,7 @@
   "hide_custom": 0,
   "icon": "users",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Users",
   "links": [
    {
@@ -4889,7 +4889,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:31.452493",
+  "modified": "2025-08-26 08:32:55.690685",
   "module": "Core",
   "name": "Users",
   "number_cards": [],
@@ -5362,7 +5362,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:54:11.788851",
+  "modified": "2025-08-26 08:32:54.979645",
   "module": "Integrations",
   "name": "Integrations",
   "number_cards": [],
@@ -5393,7 +5393,7 @@
   "hide_custom": 0,
   "icon": "accounting",
   "indicator_color": "",
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Accounting",
   "links": [
    {
@@ -6369,7 +6369,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:47:28.973818",
+  "modified": "2025-08-26 08:32:56.177800",
   "module": "Accounts",
   "name": "Accounting",
   "number_cards": [
@@ -8071,7 +8071,7 @@
   "hide_custom": 0,
   "icon": "assets",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Assets",
   "links": [
    {
@@ -8381,7 +8381,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2024-01-05 17:40:34.570041",
+  "modified": "2025-08-26 08:32:56.278719",
   "module": "Assets",
   "name": "Assets",
   "number_cards": [],
@@ -8481,7 +8481,7 @@
   "hide_custom": 0,
   "icon": "project",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Projects",
   "links": [
    {
@@ -8791,7 +8791,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:35.089753",
+  "modified": "2025-08-26 08:32:55.637406",
   "module": "Projects",
   "name": "Projects",
   "number_cards": [],
@@ -9209,7 +9209,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:54:00.975265",
+  "modified": "2025-08-26 08:32:55.195068",
   "module": "Support",
   "name": "Support",
   "number_cards": [],
@@ -11551,7 +11551,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:53:16.343707",
+  "modified": "2025-08-26 08:32:55.393563",
   "module": "Setup",
   "name": "ERPNext Settings",
   "number_cards": [],
@@ -11968,7 +11968,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:53:45.761306",
+  "modified": "2025-08-26 08:32:55.312695",
   "module": "Accounts",
   "name": "Payables",
   "number_cards": [],
@@ -12388,7 +12388,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:53:49.595011",
+  "modified": "2025-08-26 08:32:55.248132",
   "module": "Accounts",
   "name": "Receivables",
   "number_cards": [],
@@ -12932,7 +12932,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-22 23:51:41.098784",
+  "modified": "2025-08-26 08:32:55.479128",
   "module": "Accounts",
   "name": "Financial Reports",
   "number_cards": [],
@@ -13306,7 +13306,7 @@
   "hide_custom": 0,
   "icon": "tool",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Build",
   "links": [
    {
@@ -13850,7 +13850,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-09 10:48:06.443744",
+  "modified": "2025-08-26 08:32:55.829348",
   "module": "Core",
   "name": "Build",
   "number_cards": [],

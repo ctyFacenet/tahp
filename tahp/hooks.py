@@ -54,6 +54,7 @@ app_include_js = [
     "/assets/tahp/js/work_order/work_order.js",
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
+    "/assets/tahp/js/custom_utils/dynamic_filters.js",
 ]
 
 # include js, css files in header of web template
