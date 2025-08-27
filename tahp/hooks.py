@@ -37,21 +37,15 @@ fixtures = [
 # include js, css files in header of desk.html
 app_include_css = [
     "/assets/tahp/css/desk.css",
+    "/assets/tahp/css/custom.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
-    # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
-    # "/assets/tahp/js/tahp/form/controls/date.js",
+    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
+    "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
-    "/assets/tahp/js/item/item.js",
-    "/assets/tahp/js/stock_entry/stock_entry.js",
-    "/assets/tahp/js/operation/operation.js",
-    "/assets/tahp/js/routing/routing.js",
-    "/assets/tahp/js/bom/bom.js",
-    "/assets/tahp/js/warehouse/warehouse.js",
-    "/assets/tahp/js/work_order/work_order.js",
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
@@ -76,9 +70,21 @@ web_include_css = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+doctype_js = {
+    "Work Order": ["/public/js/work_order/work_order.js"],
+    "Item": ["/public/js/item/item.js"],
+    "Stock Entry": ["/public/js/stock_entry/stock_entry.js"],
+    "Operation": ["/public/js/operation/operation.js"],
+    "Routing": ["/public/js/routing/routing.js"],
+    "BOM": ["/public/js/bom/bom.js"],
+    "Warehouse": ["/public/js/warehouse/warehouse.js"],
+}
+
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"]
 }
@@ -203,6 +209,11 @@ doc_events = {
     "Operation": {
         "before_save": [
             "tahp.doc_events.operation.before_save.before_save"
+        ]
+    },
+    "Work Order": {
+        "before_submit": [
+            "tahp.doc_events.work_order.before_submit.before_submit"
         ]
     }
 }

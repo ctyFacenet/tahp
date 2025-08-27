@@ -1,0 +1,8 @@
+.form-control[data-fieldtype="Small Text"] {
+    min-height: 100px !important;
+    height: 100px !important;
+}
+
+textarea {
+    resize: none !important;
+}

@@ -10,6 +10,12 @@ frappe.ui.form.on('BOM', {
         console.log('refresh')
         frm.set_df_property("routing", "only_select", 1);
         frm.set_df_property('custom_category_materials', 'read_only', 1);
+        frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
+        frm.fields_dict.custom_sub_items.grid.wrapper.find('.btn-open-row').hide();
+        frm.fields_dict.custom_params.grid.wrapper.find('.btn-open-row').hide();
+        frm.fields_dict.custom_params_out.grid.wrapper.find('.btn-open-row').hide();
+        frm.fields_dict.operations.grid.wrapper.find('.btn-open-row').hide();
+
 
         if (frm.doc.docstatus === 0 && !frm.doc.custom_category) {
             const doc = await frappe.call('tahp.tahp.doctype.manufacturing_category.manufacturing_category.get');
@@ -68,6 +74,49 @@ frappe.ui.form.on('BOM', {
     }
 });
 
+frappe.ui.form.on('BOM Item', {
+    item_code: async function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        if (!row.item_code) {
+            frappe.model.set_value(cdt, cdn, "source_warehouse", null);
+            return;
+        }
+        if (row.source_warehouse) return;
+        let { message } = await frappe.db.get_value("Item", row.item_code, "item_group");
+        if (!message || !message.item_group) return;
+
+        let item_group = message.item_group;
+        let group_doc = await frappe.db.get_doc("Item Group", item_group);
+        if (group_doc.item_group_defaults && group_doc.item_group_defaults.length > 0) {
+            let warehouse = group_doc.item_group_defaults[0].default_warehouse;
+            frappe.model.set_value(cdt, cdn, "source_warehouse", warehouse);
+        }
+    },
+    items_add(frm, cdt, cdn) {
+        frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
+    }
+})
+
+frappe.ui.form.on('BOM Sub Items', {
+    custom_sub_items_add(frm, cdt, cdn) {
+        frm.fields_dict.custom_sub_items.grid.wrapper.find('.btn-open-row').hide();
+    }    
+})
+
+frappe.ui.form.on('Item Quality Inspection Parameter', {
+    custom_params_add(frm, cdt, cdn) {
+        frm.fields_dict.custom_params.grid.wrapper.find('.btn-open-row').hide();
+    },
+    custom_params_out_add(frm, cdt, cdn) {
+        frm.fields_dict.custom_params_out.grid.wrapper.find('.btn-open-row').hide();
+    },    
+})
+
+frappe.ui.form.on('BOM Operation', {
+    operations_add(frm, cdt, cdn) {
+        frm.fields_dict.operations.grid.wrapper.find('.btn-open-row').hide();
+    },  
+})
 
 async function fill_params(frm, template_field, table_field) {
     frm.clear_table(table_field);

@@ -1,9 +1,12 @@
 frappe.ui.form.on('Work Order', {
     refresh: async function(frm) {
         await toggle_qc_tracking(frm);
+        frm.set_intro("");
     },
     custom_is_qc_tracked: async function(frm) {
         await toggle_qc_tracking(frm);
+    },
+    production_item: async function(frm) {
     }
 });
 
@@ -19,7 +22,6 @@ frappe.ui.form.on('Work Order Operation', {
         }
     }
 })
-
 
 async function toggle_qc_tracking(frm) {
     if (!frm.doc.custom_is_qc_tracked) {
