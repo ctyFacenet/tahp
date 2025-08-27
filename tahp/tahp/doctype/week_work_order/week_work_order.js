@@ -125,8 +125,10 @@ frappe.ui.form.on('Week Work Order', {
         
         if (frm.doc.workflow_state === "Đã được PTCN duyệt" && frm.selected_workflow_action === "Gửi GĐ") {
             frappe.dom.unfreeze();
+            console.log('check wwo')
             // const ok = true;
-            let res = await frappe.call({ method: "check_wwo", args: { detail: frm.doc.items } });
+            let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
+            console.log('res', res)
             const { ok, messages } = res;
             if (!ok) {
                 const table = missing_material(messages);

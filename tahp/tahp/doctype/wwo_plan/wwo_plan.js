@@ -16,7 +16,7 @@ frappe.ui.form.on('WWO Plan', {
     refresh: async function(frm) {
         console.log('refresh123')
         setup_ui(frm);
-        const response = await frappe.call({method: 'wwo_plan', args:{plan: frm.doc.name}});
+        const response = await frappe.call({method: 'tahp.api.wwo_plan', args:{plan: frm.doc.name}});
         await generate_data(frm, response.message);
     },
     workflow_state: function(frm) {
@@ -26,6 +26,7 @@ frappe.ui.form.on('WWO Plan', {
 
 frappe.ui.form.on('WWO Plan Item', {
     form_render: function(frm, cdt, cdn) {
+        console.log('form_render')
         const row = locals[cdt][cdn];
 
         // Đổi các field thành link
@@ -216,6 +217,7 @@ function setup_hook(frm) {
 }
 
 function generate_data(frm, week) {
+    
     if (frm.doc.docstatus !== 0) {
         setup_hook(frm);
         return;
@@ -224,6 +226,7 @@ function generate_data(frm, week) {
         frappe.model.clear_table(frm.doc, 'items');
         week.forEach(week => {
             week.items.forEach((row, index) => {
+                console.log('row', row)
                 frm.add_child('items', {
                     wwo: index === 0 ? week.name : "",
                     approved: index === 0 ? week.workflow_state : "",
@@ -242,8 +245,10 @@ function generate_data(frm, week) {
 }
 
 async function setup_button(frm) {
+    console.log('setup_button', window.innerWidth)
     if (window.innerWidth <= 768) return;
-    if (!frappe.user_roles.includes("Giám đốc")) return;
+    if (!frappe.user_roles.includes("Giám đốc")) {
+        return};
     const $wrapper = frm.fields_dict.items.grid.wrapper;
 
     $('[data-fieldname="approved"]').addClass('d-flex justify-content-center align-items-center p-0');
@@ -251,6 +256,7 @@ async function setup_button(frm) {
     $wrapper.find('[data-fieldname="approved"]').each(function () {
         const $cell = $(this);
         const cellValue = $cell.find('.static-area').text().trim();
+        console.log('cellValue', cellValue)
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
         if (cellValue === "Đợi GĐ duyệt") {
