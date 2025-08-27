@@ -38,11 +38,15 @@ fixtures = [
 app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/scss/login.bundle.scss",
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+    "/assets/tahp/css/landing_page.css"
+
+
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
+     "/assets/tahp/js/landing_page.js",
     # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     # "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
@@ -59,7 +63,8 @@ app_include_js = [
 # include js, css files in header of web template
 # web_include_css = "/assets/tahp/css/tahp.css"
 web_include_css = [
-    "/assets/tahp/css/web.css"
+    "/assets/tahp/css/web.css",
+    "/assets/tahp/css/landing_page.css"
 ]
 # web_include_js = "/assets/tahp/js/tahp.js"
 
@@ -71,7 +76,9 @@ web_include_css = [
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-# page_js = {"page" : "public/js/file.js"}
+# page_js = {
+#     "modern-menu": "public/js/modern_menu.js"
+# }
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -311,4 +318,16 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+
+# Website landing page sau khi login
+website_route_rules = [
+    {"from_route": "/landingpage", "to_route": "landingpage"}
+]
+
+# Load JS + CSS
+web_include_js = ["/assets/tahp/js/landing_page.js"]
+
+# Chuyển hướng sau login
+get_home_page = "tahp.overrides.desk.get_home_page"
 
