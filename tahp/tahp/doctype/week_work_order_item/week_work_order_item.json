@@ -36,6 +36,7 @@
   },
   {
    "columns": 1,
+   "fetch_from": "item.stock_uom",
    "fieldname": "uom",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -55,14 +56,18 @@
    "fieldname": "pl_qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "SL l\u00ean l\u1ecbch"
+   "is_virtual": 1,
+   "label": "SL l\u00ean l\u1ecbch",
+   "read_only": 1
   },
   {
    "columns": 1,
    "fieldname": "got_qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "SL \u0111\u00e3 sx"
+   "is_virtual": 1,
+   "label": "SL \u0111\u00e3 sx",
+   "read_only": 1
   },
   {
    "columns": 1,
@@ -92,7 +97,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-21 15:28:56.541155",
+ "modified": "2025-08-21 16:57:59.940918",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order Item",

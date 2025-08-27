@@ -81,12 +81,9 @@ doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"]
 }
 
-# doctype_js = {
-#     "ToDo": [
-#         "public/js/to_do.js",
-#         "public/js/to_do_2.js"
-#     ]
-# }
+doctype_js = {
+    "Week Work Order": "./public/js/week work order/week_work_order_list.js"
+}
 
 # Svg Icons
 # ------------------
