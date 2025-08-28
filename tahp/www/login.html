@@ -81,7 +81,7 @@
           </form>
           <div class="social-logins text-center">
             {% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
-            <p class="text-muted login-divider" style="margin-top: 15px">{{ _("hoặc") }}</p>
+            <p class="login-divider" style="margin-top: 15px; color: #fff">{{ _("hoặc") }}</p>
             {% endif %}
             <div class="social-login-buttons">
               {% for provider in provider_logins %}

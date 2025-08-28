@@ -10,48 +10,34 @@ frappe.pages['modern-menu'].on_page_load = function (wrapper) {
 
 frappe.modern_menu = {
   make(page) {
-    // Get all items from side menu
+    // Lấy toàn bộ workspace
     let all_pages = frappe.workspaces;
 
-    // Create the HTML
-    let body = ``;
-    body += `<div id="modern-menu" class="widget-group">
-				<div class="widget-group-head">
-					<div class="widget-group-title"></div>
-				</div>
-				<div class="widget-group-body grid-col-3">
-		`;
-
+    // Tạo grid container
+    let body = `<div id="modern-menu" class="menu-grid">`;
 
     Object.values(all_pages)
-      .filter((page) => (page.parent_page == ""))
+      .filter((page) => page.parent_page == "")
       .forEach((item) => {
         body += `
-			<div
-			class="widget widget-shadow desk-sidebar-item standard-sidebar-item menu-widget no-click" 
-			data-widget-name="${item.title}">
-			<div class="widget-head">
-				<a class="widget-title" href="/app/${item.public
+          <div class="menu-card">
+            <a href="/app/${item.public
             ? frappe.router.slug(item.title)
-            : "private/" + frappe.router.slug(item.title)
-          }" >
-					<span class="widget-title-icon" item-icon=${item.icon || "folder-normal"}>
-					${item.public
-            ? frappe.utils.icon(item.icon || "folder-normal", "md")
-            : `<span class="indicator ${item.indicator_color}"></span>`
-          }
-					</span>
-					<span class="widget-title-text">${__(item.title)}</span>
-				</a>
+            : "private/" + frappe.router.slug(item.title)}">
+              <div class="menu-icon">
+                ${item.public
+            ? frappe.utils.icon(item.icon || "folder-normal", "lg")
+            : `<span class="indicator ${item.indicator_color}"></span>`}
+              </div>
+              <div class="menu-title">${__(item.title)}</div>
+              <div class="menu-subtitle">${item.subtitle || ""}</div>
+            </a>
+          </div>
+        `;
+      });
 
-				
-			</div>	
-		</div>
-		`;
-      })
-    body += `</div></div>`
+    body += `</div>`;
 
-    // Append it to the page
-    $(frappe.render_template(body, this)).appendTo(page.main);
+    $(body).appendTo(page.main);
   }
 }

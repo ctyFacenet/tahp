@@ -1,26 +1,142 @@
-.no-click {
-  cursor: default !important;
+#modern-menu.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 20px;
 }
 
-.hide-side-section {
-  display: none !important;
+/* Tablet */
+@media (max-width: 1024px) {
+  #modern-menu.menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cột */
+  }
 }
 
-.widget.menu-widget {
-  background-color: #d4daf9;
-  margin: 20px;
+/* Mobile */
+@media (max-width: 600px) {
+  #modern-menu.menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cột thay vì 1 */
+    gap: 15px;
+    /* giảm khoảng cách cho gọn */
+  }
 }
 
-.widget-title .widget-title-text {
-  text-decoration: underline;
-  font-weight: 800;
+
+/* Card */
+.menu-card {
+  background-color: #a9dcf6;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  /* thêm smooth */
+  cursor: pointer;
 }
 
-.menu-widget:hover .widget-title .widget-title-text {
-  color: var(--gray-100);
+.menu-card:hover {
+  background-color: #7bc8f2;
+  transform: scale(1.05);
+  /* phóng to 5% khi hover */
+  box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Link bên trong card */
+.menu-card a {
   text-decoration: none;
+  color: inherit;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.menu-open-btn {
-  margin-right: var(--margin-sm);
+/* Icon nền tròn trắng */
+.menu-icon {
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.menu-icon svg {
+  width: 36px;
+  height: 36px;
+  color: #007bff;
+  /* màu icon */
+}
+
+.menu-card:hover .menu-icon svg {
+  transform: scale(1.15);
+  /* icon cũng to nhẹ theo */
+}
+
+/* Title */
+.menu-card .menu-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+/* Subtitle */
+.menu-card .menu-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+#modern-menu .widget-group-body {
+  display: grid;
+  gap: 20px;
+  /* Tự động chia cột theo độ rộng màn hình */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Card */
+.menu-widget {
+  background-color: #d4daf9;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  min-height: 200px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover */
+.menu-widget:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+/* Icon */
+.menu-widget .widget-title-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: #003366;
+}
+
+/* Title */
+.menu-widget .widget-title-text {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+/* Subtitle */
+.menu-widget .widget-subtitle {
+  font-size: 14px;
+  color: #333;
 }
