@@ -1,3 +1,12 @@
+/* Ẩn toàn bộ header cho modern-menu */
+body[data-route="modern-menu"] .page-head {
+  display: none !important;
+}
+
+body[data-route="modern-menu"] .workspace-navbar {
+  display: none !important;
+}
+
 #modern-menu.menu-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

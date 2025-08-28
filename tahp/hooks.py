@@ -107,7 +107,7 @@ doctype_list_js = {
 # ----------
 
 # application home page (will override Website Settings)
-# home_page = "login"
+# home_page = "modern-menu"
 
 # website user home page (by Role)
 # role_home_page = {
@@ -254,7 +254,7 @@ doc_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	 "frappe.core.doctype.user.user.switch_theme": "tahp.overrides.switch_theme.switch_theme"
+	 "frappe.core.doctype.user.user.switch_theme": "tahp.overrides.switch_theme.switch_theme",
 }
 #
 # each overriding function accepts a `data` argument;
