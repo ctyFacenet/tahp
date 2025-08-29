@@ -99,7 +99,7 @@ body .container {
   }
 
   .workspace-navbar {
-    display: block !important;
+    display: none !important;
   }
 }
 

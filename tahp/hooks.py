@@ -40,7 +40,8 @@ app_include_css = [
     "/assets/tahp/scss/login.bundle.scss",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
     "/assets/tahp/css/menu.css",
-    "/assets/tahp/css/theme.css"
+    "/assets/tahp/css/theme.css",
+    "/assets/tahp/css/custom_workspace.css"
 
 
 ]

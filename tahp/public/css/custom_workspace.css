@@ -1,0 +1,82 @@
+/* Ẩn toàn bộ workspace navbar & page-head */
+.workspace-navbar {
+  display: none !important;
+}
+
+.page-head {
+  display: none !important;
+}
+
+.ce-block {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  /* khoảng cách dọc giữa các card */
+  margin-right: 10px;
+  /* khoảng cách ngang */
+  margin-left: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover effect */
+.ce-block:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+.widget.links-widget-box a {
+  display: block;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+/* Ẩn icon mặc định */
+.widget .es-icon {
+  display: none !important;
+}
+
+.widget a::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  margin-right: 8px;
+  align-self: center;
+}
+
+
+
+.widget.links-widget-box a:hover {
+  color: #007bff;
+}
+
+/* Desktop: 3 cột */
+@media (min-width: 992px) {
+  .workspace .col-md-4 {
+    flex: 0 0 calc(33.333% - 20px);
+    max-width: calc(33.333% - 20px);
+  }
+}
+
+/* Tablet: 2 cột */
+@media (min-width: 768px) and (max-width: 991px) {
+  .workspace .col-sm-6 {
+    flex: 0 0 calc(50% - 20px);
+    max-width: calc(50% - 20px);
+  }
+}
+
+/* Mobile: 1 cột */
+@media (max-width: 767px) {
+  .workspace .col-xs-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
