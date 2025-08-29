@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-28 13:56:09.371149",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "workstation",
+  "status",
+  "action"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Thi\u1ebft b\u1ecb",
+   "options": "Workstation",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "S\u1eb5n s\u00e0ng\n\u0110ang v\u1eadn h\u00e0nh\n\u0110ang h\u1ecfng\n\u0110ang b\u1ea3o tr\u00ec",
+   "read_only": 1
+  },
+  {
+   "columns": 8,
+   "fieldname": "action",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Thao t\u00e1c",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-29 11:06:28.651517",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Job Card Workstation",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

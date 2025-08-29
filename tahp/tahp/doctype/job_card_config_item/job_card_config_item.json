@@ -1,0 +1,58 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-28 14:27:50.588559",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_time",
+  "config_name",
+  "config_value",
+  "workstation"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Ghi nh\u1eadn",
+   "read_only": 1
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Thi\u1ebft b\u1ecb",
+   "read_only": 1
+  },
+  {
+   "fieldname": "config_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Gi\u00e1 tr\u1ecb c\u1ea5u h\u00ecnh",
+   "read_only": 1
+  },
+  {
+   "fieldname": "config_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean c\u1ea5u h\u00ecnh",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-29 11:22:18.089862",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Job Card Config Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

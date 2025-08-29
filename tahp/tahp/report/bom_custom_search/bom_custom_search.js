@@ -122,7 +122,7 @@ function mergeGroup(cells, color, label) {
     if (!cells.length) return;
     const totalWidth = cells.reduce((sum, c) => sum + parseInt($(c).css('width')), 0);
     const first = cells[0];
-    first.css({ width: totalWidth + 6 + 'px', 'background-color': color, 'text-align': 'center' }).text(label);
+    first.css({ width: totalWidth + 2 + 'px', 'background-color': color, 'text-align': 'center' }).text(label);
 
     for (let i = 1; i < cells.length; i++) {
         const $cell = cells[i], $parent = $cell.closest('.dt-cell');

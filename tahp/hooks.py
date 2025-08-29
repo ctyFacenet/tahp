@@ -79,6 +79,8 @@ doctype_js = {
     "Routing": ["/public/js/routing/routing.js"],
     "BOM": ["/public/js/bom/bom.js"],
     "Warehouse": ["/public/js/warehouse/warehouse.js"],
+    "Job Card": ["/public/js/job_card/job_card.js"],
+    "Employee": ["/public/js/employee/employee.js"],
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -183,6 +185,10 @@ after_install = "tahp.setup.setup_website"
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
+override_doctype_class = {
+	"Employee": "tahp.overrides.employee.Employee"
+}
+
 # Document Events
 # ---------------
 # Hook on document methods and events
@@ -215,7 +221,17 @@ doc_events = {
         "before_submit": [
             "tahp.doc_events.work_order.before_submit.before_submit"
         ]
-    }
+    },
+    "Workstation": {
+        "before_save": [
+            "tahp.doc_events.workstation.before_save.before_save"
+        ]
+    },
+    "Job Card": {
+        "after_insert": [
+            "tahp.doc_events.job_card.after_insert.after_insert"
+        ]
+    },
 }
 
 # doc_events = {

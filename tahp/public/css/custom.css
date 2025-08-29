@@ -6,3 +6,10 @@
 textarea {
     resize: none !important;
 }
+
+@media (max-width: 768px) {
+  .modal-content .form-grid-container .form-grid {
+    width: 100%;
+    min-width: unset;
+  }
+}

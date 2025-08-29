@@ -7633,7 +7633,7 @@ Company Contact Person,Company Contact Person
 Company Description,Company Description
 Company Description for website homepage,Company Description for website homepage
 Company Details,Company Details
-Company Email,Company Email
+Company Email,Email công ty
 Company Logo,Company Logo
 Company Name cannot be Company,Company Name cannot be Company
 Company Not Linked,Company Not Linked
@@ -8499,7 +8499,7 @@ Employee Group Table,Employee Group Table
 Employee ID,Employee ID
 Employee Internal Work History,Employee Internal Work History
 Employee Name,Employee Name
-Employee Number,Employee Number
+Employee Number,Mã nhân viên chính thức
 Employee User Id,Employee User Id
 Employee cannot report to himself.,Employee cannot report to himself.
 Employee is required while issuing Asset {0},Employee is required while issuing Asset {0}

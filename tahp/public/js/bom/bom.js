@@ -8,7 +8,6 @@ frappe.ui.form.on('BOM', {
 
     refresh: async function(frm) {
         console.log('refresh')
-        frm.set_df_property("routing", "only_select", 1);
         frm.set_df_property('custom_category_materials', 'read_only', 1);
         frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_sub_items.grid.wrapper.find('.btn-open-row').hide();
@@ -115,7 +114,10 @@ frappe.ui.form.on('Item Quality Inspection Parameter', {
 frappe.ui.form.on('BOM Operation', {
     operations_add(frm, cdt, cdn) {
         frm.fields_dict.operations.grid.wrapper.find('.btn-open-row').hide();
-    },  
+    },
+    operation(frm, cdt, cdn) {
+        if (frm.doc.doctype !== "BOM") return;
+    }
 })
 
 async function fill_params(frm, template_field, table_field) {
@@ -137,3 +139,13 @@ async function fill_params(frm, template_field, table_field) {
     frm.refresh_field(table_field);
     frm.refresh_field(template_field);
 }
+
+erpnext.bom.calculate_total = function (doc) {
+    if (cur_frm && cur_frm.doctype !== 'BOM') return;
+	var total_cost = flt(doc.operating_cost) + flt(doc.raw_material_cost) - flt(doc.scrap_material_cost);
+	var base_total_cost =
+		flt(doc.base_operating_cost) + flt(doc.base_raw_material_cost) - flt(doc.base_scrap_material_cost);
+
+	cur_frm.set_value("total_cost", total_cost);
+	cur_frm.set_value("base_total_cost", base_total_cost);
+};
