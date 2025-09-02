@@ -7,7 +7,9 @@
  "engine": "InnoDB",
  "field_order": [
   "config_name",
-  "config_value"
+  "unit",
+  "config_value",
+  "workstation"
  ],
  "fields": [
   {
@@ -19,19 +21,34 @@
    "read_only": 1
   },
   {
-   "columns": 9,
+   "columns": 1,
    "fieldname": "config_value",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Gi\u00e1 tr\u1ecb",
    "read_only": 1
+  },
+  {
+   "columns": 7,
+   "fieldname": "workstation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Thi\u1ebft b\u1ecb",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-28 14:14:52.430318",
+ "modified": "2025-09-01 00:43:28.240763",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Config",

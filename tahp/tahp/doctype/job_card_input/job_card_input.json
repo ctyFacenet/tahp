@@ -9,9 +9,11 @@
   "item_code",
   "item_name",
   "qty",
+  "uom",
   "meter",
+  "meter_out",
   "action",
-  "c\u00f4ng_t\u01a1_m\u00e9t",
+  "is_meter",
   "unit_per_reading"
  ],
  "fields": [
@@ -55,27 +57,43 @@
    "fieldname": "action",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Thao t\u00e1c"
-  },
-  {
-   "default": "0",
-   "fetch_from": "item_code.custom_is_meter",
-   "fieldname": "c\u00f4ng_t\u01a1_m\u00e9t",
-   "fieldtype": "Check",
-   "label": "C\u00f4ng t\u01a1 m\u00e9t?"
+   "label": "Thao t\u00e1c",
+   "read_only": 1
   },
   {
    "fetch_from": "item_code.custom_unit_per_reading",
    "fieldname": "unit_per_reading",
    "fieldtype": "Float",
    "label": "\u0110\u01a1n v\u1ecb tr\u00ean m\u1ed7i c\u00f4ng t\u01a1"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "item_code.custom_is_meter",
+   "fieldname": "is_meter",
+   "fieldtype": "Check",
+   "label": "C\u00f4ng t\u01a1 m\u00e9t?"
+  },
+  {
+   "columns": 1,
+   "fieldname": "meter_out",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ed1 c\u00f4ng t\u01a1 sau",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-28 14:14:45.080412",
+ "modified": "2025-09-02 22:23:38.331619",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Input",

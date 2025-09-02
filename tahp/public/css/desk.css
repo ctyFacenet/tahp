@@ -9,6 +9,19 @@ body .container {
     border: none;
 }
 
+.mobile_container {
+    gap: 15px;
+}
+
+.mobile_container .btn,
+.mobile_container .btn:focus,
+.mobile_container .btn:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
 .navbar-home img {
     max-height: 45px;
 }
@@ -17,6 +30,14 @@ body .container {
     color: white;
     font-weight: bold;
     font-size: 1.5rem;
+}
+
+.fa-bell:hover,
+.btn-log-out:hover,
+.btn-back:hover,
+.navbar-title:hover {
+	color: rgb(219, 219, 219);
+    text-decoration: none;
 }
 
 .btn-back {
@@ -35,12 +56,6 @@ body .container {
 	color: white;
 	font-weight: bold;
 	font-size: 2rem;
-}
-
-.btn-back:hover {
-	color: rgba(255, 255, 255, 0.781);
-	text-decoration: none;
-	box-shadow: none;
 }
 
 .fa-bell {

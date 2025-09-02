@@ -30,7 +30,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Tr\u1ea1ng th\u00e1i",
-   "options": "S\u1eb5n s\u00e0ng\n\u0110ang v\u1eadn h\u00e0nh\n\u0110ang h\u1ecfng\n\u0110ang b\u1ea3o tr\u00ec",
+   "options": "S\u1eb5n s\u00e0ng\nCh\u1ea1y\nD\u1eebng\nH\u1ecfng\nB\u1eadn",
    "read_only": 1
   }
  ],
@@ -38,7 +38,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-29 10:57:42.365556",
+ "modified": "2025-09-01 21:00:53.742208",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Workstation Item",

@@ -1,4 +1,7 @@
 import frappe
+import uuid
+from tahp.utils.qr_code import generate_qr
+import base64
 
 def before_save(doc, method):
     if doc.custom_is_parent:
@@ -14,4 +17,9 @@ def before_save(doc, method):
                 if child_doc.status != doc.status:
                     child_doc.status = doc.status
                     child_doc.save(ignore_permissions=True)
+
+    if not doc.custom_qr:
+        random_str = str(uuid.uuid4())
+        doc.custom_qr = random_str
+        
 

@@ -38,6 +38,7 @@ fixtures = [
 app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
+    "/assets/tahp/css/job_card.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
@@ -81,6 +82,7 @@ doctype_js = {
     "Warehouse": ["/public/js/warehouse/warehouse.js"],
     "Job Card": ["/public/js/job_card/job_card.js"],
     "Employee": ["/public/js/employee/employee.js"],
+    "Workstation": ["/public/js/workstation/workstation.js"]
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -220,6 +222,9 @@ doc_events = {
     "Work Order": {
         "before_submit": [
             "tahp.doc_events.work_order.before_submit.before_submit"
+        ],
+        "before_save": [
+            "tahp.doc_events.work_order.before_save.before_save"
         ]
     },
     "Workstation": {

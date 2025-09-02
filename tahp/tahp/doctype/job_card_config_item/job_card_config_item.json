@@ -8,6 +8,7 @@
  "field_order": [
   "from_time",
   "config_name",
+  "unit",
   "config_value",
   "workstation"
  ],
@@ -39,13 +40,20 @@
    "in_list_view": 1,
    "label": "T\u00ean c\u1ea5u h\u00ecnh",
    "read_only": 1
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-29 11:22:18.089862",
+ "modified": "2025-09-01 00:43:48.014152",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Config Item",

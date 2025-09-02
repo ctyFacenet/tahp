@@ -133,7 +133,6 @@ frappe.ui.form.ControlLink = class ControlLink extends frappe.ui.form.ControlDat
     translate_and_set_input_value(link_title, value) {
         let translated_link_text = this.get_translated(link_title);
         this.title_value_map[translated_link_text] = value;
-        console.log(translated_link_text)
         this.set_input_value(translated_link_text);
     }
     parse_validate_and_set_in_model(value, e, label) {
@@ -159,7 +158,6 @@ frappe.ui.form.ControlLink = class ControlLink extends frappe.ui.form.ControlDat
         return this.$input ? this.$input.val() : "";
     }
     set_input_value(value) {
-        console.log(value)
         this.$input && this.$input.val(value);
     }
     open_advanced_search() {

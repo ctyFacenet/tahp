@@ -27,6 +27,10 @@ frappe.ui.toolbar.Toolbar = class {
 	make() {
 		this.bind_events();
 		$(document).trigger("toolbar_setup");
+		$(".btn-back-mobile").off("click").on("click", () => {
+			if (location.pathname === "/app/home") return;
+			window.history.back();
+		});
 	}
 
 	bind_events() {
@@ -131,7 +135,11 @@ frappe.ui.toolbar.Toolbar = class {
 			}
 
 			$(".dropdown-help .dropdown-menu").on("click", "a", show_results);
-			$(".navbar-title").text(__(frappe.get_route_str().split('/')[1]));
+			// $(".navbar-title").text(__(frappe.get_route_str().split('/')[1]));
+			let doctype_text = frappe.get_route_str().split('/')[1]; // "Work Order"
+			let doctype_slug = doctype_text.toLowerCase().replace(/\s+/g, '-');
+			$(".navbar-title").text(__(doctype_text)).attr("href", "/app/" + doctype_slug);
+
 
 			let current_workspace_name = frappe.get_route_str().split('/')[1] || '';
 

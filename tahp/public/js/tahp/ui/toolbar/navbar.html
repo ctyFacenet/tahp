@@ -1,28 +1,31 @@
 <div class="sticky-top">
 	<header class="navbar navbar-expand my-navbar" role="navigation">
 		<div class="container">
-			<a class="navbar-brand navbar-home" href="/app">
-				<img
-					class="app-logo"
-					src="{{ frappe.boot.app_logo_url }}"
-					alt="{{ __("App Logo") }}"
-				>
-			</a>
-			
-			<div class="d-flex align-items-center">
-				<!-- Nút back -->
-				<button 
-					type="button" 
-					class="btn-back mr-2" 
-					onclick="window.history.back();"
-				>
+			<div class="mobile_container d-flex align-items-center d-block d-md-none" style="color:white !important;">
+				<button class="btn btn-reset sidebar-toggle-btn" style="padding-left:0px;">
+					<i class="fas fa-bars fa-2x" style="color:white !important;"></i>
+				</button>
+				<a class="btn btn-back-mobile">
+					<i class="fa fa-arrow-left fa-2x" style="color:white !important;"></i>
+				</a>
+				<a class="btn btn-link" href="/app">
+					<i class="fa fa-house fa-2x" style="color:white !important;"></i>
+				</a>
+			</div>
+			<div class="desktop_container d-none d-md-flex align-items-center">
+				<a class="navbar-brand navbar-home " href="/app">
+					<img
+						class="app-logo"
+						src="{{ frappe.boot.app_logo_url }}"
+						alt="{{ __("App Logo") }}"
+					>
+				</a>
+				<button type="button" class="btn-back mr-2" onclick="window.history.back();">
 					<i class="fa-solid fa-angle-left"></i>
 				</button>
-
-				<!-- Header hiện tại -->
-				<h5 class="m-0 navbar-title">
-					{{ frappe.breadcrumbs.current_title || __("Home") }}
-				</h5>
+				<a class="m-0 navbar-title" href="#">
+					{{ frappe.breadcrumbs.current_title || "Home" }}
+				</a>
 			</div>
 			<div class="collapse navbar-collapse justify-content-end">
 				<form class="form-inline fill-width justify-content-end" role="search" onsubmit="return false;">
@@ -36,6 +39,13 @@
 							{%= __("Impersonating {0}", [frappe.boot.user.name]) %}
 						</span>
 					{% } %}
+					<style>
+						@media (max-width: 768px) {
+						.search-bar {
+							display: none !important;
+						}
+						}
+					</style>
 					<div class="input-group search-bar text-muted hidden">
 						<input
 							id="navbar-search"
@@ -118,7 +128,7 @@
 							{% endfor %}
 						</div>
 					</li>
-					<li class="nav-item dropdown dropdown-navbar-user dropdown-mobile">
+					<li class="nav-item dropdown dropdown-navbar-user dropdown-mobile dropdown-logout">
 						<button 
 							type="button" 
 							class="btn-log-out" 
