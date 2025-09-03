@@ -58,7 +58,7 @@
                 src="/assets/tahp/images/Vietnam-flag.jpg" alt="Flag">
 
               <span class="d-flex align-items-center" style="color:#fff; gap: 4px;">
-                <span id="lang-label">Tiếng Việt</span>
+                <span id="lang-label" style="font-size: 18px; font-weight: 500;">Tiếng Việt</span>
                 <svg class="es-icon icon-xs">
                   <use href="#es-line-down"></use>
                 </svg>
@@ -85,7 +85,8 @@
 
           <li class="nav-item dropdown dropdown-navbar-user dropdown-mobile">
             <button class="btn-reset nav-link" data-toggle="dropdown" aria-label="{{ __(" User Menu") }}">
-              {{ avatar }}
+              <i class="fa-solid fa-user"></i>
+
             </button>
             <div class="dropdown-menu dropdown-menu-right" id="toolbar-user" role="menu">
               {% for item in navbar_settings.settings_dropdown %}
@@ -160,7 +161,7 @@
     </div>
   </div>
   {% endif %}
-   <div class="workspace-navbar d-none">
+  <div class="workspace-navbar d-none">
     <div class="container d-flex overflow-auto"></div>
   </div>
 </div>
