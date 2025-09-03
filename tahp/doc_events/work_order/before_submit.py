@@ -4,6 +4,7 @@ def before_submit(doc, method):
     check_shift_leader(doc)
     check_workstation(doc)
     warn_workstation(doc)
+    doc.status = "In Process"
 
 def check_shift_leader(doc):
     if doc.custom_shift_leader:
@@ -125,7 +126,7 @@ def warn_workstation(doc):
         frappe.msgprint(
             msg_html,
             indicator="orange",
-            title="Phát hiện các thiết bị con đang không sử dụng được"
+            title="Bắt đầu sản xuất, lưu ý các thiết bị sau không sử dụng được"
         )
 
 @frappe.whitelist()
@@ -134,6 +135,77 @@ def check_status(work_order):
     if work_order_doc.docstatus != 1: return False
 
     job_cards = frappe.db.get_all("Job Card", filters={"work_order": work_order_doc.name, "docstatus":1})
-    if len(job_cards):
+    if len(job_cards) == len(work_order_doc.operations):
         return True
     return False
+
+@frappe.whitelist()
+def add_input(work_order):
+    """
+    Lấy danh sách input từ Job Card đã submit thuộc work_order,
+    qty > 0, gán warehouse dựa theo item group defaults.
+    """
+    if not work_order:
+        frappe.throw("Work Order không được để trống")
+
+    job_cards = frappe.get_all(
+        "Job Card",
+        filters={"docstatus": 1, "work_order": work_order},
+        fields=["name"]
+    )
+
+    result = []
+
+    for jc in job_cards:
+        doc = frappe.get_doc("Job Card", jc.name)
+        for row in doc.custom_input_table:
+            if row.qty and row.qty > 0:
+                item_group = frappe.db.get_value("Item", row.item_code, "item_group")
+                warehouse = frappe.db.get_value(
+                    "Item Default",
+                    {"parent": item_group},
+                    "default_warehouse"
+                )
+                result.append({
+                    "item_code": row.item_code,
+                    "item_name": row.item_name,
+                    "qty": row.qty,
+                    "uom": row.uom,
+                    "s_warehouse": warehouse,
+                    "description": "Phụ gia tiêu hao trong công đoạn sản xuất"
+                })
+
+    return result
+
+@frappe.whitelist()
+def get_shift_progress():
+    """
+    Trả về danh sách LSX Ca chưa hoàn tất, mới nhất lên trước
+    """
+    shifts = frappe.db.get_all("Work Order",
+        filters=[["status", "in", ["Draft", "In Process"]]],
+        fields=["name", "status", "custom_shift_leader", "custom_shift"],  # bỏ work_order
+        order_by="creation desc"
+    )
+
+    result = []
+    for shift in shifts:
+        job_cards = frappe.db.get_all("Job Card", filters={"work_order": shift.name}, fields=["name", "docstatus", "work_order"])
+        shift_leader = frappe.db.get_value("Employee", shift.custom_shift_leader, ["employee_name"])
+        wo = frappe.get_doc("Work Order", shift.name)
+        total_ops = len(wo.operations)
+        completed_ops = 0
+        for jc in job_cards:
+            if jc.docstatus == 1:
+                completed_ops += 1
+
+        result.append({
+            "lsx_ca": shift.name,
+            "status": "Đang thực hiện" if shift.status == "In Process" else "Nháp",
+            "shift_leader": f"{shift.custom_shift_leader}: {shift_leader}",
+            "shift": shift.custom_shift,
+            "progress": f"{completed_ops}/{total_ops}" if total_ops else "",
+            "handover_record": ""
+        })
+
+    return result

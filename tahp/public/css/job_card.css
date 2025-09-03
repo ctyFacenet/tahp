@@ -125,6 +125,16 @@
     }
 }
 
+@media (max-width: 768px) {  /* chỉ áp dụng từ tablet/desktop trở lên */
+    .responsive-col {
+        border: 1px solid #adadad;
+        padding: 20px;
+        border-radius: 10px;
+    }
+}
+
+
+
 .jc-btn {
     transition: transform 0.1s ease;
 }

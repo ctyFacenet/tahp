@@ -87,7 +87,13 @@ async function finish_button(frm) {
     const response = await frappe.call({method: "tahp.doc_events.work_order.before_submit.check_status", args: {work_order: frm.doc.name}})
     if (response.message) {
         frm.add_custom_button(__('Hoàn thành'), async function () {
-
+            const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
+                work_order_id: frm.doc.name,
+                purpose: "Manufacture",
+                qty: frm.doc.qty
+            });
+            frappe.model.sync(stock_entry);
+            frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
         }).addClass('btn-primary')
     }
 }

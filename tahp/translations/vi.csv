@@ -3606,7 +3606,7 @@ Old Password,Old Password
 Old and new fieldnames are same.,Old and new fieldnames are same.
 Older backups will be automatically deleted,Older backups will be automatically deleted
 Oldest Unscheduled Job,Oldest Unscheduled Job
-On Hold,On Hold
+On Hold,Đang dừng
 On Payment Authorization,On Payment Authorization
 "On checking this option, URL will be treated like a jinja template string","On checking this option, URL will be treated like a jinja template string"
 On or After,On or After
@@ -9179,7 +9179,7 @@ In Maintenance,In Maintenance
 In Mins,In Mins
 In Party Currency,In Party Currency
 In Percentage,In Percentage
-In Process,In Process
+In Process,Đang thực hiện
 In Production,In Production
 In Qty,In Qty
 In Stock,In Stock

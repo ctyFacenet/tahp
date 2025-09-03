@@ -3,8 +3,13 @@ frappe.ui.form.on("Job Card", {
         // Ví dụ chỉ cho hiện các nút
         frm.set_intro("")
         await frm.events.generate_layout(frm);
-        // frm.toolbar.page.add_inner_message('Xin chào')
+        frm.toolbar.page.add_inner_message('')
         await frm.events.check_status(frm);
+        frm.remove_custom_button("Pause Job")
+        frm.remove_custom_button("Complete Job")
+        frm.remove_custom_button("Start Job")
+        frm.remove_custom_button("Resume Job")
+        frm.page.clear_primary_action();
     },
 
     check_status: async function(frm) {
@@ -20,6 +25,7 @@ frappe.ui.form.on("Job Card", {
 
     // === Các hàm action ===
     start_job_card: async function(frm) {
+        if (!frm.doc.custom_start_time) await frm.events.update_team(frm);
         await frm.events.update_status(frm, "start");        
         // await frm.events.update_team(frm);
         // await frm.events.update_workstations(frm);
@@ -43,10 +49,6 @@ frappe.ui.form.on("Job Card", {
         const nextTask = (frm.doc.custom_subtask || []).find(t => !t.done);
         if (!nextTask) return
         await frappe.call({method: "tahp.doc_events.job_card.job_card.set_subtask", args: {job_card: frm.doc.name, reason: nextTask.reason}})
-    },
-
-    update_team: function(frm) {
-        frappe.msgprint("Đổi người Job!");
     },
 
     complete_job_card: async function(frm) {
@@ -75,70 +77,73 @@ frappe.ui.form.on("Job Card", {
     },
 
     update_team: async function(frm) {
-        const response =  await frappe.call({method: "tahp.doc_events.job_card.job_card.get_team", args: {job_card: frm.doc.name}})
-        const team = response.message
+        return new Promise(async (resolve, reject) => {
+            const response =  await frappe.call({method: "tahp.doc_events.job_card.job_card.get_team", args: {job_card: frm.doc.name}})
+            const team = response.message
 
-        const d = new frappe.ui.Dialog({
-            title: 'Danh sách nhân viên',
-            fields: [{
-                fieldname: "items",
-                fieldtype: "Table",
-                data: team,
-                in_place_edit: true,
-                fields: [
-                    {
-                        fieldname: "employee",
-                        label: __("Mã nhân viên"),
-                        fieldtype: "Link",
-                        in_list_view: 1,
-                        options: "Employee",
-                        onchange: async function(e) {
-                            let emp = await frappe.db.get_value("Employee", this.value, fields=['employee_name']);
-                            this.doc.employee_name = emp.message.employee_name
-                            d.fields_dict.items.grid.refresh();
+            const d = new frappe.ui.Dialog({
+                title: 'Danh sách nhân viên',
+                fields: [{
+                    fieldname: "items",
+                    fieldtype: "Table",
+                    data: team,
+                    in_place_edit: true,
+                    fields: [
+                        {
+                            fieldname: "employee",
+                            label: __("Mã nhân viên"),
+                            fieldtype: "Link",
+                            in_list_view: 1,
+                            options: "Employee",
+                            onchange: async function(e) {
+                                let emp = await frappe.db.get_value("Employee", this.value, fields=['employee_name']);
+                                this.doc.employee_name = emp.message.employee_name
+                                d.fields_dict.items.grid.refresh();
+                            },
+                            get_query: function() {
+                                let selected = (d.get_values().items || [])
+                                    .map(r => r.employee)
+                                    .filter(Boolean);
+                                return {
+                                        filters: [
+                                            ["Employee", "employee", "not in", selected]
+                                        ]
+                                    };
+                            }
                         },
-                        get_query: function() {
-                            let selected = (d.get_values().items || [])
-                                .map(r => r.employee)
-                                .filter(Boolean);
-                            return {
-                                    filters: [
-                                        ["Employee", "employee", "not in", selected]
-                                    ]
-                                };
+                        {
+                            fieldname: "employee_name",
+                            label: __("Nhân viên"),
+                            fieldtype: "Data",
+                            in_list_view: 1,
+                            read_only: 1
                         }
-                    },
-                    {
-                        fieldname: "employee_name",
-                        label: __("Nhân viên"),
-                        fieldtype: "Data",
-                        in_list_view: 1,
-                        read_only: 1
+                    ]                
+                }],
+                primary_action_label: "Xác nhận",
+                primary_action: async function() {
+                    const values = d.get_values();
+                    if (!values || !values.items || values.items.length === 0) {
+                        frappe.msgprint(__('Trong danh sách phải ít nhất có 1 thành viên'));
+                        return;
                     }
-                ]                
-            }],
-            primary_action_label: "Xác nhận",
-            primary_action: async function() {
-                const values = d.get_values();
-                if (!values || !values.items || values.items.length === 0) {
-                    frappe.msgprint(__('Trong danh sách phải ít nhất có 1 thành viên'));
-                    return;
-                }
 
-                let has_valid_row = values.items.some(row => row.employee && row.employee.trim() !== "");
+                    let has_valid_row = values.items.some(row => row.employee && row.employee.trim() !== "");
 
-                if (!has_valid_row) {
-                    frappe.msgprint(__('Trong danh sách phải có ít nhất 1 thành viên hợp lệ'));
-                    return;
-                }
+                    if (!has_valid_row) {
+                        frappe.msgprint(__('Trong danh sách phải có ít nhất 1 thành viên hợp lệ'));
+                        return;
+                    }
 
-                if (values && values.items) {
-                    await frappe.call({method: "tahp.doc_events.job_card.job_card.set_team", args: {job_card: frm.doc.name, team: values.items}})
-                }
-                d.hide();
-            },
-        })
-        d.show();
+                    if (values && values.items) {
+                        await frappe.call({method: "tahp.doc_events.job_card.job_card.set_team", args: {job_card: frm.doc.name, team: values.items}})
+                    }
+                    d.hide();
+                    resolve();
+                },
+            })
+            d.show();
+        });
     },
 
     update_workstations: async function(frm) {
@@ -252,7 +257,6 @@ frappe.ui.form.on("Job Card", {
                 }
                 d.hide();
             },
-            secondary_action_label: "Quay lại"
         });
         d.show();
         requestAnimationFrame(() => {
@@ -267,13 +271,12 @@ frappe.ui.form.on("Job Card", {
         await frm.events.render_buttons(frm, visible_buttons, frm.$buttons_section)
         await frm.events.render_custom_status({frm, $wrapper: frm.$status_section})
         let sampleNotifications = [
-            { owner: "Trung", name: "Đầu việc A đã hoàn thành", from_time: "2025-08-31T12:20:00" },
-            { owner: "Hiếu", name: "Đầu việc B đang xử lý", from_time: "2025-08-31T12:10:00" },
-            { owner: "Lan", name: "Đầu việc C bị trì hoãn", from_time: "2025-08-31T12:05:00" },
-            { owner: "Minh", name: "Đầu việc D yêu cầu review", from_time: "2025-08-31T11:50:00" },
-            { owner: "Hoa", name: "Đầu việc E đã cập nhật rất nhiều việc khủng khiếp lắm luôn chời ơi", from_time: "2025-08-31T11:30:00" },
-            { owner: "Nam", name: "Đầu việc F mới tạo", from_time: "2025-08-31T11:00:00" }, // sẽ bị giới hạn chỉ hiện 5 cái
-            { owner: "Nam", name: "Đầu việc F mới tạo", from_time: "2025-08-31T11:00:00" } // sẽ bị giới hạn chỉ hiện 5 cái
+            // { owner: "Trung", name: "Đầu việc A đã hoàn thành", from_time: "2025-08-31T12:20:00" },
+            // { owner: "Lan", name: "Đầu việc C bị trì hoãn", from_time: "2025-08-31T12:05:00" },
+            // { owner: "Minh", name: "Đầu việc D yêu cầu review", from_time: "2025-08-31T11:50:00" },
+            // { owner: "Hoa", name: "Đầu việc E đã cập nhật rất nhiều việc khủng khiếp lắm luôn chời ơi", from_time: "2025-08-31T11:30:00" },
+            // { owner: "Nam", name: "Đầu việc F mới tạo", from_time: "2025-08-31T11:00:00" },
+            // { owner: "Nam", name: "Đầu việc F mới tạo", from_time: "2025-08-31T11:00:00" }
         ];
         await frm.events.render_notifications({frm, $wrapper: frm.$note_section, notifications: sampleNotifications })
     },
@@ -303,8 +306,7 @@ frappe.ui.form.on("Job Card", {
 
         // Note
         frm.$note_section = $(`
-        <div class="jc-casual d-flex flex-column order-3" style="flex:2 1 200px;">
-            <div class="subtask-section d-none d-md-block pb-2 border-bottom">Subtask (desktop only)</div>
+        <div class="d-none d-md-flex flex jc-casual flex-column order-3" style="flex:2 1 200px;">
             <div class="note">Note</div>
         </div>
         `);
@@ -315,12 +317,64 @@ frappe.ui.form.on("Job Card", {
 
         let $second_layout = $('<div class="second-layout d-flex my-2" style="flex-wrap:wrap;gap:15px;"></div>');
 
+        frm.$input_ctl = createResponsiveTable({
+            frm,
+            title: 'Đầu vào nguyên liệu',
+            container: $second_layout,
+            editAction: async () => await frm.events.edit_input(frm),
+            columns: [
+                { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true }, 
+                { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
+                { label: 'Đã tiêu hao?', fieldname: 'qty', is_value: true },
+                { label: 'Đơn vị', fieldname: 'uom', is_unit: true }, 
+            ],
+
+            data: (frm.doc.custom_input_table && frm.doc.custom_input_table.length)
+                ? frm.doc.custom_input_table.filter(d => !d.is_meter).map(d => {
+                    return {
+                        item_code: d.item_code,
+                        item_name: d.item_name,
+                        qty: d.qty,
+                        uom: d.uom,
+                    };
+                })
+                : [],
+        });
+
+        frm.$input_meter_ctl = createResponsiveTable({
+            frm,
+            title: 'Đầu vào đo bằng đồng hồ',
+            container: $second_layout,
+            editAction: async () => await frm.events.edit_meter_input(frm),
+            columns: [
+                { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true }, 
+                { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
+                { label: 'Đã tiêu hao?', fieldname: 'qty' },
+                { label: 'Đơn vị', fieldname: 'uom'},
+                { label: 'Đồng hồ', fieldname: 'meter', is_value: true },
+            ],
+            data: (frm.doc.custom_input_table && frm.doc.custom_input_table.length)
+                ? frm.doc.custom_input_table.filter(d => d.is_meter).map(d => {
+                    const meter_in = d.meter || 0;
+                    const meter_out = d.meter_out || 0;
+                    const arrow_icon = `<i class="fas fa-arrow-right"></i>`;
+                    return {
+                        item_code: d.item_code,
+                        item_name: d.item_name,
+                        qty: d.qty,
+                        uom: d.uom,
+                        meter: `${meter_in} ${arrow_icon} ${meter_out}`
+                    };
+                })
+                : [],
+        });
 
         frm.$workstation_ctl = createResponsiveTable({
             frm,
             title: 'Thiết bị',
             container: $second_layout,
-            editAction: async () => await frm.events.update_workstations(frm),
+            in_mobile_button: true,
+            // editAction: async () => await frm.events.update_workstations(frm),
             columns: [
                 { label: 'Tên thiết bị', fieldname: 'workstation', is_primary: true },
                 { label: 'Trạng thái', fieldname: 'status', is_value: true},
@@ -516,58 +570,6 @@ frappe.ui.form.on("Job Card", {
             // }
         });
 
-        frm.$input_ctl = createResponsiveTable({
-            frm,
-            title: 'Đầu vào nguyên liệu',
-            container: $second_layout,
-            editAction: async () => await frm.events.edit_input(frm),
-            columns: [
-                { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true }, 
-                { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
-                { label: 'Đã tiêu hao?', fieldname: 'qty', is_value: true },
-                { label: 'Đơn vị', fieldname: 'uom', is_unit: true }, 
-            ],
-
-            data: (frm.doc.custom_input_table && frm.doc.custom_input_table.length)
-                ? frm.doc.custom_input_table.filter(d => !d.is_meter).map(d => {
-                    return {
-                        item_code: d.item_code,
-                        item_name: d.item_name,
-                        qty: d.qty,
-                        uom: d.uom,
-                    };
-                })
-                : [],
-        });
-
-        frm.$input_meter_ctl = createResponsiveTable({
-            frm,
-            title: 'Đầu vào đo bằng đồng hồ',
-            container: $second_layout,
-            editAction: async () => await frm.events.edit_meter_input(frm),
-            columns: [
-                { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true }, 
-                { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
-                { label: 'Đã tiêu hao?', fieldname: 'qty' },
-                { label: 'Đơn vị', fieldname: 'uom'},
-                { label: 'Đồng hồ', fieldname: 'meter', is_value: true },
-            ],
-            data: (frm.doc.custom_input_table && frm.doc.custom_input_table.length)
-                ? frm.doc.custom_input_table.filter(d => d.is_meter).map(d => {
-                    const meter_in = d.meter || 0;
-                    const meter_out = d.meter_out || 0;
-                    const arrow_icon = `<i class="fas fa-arrow-right"></i>`;
-                    return {
-                        item_code: d.item_code,
-                        item_name: d.item_name,
-                        qty: d.qty,
-                        uom: d.uom,
-                        meter: `${meter_in} ${arrow_icon} ${meter_out}`
-                    };
-                })
-                : [],
-        });
-
         $wrapper.append($first_layout)
         $wrapper.append($second_layout)
     },
@@ -650,9 +652,8 @@ frappe.ui.form.on("Job Card", {
         const myButtonClass = "btn btn-xs btn-default btn-primary job-ctl-btn d-flex align-items-center justify-content-center";
 
         // Điều kiện disable
-        let disable_transfer = (frm.doc.custom_subtask || []).length <= 1;
         const disable_complete = !frm.doc.custom_start_time;
-        disable_transfer = disable_complete || false;
+        const disable_transfer = disable_complete || (frm.doc.custom_subtask || []).length === 1;
 
         for (let pos = 0; pos < TOTAL_POSITIONS; pos++) {
             let btns_at_pos = buttons.filter(b => b.position === pos);
@@ -698,9 +699,10 @@ frappe.ui.form.on("Job Card", {
 
         const status = frm.doc.status || '';
         let statusColor;
-        if (status === 'Work In Progress') statusColor = 'warning';
-        else if (status === 'Open') statusColor = 'success';
-        else if (status === 'On Hold') statusColor = 'danger';
+        if (status === 'Work In Progress') statusColor = 'success';
+        else if (status === 'Open') statusColor = 'info';
+        else if (status === 'On Hold') statusColor = 'warning';
+        else if (status === 'Completed') statusColor = 'success';
         else statusColor = 'secondary';
 
         let tasks = (frm.doc.custom_subtask || []).map(d => ({
@@ -741,8 +743,10 @@ frappe.ui.form.on("Job Card", {
         let $timerLine = $(`
             <div class="jc-timer text-center d-none d-md-block mt-2" style="font-size: 50px; font-weight: bold;">${timer}</div>
         `);
-        
-        $wrapper.append($statusLine, $taskLine, $timerLine);
+
+        $wrapper.append($statusLine);
+        if (frm.doc.docstatus == 0) $wrapper.append($taskLine)
+        $wrapper.append($timerLine)
 
         $wrapper.find('.job-tasks').off('click').on('click', () => {
             let tasks = (frm.doc.custom_subtask || []).map(d => ({
@@ -793,7 +797,7 @@ frappe.ui.form.on("Job Card", {
 
         // Container scrollable: hiển thị tối đa 4 items
         let $list = $('<div class="notification-list" style="max-height: 120px; overflow-y:auto;"></div>');
-
+        if (notifications || notifications.length == 0) $list.append('Không có thông báo')
         notifications.forEach(n => {
             let $item = $(`
                 <div class="notification-item d-flex justify-content-start align-items-start p-2 border-bottom">
@@ -1162,7 +1166,7 @@ function cleanerTable(dialog) {
     });
 }
 
-function createResponsiveTable({ frm, title, columns = [], data = [], editAction, container, action = null}) {
+function createResponsiveTable({ frm, title, columns = [], data = [], editAction, container, action = null, in_mobile_button = false }) {
     let collapseId = "collapse_" + Math.random().toString(36).substring(2,9);
 
     // --- Wrapper chính ---
@@ -1197,11 +1201,11 @@ function createResponsiveTable({ frm, title, columns = [], data = [], editAction
     let $mobileHeader = $(`
         <div class="d-flex d-md-none justify-content-between align-items-center mb-3 cursor-pointer" 
              style="user-select:none;font-size:1.25rem;">
-            <div class="title fw-bold">${title}</div>
+            <div class="title fw-bold" style="font-weight: bold;">${title}</div>
             <i class="fas fa-chevron-down"></i>
         </div>
     `);
-    let $mobileCollapse = $(`<div class="collapse d-md-none" id="${collapseId}"></div>`)
+    let $mobileCollapse = $(`<div class="collapse d-md-none show" id="${collapseId}"></div>`)
         .append(`<button class="btn btn-primary w-100 mb-2">Sửa</button>`);
 
     if (!editAction  || frm.doc.docstatus != 0) {
@@ -1214,7 +1218,7 @@ function createResponsiveTable({ frm, title, columns = [], data = [], editAction
     // --- Hàm render row ---
     function renderTableRows(frm, rows) {
         // Desktop render
-        let $thead = $desktopWrapper.find("thead tr").empty();
+        let $thead = $desktopWrapper.find("thead tr").empty().css({'background':'#eee'});
         columns.forEach(c => $thead.append(`<th>${c.label}</th>`));
         if (action?.buttons) $thead.append(`<th class="text-nowrap" style="width:1%;">Thao tác</th>`);
 
@@ -1275,6 +1279,18 @@ function createResponsiveTable({ frm, title, columns = [], data = [], editAction
             else $row.append($left, $right);
 
             $mobileCollapse.append($row);
+
+            if (in_mobile_button && action?.buttons && frm.doc.docstatus == 0) {
+                const $btnRow = $('<div class="action-row d-flex flex-wrap mb-2" style="gap:7px;"></div>');
+                action.buttons.forEach(b => {
+                    if (b.condition(r)) {
+                        const $btn = $(`<button class="${b.class}"><i class="${b.icon}"></i> ${b.label}</button>`);
+                        $btn.on("click", () => b.handler(r));
+                        $btnRow.append($btn);
+                    }
+                });
+                $mobileCollapse.append($btnRow);
+            }
         });
 
     }

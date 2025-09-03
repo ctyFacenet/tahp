@@ -1,4 +1,5 @@
 import frappe
+import calendar
 
 def after_insert(doc, method):
     if not doc.custom_code: set_code(doc)
@@ -92,8 +93,9 @@ def set_code(doc):
     today = frappe.utils.get_datetime()
     year = today.year
     month = f"{today.month:02d}"
+    last_day = calendar.monthrange(year, today.month)[1]
     start_date = f"{year}-{month}-01"
-    end_date = f"{year}-{month}-31"
+    end_date = f"{year}-{month}-{last_day}"
 
     entries = frappe.db.get_all("Stock Entry", filters={
         "docstatus": ["==", 1],

@@ -15,7 +15,9 @@ fixtures = [
     {"doctype": "Workflow Action"},
     {"doctype": "Workspace"},
     {"doctype": "Website Settings"},
-    {"doctype": "System Settings"}
+    {"doctype": "System Settings"},
+    {"doctype": "Custom HTML Block"},
+    {"doctype": "Downtime Reason"},
 ]
 
 # required_apps = []
@@ -188,7 +190,8 @@ after_install = "tahp.setup.setup_website"
 # }
 
 override_doctype_class = {
-	"Employee": "tahp.overrides.employee.Employee"
+	"Employee": "tahp.overrides.employee.Employee",
+    "Stock Entry": "tahp.overrides.stock_entry.StockEntry"
 }
 
 # Document Events
@@ -213,6 +216,9 @@ doc_events = {
         "after_insert": [
             "tahp.doc_events.stock_entry.after_insert.after_insert"
         ],
+        "before_insert": [
+            "tahp.doc_events.stock_entry.before_insert.before_insert"
+        ]
     },
     "Operation": {
         "before_save": [
