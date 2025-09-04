@@ -2,6 +2,24 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:49.076313",
+  "name": "Đã được PTCN duyệt",
+  "style": "",
+  "workflow_state_name": "Đã được PTCN duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:01:37.910709",
+  "name": "Đã hủy bỏ",
+  "style": "",
+  "workflow_state_name": "Đã hủy bỏ"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
   "icon": "question-sign",
   "modified": "2025-08-07 20:24:40.511152",
   "name": "Pending",
@@ -25,5 +43,41 @@
   "name": "Rejected",
   "style": "Danger",
   "workflow_state_name": "Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:01:16.154504",
+  "name": "Duyệt xong",
+  "style": "",
+  "workflow_state_name": "Duyệt xong"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:39.942681",
+  "name": "Đợi PTCN Duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi PTCN Duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
+  "style": "",
+  "workflow_state_name": "Nháp"
  }
 ]
