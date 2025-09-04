@@ -41,7 +41,9 @@ app_include_css = [
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
     "/assets/tahp/css/menu.css",
     "/assets/tahp/css/theme.css",
-    "/assets/tahp/css/custom_workspace.css"
+    "/assets/tahp/css/custom_workspace.css",
+    "/assets/tahp/css/bom_custom.css",
+    "/assets/tahp/css/custom_confirm.css"
 
 
 ]
@@ -53,6 +55,7 @@ app_include_js = [
     # "/assets/tahp/js/menu/workspace.js",
     "/assets/tahp/js/theme.js",
     "/assets/tahp/js/custom_logout_redirect.js",
+    "/assets/tahp/js/custom_confirm.js",
     # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     # "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
@@ -90,7 +93,8 @@ web_include_css = [
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 doctype_list_js = {
-    "Workstation": ["public/js/workstation/workstation_list.js"]
+    "Workstation": ["public/js/workstation/workstation_list.js"],
+    "BOM": ["public/js/bom/bom_custom_list.js"]
 }
 
 # doctype_js = {
@@ -184,7 +188,7 @@ after_install = "tahp.setup.setup_website"
 # Override standard doctype classes
 
 # override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
+# 	 "BOM": "tahp.overrides.bom_list_override.CustomBOM"
 # }
 
 # Document Events

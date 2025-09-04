@@ -1,0 +1,283 @@
+.custom-bom-wrapper {
+  width: 100%;
+  margin-top: 1rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+
+#bom-datatable .dt-header .dt-cell--header .dt-cell__content {
+  background-color: #CCDBEB !important;
+  font-weight: bold;
+  text-align: center !important;
+}
+
+
+.datatable .dt-header .dt-row-header {
+  background-color: #fff;
+}
+
+/* 🔹 DataTable full width */
+#bom-datatable,
+#bom-datatable .datatable,
+#bom-datatable .dt-scrollable {
+  width: 100% !important;
+  min-width: 1000px;
+}
+
+/* 🔹 Toolbar link */
+.custom-toolbar a {
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  margin-left: 12px;
+  font-size: 14px;
+  top: 100px
+}
+
+.custom-toolbar a i {
+  margin-right: 4px;
+}
+
+.custom-toolbar a.text-success {
+  color: #28a745;
+}
+
+.custom-toolbar a.text-info {
+  color: #17a2b8;
+}
+
+.custom-toolbar a.text-danger {
+  color: #dc3545;
+}
+
+.custom-toolbar a:hover {
+  text-decoration: underline;
+}
+
+
+.custom-footer select {
+  min-width: 100px;
+}
+
+/* 🔹 Footer - pagination links */
+.pagination-links a {
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  color: #17a2b8;
+  margin: 0 6px;
+}
+
+.pagination-links a:hover {
+  text-decoration: underline;
+}
+
+.pagination-links span {
+  margin: 0 8px;
+}
+
+.pagination-links input {
+  width: 80px;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+/* Sticky cột Thao tác (bên phải) */
+#bom-datatable .dt-cell:last-child {
+  position: sticky;
+  right: 0;
+  background: #fff;
+  z-index: 2;
+  min-width: 120px;
+  text-align: center;
+  border-left: 1px solid #ddd;
+}
+
+/* Filter row */
+#bom-datatable .dt-input {
+  padding: 4px 6px 4px 24px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.dt-filter-input {
+  background: #f3f3f3 url("/assets/frappe/icons/solid/search.svg") no-repeat 6px center;
+  background-size: 14px;
+  padding-left: 26px !important;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.dt-filter-input:focus {
+  outline: none;
+  border-color: #2490ef;
+  background-color: #fff;
+}
+
+.custom-footer select,
+.custom-footer input[type="number"] {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 13px;
+  color: #888;
+  opacity: 0.9;
+}
+
+
+#toggle-filter-btn {
+  display: block;
+}
+
+
+/* Icon toggle năm */
+.year-toggle {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  cursor: pointer;
+  color: #333;
+  vertical-align: middle;
+}
+
+/* Month list thụt vào */
+.month-list {
+  margin-left: 16px;
+}
+
+#time-filter-toggle {
+  position: absolute;
+  top: 45px;
+  left: 10px;
+  background: #17a2b8;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 201;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#time-filter {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 220px;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  transform: translateX(-110%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 200;
+}
+
+#time-filter.active {
+  transform: translateX(0);
+}
+
+#time-filter ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 12px;
+}
+
+#time-filter li {
+  margin: 3px 0;
+}
+
+#time-filter .year-toggle {
+  cursor: pointer;
+  margin-right: 6px;
+  font-weight: bold;
+}
+
+#time-filter .year-toggle:hover {
+  color: #007bff;
+}
+
+.custom-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 13px;
+  gap: 12px;
+}
+
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+/* UL chứa số trang */
+.pagination-wrapper ul.pagination {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Link số trang */
+.pagination-wrapper .page-link {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+  min-width: 28px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+/* Hover */
+.pagination-wrapper .page-link:hover {
+  background-color: #f1f1f1;
+}
+
+/* Active page */
+.pagination-wrapper .page-link.active {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  border-color: #007bff;
+}
+
+/* Disabled */
+.pagination-wrapper .page-link.disabled {
+  pointer-events: none;
+  color: #aaa;
+  background-color: #f9f9f9;
+  border-color: #eee;
+}
+
+/* Ellipsis */
+.pagination-wrapper .page-ellipsis {
+  padding: 4px 6px;
+  color: #777;
+}
