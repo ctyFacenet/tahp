@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-24 20:32:42.678087",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "items"
+ ],
+ "fields": [
+  {
+   "description": "\u0110\u1ec3 \u0111i\u1ec1n nguy\u00ean li\u1ec7u c\u00f9ng l\u00fac, vi\u1ebft c\u00e1ch nhau b\u1edfi d\u1ea5u ph\u1ea9y. VD: gyps A, gyps B",
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "Manufacturing Category Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-08-24 21:08:16.534694",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Manufacturing Category",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
