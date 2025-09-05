@@ -172,7 +172,7 @@ def add_input(work_order):
                     "qty": row.qty,
                     "uom": row.uom,
                     "s_warehouse": warehouse,
-                    "description": "Phụ gia tiêu hao trong công đoạn sản xuất"
+                    "description": "Phụ gia tiêu hao trong SX"
                 })
 
     return result

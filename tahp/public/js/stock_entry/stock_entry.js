@@ -15,7 +15,6 @@ frappe.ui.form.on('Stock Entry', {
             frm.doc.items.forEach(row => {
                 if (row.is_finished_item) row.description = 'Thành phẩm';
                 else row.description = 'Nguyên liệu trong sản xuất';
-                row.qty = 0
             });
             inputs.forEach(input => {
                 let row = frm.add_child('items');
@@ -33,6 +32,16 @@ frappe.ui.form.on('Stock Entry', {
             frm.refresh_field('items');
         frm.refresh_field('items');
     },
+
+    refresh: function(frm) {
+        if (frm.doc.stock_entry_type !== "Manufacture") return;
+        let html = `
+            <div class="alert alert-info w-100" role="alert" style="margin-bottom:0px;">
+                Người dùng có thể chỉnh sửa lại số lượng nguyên liệu và thành phẩm tạo ra theo thực tế
+            </div>
+        `;
+        frm.fields_dict.custom_warn.$wrapper.html(html);
+    }
 
 });
 

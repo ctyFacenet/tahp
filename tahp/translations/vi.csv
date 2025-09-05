@@ -120,7 +120,8 @@ Remove Column,Xóa cột
 Reset Sorting,Xóa sắp xếp
 Sort Descending,Sắp xếp giảm dần
 Sort Ascending,Sắp xếp tăng dần
-Item Balance (Simple),Danh sách tồn kho
+Item Balance (Simple),Danh sách tồn kho,
+Item Balance, Tồn kho
 Balance Qty,SL tồn kho
 Include UOM,Bao gồm đơn vị
 Voucher #,Mã chứng từ gốc

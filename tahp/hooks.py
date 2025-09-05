@@ -188,7 +188,8 @@ after_install = "tahp.setup.setup_website"
 
 override_doctype_class = {
 	"Employee": "tahp.overrides.employee.Employee",
-    "Stock Entry": "tahp.overrides.stock_entry.StockEntry"
+    "Stock Entry": "tahp.overrides.stock_entry.StockEntry",
+    "Job Card": "tahp.overrides.job_card.JobCard",
 }
 
 # Document Events
@@ -238,7 +239,7 @@ doc_events = {
     "Job Card": {
         "after_insert": [
             "tahp.doc_events.job_card.after_insert.after_insert"
-        ]
+        ],
     },
 }
 

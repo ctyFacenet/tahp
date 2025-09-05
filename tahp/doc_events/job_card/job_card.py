@@ -343,149 +343,84 @@ def set_configs(job_card, configs):
         doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
-def update_time(docname, timestamp, active):
-    """
-    Cập nhật trạng thái đồng hồ của Job Card
-    docname: tên doc Job Card
-    timestamp: thời gian hiện tại client gửi lên (string)
-    active: True nếu start/resume, False nếu pause
-    """
-    doc = frappe.get_doc("Job Card", docname)
-    ts = frappe.utils.get_datetime(timestamp)
-
-    if active == "true":
-        doc.status = "Work In Progress"
-        start = True if doc.custom_start_time else False
-
-        if not doc.custom_active:
-            doc.custom_start_time = ts
-
-        if not doc.time_logs:
-            if not doc.custom_team_table:
-                frappe.throw("Vui lòng thêm nhân viên trước")
-            doc.append("time_logs", {"employee": doc.custom_team_table[0].employee, "from_time": frappe.utils.now_datetime(), "completed_qty": doc.for_quantity })
-    
-        doc.custom_active = True
-        doc.save(ignore_permissions=True, ignore_version=True)
-
-        if not start:
-            if all(ws.status in ["Hỏng", "Bận"] for ws in doc.custom_workstation_table):
-                frappe.throw("Toàn bộ thiết bị đang bận/hỏng, không thể tiếp tục công đoạn")
-                
-            workstations = get_workstations(doc.name)
-            set_workstations(doc.name, workstations, True)
-        else:
-            workstations_to_update = []
-            if all(ws.status in ["Hỏng", "Bận"] for ws in doc.custom_workstation_table):
-                frappe.throw("Toàn bộ thiết bị đang bận/hỏng, không thể tiếp tục công đoạn")
-
-            for ws in doc.custom_workstation_table:
-                if ws.status == "Dừng":
-                    workstations_to_update.append({"workstation": ws.workstation, "status": "Chạy"})
-                
-            if workstations_to_update:
-                update_workstations(docname, workstations_to_update, True)
-
-    else:
-        doc.custom_active = False
-        doc.status = "On Hold"
-        elapsed_ms = int((ts - doc.custom_start_time).total_seconds() * 1000)
-        doc.custom_check_time = (doc.custom_check_time or 0) + elapsed_ms
-        doc.save(ignore_permissions=True, ignore_version=True)
-
-        workstations_to_update = []
-        for ws in doc.custom_workstation_table:
-            if ws.status == "Chạy":
-                workstations_to_update.append({"workstation": ws.workstation, "status": "Dừng"})
-
-        if workstations_to_update:
-            update_workstations(docname, workstations_to_update, True)
-
-@frappe.whitelist()
-def update_workstations(job_card, workstations, update_manual=False):
+def update_workstations(job_card, workstations):
     doc = frappe.get_doc("Job Card", job_card)
     from_time = frappe.utils.now_datetime()
     if isinstance(workstations, str): workstations = json.loads(workstations)
-    ready = []
     for item in workstations:
         status = item.get("status")
         workstation = item.get("workstation")
         reason = item.get("reason")
         group_name = item.get("group_name", "")
-        data = { "workstation": workstation, "status": status }
-        ws_doc = frappe.get_doc("Workstation", workstation)
+        ready = []
+        workstation_doc = frappe.get_doc("Workstation", workstation)
         if status == "Hỏng":
-            ws_doc.status = "Problem"
-        elif status == "Tắt":
-            ws_doc.status = "Off"
-        ws_doc.save(ignore_permissions=True)
+            workstation_doc.status = "Problem"
+            workstation_doc.save()
 
-        
+
         for row in doc.custom_workstation_table:
             if row.workstation == workstation:
-                if row.status != status:
-                    exists = any( cw.workstation == workstation for cw in doc.custom_workstations)
-                    if not exists:
-                        doc.append("custom_workstations", {**data, "status": "Chạy", "from_time": from_time})
-                    row.status = status
+                if status == "Chạy":
+                    real_status = workstation_doc.status
+                    if not doc.custom_team_table:
+                        frappe.throw("Vui lòng thêm nhân viên trước")
+
+                    if real_status in ["Problem", "Maintenance"]:
+                        frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
+
+                    if not row.active:
+                        if not doc.time_logs:
+                            doc.append("time_logs", {"employee": doc.custom_team_table[0].employee, "from_time": from_time, "completed_qty": doc.for_quantity})
+                        row.start_time = from_time
+    
+                    row.active = True
+                elif status in ["Dừng", "Tắt", "Hỏng"]:
+                    row.active = False
+                    if row.start_time:
+                        second = int((from_time - row.start_time).total_seconds() * 1000)
+                        row.time = (row.time or 0) + second
+                        ready.append({ "workstation": workstation, "from_time": from_time, "reason": reason, "is_danger": 1 if status == "Hỏng" else 0 })
+
+                row.status = status
 
 
-        if status in ["Dừng", "Hỏng", "Tắt"]:
-            ready.append({
-                "workstation": workstation,
-                "from_time": from_time,
-                "reason": reason,
-                "group_name": group_name,
-                "is_danger": 1 if status == "Hỏng" else 0
-            })
-        elif status in ["Chạy"]:
-            if ws_doc.status in ["Problem", "Maintenance"]:
-                frappe.throw("Khôi phục thất bại, bộ phận bảo trì chưa cập nhật tình trạng máy")
-                return
-            downtime_rows = [d for d in doc.custom_downtime if d.workstation == workstation and not d.to_time]
-            if downtime_rows:
-                last_downtime = sorted(downtime_rows, key=lambda x: x.from_time, reverse=True)[0]
-                last_downtime.to_time = from_time
-                # Tính duration theo phút
-                from_dt = frappe.utils.get_datetime(last_downtime.from_time)
-                to_dt = frappe.utils.get_datetime(from_time)
-                duration = frappe.utils.time_diff_in_seconds(to_dt, from_dt)
-                last_downtime.duration = duration
+    for item in doc.custom_downtime:
+        for workstation in workstations:
+            if item.workstation == workstation.get("workstation") and workstation.get("status") == "Chạy" and item.to_time == None:
+                item.to_time = from_time
+                item.duration = frappe.utils.time_diff_in_seconds(item.to_time, item.from_time)
+                break
 
-    all_stopped = all(row.status in ["Dừng", "Hỏng", "Tắt"] for row in doc.custom_workstation_table)
+    all_running = all(
+        row.status == "Chạy" for row in doc.custom_workstation_table 
+        if row.status not in ["Hỏng", "Bận"]
+    )
+    if all_running:
+        for item in doc.custom_downtime:
+            if item.workstation == "Tất cả" and not item.to_time:
+                item.to_time = from_time
+                item.duration = frappe.utils.time_diff_in_seconds(item.to_time, item.from_time)
+        doc.status = "In Progress"
+
+
+    workstation_names = [item.get("workstation") for item in workstations]
+    all_stopped = all(
+        row.status == "Dừng" for row in doc.custom_workstation_table 
+        if row.status not in ["Hỏng", "Bận"]
+    )
+
     if all_stopped:
-        ready = []
-        print('all stopped')
         doc.append("custom_downtime", {
             "workstation": "Tất cả",
             "from_time": from_time,
-            "group_name": group_name,
             "reason": reason,
-            "is_danger": 1 if status == "Hỏng" else 0
+            "is_danger": 0
         })
-        doc.save(ignore_permissions=True, ignore_version=True)
-        if doc.custom_start_time and not update_manual:
-            update_time(job_card, str(frappe.utils.now_datetime()), active="false")
+        doc.status = "On Hold"
     else:
-        print('all continue')
-        available_rows = [row for row in doc.custom_workstation_table if row.status not in ["Hỏng", "Bận"]]
-        all_available_running = all(row.status == "Chạy" for row in available_rows)
-        if all_available_running:
-            downtime_rows = [d for d in doc.custom_downtime if d.workstation == "Tất cả" and not d.to_time]
-            if downtime_rows:
-                last_downtime = sorted(downtime_rows, key=lambda x: x.from_time, reverse=True)[0]
-                last_downtime.to_time = from_time
-                from_dt = frappe.utils.get_datetime(last_downtime.from_time)
-                to_dt = frappe.utils.get_datetime(from_time)
-                duration = frappe.utils.time_diff_in_seconds(to_dt, from_dt)
-                last_downtime.duration = duration   
-            doc.save(ignore_permissions=True, ignore_version=True)
-            if doc.custom_start_time and not update_manual:
-                update_time(job_card, str(frappe.utils.now_datetime()), active="true")
-        else:
-            for row in ready:
-                doc.append("custom_downtime", row)           
-            doc.save(ignore_permissions=True, ignore_version=True)
+        for r in ready: doc.append("custom_downtime", r)
+    doc.save()
 
 @frappe.whitelist()
 def set_inputs(job_card, inputs=None):
@@ -618,7 +553,9 @@ def set_subtask(job_card, reason=None):
 @frappe.whitelist()
 def submit(job_card):
     doc = frappe.get_doc("Job Card", job_card)
+    from_time = frappe.utils.now_datetime()
 
+    # 1. Kiểm tra input
     input_issues = [
         t for t in doc.get("custom_input_table")
         if t.is_meter and t.meter != 0 and t.meter_out == 0
@@ -626,42 +563,58 @@ def submit(job_card):
     if input_issues:
         frappe.throw("Bạn nhập số đo đồng hồ đầu vào nhưng chưa nhập đầu ra, vui lòng nhập đủ")
 
+    # 2. Xử lý workstations: dừng & cộng dồn thời gian
     for ws in doc.get("custom_workstation_table"):
         if ws.status in ["Chạy", "Dừng"]:
-            ws.status = 'Sẵn sàng'
+            if ws.start_time:
+                elapsed = int((from_time - ws.start_time).total_seconds() * 1000)
+                ws.time = (ws.time or 0) + elapsed
+                ws.active = False
+
+            ws.status = "Sẵn sàng"
+
+            # cập nhật Workstation doc
             ws_doc = frappe.get_doc("Workstation", ws.workstation)
             ws_doc.status = "Off"
             ws_doc.save(ignore_permissions=True)
-    
-    if doc.time_logs and len(doc.time_logs) > 0:
-        doc.time_logs[0].to_time = frappe.utils.now_datetime()
 
+    # 3. Chốt downtime entries chưa đóng
+    for dt in doc.get("custom_downtime"):
+        if not dt.to_time:
+            dt.to_time = from_time
+            dt.duration = frappe.utils.time_diff_in_seconds(dt.to_time, dt.from_time)
+
+    # 4. Đóng time_logs nếu có
+    if doc.time_logs and len(doc.time_logs) > 0:
+        if not doc.time_logs[-1].to_time:
+            doc.time_logs[-1].to_time = from_time
+
+    # 5. Đánh dấu subtask cuối là hoàn thành
     if doc.custom_subtask and len(doc.custom_subtask) > 0:
         last_subtask = doc.custom_subtask[-1]
         last_subtask.done = 1
 
-    doc.custom_active = False
-    elapsed_ms = int((frappe.utils.now_datetime() - doc.custom_start_time).total_seconds() * 1000)
-    doc.custom_check_time = (doc.custom_check_time or 0) + elapsed_ms
+    # 6. Đổi trạng thái job card
     doc.status = "Completed"
 
-    # Thông báo cho trưởng ca
+    # 7. Thông báo cho trưởng ca
     wo_name = doc.work_order
     wo_doc = frappe.get_doc("Work Order", wo_name)
     shift_leader = wo_doc.custom_shift_leader
     user = frappe.db.get_value("Employee", shift_leader, "user_id")
 
-    other_job_cards = frappe.get_all(
+    other_incomplete = frappe.get_all(
         "Job Card",
         filters={
             "work_order": wo_name,
             "name": ["!=", job_card],
-            "docstatus": 1
+            "status": ["!=", "Completed"],
+            "docstatus": ["<", 2]   # loại bỏ hủy
         },
         fields=["name"]
     )
 
-    if other_job_cards:
+    if not other_incomplete:  # tức là không còn job card nào chưa hoàn thành
         subject = f"Đã hoàn thành toàn bộ công đoạn của LSX Ca: {wo_name}"
         frappe.get_doc({
             "doctype": "Notification Log",
@@ -673,6 +626,9 @@ def submit(job_card):
             "document_name": wo_name
         }).insert(ignore_permissions=True)
 
+
+    # 8. Submit
     doc.submit()
+
 
     
