@@ -39,9 +39,9 @@ frappe.listview_settings["BOM"] = {
         </div>
 
         <div class="d-flex justify-content-end gap-4 mb-2 custom-toolbar">
-          <a href="javascript:void(0)" id="btn-add" class="text-success"><i class="fa fa-plus"></i> Thêm mới</a>
-          <a href="javascript:void(0)" id="btn-copy" class="text-info"><i class="fa fa-copy"></i> Sao chép</a>
-          <a href="javascript:void(0)" id="btn-delete" class="text-danger"><i class="fa fa-trash"></i> Xóa</a>
+          <a href="javascript:void(0)" id="btn-add" class="text-info"> <img src="/assets/tahp/images/add_plus.svg" alt="Thêm mới"> Thêm mới</a>
+          <a href="javascript:void(0)" id="btn-copy" class="text-info"> <img src="/assets/tahp/images/copy.svg" alt="Sao chép"> Sao chép</a>
+          <a href="javascript:void(0)" id="btn-delete" class="text-info"> <img src="/assets/tahp/images/trash.svg" alt="Xoá"> Xóa</a>
         </div>
 
         <div id="bom-datatable"></div>
@@ -169,7 +169,7 @@ frappe.listview_settings["BOM"] = {
 
     function render_table(data, visible_fields) {
       let columns = [
-        { name: "STT", align: "center", editable: false },
+        { name: "STT", align: "center", editable: false, field: "__stt", disableFilter: true },
         ...visible_fields
           .filter((f) => !hidden_fields.includes(f))
           .map((f) => {
@@ -181,7 +181,7 @@ frappe.listview_settings["BOM"] = {
               editable: false,
             };
           }),
-        { name: "Thao tác", align: "center", editable: false, width: 120 },
+        { name: "Thao tác", align: "center", editable: false, width: 120, field: "__actions", disableFilter: true },
       ];
 
       let rows = data.map((d, i) => {
@@ -220,18 +220,34 @@ frappe.listview_settings["BOM"] = {
             }
             return d[f] || "";
           });
+        let actions = "";
+        if (d.docstatus == 0) {
+          actions = `
+          <a href="/app/bom/${d.name}" class="btn btn-sm" title="Xem">
+             <img src="/assets/tahp/images/eye.svg" alt="Xem" class="icon-btn">
+          </a>
+          <a href="/app/bom/${d.name}" class="btn btn-sm" title="Sửa">
+            <img src="/assets/tahp/images/edit.svg" alt="Sửa" class="icon-btn">
+          </a>
+          <button class="btn btn-sm btn-delete-row" data-bom="${d.name}" title="Xóa">
+          <img src="/assets/tahp/images/trash.svg" alt="Xoá" class="icon-btn">
+          </button>
+  `;
+        } else {
+          actions = `
+          <a href="/app/bom/${d.name}" class="btn btn-sm" title="Xem">
+             <img src="/assets/tahp/images/eye.svg" alt="Xem" class="icon-btn">
+          </a>
+  `;
+        }
 
-        let actions = `
-          <a href="/app/bom/${d.name}" class="btn btn-sm btn-outline-secondary" title="Xem"><i class="fa fa-eye"></i></a>
-          <a href="/app/bom/${d.name}" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="fa fa-edit"></i></a>
-          <button class="btn btn-sm btn-outline-danger btn-delete-row" data-bom="${d.name}" title="Xóa"><i class="fa fa-trash"></i></button>
-        `;
 
         return [...base, ...values, actions];
       });
 
       let el = document.getElementById("bom-datatable");
       if (!el) return;
+
 
       if (datatable) datatable.refresh(rows, columns);
       else
@@ -247,6 +263,16 @@ frappe.listview_settings["BOM"] = {
           height: "auto",
           noDataMessage: `<div class="no-data-message">Không có dữ liệu</div>`,
         });
+
+      datatable.wrapper.querySelectorAll(".dt-row-filter .dt-filter").forEach((el, idx) => {
+        let col = datatable.options.columns[idx - 1];
+
+        if (idx === 0 || (col && col.disableFilter && (col.field === "__stt" || col.field === "__actions"))) {
+          el.style.display = "none";
+        } else {
+          el.classList.add("search-filter");
+        }
+      });
 
       renderPagination(current_page, Math.ceil(total_count / page_size), total_count);
     }
