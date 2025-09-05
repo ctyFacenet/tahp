@@ -1624,7 +1624,7 @@ Compiled Successfully,Compiled Successfully
 Complete,Complete
 Complete Registration,Complete Registration
 Complete Setup,Complete Setup
-Completed,Completed
+Completed,Hoàn thành
 Completed By Role,Completed By Role
 Completed By User,Completed By User
 Component,Component
@@ -3606,7 +3606,7 @@ Old Password,Old Password
 Old and new fieldnames are same.,Old and new fieldnames are same.
 Older backups will be automatically deleted,Older backups will be automatically deleted
 Oldest Unscheduled Job,Oldest Unscheduled Job
-On Hold,On Hold
+On Hold,Đang dừng
 On Payment Authorization,On Payment Authorization
 "On checking this option, URL will be treated like a jinja template string","On checking this option, URL will be treated like a jinja template string"
 On or After,On or After
@@ -7633,7 +7633,7 @@ Company Contact Person,Company Contact Person
 Company Description,Company Description
 Company Description for website homepage,Company Description for website homepage
 Company Details,Company Details
-Company Email,Company Email
+Company Email,Email công ty
 Company Logo,Company Logo
 Company Name cannot be Company,Company Name cannot be Company
 Company Not Linked,Company Not Linked
@@ -8499,7 +8499,7 @@ Employee Group Table,Employee Group Table
 Employee ID,Employee ID
 Employee Internal Work History,Employee Internal Work History
 Employee Name,Employee Name
-Employee Number,Employee Number
+Employee Number,Mã nhân viên chính thức
 Employee User Id,Employee User Id
 Employee cannot report to himself.,Employee cannot report to himself.
 Employee is required while issuing Asset {0},Employee is required while issuing Asset {0}
@@ -9179,7 +9179,7 @@ In Maintenance,In Maintenance
 In Mins,In Mins
 In Party Currency,In Party Currency
 In Percentage,In Percentage
-In Process,In Process
+In Process,Đang thực hiện
 In Production,In Production
 In Qty,In Qty
 In Stock,In Stock
@@ -13727,7 +13727,7 @@ Wire Transfer,Wire Transfer
 With Period Closing Entry For Opening Balances,With Period Closing Entry For Opening Balances
 Withdrawal,Withdrawal
 Work Done,Work Done
-Work In Progress,Work In Progress
+Work In Progress,Đang thực hiện
 Work In Progress Warehouse,Work In Progress Warehouse
 Work Order / Subcontract PO,Work Order / Subcontract PO
 Work Order Analysis,Work Order Analysis

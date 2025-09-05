@@ -1,12 +1,50 @@
 frappe.ui.form.on('Stock Entry', {
     onload: async function(frm) {
         await set_code(frm);
+        await frm.events.autofill_input(frm);
     },
 
     stock_entry_type: async function(frm) {
         await set_code(frm);
+    },
+
+    autofill_input: async function(frm) {
+        if (!frm.is_new() || !frm.doc.work_order) return;
+        const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
+        if (inputs && inputs.length) {
+            frm.doc.items.forEach(row => {
+                if (row.is_finished_item) row.description = 'Thành phẩm';
+                else row.description = 'Nguyên liệu trong sản xuất';
+                row.qty = 0
+            });
+            inputs.forEach(input => {
+                let row = frm.add_child('items');
+                row.s_warehouse = input.s_warehouse;
+                row.item_code = input.item_code;
+                row.item_name = input.item_name;
+                row.qty = input.qty;
+                row.uom = input.uom;
+                row.description = input.description;
+                row.conversion_factor = 1;
+                row.transfer_qty = input.qty;
+                row.set_basic_rate_manually = 1;
+            });
+            }
+            frm.refresh_field('items');
+        frm.refresh_field('items');
+    },
+
+});
+
+frappe.ui.form.on('Stock Entry Detail', {
+    qty: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        if (row.is_finished_item) {
+            frm.doc.fg_completed_qty = row.qty;
+        }
     }
 });
+
 
 /**
  * Sinh custom_code cho Stock Entry khi tạo mới.
@@ -29,9 +67,9 @@ async function set_code(frm) {
     const today = frappe.datetime.str_to_obj(frappe.datetime.get_today());
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
-
+    const lastDay = new Date(year, today.getMonth() + 1, 0).getDate();
     const start_date = `${year}-${month}-01`;
-    const end_date = `${year}-${month}-31`;
+    const end_date = `${year}-${month}-${lastDay}`;
 
     const entries = await frappe.db.get_list("Stock Entry", {
         filters: [

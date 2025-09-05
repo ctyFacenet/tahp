@@ -15,7 +15,9 @@ fixtures = [
     {"doctype": "Workflow Action"},
     {"doctype": "Workspace"},
     {"doctype": "Website Settings"},
-    {"doctype": "System Settings"}
+    {"doctype": "System Settings"},
+    {"doctype": "Custom HTML Block"},
+    {"doctype": "Downtime Reason"},
 ]
 
 # required_apps = []
@@ -37,22 +39,19 @@ fixtures = [
 # include js, css files in header of desk.html
 app_include_css = [
     "/assets/tahp/css/desk.css",
+    "/assets/tahp/css/custom.css",
+    "/assets/tahp/css/job_card.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
-    # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
-    # "/assets/tahp/js/tahp/form/controls/date.js",
+    "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
+    "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
-    "/assets/tahp/js/item/item.js",
-    "/assets/tahp/js/stock_entry/stock_entry.js",
-    "/assets/tahp/js/operation/operation.js",
-    "/assets/tahp/js/routing/routing.js",
-    "/assets/tahp/js/bom/bom.js",
-    "/assets/tahp/js/work_order/work_order.js",
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
+    "/assets/tahp/js/custom_utils/dynamic_filters.js",
 ]
 
 # include js, css files in header of web template
@@ -74,9 +73,24 @@ web_include_css = [
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+doctype_js = {
+    "Work Order": ["/public/js/work_order/work_order.js"],
+    "Item": ["/public/js/item/item.js"],
+    "Stock Entry": ["/public/js/stock_entry/stock_entry.js"],
+    "Operation": ["/public/js/operation/operation.js"],
+    "Routing": ["/public/js/routing/routing.js"],
+    "BOM": ["/public/js/bom/bom.js"],
+    "Warehouse": ["/public/js/warehouse/warehouse.js"],
+    "Job Card": ["/public/js/job_card/job_card.js"],
+    "Employee": ["/public/js/employee/employee.js"],
+    "Workstation": ["/public/js/workstation/workstation.js"]
+}
+
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"]
 }
@@ -172,6 +186,11 @@ after_install = "tahp.setup.setup_website"
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
+override_doctype_class = {
+	"Employee": "tahp.overrides.employee.Employee",
+    "Stock Entry": "tahp.overrides.stock_entry.StockEntry"
+}
+
 # Document Events
 # ---------------
 # Hook on document methods and events
@@ -194,12 +213,33 @@ doc_events = {
         "after_insert": [
             "tahp.doc_events.stock_entry.after_insert.after_insert"
         ],
+        "before_insert": [
+            "tahp.doc_events.stock_entry.before_insert.before_insert"
+        ]
     },
     "Operation": {
         "before_save": [
             "tahp.doc_events.operation.before_save.before_save"
         ]
-    }
+    },
+    "Work Order": {
+        "before_submit": [
+            "tahp.doc_events.work_order.before_submit.before_submit"
+        ],
+        "before_save": [
+            "tahp.doc_events.work_order.before_save.before_save"
+        ]
+    },
+    "Workstation": {
+        "before_save": [
+            "tahp.doc_events.workstation.before_save.before_save"
+        ]
+    },
+    "Job Card": {
+        "after_insert": [
+            "tahp.doc_events.job_card.after_insert.after_insert"
+        ]
+    },
 }
 
 # doc_events = {

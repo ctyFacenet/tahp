@@ -8,4 +8,6 @@ from frappe.model.document import Document
 class DowntimeReason(Document):
 	pass
 
-
+@frappe.whitelist()
+def get():
+    return frappe.get_single("Downtime Reason")
