@@ -1,4 +1,5 @@
 import frappe
+import calendar
 
 def after_insert(doc, method):
     if not doc.custom_code: set_code(doc)
@@ -64,6 +65,8 @@ def generate_qc(doc):
                 })
                 qi.insert(ignore_permissions=True)
                 row.quality_inspection = qi.name
+        
+        doc.save(ignore_permissions=True)
 
 def set_code(doc):
     """
@@ -90,8 +93,9 @@ def set_code(doc):
     today = frappe.utils.get_datetime()
     year = today.year
     month = f"{today.month:02d}"
+    last_day = calendar.monthrange(year, today.month)[1]
     start_date = f"{year}-{month}-01"
-    end_date = f"{year}-{month}-31"
+    end_date = f"{year}-{month}-{last_day}"
 
     entries = frappe.db.get_all("Stock Entry", filters={
         "docstatus": ["==", 1],
@@ -102,5 +106,6 @@ def set_code(doc):
     index = len(entries) + 1
     custom_code = f"{code}.{year}.{month}.{index:04d}"
     doc.custom_code = custom_code
+    doc.save()
 
     

@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom HTML Block",
+  "html": "<div class=\"lsx-ca-progress-block\">\n    <table class=\"table table-bordered table-condensed\" id=\"lsx_ca_table\">\n        <thead>\n            <tr>\n                <th>LSX Ca</th>\n                <th>Trạng thái</th>\n                <th>Trưởng ca</th>\n                <th>Ca</th>\n                <th>Số công đoạn xong</th>\n                <th>Biên bản giao ca</th>\n            </tr>\n        </thead>\n        <tbody class=\"lsx-ca-body\">\n            <!-- Rows sẽ được JS chèn vào -->\n        </tbody>\n    </table>\n</div>",
+  "modified": "2025-09-03 11:47:10.991328",
+  "name": "Tiến độ LSX Ca",
+  "private": 0,
+  "roles": [],
+  "script": "const tbody = root_element.querySelector(\".lsx-ca-body\");\n\nfrappe.call({\n    method: \"tahp.doc_events.work_order.before_submit.get_shift_progress\",\n    callback: function(r) {\n        tbody.innerHTML = \"\";\n        if (r.message && r.message.length) {\n            r.message.forEach(shift => {\n                const tr = document.createElement(\"tr\");\n\n                // Status badge\n                let status_html = \"\";\n                if (shift.status === \"Nháp\") {\n                    status_html = `<span class=\"badge-status badge-draft\">Nháp</span>`;\n                } else {\n                    status_html = `<span class=\"badge-status badge-in-progress\">Đang thực hiện</span>`;\n                }\n\n                tr.innerHTML = `\n                    <td><span class=\"lsx-link\" onclick=\"frappe.set_route('Form', 'Work Order', '${shift.lsx_ca}')\">${shift.lsx_ca}</span></td>\n                    <td>${status_html}</td>\n                    <td>${shift.shift_leader || \"\"}</td>\n                    <td>${shift.shift || \"\"}</td>\n                    <td>${shift.progress || \"0/0\"}</td>\n                    <td>${shift.handover_record || \"\"}</td>\n                `;\n                tbody.appendChild(tr);\n            });\n        } else {\n            tbody.innerHTML = `<tr><td colspan=\"6\">Không có LSX Ca nào</td></tr>`;\n        }\n    }\n});",
+  "style": ".lsx-ca-progress-block h4 {\n    margin-bottom: 1rem;\n    font-weight: bold;\n    color: #ccc;\n}\n.lsx-ca-progress-block table th, \n.lsx-ca-progress-block table td {\n    text-align: center;\n    vertical-align: middle;\n    border-radius: 50px;\n}\n.badge-status {\n    padding: 0.35em 0.7em;\n    border-radius: 1rem;\n    color: #fff;\n}\n.badge-draft {\n    background-color: #6c757d; /* xám nhạt */\n}\n.badge-in-progress {\n    background-color: #17a2b8; /* xanh dương */\n}\n.lsx-link {\n    text-decoration: underline;\n    cursor: pointer;\n}\n\nthead {\n    background: #eee;\n}"
+ }
+]
