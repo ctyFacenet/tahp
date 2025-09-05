@@ -619,9 +619,9 @@ async function open_create_shift_dialog(frm) {
                     custom_note: values.note,
                     custom_shift: values.shift,
                     custom_shift_leader: values.shift_leader,
-                    custom_week: frm.doc.name,
+                    custom_plan: frm.doc.name,
                     custom_worker_qty: values.worker_qty,
-                    custom_week_row: values.selected_row,
+                    custom_plan_code: values.selected_row,
                     operations: operations
                 };
                 
