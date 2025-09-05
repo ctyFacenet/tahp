@@ -10,7 +10,10 @@ frappe.listview_settings["BOM"] = {
       <div class="custom-bom-wrapper position-relative">
         <h3 class="text-center fw-bold mb-3">Quản lý BOM</h3>
         
-        <div id="time-filter-toggle"><i class="fa fa-align-left"></i></div>
+       <div id="time-filter-toggle">
+        <img src="/assets/tahp/images/filter_time.svg" alt="Filter Time">
+      </div>
+
         <div id="time-filter" class="collapsed">
           <ul class="year-list">
             ${[2025, 2024, 2023, 2022, 2021, 2020].map(
@@ -29,6 +32,7 @@ frappe.listview_settings["BOM"] = {
           </ul>
         </div>
 
+        
         <div class="d-flex justify-content-end gap-4 mb-2 custom-toolbar">
           <a href="javascript:void(0)" id="btn-add" class="text-success"><i class="fa fa-plus"></i> Thêm mới</a>
           <a href="javascript:void(0)" id="btn-copy" class="text-info"><i class="fa fa-copy"></i> Sao chép</a>
@@ -68,9 +72,20 @@ frappe.listview_settings["BOM"] = {
       total_count = 0,
       time_filters = [];
 
-    // Toggle filter
-    $(document).on("click", "#time-filter-toggle", function () {
+
+    $(document).on("click", "#time-filter-toggle", function (e) {
+      e.stopPropagation();
       $("#time-filter").toggleClass("active");
+    });
+
+    $(document).on("click", function (e) {
+      if (
+        $("#time-filter").hasClass("active") &&
+        !$(e.target).closest("#time-filter").length &&
+        !$(e.target).is("#time-filter-toggle")
+      ) {
+        $("#time-filter").removeClass("active");
+      }
     });
 
     // Toggle năm
