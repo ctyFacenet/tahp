@@ -1214,7 +1214,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.091244",
+  "modified": "2025-09-05 14:17:43.312607",
   "module": "CRM",
   "name": "CRM",
   "number_cards": [],
@@ -2361,7 +2361,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.926411",
+  "modified": "2025-09-05 14:17:42.584628",
   "module": "Selling",
   "name": "Selling",
   "number_cards": [],
@@ -3345,7 +3345,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:56.069229",
+  "modified": "2025-09-05 14:17:42.457940",
   "module": "Buying",
   "name": "Buying",
   "number_cards": [],
@@ -3870,7 +3870,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.757662",
+  "modified": "2025-09-05 14:17:42.761475",
   "module": "Website",
   "name": "Website",
   "number_cards": [],
@@ -4541,7 +4541,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.543683",
+  "modified": "2025-09-05 14:17:42.929392",
   "module": "Automation",
   "name": "Tools",
   "number_cards": [],
@@ -4889,7 +4889,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.690685",
+  "modified": "2025-09-05 14:17:42.816872",
   "module": "Core",
   "name": "Users",
   "number_cards": [],
@@ -5362,7 +5362,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:54.979645",
+  "modified": "2025-09-05 14:17:43.388523",
   "module": "Integrations",
   "name": "Integrations",
   "number_cards": [],
@@ -6369,7 +6369,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:56.177800",
+  "modified": "2025-09-05 14:17:42.314931",
   "module": "Accounts",
   "name": "Accounting",
   "number_cards": [
@@ -7779,7 +7779,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:56.278719",
+  "modified": "2025-09-05 14:17:42.225697",
   "module": "Assets",
   "name": "Assets",
   "number_cards": [],
@@ -8189,7 +8189,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.637406",
+  "modified": "2025-09-05 14:17:42.869519",
   "module": "Projects",
   "name": "Projects",
   "number_cards": [],
@@ -8607,7 +8607,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.195068",
+  "modified": "2025-09-05 14:17:43.227388",
   "module": "Support",
   "name": "Support",
   "number_cards": [],
@@ -10477,7 +10477,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.393563",
+  "modified": "2025-09-05 14:17:43.048203",
   "module": "Setup",
   "name": "ERPNext Settings",
   "number_cards": [],
@@ -10894,7 +10894,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.312695",
+  "modified": "2025-09-05 14:17:43.109313",
   "module": "Accounts",
   "name": "Payables",
   "number_cards": [],
@@ -11314,7 +11314,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.248132",
+  "modified": "2025-09-05 14:17:43.156664",
   "module": "Accounts",
   "name": "Receivables",
   "number_cards": [],
@@ -11858,7 +11858,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.479128",
+  "modified": "2025-09-05 14:17:42.989559",
   "module": "Accounts",
   "name": "Financial Reports",
   "number_cards": [],
@@ -12776,7 +12776,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-08-26 08:32:55.829348",
+  "modified": "2025-09-05 14:17:42.694966",
   "module": "Core",
   "name": "Build",
   "number_cards": [],
