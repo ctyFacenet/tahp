@@ -46,6 +46,7 @@ app_include_css = [
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
+    "override.bundle.js",
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
