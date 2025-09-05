@@ -134,7 +134,7 @@
 .jc-edit-editing {
     font-size: 1.25rem;
     padding: 5px 10px;
-    max-width: 5ch;
+    max-width: 10ch;
     border: 1px solid #ccc;
     border-radius: 20px;
     overflow: hidden;

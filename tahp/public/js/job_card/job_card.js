@@ -569,10 +569,11 @@ frappe.ui.form.on('Job Card', {
                     if (col.type !== 'string') {
                         let value = row[col.fieldname] != null ? row[col.fieldname] : '';
                         if (col.type === 'number' && value !== '') value = parseFloat(value);
-                        let $input = $(`<input type="number" class="jc-tb-mobile-value" disabled value="${value}">`);
+                        let $input = $(`<input type="number" class="jc-tb-mobile-value" value="${value}">`);
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
-                        if (col.nowrap) $input.css({'max-width': '3.5ch'})
+                        $input.css('pointer-events', 'none')
+                        if (col.nowrap) $input.css({'max-width': '5ch'})
                         else $input.css({'width':'100%'})
                         $realRight.append($input);
                         if (col.symbolize) $realRight.append(col.symbolize);
@@ -674,7 +675,7 @@ frappe.ui.form.on('Job Card', {
             editing = true;
 
             inputs.forEach(($input, index) => {
-                $input.prop('disabled', false).addClass('jc-edit-editing');
+                $input.css('pointer-events', 'auto').addClass('jc-edit-editing');
                 // Enter để nhảy qua input kế tiếp
                 $input.on('keydown.nextFocus', function(e) {
                     if (e.key === 'Enter' || e.keyCode === 13) {
@@ -711,7 +712,8 @@ frappe.ui.form.on('Job Card', {
         function disableEditing(inputs) {
             editing = false;
             inputs.forEach($input => {
-                $input.prop('disabled', true)
+                $input
+                    .css('pointer-events', 'none')
                     .removeClass('jc-edit-editing')
                     .off('keydown.nextFocus')
                     .off('blur.saveCheck');
