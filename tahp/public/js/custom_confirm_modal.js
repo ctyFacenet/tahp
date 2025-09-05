@@ -1,11 +1,22 @@
-// public/js/custom_confirm.js
-function customConfirm({
+function customConfirmModal({
   title = "Xác nhận",
   message = "",
   note = "",
-  onConfirm = null
+  type = "info",
+  buttons = []
 }) {
   $("#customConfirmModal").remove();
+
+  let buttonsHtml = buttons.map((btn, i) => `
+    <button type="button" class="btn ${btn.class || "btn-secondary"} btn-action" data-idx="${i}">
+      ${btn.text}
+    </button>
+  `).join("");
+
+  let alertClass = "";
+  if (type === "danger") alertClass = "alert-danger";
+  else if (type === "success") alertClass = "alert-success";
+  else alertClass = "alert-info";
 
   let modalHtml = `
     <div class="modal fade" id="customConfirmModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -22,7 +33,7 @@ function customConfirm({
           <div class="modal-body">
             <p>${message}</p>
             ${note ? `
-              <div class="alert alert-info d-flex align-items-center">
+              <div class="alert ${alertClass} d-flex align-items-center">
                 <i class="fa fa-exclamation-triangle mr-2"></i>
                 <div>
                   <strong>Lưu ý:</strong><br>
@@ -33,8 +44,7 @@ function customConfirm({
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-cancel">Hủy bỏ</button>
-            <button type="button" class="btn btn-primary btn-ok">Xác nhận</button>
+            ${buttonsHtml}
           </div>
 
         </div>
@@ -46,12 +56,13 @@ function customConfirm({
 
   let $dialog = $("#customConfirmModal");
 
-  $dialog.find(".btn-ok").on("click", function () {
-    if (onConfirm) onConfirm();
+  $dialog.find(".btn-action").on("click", function () {
+    let idx = $(this).data("idx");
+    if (buttons[idx].onClick) buttons[idx].onClick();
     $dialog.modal("hide");
   });
 
-  $dialog.find(".btn-cancel, .close").on("click", function () {
+  $dialog.find(".close").on("click", function () {
     $dialog.modal("hide");
   });
 

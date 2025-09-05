@@ -5,12 +5,13 @@
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Căn giữa tiêu đề modal */
 #customConfirmModal .modal-header {
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  border-bottom: none;
+  padding: 16px;
 }
 
 #customConfirmModal .modal-title {
@@ -21,51 +22,75 @@
   margin: 0;
 }
 
-/* Nút X giữ bên phải */
+/* Close button */
 #customConfirmModal .close {
   position: absolute;
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 35px;
+  font-size: 32px;
+  line-height: 1;
+  color: #333;
+  background: none;
+  border: none;
 }
 
 #customConfirmModal .close:hover {
+  color: #1d6eb5;
   opacity: 1;
 }
 
-/* Body */
 #customConfirmModal .modal-body {
   font-size: 14px;
   color: #333;
+  padding: 16px;
 }
 
 #customConfirmModal .modal-body p {
   margin-bottom: 12px;
 }
 
-/* Block lưu ý */
 #customConfirmModal .modal-body .alert {
   font-size: 13px;
-  border-left: 5px solid rgb(78, 78, 255);
-  background-color: rgba(0, 174, 238, 0.1);
   margin-top: 8px;
   border-radius: 6px;
-  padding: 22px 12px;
+  padding: 16px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 #customConfirmModal .modal-body .alert i {
-  color: #007bff;
-  margin-right: 6px;
+  margin-top: 2px;
   font-size: 15px;
 }
 
-/* Footer */
+#customConfirmModal .alert-info {
+  border-left: 5px solid #17a2b8 !important;
+  background-color: rgba(23, 162, 184, 0.1);
+  color: #055160;
+}
+
+#customConfirmModal .alert-danger {
+  border-left: 5px solid #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #842029;
+}
+
+#customConfirmModal .alert-success {
+  border-left: 5px solid #28a745 !important;
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #0f5132;
+}
+
+
 #customConfirmModal .modal-footer {
   border-top: 1px solid #dee2e6;
   padding: 10px 16px;
   justify-content: flex-end !important;
+  gap: 10px;
 }
+
 
 #customConfirmModal .btn {
   min-width: 80px;
@@ -73,13 +98,13 @@
   font-weight: 500;
   border-radius: 4px;
   padding: 6px 14px;
+  transition: all 0.2s;
 }
 
-/* Button styles */
 #customConfirmModal .btn-secondary {
   background-color: #6c757d;
   border: none;
-  margin-right: 10px;
+  color: #fff;
 }
 
 #customConfirmModal .btn-secondary:hover {
@@ -93,4 +118,22 @@
 
 #customConfirmModal .btn-primary:hover {
   background-color: #0069d9;
+}
+
+#customConfirmModal .btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+
+#customConfirmModal .btn-danger:hover {
+  background-color: #c82333;
+}
+
+#customConfirmModal .btn-success {
+  background-color: #28a745;
+  border: none;
+}
+
+#customConfirmModal .btn-success:hover {
+  background-color: #218838;
 }

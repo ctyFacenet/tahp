@@ -269,21 +269,29 @@ frappe.listview_settings["BOM"] = {
     // Event: xóa 1 dòng
     $(listview.page.body).on("click", ".btn-delete-row", function () {
       let bom_name = $(this).data("bom");
-      customConfirm({
+
+      customConfirmModal({
         title: "Xác nhận xóa BOM",
         message: `Bạn có chắc muốn xóa BOM <b>${bom_name}</b>?`,
         note: "Sau khi xóa, dữ liệu sẽ không thể khôi phục!",
-        onConfirm: function () {
-          frappe.call({
-            method: "frappe.client.delete",
-            args: { doctype: "BOM", name: bom_name },
-            callback: function () {
-              frappe.show_alert({ message: `Đã xóa ${bom_name}`, indicator: "red" });
-              load_data(current_page, search_text, time_filters);
+        type: "danger",
+        buttons: [
+          { text: "Hủy bỏ", class: "btn-secondary" },
+          {
+            text: "Xóa", class: "btn-danger", onClick: () => {
+              frappe.call({
+                method: "frappe.client.delete",
+                args: { doctype: "BOM", name: bom_name },
+                callback: function () {
+                  frappe.show_alert({ message: `Đã xóa ${bom_name}`, indicator: "red" });
+                  load_data(current_page, search_text, time_filters);
+                }
+              });
             }
-          });
-        }
+          }
+        ]
       });
+
     });
 
     // Toolbar
