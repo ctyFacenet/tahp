@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-18 14:10:28.146266",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_xdwe",
+  "items",
+  "section_break_inml",
+  "note",
+  "section_break_jnld",
+  "plan",
+  "column_break_djft",
+  "creation_time",
+  "amended_from",
+  "section_break_ohpc",
+  "wo_detail"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_xdwe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Danh s\u00e1ch m\u1eb7t h\u00e0ng c\u1ea7n s\u1ea3n xu\u1ea5t",
+   "options": "Week Work Order Item"
+  },
+  {
+   "fieldname": "section_break_inml",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Ghi ch\u00fa"
+  },
+  {
+   "fieldname": "section_break_jnld",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "plan",
+   "fieldtype": "Link",
+   "label": "K\u1ebf ho\u1ea1ch s\u1ea3n xu\u1ea5t",
+   "options": "WWO Plan",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_djft",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "creation_time",
+   "fieldtype": "Datetime",
+   "label": "Th\u1eddi \u0111i\u1ec3m t\u1ea1o"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Week Work Order",
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_ohpc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "wo_detail",
+   "fieldtype": "Table",
+   "options": "Week Work Order Item 2",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-21 15:32:03.894211",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Week Work Order",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

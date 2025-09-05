@@ -70,9 +70,9 @@ frappe.ui.form.on('Job Card', {
                 { label: 'Tên thiết bị', fieldname: 'workstation', is_primary: true },
                 { label: 'Đã chạy được', fieldname: 'time' },
                 { label: 'Trạng thái', fieldname: 'status', is_value: true, type: "string" },
-                { 
-                    label: 'Hành động', 
-                    fieldname: 'action', 
+                {
+                    label: 'Hành động',
+                    fieldname: 'action',
                     action: [
                         {
                             label: "Bật",
@@ -158,7 +158,7 @@ frappe.ui.form.on('Job Card', {
             edittable=false,
         )
         if (frm.__workstation_timer) clearInterval(frm.__workstation_timer);
-        frm.__workstation_timer = setInterval(() => frm.events.update_workstations_timer_display(frm, $col2), 1000);    
+        frm.__workstation_timer = setInterval(() => frm.events.update_workstations_timer_display(frm, $col2), 1000);
         frm.events.update_workstations_timer_display(frm, $col2)
 
         frm.events.define_table(
@@ -167,12 +167,12 @@ frappe.ui.form.on('Job Card', {
                 { label: 'Cấu hình', fieldname: 'config_name', is_primary: true },
                 { label: 'Giá trị', fieldname: 'config_value', is_value: true },
                 { label: 'Đơn vị', fieldname: 'unit', is_unit: true},
-                { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },                
+                { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
             ],
-            data= (frm.doc.custom_config_table || []).map(row => ({ 
-                config_name: row.config_name, 
-                unit: row.unit, 
-                config_value: row.config_value, 
+            data= (frm.doc.custom_config_table || []).map(row => ({
+                config_name: row.config_name,
+                unit: row.unit,
+                config_value: row.config_value,
                 workstation: row.workstation ? row.workstation : "Áp dụng tất cả" })),
             edittable=true,
             action="update_configs"
@@ -235,8 +235,8 @@ frappe.ui.form.on('Job Card', {
             columns=[
                 { label: 'Mã nhân viên', fieldname: 'employee', is_value: true, type: "string" },
                 { label: 'Tên nhân viên', fieldname: 'employee_name', is_primary: true },
-                { 
-                    label: 'Hành động', 
+                {
+                    label: 'Hành động',
                     fieldname: 'action',
                     action: [
                         {
@@ -273,9 +273,9 @@ frappe.ui.form.on('Job Card', {
             frm.events.define_table(
                 frm, $col7, 'Lịch sử dừng máy',
                 columns=[
-                    { label: 'Thời gian', fieldname: 'time', is_primary: true }, 
+                    { label: 'Thời gian', fieldname: 'time', is_primary: true },
                     { label: 'Khoảng dừng', fieldname: 'duration', is_secondary: true },
-                    { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true }, 
+                    { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
                     { label: 'Lý do', fieldname: 'reason', is_value: true, type: "string" },
                 ],
                 data=frm.doc.custom_downtime.map(d => {
@@ -312,7 +312,7 @@ frappe.ui.form.on('Job Card', {
                         reason: reason_str,
                     };
                 }),
-            )            
+            )
         }
     },
 
@@ -344,7 +344,7 @@ frappe.ui.form.on('Job Card', {
     },
 
     define_controller: async function(frm, $wrapper) {
-        // Định nghĩa khung 
+        // Định nghĩa khung
         let $status = $(`<div class="flex justify-content-between align-items-center jc-header">
             <div>
                 <span class="jc-circle"></span>
@@ -376,7 +376,7 @@ frappe.ui.form.on('Job Card', {
             list = []
         }
 
-        // Kiểm tra đầu việc 
+        // Kiểm tra đầu việc
         let subtasks = frm.doc.custom_subtask || [];
         let firstUndoneIndex = subtasks.findIndex(row => row.done === 0);
         if (firstUndoneIndex !== -1) {
@@ -384,7 +384,7 @@ frappe.ui.form.on('Job Card', {
             $task.text(`Đang thực hiện: ${subtasks[firstUndoneIndex].reason}`);
         }
 
-        let cOpen = frm.doc.status !== "Open" 
+        let cOpen = frm.doc.status !== "Open"
         let cTask = true
         if (frm.doc.custom_subtask && frm.doc.custom_subtask.length > 0) {
             const undone = frm.doc.custom_subtask.filter(t => !t.done).length;
@@ -401,7 +401,7 @@ frappe.ui.form.on('Job Card', {
             { icon: "fas fa-pause", label: "Tạm dừng", action: () => frm.events.pause_job_card(frm), condition: cGood },
             { icon: "fas fa-play", label: "Tiếp tục", action: () => frm.events.resume_job_card(frm), condition: cGood },
             { icon: "fas fa-forward", label: "Chuyển việc", action: () => frm.events.transfer_job_card(frm), condition: cOpen && cTask },
-            { icon: "fas fa-circle-check", label: "Hoàn thành", action: () => frm.events.complete_job_card(frm), condition: cOpen }            
+            { icon: "fas fa-circle-check", label: "Hoàn thành", action: () => frm.events.complete_job_card(frm), condition: cOpen }
         ]
 
         list.forEach(label => {
@@ -514,7 +514,7 @@ frappe.ui.form.on('Job Card', {
                         $td.append($input);
                     } else {
                         $td = $(`<td>${row[col.fieldname] || ''}</td>`);
-                    }                    
+                    }
                 } else {
                     $td = $(`<td>${row[col.fieldname] || ''}</td>`)
                     $td.attr('data-fieldname', col.fieldname)
@@ -538,7 +538,7 @@ frappe.ui.form.on('Job Card', {
             $theadMobile.append(`<div style="flex:1" class="text-right">${value?.label || ""}</div>`)
         } else {
             $theadMobile.append(`<div style="flex:2" class="text-left">${primary?.label || ""}</div>`)
-            $theadMobile.append(`<div style="flex:1" class="text-right">${value?.label || ""}</div>`)            
+            $theadMobile.append(`<div style="flex:1" class="text-right">${value?.label || ""}</div>`)
         }
         $mobileTable.append($theadMobile)
         $wrapper.append($mobileTable)
@@ -561,7 +561,7 @@ frappe.ui.form.on('Job Card', {
                 $right.append($realRight)
 
             }
-            
+
             let $buttons = $(`<div></div>`)
             columns.forEach(col => {
                 if (col.is_primary && row[col.fieldname]) {$left.append(`<div class="">${row[col.fieldname]}</div>`)}
@@ -737,13 +737,13 @@ frappe.ui.form.on('Job Card', {
     start_job_card: async function(frm) {
         const workstations_ready = (frm.doc.custom_workstation_table || []).filter(
             row => row.status === "Sẵn sàng"
-        );   
+        );
         if (workstations_ready.length === 0) return;
         const ws_first = workstations_ready[0];
         if (!ws_first.start_time) {
             await frm.events.update_team(frm);
         }
-        
+
         const workstations = workstations_ready.map(row => ({
             ...row,
             status: "Chạy"
@@ -785,7 +785,7 @@ frappe.ui.form.on('Job Card', {
     resume_job_card: async function(frm) {
         const workstations_ready = (frm.doc.custom_workstation_table || []).filter(
             row => row.status === "Dừng"
-        );   
+        );
         if (workstations_ready.length === 0) return;
         const workstations = workstations_ready.map(row => ({
             ...row,
@@ -807,7 +807,7 @@ frappe.ui.form.on('Job Card', {
             let done_count = subtask_list.filter(t => t.done === 1).length;
             if (done_count + 1 !== subtask_list.length) {
                 const message = `<div>Bạn chưa hoàn thành đủ đầu việc.</div><p>Bạn có chắc chắn muốn tiếp tục Submit không?</p>`;
-                
+
                 await new Promise((resolve, reject) => {
                     frappe.confirm(message, resolve, () => {
                         reject();
@@ -874,7 +874,7 @@ frappe.ui.form.on('Job Card', {
                             in_list_view: 1,
                             read_only: 1
                         }
-                    ]                
+                    ]
                 }],
                 primary_action_label: "Xác nhận",
                 primary_action: async function() {
@@ -953,7 +953,7 @@ frappe.ui.form.on('Job Card', {
             frappe.show_alert({ message:__('Đã cập nhật lại danh sách nhân viên'), indicator:'green'});
         } catch (err) {
             frappe.show_alert({ message:__('Cập nhật danh sách nhân viên thất bại'), indicator:'red'});
-        }        
+        }
     },
 
     update_configs: async function(frm, data) {
