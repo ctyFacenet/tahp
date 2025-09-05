@@ -505,9 +505,10 @@ frappe.ui.form.on('Job Card', {
                         let value = row[col.fieldname] != null ? row[col.fieldname] : '';
                         if (col.type === 'number' && value !== '') value = parseFloat(value);
 
-                        let $input = $(`<input type="number" class="jc-tb-mobile-value text-left" disabled value="${value}" style="max-width:5ch;">`);
+                        let $input = $(`<input type="number" class="jc-tb-mobile-value text-left" value="${value}" style="max-width:10ch;">`);
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
+                        $input.css('pointer-events', 'none')
                         $td = $('<td></td>');
                         desktopInputs.push($input);
                         $td.append($input);
@@ -670,7 +671,7 @@ frappe.ui.form.on('Job Card', {
         // ----- XỬ LÝ CHẾ ĐỘ EDIT -----
         let editing = false;
 
-        function enableEditing(inputs) {
+        function enableEditing(inputs ,$btn=null) {
             if (editing) return;
             editing = true;
 
@@ -697,19 +698,19 @@ frappe.ui.form.on('Job Card', {
                                 () => {
                                     const result = covertAllData(data, inputs);
                                     if (action) frm.events[action](frm, result);
-                                    disableEditing(inputs);
+                                    disableEditing(inputs, $btn);
                                 },
-                                () => { disableEditing(inputs); }
+                                () => { disableEditing(inputs, $btn); }
                             );
                         }
                     }, 150);
                 });
             });
-
+            if ($btn) $btn.addClass('jc-edit-btn-save').text('Lưu');
             if (inputs[0]) scrollAndFocus(inputs, 0);
         }
 
-        function disableEditing(inputs) {
+        function disableEditing(inputs, $btn) {
             editing = false;
             inputs.forEach($input => {
                 $input
@@ -718,11 +719,13 @@ frappe.ui.form.on('Job Card', {
                     .off('keydown.nextFocus')
                     .off('blur.saveCheck');
             });
+            if ($btn) $btn.removeClass('jc-edit-btn-save').text('Sửa');
         }
 
         // Desktop: vẫn dùng nút Sửa
         $wrapper.on("click", ".jc-edit-btn", function() {
-            enableEditing(desktopInputs);
+            const $btn = $(this);
+            enableEditing(desktopInputs, $btn);
         });
 
         // Mobile: click vào bảng để bật edit
