@@ -248,6 +248,22 @@
   #bom-datatable .datatable {
     min-width: 900px;
   }
+
+  .custom-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .custom-footer #page-size,
+  .custom-footer #goto-page,
+  .custom-footer span {
+    display: none !important;
+  }
+
+  .pagination-wrapper {
+    justify-content: center;
+    width: 100%;
+  }
 }
 
 @media (max-width: 576px) {
