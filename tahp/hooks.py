@@ -46,6 +46,7 @@ app_include_css = [
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
+    "override.bundle.js",
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
@@ -95,9 +96,12 @@ doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"]
 }
 
-doctype_js = {
-    "Week Work Order": "./public/js/week work order/week_work_order_list.js"
-}
+# doctype_js = {
+#     "ToDo": [
+#         "public/js/to_do.js",
+#         "public/js/to_do_2.js"
+#     ]
+# }
 
 # Svg Icons
 # ------------------
@@ -348,4 +352,3 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
