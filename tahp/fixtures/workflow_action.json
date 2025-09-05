@@ -1,1 +1,128 @@
-[]
+[
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-21 17:09:35.414964",
+  "name": "otqert2hn9",
+  "permitted_roles": [
+   {
+    "parent": "otqert2hn9",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.21.08.2025.00002",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Nháp"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 11:58:33.561183",
+  "name": "95vn15il98",
+  "permitted_roles": [
+   {
+    "parent": "95vn15il98",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.27.08.2025.00003",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Nháp"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 14:45:47.300474",
+  "name": "b5hbdsosm4",
+  "permitted_roles": [
+   {
+    "parent": "b5hbdsosm4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.27.08.2025.00004",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Nháp"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 14:51:37.885338",
+  "name": "ej2v9rclah",
+  "permitted_roles": [
+   {
+    "parent": "ej2v9rclah",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.27.08.2025.00004",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Đợi PTCN Duyệt"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 14:52:18.890658",
+  "name": "evsd999nc2",
+  "permitted_roles": [
+   {
+    "parent": "evsd999nc2",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.27.08.2025.00004",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Đã được PTCN duyệt"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 16:40:45.542016",
+  "name": "eh7g9k25j5",
+  "permitted_roles": [
+   {
+    "parent": "eh7g9k25j5",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Week Work Order",
+  "reference_name": "LSXT.27.08.2025.00004",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Đợi GĐ duyệt"
+ }
+]
