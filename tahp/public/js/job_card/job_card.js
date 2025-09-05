@@ -211,8 +211,8 @@ frappe.ui.form.on('Job Card', {
                     { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true },
                     { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
                     { label: 'Đã tiêu hao', fieldname: 'qty' },
-                    { label: 'Số đo đầu', fieldname: 'meter', is_value: true, symbolize: '<i class="fas fa-arrow-right jc-i mx-1"></i>' },
-                    { label: 'Số đo mới', fieldname: 'meter_out', is_value: true },
+                    { label: 'Số đo đầu', fieldname: 'meter', is_value: true, symbolize: '<i class="fas fa-arrow-right jc-i mx-1"></i>', nowrap: true },
+                    { label: 'Số đo mới', fieldname: 'meter_out', is_value: true, nowrap: true },
                     { label: 'Đơn vị', fieldname: 'uom', is_unit: true},
                 ],
                 data=frm.doc.custom_input_table.filter(d => d.is_meter).map(d => {
@@ -455,16 +455,21 @@ frappe.ui.form.on('Job Card', {
     define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null) {
 
         // Header
-        let $header = $(`<div class="d-flex jc-title jc-tb-title"><div>${title}</div></div>`)
-        $wrapper.append($header)
+        let $header = $(`
+            <div class="d-flex flex-wrap justify-content-between jc-title jc-tb-title">
+                <div class="flex-grow-1">${title}</div>
+                ${edittable ? `<div class="d-md-none text-info small ms-auto text-end" style="line-height: 1rem;">Bấm để sửa</div>` : ""}
+            </div>
+        `);
+        $wrapper.append($header);
 
         // Nút sửa
         if ((edittable || action) && frm.doc.docstatus === 0) {
             let $editBtn = $('<button class="btn btn-secondary d-none d-md-table jc-edit-btn">Sửa</button>')
             $header.append($editBtn)
 
-            let $editMobileBtn = $('<button class="btn btn-secondary d-md-none w-100 mt-2 jc-edit-btn jc-mobile-input">Sửa</button>')
-            $wrapper.append($editMobileBtn)
+            // let $editMobileBtn = $('<button class="btn btn-secondary d-md-none w-100 mt-2 jc-edit-btn jc-mobile-input">Sửa</button>')
+            // $wrapper.append($editMobileBtn)
         }
 
 
@@ -500,7 +505,7 @@ frappe.ui.form.on('Job Card', {
                         let value = row[col.fieldname] != null ? row[col.fieldname] : '';
                         if (col.type === 'number' && value !== '') value = parseFloat(value);
 
-                        let $input = $(`<input type="number" class="jc-tb-mobile-value" disabled value="${value}">`);
+                        let $input = $(`<input type="number" class="jc-tb-mobile-value text-left" disabled value="${value}" style="max-width:5ch;">`);
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $td = $('<td></td>');
@@ -567,6 +572,8 @@ frappe.ui.form.on('Job Card', {
                         let $input = $(`<input type="number" class="jc-tb-mobile-value" disabled value="${value}">`);
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
+                        if (col.nowrap) $input.css({'max-width': '3.5ch'})
+                        else $input.css({'width':'100%'})
                         $realRight.append($input);
                         if (col.symbolize) $realRight.append(col.symbolize);
                         mobileInputs.push($input);
@@ -608,55 +615,117 @@ frappe.ui.form.on('Job Card', {
              return;
         }
 
+        // let editing = false;
+        // $wrapper.on("click", ".jc-edit-btn", function() {
+        //     editing = !editing;
+        //     const $btn = $(this);
+
+        //     if (editing) {
+        //         mobileInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
+        //         if (mobileInputs[0]) scrollAndFocus(mobileInputs, 0);
+        //         $btn.text('Lưu').addClass('jc-edit-btn-save');
+
+        //         mobileInputs.forEach(($input, index) => {
+        //             $input.off('keydown.nextFocus');
+        //             $input.on('keydown.nextFocus', function(e) {
+        //                 if (e.key === 'Enter' || e.keyCode === 13) {
+        //                     e.preventDefault();
+        //                     const nextIndex = index + 1;
+        //                     if (nextIndex < mobileInputs.length) scrollAndFocus(mobileInputs, nextIndex);
+        //                     else $btn.trigger('click');
+        //                 }
+        //             });
+        //         });
+
+        //         desktopInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
+        //         if (desktopInputs[0]) scrollAndFocus(desktopInputs, 0);
+        //         $btn.text('Lưu').addClass('jc-edit-btn-save');
+
+        //         desktopInputs.forEach(($input, index) => {
+        //             $input.off('keydown.nextFocus');
+        //             $input.on('keydown.nextFocus', function(e) {
+        //                 if (e.key === 'Enter' || e.keyCode === 13) {
+        //                     e.preventDefault();
+        //                     const nextIndex = index + 1;
+        //                     if (nextIndex < desktopInputs.length) scrollAndFocus(desktopInputs, nextIndex);
+        //                     else $btn.trigger('click');
+        //                 }
+        //             });
+        //         });
+
+        //     } else {
+        //         const isMobileBtn = $btn.hasClass('jc-mobile-input');
+        //         const inputs = isMobileBtn ? mobileInputs : desktopInputs;
+        //         desktopInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
+        //         mobileInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
+        //         $btn.text('Sửa').removeClass('jc-edit-btn-save');
+        //         if (action) {
+        //             const result = covertAllData(data, inputs);
+        //             frm.events[action](frm, result)
+        //         }
+        //     }
+        // });
+
+        // ----- XỬ LÝ CHẾ ĐỘ EDIT -----
         let editing = false;
+
+        function enableEditing(inputs) {
+            if (editing) return;
+            editing = true;
+
+            inputs.forEach(($input, index) => {
+                $input.prop('disabled', false).addClass('jc-edit-editing');
+                // Enter để nhảy qua input kế tiếp
+                $input.on('keydown.nextFocus', function(e) {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        const nextIndex = index + 1;
+                        if (nextIndex < inputs.length) {
+                            scrollAndFocus(inputs, nextIndex);
+                        } else {
+                            $input.blur(); // giả lập blur cuối cùng
+                        }
+                    }
+                });
+                // Khi blur thì kiểm tra xem có phải input cuối hoặc rời hết không
+                $input.on('blur.saveCheck', function() {
+                    setTimeout(() => {
+                        if (!$(".jc-edit-editing:focus").length) { // không còn input nào focus
+                            frappe.confirm(
+                                "Lưu thay đổi?",
+                                () => {
+                                    const result = covertAllData(data, inputs);
+                                    if (action) frm.events[action](frm, result);
+                                    disableEditing(inputs);
+                                },
+                                () => { disableEditing(inputs); }
+                            );
+                        }
+                    }, 150);
+                });
+            });
+
+            if (inputs[0]) scrollAndFocus(inputs, 0);
+        }
+
+        function disableEditing(inputs) {
+            editing = false;
+            inputs.forEach($input => {
+                $input.prop('disabled', true)
+                    .removeClass('jc-edit-editing')
+                    .off('keydown.nextFocus')
+                    .off('blur.saveCheck');
+            });
+        }
+
+        // Desktop: vẫn dùng nút Sửa
         $wrapper.on("click", ".jc-edit-btn", function() {
-            editing = !editing;
-            const $btn = $(this);
+            enableEditing(desktopInputs);
+        });
 
-            if (editing) {
-                mobileInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
-                if (mobileInputs[0]) scrollAndFocus(mobileInputs, 0);
-                $btn.text('Lưu').addClass('jc-edit-btn-save');
-
-                mobileInputs.forEach(($input, index) => {
-                    $input.off('keydown.nextFocus');
-                    $input.on('keydown.nextFocus', function(e) {
-                        if (e.key === 'Enter' || e.keyCode === 13) {
-                            e.preventDefault();
-                            const nextIndex = index + 1;
-                            if (nextIndex < mobileInputs.length) scrollAndFocus(mobileInputs, nextIndex);
-                            else $btn.trigger('click');
-                        }
-                    });
-                });
-
-                desktopInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
-                if (desktopInputs[0]) scrollAndFocus(desktopInputs, 0);
-                $btn.text('Lưu').addClass('jc-edit-btn-save');
-
-                desktopInputs.forEach(($input, index) => {
-                    $input.off('keydown.nextFocus');
-                    $input.on('keydown.nextFocus', function(e) {
-                        if (e.key === 'Enter' || e.keyCode === 13) {
-                            e.preventDefault();
-                            const nextIndex = index + 1;
-                            if (nextIndex < desktopInputs.length) scrollAndFocus(desktopInputs, nextIndex);
-                            else $btn.trigger('click');
-                        }
-                    });
-                });
-
-            } else {
-                const isMobileBtn = $btn.hasClass('jc-mobile-input');
-                const inputs = isMobileBtn ? mobileInputs : desktopInputs;
-                desktopInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
-                mobileInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
-                $btn.text('Sửa').removeClass('jc-edit-btn-save');
-                if (action) {
-                    const result = covertAllData(data, inputs);
-                    frm.events[action](frm, result)
-                }
-            }
+        // Mobile: click vào bảng để bật edit
+        $wrapper.on("click", ".jc-tb-mobile-row", function() {
+            if (!editing) enableEditing(mobileInputs);
         });
     },
 

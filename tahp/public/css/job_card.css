@@ -128,7 +128,7 @@
     text-align: right;
     padding: 0px;
     border: none;
-    max-width: 3ch;
+    /* max-width: 3.5ch; */
 }
 
 .jc-edit-editing {
@@ -153,6 +153,10 @@
     display: flex;
     justify-content: flex-end;
     flex-wrap: nowrap;
+}
+
+jc-tb-right > input {
+    width: 100%;
 }
 
 .overflow-auto {
