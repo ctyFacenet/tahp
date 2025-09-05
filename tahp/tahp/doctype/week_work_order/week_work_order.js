@@ -148,7 +148,7 @@ frappe.ui.form.on('Week Work Order', {
                 frappe.confirm(
                     __("Phát hiện LSX Tuần này là phiên bản bị trả về. Bạn có muốn tạo Phương án KHSX mới cho LSX Tuần này không?"),
                     async () => {
-                        const response = await frappe.call({method: "wwo_generate"});
+                        const response = await frappe.call({method: "tahp.api.wwo_generate"});
                         if (response.plan) {
                             frm.set_value("plan", response.plan);
                             await frm.save();
@@ -454,7 +454,7 @@ function validate_dates(cdt, cdn) {
 }
 
 async function notify_role(role, subject, document_type, document_name) {
-    await frappe.call({ method: "wwo_notify", args: { role, subject, document_type, document_name },});
+    await frappe.call({ method: "tahp.api.wwo_notify", args: { role, subject, document_type, document_name },});
 }
 
 function missing_material(messages) {
