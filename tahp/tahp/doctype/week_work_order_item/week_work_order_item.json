@@ -87,7 +87,7 @@
   },
   {
    "default": "0",
-   "fetch_from": "item.custom_scrap",
+   "fetch_from": "item.custom_is_scrap",
    "fieldname": "scrap",
    "fieldtype": "Check",
    "label": "Ph\u1ee5 ph\u1ea9m"

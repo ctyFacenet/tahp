@@ -339,7 +339,7 @@ async function setup_note(frm) {
 }
 
 async function wwo_flow(frm, wwo_name, state) {
-    const response = await frappe.call({ method: 'wwo_flow', args: { name: wwo_name, workflow: state }});
+    const response = await frappe.call({ method: 'tahp.api.wwo_flow', args: { name: wwo_name, workflow: state }});
     return response;
 }
 
@@ -365,7 +365,7 @@ async function process_wwo(frm, wwo, state, message, alert_message, role, notifi
         });
 
         // Gửi notify không cần callback
-        await frappe.call({ method: "wwo_notify", args: { role: role, subject: notification, document_type: "Week Work Order", document_name: wwo}});
+        await frappe.call({ method: "tahp.api.wwo_notify", args: { role: role, subject: notification, document_type: "Week Work Order", document_name: wwo}});
         await wwo_flow(frm, wwo, state);
         frm.reload_doc();
         frappe.show_alert(alert_message);
@@ -399,7 +399,7 @@ async function process_wwo_mobile(frm, wwo, state, message, alert_message, role,
                 });
 
                 await frappe.call({
-                    method: "wwo_notify",
+                    method: "tahp.api.wwo_notify",
                     args: {
                         role: role,
                         subject: notification,
@@ -521,7 +521,7 @@ async function approved_mobile(frm, wwo, cdt, cdn) {
                 }
 
                 await frappe.call({
-                    method: "wwo_notify",
+                    method: "tahp.api.wwo_notify",
                     args: {
                         role: 'Kế hoạch sản xuất',
                         subject: `LSX Tuần ${wwo} đã được duyệt`,
@@ -622,7 +622,7 @@ async function handle_approve(frm, wwo) {
         }
 
         
-        await frappe.call({ method: "wwo_notify", args: { role: 'Kế hoạch sản xuất', subject: `LSX Tuần ${wwo} đã được duyệt`, document_type: "Week Work Order", document_name: wwo}});
+        await frappe.call({ method: "tahp.api.wwo_notify", args: { role: 'Kế hoạch sản xuất', subject: `LSX Tuần ${wwo} đã được duyệt`, document_type: "Week Work Order", document_name: wwo}});
         frappe.show_alert({
             message:__('Duyệt phương án thành công!'),
             indicator:'green'
