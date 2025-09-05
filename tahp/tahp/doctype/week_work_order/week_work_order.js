@@ -44,7 +44,7 @@ frappe.ui.form.on('Week Work Order', {
         frm.fields_dict['items'].grid.get_field('item').get_query = function (doc, cdt, cdn) {
             return {
                 filters: [
-                    ["Item", "item_group", "like", "%products%"],
+                    ["Item", "item_group", "like", "%Sản phẩm%"],
                     ["Item", "disabled", "=", 0]
                 ]
             };
