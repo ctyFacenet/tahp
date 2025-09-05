@@ -8,7 +8,10 @@
  "field_order": [
   "workstation",
   "status",
-  "action"
+  "action",
+  "start_time",
+  "time",
+  "active"
  ],
  "fields": [
   {
@@ -36,13 +39,32 @@
    "in_list_view": 1,
    "label": "Thao t\u00e1c",
    "read_only": 1
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "B\u1eaft \u0111\u1ea7u"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Th\u1eddi gian t\u00edch l\u0169y"
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "\u0110ang h\u1ecdat \u0111\u1ed9ng"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-01 21:00:40.135188",
+ "modified": "2025-09-05 01:09:10.249807",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Workstation",

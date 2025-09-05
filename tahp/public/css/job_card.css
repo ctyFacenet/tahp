@@ -1,173 +1,194 @@
-.jc-casual {
-    border-radius: 15px;
-    border: 1px solid rgb(197, 197, 197);
-    padding: 10px;
+:root {
+    --jc-gap: 15px;
 }
 
-.job-buttons i.fas {
-    font-size: 60px;
+.jc-layout {
+    gap: var(--jc-gap);
+    margin-bottom: 10px;
+}
+
+.jc-container {
+    gap: var(--jc-gap);
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.jc-col {
+    min-width: 0;
+    background: #ffffff;
+    border-radius: 5px;
+    padding: 12px;
+    line-height: 1.75rem;
+}
+
+.jc-header {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.jc-title {
+    font-weight: bold;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.jc-icon {
+    font-size: 1rem;
+    cursor: pointer;
     transition: transform 0.2s ease;
 }
 
-.job-ctl-btn{
-    color: white !important;
-    background-color: rgb(0, 0, 0) !important;
-    transition: background-color 0.3s ease; /* mượt khi đổi màu */
-}
-
-
-.job-buttons .job-ctl-btn:hover i.fas {
+.jc-icon:hover {
     transform: scale(1.2);
 }
 
-.job-task-name {
-    font-size: 1.25rem;
-}
-
-.job-tasks:focus,
-.job-tasks:active {
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-.job-tasks:hover {
-    transform: scale(1.1) translateX(-5px);;
-}
-
-.job-tasks {
-    transition: transform 0.2s ease;
-}
-
-@media (max-width: 767.98px) {
-    .status-badge {
-        font-size: 14px !important;
-        padding: 3px 10px !important;
-    }
-
-    .timer-mobile {
-        font-size: 14px !important;
-    }
-    .job-task-name {
-        font-size: 1rem !important;
-    }
-    .job-note-title {
-        font-size: 1rem !important;
-    }
-}
-
-/* Desktop */
-.status-badge {
-    font-size: 20px;
-    padding: 5px 20px;
-}
-
-.jc-timer.d-md-block {
-    font-size: 50px;
-    font-weight: bold;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
-
-
-@media (max-width: 1270px) {
-    .job-buttons i.fas {
-        font-size: 45px;
-    }
-    .job-note-tip {
-        display: none;
-    }
-}
-
-@media (max-width: 980px) {
-    .job-buttons i.fas {
-        font-size: 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .job-buttons i.fas {
-        font-size: 30px;
-    }
-}
-
-@media (max-width: 595px) {
-    .job-buttons i.fas {
-        font-size: 20px;
-    }
-}
-
-@media (max-width: 535px) {
-    .job-buttons i.fas {
-        font-size: 40px;
-    }
-}
-
-@media (max-width: 768px) {
-    .responsive-col {
-        width: 100%;
-    }
-}
-
-.responsive-col {
-    flex: 1 1 100%;     /* mặc định chiếm 1 dòng */
-    min-width: unset;   /* bỏ hạn chế min-width */
-}
-
-@media (min-width: 768px) {  /* chỉ áp dụng từ tablet/desktop trở lên */
-    .responsive-col {
-        flex: 1 1 calc(50% - 10px);
-        min-width: 300px;
-    }
-}
-
-@media (max-width: 768px) {  /* chỉ áp dụng từ tablet/desktop trở lên */
-    .responsive-col {
-        border: 1px solid #adadad;
-        padding: 20px;
-        border-radius: 10px;
-    }
-}
-
-
-
-.jc-btn {
-    transition: transform 0.1s ease;
-}
-
-.jc-btn:hover {
-    transform: scale(1.05); /* lớn lên 5% khi hover */
-}
-
-.task-line-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.task-circle {
+.jc-circle {
     width: 12px;
     height: 12px;
     border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
     background-color: #0fd388;
-}
-.pulse-circle {
     animation: pulse 1.5s infinite;
 }
-.task-line {
-    width: 2px;
-    flex-grow: 1;
-    background-color: #ccc;
-    margin-top: 2px;
+
+.jc-count {
+    padding: 5px 10px;
+    background: #d8e6ff;
+    border-radius: 20px;
+    margin-right: 5px;
+    font-size: 0.75rem;
+    white-space: nowrap;
 }
-.task-reason {
-    padding-top: 2px;
+
+.jc-task {
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;    
 }
+
+.jc-g {
+    gap: var(--jc-gap)
+}
+
+.jc-button {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border-radius: 8px;
+}
+
+.jc-button i.fas {
+    transition: transform 0.2s ease;
+}
+
+.jc-button:hover {
+    background: #f3f3f3;
+}
+
+.jc-button:hover i.fas {
+    transform: scale(1.2);
+}
+
+.jc-button-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.jc-undone {
+    color: green;
+}
+
+.jc-tb-title {
+    justify-content: space-between;
+    align-items: center;
+}   
+
+.jc-tb-secondary {
+    font-size: 0.75rem;
+}
+
+.jc-tb-mobile-row {
+    line-height: 1.25rem;
+    font-size: 1rem;
+}
+
+.jc-i {
+    font-size: 1rem;
+    padding: 0.1rem;
+}
+
+.jc-tb-mobile-value {
+    background: white;
+    text-align: right;
+    padding: 0px;
+    border: none;
+    max-width: 3ch;
+}
+
+.jc-edit-editing {
+    font-size: 1.25rem;
+    padding: 5px 10px;
+    max-width: 5ch;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.jc-tb-mobile-value {
+    -moz-appearance: textfield;
+}
+
+.jc-edit-btn-save {
+    background: black !important;
+    color: white !important;
+}
+
+.jc-tb-right {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+}
+
+.overflow-auto {
+    width: 100%;
+    overflow-x: auto;
+}
+.table {
+    width: 100%;
+    table-layout: auto;
+}
+
+th {
+    border: none !important;
+}
+
+
 @keyframes pulse {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 0.6; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+@media (min-width: 768px) {
+    .jc-col.d1 { flex: 0 0 calc((25% - (2 * var(--jc-gap) / 4))); } 
+    .jc-col.d2 { flex: 0 0 calc((50% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.d3 { flex: 0 0 calc((45% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.d4 { flex: 0 0 calc((30% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.half { flex: 0 0 calc(50% - var(--jc-gap) / 2); }
+}
+
+@media (max-width: 767px) {
+    .jc-col { flex: 0 0 100%; }
+    .jc-button { font-size: 50px; }
+}
+
+@media (min-width: 1200px) {
+    .jc-button { font-size: 50px; }
+}
+
