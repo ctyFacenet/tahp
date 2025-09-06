@@ -66,3 +66,45 @@ async function toggle_qc_tracking(frm) {
     }
     frm.refresh_field("operations");
 }
+
+
+// call api
+frappe.ui.form.on("Work Order", {
+    refresh: function(frm) {
+        let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
+            $wrapper.removeClass("w-100 alert alert-warning")
+            $wrapper.empty()
+        frm.set_intro("");
+        if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
+    }
+});
+
+function show_shift_handover(frm) {
+    console.log('hi1')
+    if (frm.doc.custom_plan && frm.doc.custom_plan_code) {
+        frappe.call({
+                method: "tahp.doc_events.work_order.work_order_api.check_shift_handover",  
+            args: {
+                work_order: frm.doc.name,
+                custom_plan: frm.doc.custom_plan,
+                custom_plan_code: frm.doc.custom_plan_code
+            },
+            callback: function(r) {
+                if (r.message && r.message.warning) {
+                    // frm.dashboard.add_comment(
+                    //     r.message.warning,
+                    //     "orange",
+                    //     true
+                    // );
+                    
+
+            let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
+                $wrapper.addClass("w-100 alert alert-warning")
+                $wrapper.empty()
+                $wrapper.html(r.message.warning)
+            }
+                console.log('e')
+            }
+        });
+    }
+}

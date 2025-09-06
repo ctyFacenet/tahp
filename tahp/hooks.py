@@ -197,12 +197,25 @@ doc_events = {
         "after_insert": [
             "tahp.doc_events.stock_entry.after_insert.after_insert"
         ],
+        "on_submit": [
+            "tahp.doc_events.stock_entry.on_submit.on_submit"
+        ]
     },
     "Operation": {
         "before_save": [
             "tahp.doc_events.operation.before_save.before_save"
         ]
-    }
+    },
+    "Work Order": {
+        "before_submit": [
+            "tahp.doc_events.work_order.before_submit.before_submit"
+        ],
+        "on_submit": [
+            "tahp.doc_events.work_order.on_submit.on_submit"
+        ]
+        
+        
+    },
 }
 
 # doc_events = {

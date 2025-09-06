@@ -29,9 +29,9 @@ async function set_code(frm) {
     const today = frappe.datetime.str_to_obj(frappe.datetime.get_today());
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
-
+    const lastDay = new Date(year, today.getMonth() + 1, 0).getDate();
     const start_date = `${year}-${month}-01`;
-    const end_date = `${year}-${month}-31`;
+    const end_date = `${year}-${month}-${lastDay}`;
 
     const entries = await frappe.db.get_list("Stock Entry", {
         filters: [

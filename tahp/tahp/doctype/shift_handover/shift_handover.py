@@ -6,11 +6,48 @@ from frappe.model.document import Document
 
 
 class ShiftHandover(Document):
-   pass
+   
+   def autoname(self):
+       pass
 
 
-class api_create_shift_handover(work_order_name):
-    work_order = frappe.get_doc('Work Order Test', work_order_name)
+
+
+"""Doctype dùng để quản lý bàn giao ca sản xuất.
+    
+    Liên kết với Work Order và lưu danh sách Job Card theo từng Operation.
+"""
+def create_shift_handover(work_order_name):
+    """
+    Tạo mới một bản ghi Shift Handover dựa trên Work Order.
+
+    Quy trình:
+        1. Lấy Work Order theo `work_order_name`.
+        2. Kiểm tra trạng thái Work Order:
+            - Chỉ cho phép tạo Shift Handover nếu Work Order ở trạng thái 'Not Started'.
+        3. Kiểm tra xem đã tồn tại Shift Handover nào cho Work Order này chưa.
+            - Nếu có, trả về lỗi.
+        4. Nếu chưa có, tạo mới Shift Handover:
+            - Gán work_order, shift_leader_1 (từ custom field trên Work Order).
+            - Duyệt qua operations của Work Order:
+                + Tìm tất cả Job Card theo work_order + operation.
+                + Ghi nhận Job Card ID vào child table `job_card_list`.
+        5. Lưu Shift Handover vào database.
+
+    Args:
+        work_order_name (str): ID của Work Order cần tạo Shift Handover.
+
+    Returns:
+        dict: 
+            - Nếu lỗi:
+                {"status": "error", "message": <lý do>}
+            - Nếu thành công:
+                {"status": "success", "handover": <ID Shift Handover>}
+    """
+    work_order = frappe.get_doc('Work Order', work_order_name)
+    
+   
+    print("Work Order status:", work_order.status)
     # check status
     if work_order.status != 'Not Started':
         return{
@@ -19,20 +56,64 @@ class api_create_shift_handover(work_order_name):
         }
     
     # check xem có tồn tại một bản ghi Shift Handover nào chưa
-    existing_handover = frappe.get_all('Shift Handover', filters={"work_order": work_order_name}, limit = 1)
+    existing_handover = frappe.db.exists('Shift Handover', {"work_order": work_order_name})
     if existing_handover:
-        existing_handover = existing_handover[0].name
-    if existing_handover:
-        return {f"Đã tồn tại 1 bản ghi Shilf Handover"}
-	
+        return {"status": "error", "message": "Đã tồn tại 1 bản ghi Shift Handover"}
     # chưa tồn tại bản ghi nào thì tạo mới
-    shilf_handover = frappe.new_doc('Shift Handover')
-    shilf_handover.work_order = work_order_name
-    shilf_handover.shift_leader_1 = work_order.shift_leader_1
+    shift_handover = frappe.new_doc('Shift Handover')
+    shift_handover.work_order = work_order_name
+    shift_handover.shift_leader_1 = work_order.custom_shift_leader
     # shilf_handover.notes_1 = work_order.notes_1
     
-    #lấy job card
-    job_card_list = frappe.get_all('Shift Handover Item', filters = {'word_order': work_order_name}, fields=["operation", "job_card"] )
-     
+    #duyêt qua operations của workorder lấy ra job_card
+    for op in work_order.operations:
+        
+        job_cards = frappe.get_all(
+            'Job Card',
+            filters = {'work_order': work_order_name, 'operation': op.operation},
+            fields = ['name']
+        )
+        
+        operation_doc = frappe.get_doc('Operation', op.operation)
+        print('check1')
+        shift_handover.append("table", {
+                                        
+                                "caption": operation_doc.name,
+                                "status":'',
+                                "safe": '',
+                                "clean": '',
+                                'is_header': 1
+                                
+                            })
+        if hasattr(operation_doc, 'custom_subtasks') and operation_doc.custom_subtasks:
+               
+                subtasks = operation_doc.custom_subtasks
+                
+                # Duyệt qua từng row trong child table
+                for subtask_row in subtasks:
+                    if hasattr(subtask_row, 'reason') and subtask_row.reason:
+                       
+                        reason = subtask_row.reason.strip()
+                        if reason :
+                           
+                            shift_handover.append("table", {
+                                "caption": reason,
+                                'is_header': 0
+                                
+                                
+                                
+                            })
+               
+       
+        for jd in job_cards:
+            shift_handover.append("job_card_list", {
+                    "operation": op.operation,
+                    "job_card": jd['name']
+                })
 
 
+    shift_handover.insert(ignore_permissions=True)
+    return {
+        "status": "success",
+        "handover": shift_handover.name
+    }

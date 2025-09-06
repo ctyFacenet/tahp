@@ -101,6 +101,10 @@ def set_code(doc):
 
     index = len(entries) + 1
     custom_code = f"{code}.{year}.{month}.{index:04d}"
+    print(custom_code)
     doc.custom_code = custom_code
+    
+    doc.save()
+    print('here')
 
     
