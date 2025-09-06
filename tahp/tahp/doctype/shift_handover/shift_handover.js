@@ -1,6 +1,17 @@
 // Copyright (c) 2025, FaceNet and contributors
 // For license information, please see license.txt
 
+
+
+/**
+ * Script cho DocType Shift Handover.
+ * 
+ * Chức năng:
+ * - Ẩn toàn bộ nút workflow mặc định (Actions).
+ * - Chỉ hiển thị các nút custom khi liên kết Stock Entry đã được Submit (docstatus = 1).
+ * - Quản lý luồng chuyển trạng thái: Draft → Handed Over → Completed.
+ * - Gọi API backend để xử lý logic khi hoàn tất bàn giao.
+ */
 frappe.ui.form.on("Shift Handover", {
     refresh: function(frm) {
         if (frm.doc.workflow_state) {

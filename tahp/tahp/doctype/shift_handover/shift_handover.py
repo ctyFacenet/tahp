@@ -99,9 +99,7 @@ def create_shift_handover(work_order_name):
                             shift_handover.append("table", {
                                 "caption": reason,
                                 'is_header': 0
-                                
-                                
-                                
+                               
                             })
                
        
@@ -110,7 +108,6 @@ def create_shift_handover(work_order_name):
                     "operation": op.operation,
                     "job_card": jd['name']
                 })
-
 
     shift_handover.insert(ignore_permissions=True)
     return {

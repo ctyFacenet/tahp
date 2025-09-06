@@ -80,7 +80,7 @@ frappe.ui.form.on("Work Order", {
 });
 
 function show_shift_handover(frm) {
-    console.log('hi1')
+   
     if (frm.doc.custom_plan && frm.doc.custom_plan_code) {
         frappe.call({
                 method: "tahp.doc_events.work_order.work_order_api.check_shift_handover",  
@@ -103,7 +103,7 @@ function show_shift_handover(frm) {
                 $wrapper.empty()
                 $wrapper.html(r.message.warning)
             }
-                console.log('e')
+              
             }
         });
     }
