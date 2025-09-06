@@ -27,28 +27,35 @@ frappe.listview_settings["BOM"] = {
         </div>
 
         <div class="bom-content d-flex">
-        <button id="toggle-filter" class="btn btn-sm">
-              <img src="/assets/tahp/images/filter_time.svg" alt="Filter" class="icon-btn">
-            </button>
-          <div id="time-filter" class="active">
-            <ul class="year-list">
-              ${[2025, 2024, 2023, 2022, 2021, 2020]
-        .map(
-          (y) => `
-                  <li>
-                    <span class="year-toggle">▶</span>
-                    <label><input type="checkbox" value="${y}" class="year-checkbox"> Năm ${y}</label>
-                    <ul class="month-list" style="display:none">
-                      ${Array.from({ length: 12 }, (_, i) => `
-                        <li><label><input type="checkbox" value="${y}-${(i + 1).toString().padStart(2, "0")}"> Tháng ${i + 1}</label></li>
-                      `).join("")}
-                    </ul>
-                  </li>
-                `
-        )
-        .join("")}
+          <button id="toggle-filter" class="btn btn-sm">
+                <img src="/assets/tahp/images/filter_time.svg" alt="Filter" class="icon-btn">
+          </button>
+         <div id="time-filter" class="collapsed">
+    <ul class="year-list">
+      ${[2025, 2024, 2023, 2022, 2021, 2020].map(
+      (y) => `
+          <li>
+            <div class="year-item">
+              <span class="year-toggle">▶</span>
+              <label>
+                <input type="checkbox" value="${y}" class="year-checkbox"> Năm ${y}
+              </label>
+            </div>
+            <ul class="month-list" style="display:none">
+              ${Array.from({ length: 12 }, (_, i) => `
+                <li>
+                  <label>
+                    <input type="checkbox" value="${y}-${(i + 1).toString().padStart(2, "0")}">
+                    Tháng ${i + 1}
+                  </label>
+                </li>
+              `).join("")}
             </ul>
-          </div>
+          </li>
+        `
+    ).join("")}
+    </ul>
+  </div>
           <div id="bom-datatable"></div>
         </div>
 
@@ -362,8 +369,13 @@ frappe.listview_settings["BOM"] = {
       $(".bom-content").toggleClass("filter-collapsed", $("#time-filter").hasClass("collapsed"));
     });
 
+    $(document).on("click", "#time-filter-toggle", function (e) {
+      e.stopPropagation();
+      $("#time-filter").toggleClass("active");
+    });
+
     $(document).on("click", ".year-toggle", function () {
-      let $months = $(this).siblings("ul.month-list");
+      let $months = $(this).closest(".year-item").siblings(".month-list");
       $months.toggle();
       $(this).text($months.is(":visible") ? "▼" : "▶");
     });
@@ -392,6 +404,7 @@ frappe.listview_settings["BOM"] = {
       current_page = 1;
       load_data(current_page, search_text, time_filters, listview);
     });
+
 
 
     // --- Load lần đầu ---

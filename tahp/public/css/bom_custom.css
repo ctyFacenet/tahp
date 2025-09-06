@@ -28,6 +28,7 @@
   padding: 12px;
   overflow-y: auto;
   transition: all 0.3s ease;
+  max-height: 50vh;
 }
 
 #time-filter.collapsed {
@@ -316,4 +317,63 @@
     flex-wrap: wrap;
     gap: 12px;
   }
+}
+
+/* Container năm */
+#time-filter .year-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+#time-filter .year-toggle {
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 11px;
+  color: #444;
+}
+
+#time-filter .year-item label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+#time-filter .month-list {
+  margin-left: 16px;
+  padding-left: 0;
+}
+
+#time-filter .month-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0;
+}
+
+#time-filter .month-list label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #555;
+}
+
+#time-filter::-webkit-scrollbar {
+  width: 6px;
+}
+
+#time-filter::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
