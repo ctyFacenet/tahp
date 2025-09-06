@@ -1,36 +1,56 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-08-24 20:32:42.678087",
+ "autoname": "field:category",
+ "creation": "2025-09-05 15:37:02.622410",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "items"
+  "category",
+  "qc_template",
+  "qc_template_out"
  ],
  "fields": [
   {
-   "description": "\u0110\u1ec3 \u0111i\u1ec1n nguy\u00ean li\u1ec7u c\u00f9ng l\u00fac, vi\u1ebft c\u00e1ch nhau b\u1edfi d\u1ea5u ph\u1ea9y. VD: gyps A, gyps B",
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "options": "Manufacturing Category Item"
+   "allow_in_quick_entry": 1,
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "H\u1ec7 s\u1ea3n xu\u1ea5t",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "qc_template",
+   "fieldtype": "Link",
+   "label": "M\u1eabu ch\u1ec9 s\u1ed1 \u0111\u1ea7u v\u00e0o",
+   "options": "Quality Inspection Template"
+  },
+  {
+   "fieldname": "qc_template_out",
+   "fieldtype": "Link",
+   "label": "M\u1eabu ch\u1ec9 s\u1ed1 \u0111\u1ea7u ra",
+   "options": "Quality Inspection Template"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "issingle": 1,
  "links": [],
- "modified": "2025-08-24 21:08:16.534694",
+ "modified": "2025-09-06 11:25:37.170731",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Manufacturing Category",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
+   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
@@ -39,15 +59,20 @@
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
+   "report": 1,
    "role": "All",
    "share": 1,
    "write": 1
   }
  ],
+ "quick_entry": 1,
  "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "category"
 }

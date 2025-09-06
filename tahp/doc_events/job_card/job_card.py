@@ -192,8 +192,8 @@ def get_workstations(job_card):
                 "name": ["!=", doc.name]
             }
         )
-        if wip_count >= workstation.production_capacity:
-            frappe.thrơw(f"{'Cụm thiết bị' if workstation.is_parent else 'Thiết bị'}'{workstation.name}' đã đạt tối đa công suất")
+        # if wip_count >= workstation.production_capacity:
+            # frappe.throw(f"{'Cụm thiết bị' if workstation.is_parent else 'Thiết bị'} {workstation.name} đã đạt tối đa công suất")
 
     # Nếu không phải máy parent
     if not workstation.custom_is_parent:

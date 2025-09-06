@@ -55,6 +55,7 @@ frappe.query_reports["BOM Custom Search"] = {
 // ----------------------- Utility Functions -----------------------
 
 function injectDatatableCSS() {
+    $(".dt-row.dt-row-header").css({"pointer-events":"none"})
     if ($('#custom-dt-style').length) return;
     const style = document.createElement('style');
     style.id = 'custom-dt-style';

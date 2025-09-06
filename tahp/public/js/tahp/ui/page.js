@@ -184,7 +184,6 @@ frappe.ui.Page = class Page {
 	}
 
 	setup_sidebar_toggle() {
-		console.log('hi5')
 		// let sidebar_toggle = $(".page-head").find(".sidebar-toggle-btn");
 		let sidebar_toggle = $(".sidebar-toggle-btn");
 		let sidebar_wrapper = this.wrapper.find(".layout-side-section");

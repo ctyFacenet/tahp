@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestManufacturingCategoryOption(FrappeTestCase):
+class TestManufacturingCategoryMaterial(FrappeTestCase):
 	pass

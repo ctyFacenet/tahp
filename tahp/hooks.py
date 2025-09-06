@@ -46,7 +46,6 @@ app_include_css = [
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
-    "override.bundle.js",
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
@@ -93,7 +92,8 @@ doctype_js = {
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
 doctype_list_js = {
-    "Workstation": ["public/js/workstation/workstation_list.js"]
+    "Workstation": ["public/js/workstation/workstation_list.js"],
+    "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
 }
 
 # doctype_js = {

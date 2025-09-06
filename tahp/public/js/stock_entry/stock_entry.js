@@ -34,10 +34,31 @@ frappe.ui.form.on('Stock Entry', {
     },
 
     refresh: function(frm) {
+        if (frm.doc.stock_entry_type) {
+            let title = "";
+
+            switch (frm.doc.stock_entry_type) {
+                case "Manufacture":
+                    title = "Nhập kho thành phẩm";
+                    break;
+                case "Material Receipt":
+                    title = "Nhập kho";
+                    break;
+                case "Material Issue":
+                    title = "Xuất kho";
+                    break;
+                case "Material Transfer":
+                    title = "Chuyển kho";
+                    break;
+                default:
+                    title = frm.doc.stock_entry_type;
+            }
+            frm.page.set_title(title);
+        }
         if (frm.doc.stock_entry_type !== "Manufacture") return;
         let html = `
             <div class="alert alert-info w-100" role="alert" style="margin-bottom:0px;">
-                Người dùng có thể chỉnh sửa lại số lượng nguyên liệu và thành phẩm tạo ra theo thực tế
+                Bạn có thể chỉnh sửa lại số lượng theo thực tế
             </div>
         `;
         frm.fields_dict.custom_warn.$wrapper.html(html);
