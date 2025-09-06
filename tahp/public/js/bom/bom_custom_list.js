@@ -9,10 +9,10 @@ frappe.listview_settings["BOM"] = {
       .remove();
 
     $(listview.page.body).append(`
-      <div class="custom-bom-wrapper position-relative">
+      <div class="custom-bom-wrapper">
         <h3 class="text-center fw-bold mb-3">Quản lý BOM</h3>
         <div class="mb-2 d-flex justify-content-between align-items-center">
-          <input type="text" id="global-search" class="form-control" placeholder="Nhập thông tin và nhấn Enter để tìm kiếm">
+            <input type="text" id="global-search" class="form-control" placeholder="Nhập thông tin và nhấn Enter để tìm kiếm">
           <div class="d-flex gap-3 custom-toolbar">
             <a href="javascript:void(0)" id="btn-add" class="text-info">
               <img src="/assets/tahp/images/add_plus.svg" alt="Thêm mới"> Thêm mới
@@ -25,7 +25,33 @@ frappe.listview_settings["BOM"] = {
             </a>
           </div>
         </div>
-        <div id="bom-datatable"></div>
+
+        <div class="bom-content d-flex">
+        <button id="toggle-filter" class="btn btn-sm">
+              <img src="/assets/tahp/images/filter_time.svg" alt="Filter" class="icon-btn">
+            </button>
+          <div id="time-filter" class="active">
+            <ul class="year-list">
+              ${[2025, 2024, 2023, 2022, 2021, 2020]
+        .map(
+          (y) => `
+                  <li>
+                    <span class="year-toggle">▶</span>
+                    <label><input type="checkbox" value="${y}" class="year-checkbox"> Năm ${y}</label>
+                    <ul class="month-list" style="display:none">
+                      ${Array.from({ length: 12 }, (_, i) => `
+                        <li><label><input type="checkbox" value="${y}-${(i + 1).toString().padStart(2, "0")}"> Tháng ${i + 1}</label></li>
+                      `).join("")}
+                    </ul>
+                  </li>
+                `
+        )
+        .join("")}
+            </ul>
+          </div>
+          <div id="bom-datatable"></div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mt-2 custom-footer">
           <div>
             <select id="page-size" class="form-select form-select-sm">
@@ -329,6 +355,44 @@ frappe.listview_settings["BOM"] = {
     $(listview.page.body).on("click", "#btn-delete", () =>
       frappe.msgprint("Tính năng xoá hàng loạt đang phát triển!")
     );
+
+
+    $(document).on("click", "#toggle-filter", function () {
+      $("#time-filter").toggleClass("collapsed");
+      $(".bom-content").toggleClass("filter-collapsed", $("#time-filter").hasClass("collapsed"));
+    });
+
+    $(document).on("click", ".year-toggle", function () {
+      let $months = $(this).siblings("ul.month-list");
+      $months.toggle();
+      $(this).text($months.is(":visible") ? "▼" : "▶");
+    });
+
+    $(document).on("change", ".year-checkbox", function () {
+      let checked = $(this).is(":checked");
+      $(this).closest("li").find(".month-list input[type=checkbox]").prop("checked", checked);
+    });
+
+    $(document).on("change", "#time-filter input[type=checkbox]", function () {
+      let selected = [];
+      $("#time-filter input[type=checkbox]:checked").each(function () {
+        selected.push($(this).val());
+      });
+
+      time_filters = selected.map((val) => {
+        if (val.length === 4) {
+          return ["creation", "between", [`${val}-01-01`, `${val}-12-31`]];
+        } else {
+          let [y, m] = val.split("-");
+          let lastDay = new Date(y, m, 0).getDate();
+          return ["creation", "between", [`${y}-${m}-01`, `${y}-${m}-${lastDay}`]];
+        }
+      });
+
+      current_page = 1;
+      load_data(current_page, search_text, time_filters, listview);
+    });
+
 
     // --- Load lần đầu ---
     load_data(current_page, search_text, time_filters, listview);
