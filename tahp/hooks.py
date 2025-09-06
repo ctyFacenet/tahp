@@ -52,6 +52,17 @@ app_include_js = [
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
+
+    # "/assets/tahp/js/work_order/work_order.js",
+    # "/assets/tahp/js/item/item.js",
+    # "/assets/tahp/js/stock_entry/stock_entry.js",
+    # "/assets/tahp/js/operation/operation.js",
+    # "/assets/tahp/js/routing/routing.js",
+    # "/assets/tahp/js/bom/bom.js",
+    # "/assets/tahp/js/warehouse/warehouse.js",
+    # "/assets/tahp/js/job_card/job_card.js",
+    # "/assets/tahp/js/employee/employee.js",
+    # "/assets/tahp/js/workstation/workstation.js",
 ]
 
 # include js, css files in header of web template
@@ -75,16 +86,16 @@ web_include_css = [
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
 doctype_js = {
-    "Work Order": ["/public/js/work_order/work_order.js"],
-    "Item": ["/public/js/item/item.js"],
-    "Stock Entry": ["/public/js/stock_entry/stock_entry.js"],
-    "Operation": ["/public/js/operation/operation.js"],
-    "Routing": ["/public/js/routing/routing.js"],
-    "BOM": ["/public/js/bom/bom.js"],
-    "Warehouse": ["/public/js/warehouse/warehouse.js"],
-    "Job Card": ["/public/js/job_card/job_card.js"],
-    "Employee": ["/public/js/employee/employee.js"],
-    "Workstation": ["/public/js/workstation/workstation.js"]
+    "Work Order": "/public/js/work_order/work_order.js",
+    "Item": "/public/js/item/item.js",
+    "Stock Entry": "/public/js/stock_entry/stock_entry.js",
+    "Operation": "/public/js/operation/operation.js",
+    "Routing": "/public/js/routing/routing.js",
+    "BOM": "/public/js/bom/bom.js",
+    "Warehouse": "/public/js/warehouse/warehouse.js",
+    "Job Card": "/public/js/job_card/job_card.js",
+    "Employee": "/public/js/employee/employee.js",
+    "Workstation": "/public/js/workstation/workstation.js"
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
