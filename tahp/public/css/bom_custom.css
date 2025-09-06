@@ -17,7 +17,6 @@
   -webkit-overflow-scrolling: touch;
 }
 
-
 #bom-datatable .dt-header .dt-cell--header .dt-cell__content {
   background-color: #CCDBEB !important;
   font-weight: bold;
@@ -33,7 +32,6 @@
   width: 100% !important;
   min-width: 1000px;
 }
-
 
 .custom-toolbar a {
   font-weight: 500;
@@ -67,7 +65,6 @@
   min-width: 100px;
 }
 
-
 #bom-datatable .dt-input {
   padding: 4px 6px 4px 24px;
   font-size: 13px;
@@ -86,7 +83,6 @@
   color: #888;
   opacity: 0.9;
 }
-
 
 .custom-footer {
   display: flex;
@@ -150,7 +146,6 @@
   padding: 4px 6px;
   color: #777;
 }
-
 
 #time-filter-toggle {
   position: absolute;
@@ -229,7 +224,6 @@
   margin-left: 16px;
 }
 
-
 @media (max-width: 768px) {
   #bom-datatable .datatable {
     min-width: 900px;
@@ -284,8 +278,25 @@
     flex-wrap: wrap;
     gap: 2px;
   }
-}
 
+  .mb-2.d-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  #global-search {
+    flex: 1 1 auto;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .custom-toolbar {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
 
 .datatable .dt-row-filter .dt-filter.dt-input {
   background: #fff url("/assets/tahp/images/search.svg") no-repeat 8px center !important;
@@ -305,4 +316,22 @@
 
 .icon-btn:hover {
   opacity: 0.6;
+}
+
+#global-search {
+  flex: 0 0 50%;
+  max-width: 400px;
+  padding-left: 28px;
+  height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff url("/assets/tahp/images/search.svg") no-repeat 8px center;
+  background-size: 16px;
+  font-size: 14px;
+}
+
+#global-search:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
+  outline: none;
 }
