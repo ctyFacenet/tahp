@@ -10,12 +10,14 @@ frappe.ui.form.on('Stock Entry', {
 
     autofill_input: async function(frm) {
         if (!frm.is_new() || !frm.doc.work_order) return;
-        const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
-        if (inputs && inputs.length) {
+        if (frm.doc.stock_entry_type === "Manufacture") {
             frm.doc.items.forEach(row => {
                 if (row.is_finished_item) row.description = 'Thành phẩm';
                 else row.description = 'Nguyên liệu trong sản xuất';
-            });
+            });            
+        }
+        const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
+        if (inputs && inputs.length) {
             inputs.forEach(input => {
                 let row = frm.add_child('items');
                 row.s_warehouse = input.s_warehouse;
@@ -34,6 +36,7 @@ frappe.ui.form.on('Stock Entry', {
     },
 
     refresh: function(frm) {
+        frm.set_intro("")
         if (frm.doc.stock_entry_type) {
             let title = "";
 

@@ -113,9 +113,18 @@ frappe.ui.Notifications = class Notifications {
 
 	mark_all_as_read(e) {
 		e.stopImmediatePropagation();
-		this.dropdown_list.find(".unread").removeClass("unread");
-		frappe.call("frappe.desk.doctype.notification_log.notification_log.mark_all_as_read");
-        this.tabs.notifications.update_badge();
+		// this.dropdown_list.find(".unread").removeClass("unread");
+
+		let notificationsView = this.tabs.notifications;
+		this.dropdown_list.find(".notification-item.unread").each((idx, el) => {
+			const $el = $(el);
+			const docname = $el.data("name");
+			notificationsView.mark_as_read(docname, $el);
+		});
+
+		frappe.call("frappe.desk.doctype.notification_log.notification_log.mark_all_as_read").then(() => {
+			this.tabs.notifications.update_badge();
+		});
 	}
 
 	setup_dropdown_events() {
@@ -267,7 +276,6 @@ class NotificationsView extends BaseNotificationsView {
 			})
 			.then(() => {
 				$el.removeClass("unread");
-                console.log(this.dropdown_items)
                 this.update_badge();
 			});
 	}
@@ -321,7 +329,6 @@ class NotificationsView extends BaseNotificationsView {
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				this.mark_as_read(notification_log.name, item_html);
-                console.log('cicked2')
 			});
 		}
 
@@ -423,7 +430,6 @@ class NotificationsView extends BaseNotificationsView {
     }
 
     update_badge() {
-        console.log('hi')
         let unreadCount = this.container.find(".unread").length;
         if (!this.badge) this.create_badge();
 
@@ -446,14 +452,18 @@ class NotificationsView extends BaseNotificationsView {
 		});
 
 		this.parent.on("show.bs.dropdown", () => {
-			this.toggle_seen(true);
 			if (this.notifications_icon.find(".notifications-unseen").is(":visible")) {
 				this.toggle_notification_icon(true);
 				frappe.call(
 					"frappe.desk.doctype.notification_log.notification_log.trigger_indicator_hide"
 				);
-                this.update_badge(true);
 			}
+			let notificationsView = this;
+			this.container.find(".notification-item.unread").each((idx, el) => {
+				const $el = $(el);
+				const docname = $el.data("name");
+				notificationsView.mark_as_read(docname, $el);
+			});
 		});
 	}
 }

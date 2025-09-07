@@ -357,6 +357,9 @@ def update_workstations(job_card, workstations):
         if status == "Hỏng":
             workstation_doc.status = "Problem"
             workstation_doc.save()
+        if status == "Chạy" or status == "Dừng":
+            workstation_doc.status = "Production"
+            workstation_doc.save()
 
 
         for row in doc.custom_workstation_table:
@@ -366,12 +369,15 @@ def update_workstations(job_card, workstations):
                     if not doc.custom_team_table:
                         frappe.throw("Vui lòng thêm nhân viên trước")
 
-                    if real_status in ["Problem", "Maintenance"]:
-                        frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
+                    # if real_status in ["Problem", "Maintenance"]:
+                    #     frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
 
                     if not row.active:
                         if not doc.time_logs:
                             doc.append("time_logs", {"employee": doc.custom_team_table[0].employee, "from_time": from_time, "completed_qty": doc.for_quantity})
+                        
+                        if len(doc.custom_subtask) == 1:
+                            doc.custom_subtask[0].done = "Đang thực hiện"
                         row.start_time = from_time
     
                     row.active = True
@@ -522,32 +528,38 @@ def set_inputs(job_card, inputs=None):
 @frappe.whitelist()
 def set_subtask(job_card, reason=None):
     """
-    Lấy subtask từ operation của Job Card:
-    - Nếu operation không có custom_subtask, tạo 1 subtask mặc định
-    - Nếu truyền vào một reason, hàm được dùng để xác định hoàn thành việc
+    Quản lý trạng thái subtask trong Job Card:
+    - Nếu chưa có thì tạo subtask từ operation (mặc định Pending)
+    - Nếu truyền reason -> set subtask đó = In Progress,
+      đồng thời chuyển subtask trước đó từ In Progress thành Completed
     """
     doc = frappe.get_doc("Job Card", job_card)
-    if not doc.operation: return
+    if not doc.operation:
+        return
+
     operation = frappe.get_doc("Operation", doc.operation)
+
     if not doc.custom_subtask:
         if not operation.custom_subtasks:
-            doc.append("custom_subtask", {
-                "reason": doc.operation,
-            })
+            doc.append("custom_subtask", { "reason": doc.operation })
         else:
             for subtask in operation.custom_subtasks:
-                doc.append("custom_subtask", {
-                    "reason": subtask.reason,
-                    "workstation": subtask.workstation,
-                })
+                if subtask.reason:
+                    doc.append("custom_subtask", { "reason": subtask.reason, "workstation": subtask.workstation, })
+            if len(doc.custom_subtask) == 0:
+                doc.append("custom_subtask", { "reason": doc.operation,})
         doc.save(ignore_permissions=True)
         return
 
     if reason and doc.custom_subtask:
         for subtask in doc.custom_subtask:
+            if subtask.done == "Đang thực hiện":
+                subtask.done = "Xong"
+
+        for subtask in doc.custom_subtask:
             if subtask.reason == reason:
-                subtask.done = 1
-    
+                subtask.done = "Đang thực hiện"
+
     doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
@@ -590,9 +602,10 @@ def submit(job_card):
             doc.time_logs[-1].to_time = from_time
 
     # 5. Đánh dấu subtask cuối là hoàn thành
-    if doc.custom_subtask and len(doc.custom_subtask) > 0:
-        last_subtask = doc.custom_subtask[-1]
-        last_subtask.done = 1
+    if doc.custom_subtask:
+        for subtask in doc.custom_subtask:
+            if subtask.done == "Đang thực hiện":
+                subtask.done = "Xong"
 
     # 6. Đổi trạng thái job card
     doc.status = "Completed"
