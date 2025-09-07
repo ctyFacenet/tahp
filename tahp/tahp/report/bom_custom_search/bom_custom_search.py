@@ -16,8 +16,8 @@ def execute(filters=None):
         bom_filters["item"] = filters["item_code"]
     if filters.get("custom_category"):
         bom_filters["custom_category"] = filters["custom_category"]
-    if filters.get("custom_category_materials"):
-        bom_filters["custom_category_materials"] = filters["custom_category_materials"]
+    if filters.get("custom_gyps"):
+        bom_filters["custom_gyps"] = filters["custom_gyps"]
 
     boms = frappe.db.get_all("BOM", filters=bom_filters, fields=["name", "item"])
     for bom in boms:
@@ -30,7 +30,7 @@ def execute(filters=None):
             "item_name": frappe.get_value("Item", doc.item, "item_name") or "",
             "custom_density_normal": doc.custom_density_normal,
             "custom_category": doc.custom_category or "Không xác định",
-            "custom_category_materials": doc.custom_category_materials,
+            "custom_gyps": doc.custom_gyps,
         }
 
         for child in doc.custom_params or []:
