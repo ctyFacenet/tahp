@@ -11,15 +11,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-20 11:33:13.534352",
-  "name": "Draft",
-  "style": "",
-  "workflow_state_name": "Draft"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
   "icon": "question-sign",
   "modified": "2025-08-07 20:24:40.511152",
   "name": "Pending",
@@ -34,5 +25,41 @@
   "name": "Approved",
   "style": "Success",
   "workflow_state_name": "Approved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-26 16:08:05.160131",
+  "name": "Ready to Handover",
+  "style": "",
+  "workflow_state_name": "Ready to Handover"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-26 16:08:16.327593",
+  "name": "Handed Over",
+  "style": "",
+  "workflow_state_name": "Handed Over"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-26 16:08:27.412699",
+  "name": "Completed",
+  "style": "",
+  "workflow_state_name": "Completed"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-20 11:33:13.534352",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
  }
 ]

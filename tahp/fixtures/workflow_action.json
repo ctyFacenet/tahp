@@ -1,5 +1,26 @@
 [
  {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-23 08:28:30.323600",
+  "name": "v3f06nhini",
+  "permitted_roles": [
+   {
+    "parent": "v3f06nhini",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Employee Leave Tracker",
+  "reference_name": "v32qu95ei0",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
   "completed_by": "Administrator",
   "completed_by_role": "All",
   "docstatus": 0,
@@ -418,5 +439,2042 @@
   "status": "Open",
   "user": null,
   "workflow_state": "Pending"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.572088",
+  "name": "of76afefcf",
+  "permitted_roles": [
+   {
+    "parent": "of76afefcf",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "1ici8v6tsi",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.670928",
+  "name": "of8njfcphv",
+  "permitted_roles": [
+   {
+    "parent": "of8njfcphv",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "npmgm01ebb",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.710410",
+  "name": "of950pv6ej",
+  "permitted_roles": [
+   {
+    "parent": "of950pv6ej",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "m7fbfgerap",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.752953",
+  "name": "of9vjbkt4e",
+  "permitted_roles": [
+   {
+    "parent": "of9vjbkt4e",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "dkuk3nct9h",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.793672",
+  "name": "of9951k9ca",
+  "permitted_roles": [
+   {
+    "parent": "of9951k9ca",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "cgrseeope2",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:09.838580",
+  "name": "ofan1so56m",
+  "permitted_roles": [
+   {
+    "parent": "ofan1so56m",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "dtu14o5ph1",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:23:22.864947",
+  "name": "ojcueelmi4",
+  "permitted_roles": [
+   {
+    "parent": "ojcueelmi4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "8pqhjh9a9l",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:24:20.598295",
+  "name": "p5ec7gkukk",
+  "permitted_roles": [
+   {
+    "parent": "p5ec7gkukk",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "8pqhjh9a9l",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:30:58.993835",
+  "name": "t1ul1emh76",
+  "permitted_roles": [
+   {
+    "parent": "t1ul1emh76",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "e4318m2611",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:31:00.548922",
+  "name": "t2db7mou0o",
+  "permitted_roles": [
+   {
+    "parent": "t2db7mou0o",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "e4318m2611",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:48:12.516410",
+  "name": "74tdb01uft",
+  "permitted_roles": [
+   {
+    "parent": "74tdb01uft",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "74stf5p3o7",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 16:55:38.659351",
+  "name": "bga25rf3f2",
+  "permitted_roles": [
+   {
+    "parent": "bga25rf3f2",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "bga2ousg56",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 17:01:54.666863",
+  "name": "f5qsn1f3sr",
+  "permitted_roles": [
+   {
+    "parent": "f5qsn1f3sr",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "bga2ousg56",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-26 17:02:02.228364",
+  "name": "f86f0vud2d",
+  "permitted_roles": [
+   {
+    "parent": "f86f0vud2d",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "bga2ousg56",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 08:34:05.246876",
+  "name": "hc4kqq35pm",
+  "permitted_roles": [
+   {
+    "parent": "hc4kqq35pm",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "1ici8v6tsi",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 08:36:10.096622",
+  "name": "ij4bnr1vit",
+  "permitted_roles": [
+   {
+    "parent": "ij4bnr1vit",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "cnca4bde1c",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 08:56:40.844536",
+  "name": "ujo3khmqca",
+  "permitted_roles": [
+   {
+    "parent": "ujo3khmqca",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "ujnve1s63r",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:00:04.836032",
+  "name": "0jgqp24uva",
+  "permitted_roles": [
+   {
+    "parent": "0jgqp24uva",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "0jgi1lgdju",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:08:12.079662",
+  "name": "5boh8ktgf6",
+  "permitted_roles": [
+   {
+    "parent": "5boh8ktgf6",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "5bkk7n9d7d",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:27:08.310723",
+  "name": "ger2cn1soc",
+  "permitted_roles": [
+   {
+    "parent": "ger2cn1soc",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "gena1mku3o",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:32:34.273907",
+  "name": "jkmffmtu3n",
+  "permitted_roles": [
+   {
+    "parent": "jkmffmtu3n",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "jkm8nbi68i",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:36:04.096444",
+  "name": "lm9u4c6rak",
+  "permitted_roles": [
+   {
+    "parent": "lm9u4c6rak",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "lm8jefces1",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 09:57:38.545600",
+  "name": "2apvos287u",
+  "permitted_roles": [
+   {
+    "parent": "2apvos287u",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "2aljo9t3gq",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:01:27.025650",
+  "name": "4i65gt6217",
+  "permitted_roles": [
+   {
+    "parent": "4i65gt6217",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "4i1kv3589f",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:08:33.550568",
+  "name": "8nf899ci4f",
+  "permitted_roles": [
+   {
+    "parent": "8nf899ci4f",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "8nbc224uss",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:16:18.571901",
+  "name": "d8piv3r86v",
+  "permitted_roles": [
+   {
+    "parent": "d8piv3r86v",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "d8ogmvp3np",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:19:09.309970",
+  "name": "eu5o0evhig",
+  "permitted_roles": [
+   {
+    "parent": "eu5o0evhig",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "d8ogmvp3np",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:19:11.466521",
+  "name": "euq3tf1373",
+  "permitted_roles": [
+   {
+    "parent": "euq3tf1373",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "d8ogmvp3np",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 10:19:25.514868",
+  "name": "f37jql1822",
+  "permitted_roles": [
+   {
+    "parent": "f37jql1822",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "f36k3tp15j",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-27 11:55:34.703922",
+  "name": "7e3s0sec6b",
+  "permitted_roles": [
+   {
+    "parent": "7e3s0sec6b",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "7e1a7tjajp",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 10:34:19.556452",
+  "name": "3ijenqiine",
+  "permitted_roles": [
+   {
+    "parent": "3ijenqiine",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "7e1a7tjajp",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 10:35:19.193356",
+  "name": "4570u7st9s",
+  "permitted_roles": [
+   {
+    "parent": "4570u7st9s",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "7e1a7tjajp",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 11:49:29.821595",
+  "name": "fk24148fig",
+  "permitted_roles": [
+   {
+    "parent": "fk24148fig",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "fk1jf1ojgm",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 11:50:49.968486",
+  "name": "gd3bthmsem",
+  "permitted_roles": [
+   {
+    "parent": "gd3bthmsem",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "fk1jf1ojgm",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 11:50:51.888460",
+  "name": "gdm0tudn3g",
+  "permitted_roles": [
+   {
+    "parent": "gdm0tudn3g",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "fk1jf1ojgm",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-08-28 11:51:29.159961",
+  "name": "gpbktuhn93",
+  "permitted_roles": [
+   {
+    "parent": "gpbktuhn93",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "gpb1o59hub",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:25:21.045667",
+  "name": "4qaem4tnek",
+  "permitted_roles": [
+   {
+    "parent": "4qaem4tnek",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "4q52ehi1iu",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:30:05.814642",
+  "name": "7jasuns2h4",
+  "permitted_roles": [
+   {
+    "parent": "7jasuns2h4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "4q52ehi1iu",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:34:49.832861",
+  "name": "ac29q0jde6",
+  "permitted_roles": [
+   {
+    "parent": "ac29q0jde6",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "4q52ehi1iu",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:35:30.369953",
+  "name": "aonlone4k7",
+  "permitted_roles": [
+   {
+    "parent": "aonlone4k7",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "aon1bc7gp1",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:38:59.235505",
+  "name": "cq06naqelv",
+  "permitted_roles": [
+   {
+    "parent": "cq06naqelv",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "cq01dbb84j",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:44:37.969340",
+  "name": "g3rea6sedq",
+  "permitted_roles": [
+   {
+    "parent": "g3rea6sedq",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "g3qpf0aiqt",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 10:50:52.382035",
+  "name": "jor4nph2ef",
+  "permitted_roles": [
+   {
+    "parent": "jor4nph2ef",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "joo2hls2nf",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 11:00:27.297981",
+  "name": "pchkbhnn16",
+  "permitted_roles": [
+   {
+    "parent": "pchkbhnn16",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "pcfs5vk4jc",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 11:09:09.420779",
+  "name": "ufmph73mke",
+  "permitted_roles": [
+   {
+    "parent": "ufmph73mke",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "pcfs5vk4jc",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-03 11:09:14.572901",
+  "name": "uh9ifjuvor",
+  "permitted_roles": [
+   {
+    "parent": "uh9ifjuvor",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "pcfs5vk4jc",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-04 11:28:03.896376",
+  "name": "la7tces906",
+  "permitted_roles": [
+   {
+    "parent": "la7tces906",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "la51j7dbi3",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-04 11:35:09.315063",
+  "name": "pf5o6cd1gd",
+  "permitted_roles": [
+   {
+    "parent": "pf5o6cd1gd",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "la51j7dbi3",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Ready to Handover"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-04 11:35:14.468698",
+  "name": "pgo0l2neud",
+  "permitted_roles": [
+   {
+    "parent": "pgo0l2neud",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "la51j7dbi3",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 08:53:16.701361",
+  "name": "6bvpmmujo3",
+  "permitted_roles": [
+   {
+    "parent": "6bvpmmujo3",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "6bppme4lgu",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 09:06:28.636133",
+  "name": "e3ehn4f89m",
+  "permitted_roles": [
+   {
+    "parent": "e3ehn4f89m",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "e39knj0h5f",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 09:14:29.573203",
+  "name": "ipn61qa5fa",
+  "permitted_roles": [
+   {
+    "parent": "ipn61qa5fa",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "ipj0o1pvr1",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 09:35:10.034303",
+  "name": "utdj4dihnk",
+  "permitted_roles": [
+   {
+    "parent": "utdj4dihnk",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "ut84cr83g3",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 09:43:09.647026",
+  "name": "3j84dp8biv",
+  "permitted_roles": [
+   {
+    "parent": "3j84dp8biv",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "3j8vglh6us",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 09:51:23.583915",
+  "name": "8dj07ksltf",
+  "permitted_roles": [
+   {
+    "parent": "8dj07ksltf",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "8djj5snh6q",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:03:50.156702",
+  "name": "fmtb2usfrt",
+  "permitted_roles": [
+   {
+    "parent": "fmtb2usfrt",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "8djj5snh6q",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:08:49.254339",
+  "name": "ikcugcmc8m",
+  "permitted_roles": [
+   {
+    "parent": "ikcugcmc8m",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "6bppme4lgu",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:12:19.363687",
+  "name": "km1orcligo",
+  "permitted_roles": [
+   {
+    "parent": "km1orcligo",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "kltggis63g",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:13:17.723308",
+  "name": "l8986rpfuo",
+  "permitted_roles": [
+   {
+    "parent": "l8986rpfuo",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "kltggis63g",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:45:15.834592",
+  "name": "7vm8ibpghl",
+  "permitted_roles": [
+   {
+    "parent": "7vm8ibpghl",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "7virmjiu2h",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 10:53:37.348298",
+  "name": "csdfqot57t",
+  "permitted_roles": [
+   {
+    "parent": "csdfqot57t",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "cs87jg27bj",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 11:27:09.791605",
+  "name": "0h9i76v45d",
+  "permitted_roles": [
+   {
+    "parent": "0h9i76v45d",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "0h5oui0kd6",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 11:35:51.660458",
+  "name": "5kc0av9llt",
+  "permitted_roles": [
+   {
+    "parent": "5kc0av9llt",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "5k8hd79io2",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-05 11:43:02.793302",
+  "name": "9r3r6am9ts",
+  "permitted_roles": [
+   {
+    "parent": "9r3r6am9ts",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "9r0d50aqde",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 08:45:18.232510",
+  "name": "deepgs56p9",
+  "permitted_roles": [
+   {
+    "parent": "deepgs56p9",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "5k8hd79io2",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 09:14:51.731369",
+  "name": "uol3erb0c9",
+  "permitted_roles": [
+   {
+    "parent": "uol3erb0c9",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "9r0d50aqde",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 09:16:20.929006",
+  "name": "vkhc2skb2l",
+  "permitted_roles": [
+   {
+    "parent": "vkhc2skb2l",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "0h5oui0kd6",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 09:40:28.388227",
+  "name": "dor74332ap",
+  "permitted_roles": [
+   {
+    "parent": "dor74332ap",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "7virmjiu2h",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 10:00:43.855152",
+  "name": "pkmdahrst3",
+  "permitted_roles": [
+   {
+    "parent": "pkmdahrst3",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00086",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 10:37:54.710571",
+  "name": "fdrl68h87o",
+  "permitted_roles": [
+   {
+    "parent": "fdrl68h87o",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00086",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 10:53:48.385315",
+  "name": "onsleoc57i",
+  "permitted_roles": [
+   {
+    "parent": "onsleoc57i",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00087",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 10:55:09.289861",
+  "name": "ph4kjoduli",
+  "permitted_roles": [
+   {
+    "parent": "ph4kjoduli",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00087",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:00:49.568798",
+  "name": "srfre7e5e9",
+  "permitted_roles": [
+   {
+    "parent": "srfre7e5e9",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00088",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:02:39.933959",
+  "name": "ttvh93foa2",
+  "permitted_roles": [
+   {
+    "parent": "ttvh93foa2",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00088",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:08:00.633625",
+  "name": "126osdvhpc",
+  "permitted_roles": [
+   {
+    "parent": "126osdvhpc",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00090",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:09:13.342044",
+  "name": "1otfs32gsc",
+  "permitted_roles": [
+   {
+    "parent": "1otfs32gsc",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00090",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:16:11.948853",
+  "name": "5rn91igpsq",
+  "permitted_roles": [
+   {
+    "parent": "5rn91igpsq",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00092",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:17:16.597023",
+  "name": "6fu84iqd4h",
+  "permitted_roles": [
+   {
+    "parent": "6fu84iqd4h",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00092",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:20:47.093206",
+  "name": "8hm482rc6h",
+  "permitted_roles": [
+   {
+    "parent": "8hm482rc6h",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00094",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:21:47.791768",
+  "name": "94lmletisb",
+  "permitted_roles": [
+   {
+    "parent": "94lmletisb",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00094",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:34:54.075958",
+  "name": "gqc0dpv4kl",
+  "permitted_roles": [
+   {
+    "parent": "gqc0dpv4kl",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00097",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:35:52.914285",
+  "name": "hcp5iavhl2",
+  "permitted_roles": [
+   {
+    "parent": "hcp5iavhl2",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00097",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:43:18.700373",
+  "name": "lo37qvg0q4",
+  "permitted_roles": [
+   {
+    "parent": "lo37qvg0q4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00099",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:44:11.231911",
+  "name": "m8g03okka7",
+  "permitted_roles": [
+   {
+    "parent": "m8g03okka7",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00099",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:52:34.052510",
+  "name": "r5kbva4v67",
+  "permitted_roles": [
+   {
+    "parent": "r5kbva4v67",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00101",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 11:59:02.086399",
+  "name": "uusp6secg8",
+  "permitted_roles": [
+   {
+    "parent": "uusp6secg8",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00101",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 12:01:34.274432",
+  "name": "0ee1af234m",
+  "permitted_roles": [
+   {
+    "parent": "0ee1af234m",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00102",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 13:35:18.255090",
+  "name": "nbucpoe6jm",
+  "permitted_roles": [
+   {
+    "parent": "nbucpoe6jm",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00098",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 13:51:48.433799",
+  "name": "11c898mjsu",
+  "permitted_roles": [
+   {
+    "parent": "11c898mjsu",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00098",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 13:59:30.916186",
+  "name": "5htpmvto35",
+  "permitted_roles": [
+   {
+    "parent": "5htpmvto35",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00104",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": null,
+  "completed_by_role": null,
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 14:20:10.227583",
+  "name": "hl6t6o2bdn",
+  "permitted_roles": [
+   {
+    "parent": "hl6t6o2bdn",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00105",
+  "status": "Open",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:00:00.874519",
+  "name": "908t1eb3b0",
+  "permitted_roles": [
+   {
+    "parent": "908t1eb3b0",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00106",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:00:59.818756",
+  "name": "9im38rmrc4",
+  "permitted_roles": [
+   {
+    "parent": "9im38rmrc4",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00106",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:05:21.135926",
+  "name": "c4bpvbo7pg",
+  "permitted_roles": [
+   {
+    "parent": "c4bpvbo7pg",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00107",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:06:42.801868",
+  "name": "ctsdaujt9s",
+  "permitted_roles": [
+   {
+    "parent": "ctsdaujt9s",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00107",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:07:22.353403",
+  "name": "da7clft038",
+  "permitted_roles": [
+   {
+    "parent": "da7clft038",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00109",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Draft"
+ },
+ {
+  "completed_by": "Administrator",
+  "completed_by_role": "All",
+  "docstatus": 0,
+  "doctype": "Workflow Action",
+  "modified": "2025-09-06 15:10:34.460757",
+  "name": "f6888cc1c5",
+  "permitted_roles": [
+   {
+    "parent": "f6888cc1c5",
+    "parentfield": "permitted_roles",
+    "parenttype": "Workflow Action",
+    "role": "All"
+   }
+  ],
+  "reference_doctype": "Shift Handover",
+  "reference_name": "Biên bản MFG-WO-2025-00109",
+  "status": "Completed",
+  "user": null,
+  "workflow_state": "Handed Over"
  }
 ]
