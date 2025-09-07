@@ -27,8 +27,6 @@ frappe.ui.form.on('BOM', {
         let doc = await frappe.db.get_doc("Manufacturing Category", frm.doc.custom_category)
         frm.set_value('custom_qc_template', doc.qc_template)
         frm.set_value('custom_qc_template_out', doc.qc_template_out)
-        await fill_params(frm, "custom_qc_template", "custom_params")
-        await fill_params(frm, "custom_qc_template_out", "custom_params_out");
     },
 
     custom_update_category: function(frm) {
@@ -120,7 +118,6 @@ frappe.ui.form.on('BOM Operation', {
 
 async function fill_params(frm, template_field, table_field) {
     frm.clear_table(table_field);
-
     let template_name = frm.doc[template_field];
     if (template_name) {
         let template = await frappe.db.get_doc('Quality Inspection Template', template_name);
