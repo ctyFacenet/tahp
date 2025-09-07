@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:LSX.{DD}.{MM}.{YY}.{##}",
  "creation": "2025-08-18 14:10:28.146266",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -78,10 +79,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-21 15:32:03.894211",
+ "modified": "2025-09-07 19:27:07.691030",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

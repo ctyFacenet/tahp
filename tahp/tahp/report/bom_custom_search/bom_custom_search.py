@@ -221,7 +221,7 @@ def get_filter_columns():
     
     exclude = ["bom_name", "custom_category","custom_note"]
 
-    filters = []
+    filters = [{"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1}]
     for column in columns:
         if column["fieldname"] in exclude:
             continue

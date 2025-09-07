@@ -13,8 +13,7 @@
   "planned_start_time",
   "planned_end_time",
   "note",
-  "approved",
-  "unit"
+  "approved"
  ],
  "fields": [
   {
@@ -72,21 +71,13 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Tr\u1ea1ng th\u00e1i LSX Tu\u1ea7n"
-  },
-  {
-   "columns": 1,
-   "fieldname": "unit",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "\u0110\u01a1n v\u1ecb",
-   "options": "UOM"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-27 17:30:20.627067",
+ "modified": "2025-09-07 19:00:24.854088",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "WWO Plan Item",

@@ -9,12 +9,10 @@
 
 frappe.ui.form.on('WWO Plan', {
     onload: function(frm) {
-        console.log('onload')
         setup_ui(frm);
         setup_hook(frm);
     },
     refresh: async function(frm) {
-        console.log('refresh123')
         setup_ui(frm);
         const response = await frappe.call({method: 'tahp.api.wwo_plan', args:{plan: frm.doc.name}});
         await generate_data(frm, response.message);
@@ -26,7 +24,6 @@ frappe.ui.form.on('WWO Plan', {
 
 frappe.ui.form.on('WWO Plan Item', {
     form_render: function(frm, cdt, cdn) {
-        console.log('form_render')
         const row = locals[cdt][cdn];
 
         // Đổi các field thành link
@@ -95,22 +92,8 @@ frappe.ui.form.on('WWO Plan Item', {
 });
 
 function setup_ui(frm) {
-    // Giao diện rộng và ẩn các thành phần không cần thiết
-    document.body.classList.add('full-width');
-    // $('.col-lg-2.layout-side-section, .sidebar-toggle-btn, .btn-open-row').hide();
-    // $('.sidebar-toggle-placeholder').click();
-    $('.btn-open-row, .form-message-container').hide();
+    $(frm.page.wrapper).find('.btn-open-row, .form-message-container').hide();
     frm.page.btn_primary.hide();
-    const sidebar = document.querySelector('.col-lg-2.layout-side-section');
-    const toggleBtn = document.querySelector('.sidebar-toggle-icon');
-
-    if (sidebar && toggleBtn && getComputedStyle(sidebar).display !== 'none') {
-        if (window.innerWidth > 768) {
-            toggleBtn.click();
-        }
-    }
-
-    // Cấm can thiệp vào bảng
     frm.set_df_property('items', 'cannot_add_rows', true);
     frm.set_df_property('items', 'cannot_delete_rows', true);
     frm.set_df_property('items', 'cannot_delete_all_rows', true);
@@ -193,8 +176,8 @@ function setup_hook(frm) {
 
     if (window.innerWidth > 768) {
         setTimeout(() => {
-            $('.rows').css('pointer-events', 'none');
-            $('.rows .btn').css('pointer-events', 'auto');
+            $(frm.page.wrapper).find('.rows').css('pointer-events', 'none');
+            $(frm.page.wrapper).find('.rows .btn').css('pointer-events', 'auto');
             setup_bom_tooltip_events();
             setup_item_tooltip_events();
             setup_wwo_link_events();
@@ -226,7 +209,6 @@ function generate_data(frm, week) {
         frappe.model.clear_table(frm.doc, 'items');
         week.forEach(week => {
             week.items.forEach((row, index) => {
-                console.log('row', row)
                 frm.add_child('items', {
                     wwo: index === 0 ? week.name : "",
                     approved: index === 0 ? week.workflow_state : "",
@@ -245,7 +227,6 @@ function generate_data(frm, week) {
 }
 
 async function setup_button(frm) {
-    console.log('setup_button', window.innerWidth)
     if (window.innerWidth <= 768) return;
     if (!frappe.user_roles.includes("Giám đốc")) {
         return};
@@ -256,7 +237,6 @@ async function setup_button(frm) {
     $wrapper.find('[data-fieldname="approved"]').each(function () {
         const $cell = $(this);
         const cellValue = $cell.find('.static-area').text().trim();
-        console.log('cellValue', cellValue)
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
         if (cellValue === "Đợi GĐ duyệt") {
@@ -325,7 +305,6 @@ async function setup_note(frm) {
                     $cell.attr('data-tooltip-content', note);
                 })
                 .catch(err => {
-                    console.warn(`Không thể lấy note từ WWO ${wwo}:`, err);
                     $cell.find('.static-area').text('Xem ghi chú');
                     $cell.attr('data-tooltip-content', 'Không có ghi chú');
                 });
@@ -344,7 +323,6 @@ async function wwo_flow(frm, wwo_name, state) {
 }
 
 async function process_wwo(frm, wwo, state, message, alert_message, role, notification) {
-    console.log('hi')
     frappe.prompt({
         label: 'Lý do từ chối',
         fieldname: 'comment',
@@ -422,7 +400,6 @@ async function process_wwo_mobile(frm, wwo, state, message, alert_message, role,
                 $('.modal').off('hide.bs.modal');
                 dialog.hide();
             } catch (error) {
-                console.error("Lỗi xử lý:", error);
                 frappe.msgprint("Đã xảy ra lỗi khi xử lý. Vui lòng thử lại.");
             }
         },

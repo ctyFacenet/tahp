@@ -1,7 +1,23 @@
 frappe.query_reports["BOM Custom Search"] = {
+    filters: [
+        {"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1},
+        {"fieldname": "item_code", "label": "Item", "fieldtype": "Data","hidden": 1},
+    ],
     onload: async function(report) {
         injectDatatableCSS();
         report.page.set_title("Tìm kiếm BOM");
+        const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
+        if (res?.message) {
+            res.message.forEach(f => {
+                if (f.fieldname === 'week_work_order') {
+                    f.default = report.get_filter_value('week_work_order');
+                }
+                if (f.fieldname === 'item_code') {
+                    f.default = report.get_filter_value('item_code');
+                }
+            });
+            frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(() => merge_columns()));
+        }
 
         // Override refresh
         const original_refresh = report.refresh;
@@ -18,10 +34,7 @@ frappe.query_reports["BOM Custom Search"] = {
         };
 
         // Load filter columns  
-        const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
-        if (res?.message) {
-            frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(() => merge_columns()));
-        }
+
 
         report.page.add_inner_button(__('Tạo BOM mới'), function() {
             frappe.new_doc('BOM', {
@@ -136,9 +149,6 @@ function selectBOM(report) {
     report.page.wrapper.off('click', '.select-bom').on('click', '.select-bom', async e => {
         const bomName = e.currentTarget.dataset.bom;
         const itemCode = e.currentTarget.dataset.item;
-        msgprint(`BOM: ${bomName} - Mặt hàng: ${itemCode}`)
-        return;
-
         try {
             const docname = report.get_filter_value('week_work_order');
             if (!docname) return frappe.show_alert({ message: 'Không xác định được LSX', indicator: 'red' });
