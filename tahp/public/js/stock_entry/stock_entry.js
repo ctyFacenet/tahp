@@ -37,6 +37,7 @@ frappe.ui.form.on('Stock Entry', {
 
     refresh: function(frm) {
         frm.set_intro("")
+        frm.events.set_warehouse_readonly(frm);
         if (frm.doc.stock_entry_type) {
             let title = "";
 
@@ -65,6 +66,18 @@ frappe.ui.form.on('Stock Entry', {
             </div>
         `;
         frm.fields_dict.custom_warn.$wrapper.html(html);
+    },
+
+    set_warehouse_readonly(frm) {
+        const type = frm.doc.stock_entry_type;
+        frm.fields_dict.items.grid.update_docfield_property('s_warehouse', 'read_only', 0);
+        frm.fields_dict.items.grid.update_docfield_property('t_warehouse', 'read_only', 0);
+        if (type === "Material Receipt") {
+            frm.fields_dict.items.grid.update_docfield_property('s_warehouse', 'read_only', 1);
+        } else if (type === "Material Issue") {
+            frm.fields_dict.items.grid.update_docfield_property('t_warehouse', 'read_only', 1);
+        }
+        frm.fields_dict.items.grid.refresh();        
     }
 
 });
