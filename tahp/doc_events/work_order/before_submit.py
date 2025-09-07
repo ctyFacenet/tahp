@@ -1,9 +1,11 @@
 import frappe
+from tahp.doc_events.work_order.work_order_api import execute_shift_handover
 
 def before_submit(doc, method):
     check_shift_leader(doc)
     check_workstation(doc)
     warn_workstation(doc)
+    execute_shift_handover(doc)
     doc.status = "In Process"
 
 def check_shift_leader(doc):

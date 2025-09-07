@@ -8682,7 +8682,7 @@
   "hide_custom": 0,
   "icon": "quality",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Quality",
   "links": [
    {
@@ -9038,7 +9038,7 @@
  },
  {
   "charts": [],
-  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}}]",
+  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}},{\"id\":\"O7BPepEwKX\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Biên bản giao ca\",\"col\":3}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -9194,7 +9194,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-09-06 13:48:05.057917",
+  "modified": "2025-09-07 18:11:20.141661",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],
@@ -9208,7 +9208,7 @@
    {
     "color": "Grey",
     "doc_view": "List",
-    "format": null,
+    "format": "&nbsp;",
     "icon": null,
     "kanban_board": null,
     "label": "Nhập kho thành phẩm",
@@ -9219,6 +9219,23 @@
     "report_ref_doctype": null,
     "restrict_to_domain": null,
     "stats_filter": "[[\"Stock Entry\",\"stock_entry_type\",\"=\",\"Manufacture\",false]]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Biên bản giao ca",
+    "link_to": "Shift Handover",
+    "parent": "Manufacturing",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[[\"Shift Handover\",\"workflow_state\",\"!=\",\"Completed\",false]]",
     "type": "DocType",
     "url": null
    },

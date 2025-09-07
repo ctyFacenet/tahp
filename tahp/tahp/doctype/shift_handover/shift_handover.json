@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:Bi\u00ean b\u1ea3n {work_order}",
+ "creation": "2025-08-23 08:52:15.518118",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "creation_date",
+  "work_order",
+  "stock_entry",
+  "column_break_mdwj",
+  "shift_leader_1",
+  "shift_leader_2",
+  "section_break_icom",
+  "table",
+  "job_card_list",
+  "notes_1",
+  "notes_2"
+ ],
+ "fields": [
+  {
+   "allow_in_quick_entry": 1,
+   "default": "Today",
+   "fieldname": "creation_date",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "LSX Ca",
+   "options": "Work Order",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "lsx_ca.truong_ca",
+   "fieldname": "shift_leader_1",
+   "fieldtype": "Link",
+   "label": "Tr\u01b0\u1edfng ca s\u1ed1 1",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shift_leader_2",
+   "fieldtype": "Link",
+   "label": "Tr\u01b0\u1edfng ca s\u1ed1 2",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes_1",
+   "fieldtype": "Text",
+   "label": "\u0110\u00e1nh gi\u00e1 c\u1ee7a nh\u00e2n vi\u00ean v\u1eadn h\u00e0nh, \u0111\u1ec1 xu\u1ea5t, ki\u1ebfn ngh\u1ecb"
+  },
+  {
+   "fieldname": "notes_2",
+   "fieldtype": "Text",
+   "label": "\u0110\u00e1nh gi\u00e1 c\u1ee7a tr\u01b0\u1edfng ca, \u0111\u1ec1 xu\u1ea5t, ki\u1ebfn ngh\u1ecb"
+  },
+  {
+   "fieldname": "job_card_list",
+   "fieldtype": "Table",
+   "label": "Danh s\u00e1ch Job Card",
+   "options": "Shift Handover Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Phi\u1ebfu v\u1eadn chuy\u1ec3n",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "table",
+   "fieldtype": "Table",
+   "label": "Bi\u00ean b\u1ea3n giao ca",
+   "options": "Shift Handover Item 1"
+  },
+  {
+   "fieldname": "column_break_mdwj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_icom",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-07 18:07:09.047071",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Shift Handover",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

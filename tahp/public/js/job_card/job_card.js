@@ -685,6 +685,7 @@ frappe.ui.form.on('Job Card', {
 
             inputs.forEach(($input, index) => {
                 $input.css('pointer-events', 'auto').addClass('jc-edit-editing');
+                $input.data("original-value", $input.val());
                 // Enter để nhảy qua input kế tiếp
                 $input.on('keydown.nextFocus', function(e) {
                     if (e.key === 'Enter' || e.keyCode === 13) {
@@ -721,6 +722,7 @@ frappe.ui.form.on('Job Card', {
         function disableEditing(inputs, $btn) {
             editing = false;
             inputs.forEach($input => {
+                $input.val($input.data("original-value"));
                 $input
                     .css('pointer-events', 'none')
                     .removeClass('jc-edit-editing')

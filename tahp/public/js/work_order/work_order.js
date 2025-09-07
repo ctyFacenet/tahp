@@ -1,12 +1,14 @@
 frappe.ui.form.on('Work Order', {
     refresh: async function(frm) {
         frm.set_intro("");
-        await toggle_qc_tracking(frm);
         await finish_button(frm);
     },
     production_item: async function(frm) {
         await autofill_items(frm);
     },
+    bom_no: async function(frm) {
+        await autofill_items(frm);
+    }
 });
 
 frappe.ui.form.on('Work Order Operation', {
@@ -24,23 +26,8 @@ frappe.ui.form.on('Work Order Operation', {
     }
 })
 
-async function toggle_qc_tracking(frm) {
-    for (let row of frm.doc.operations || []) {
-        if (row.custom_is_qc_tracked === 1) return;
-        let trackers = await frappe.db.get_list('Operation Tracker', {
-            filters: { operation: row.operation, docstatus: 1 },
-            fields: ["name"],
-            order_by: "creation desc",
-            limit: 1
-        });
-
-        if (trackers.length > 0) frappe.model.set_value(row.doctype, row.name, 'custom_is_qc_tracked', 1);
-    }
-    frm.refresh_field("operations");
-}
-
 async function finish_button(frm) {
-    if (frm.is_new() || frm.doc.docstatus != 1) return;
+    if (frm.is_new() || frm.doc.docstatus != 1 || frm.doc.status == "Completed" ) return;
     frm.remove_custom_button("Finish");
     const response = await frappe.call({method: "tahp.doc_events.work_order.before_submit.check_status", args: {work_order: frm.doc.name}})
     if (response.message) {
@@ -64,7 +51,47 @@ async function autofill_items(frm) {
             if (op_doc.custom_team && op_doc.custom_team.length === 1) {
                 frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
             }
+            let trackers = await frappe.db.get_list('Operation Tracker', {
+                filters: { operation: row.operation, docstatus: 1 },
+                fields: ["name"],
+                order_by: "creation desc",
+                limit: 1
+            });
+            if (trackers.length > 0) frappe.model.set_value(row.doctype, row.name, 'custom_is_qc_tracked', 1);
         }
         frm.refresh_field("operations");
     }, 100);
+}
+
+// Huy Section
+frappe.ui.form.on("Work Order", {
+    refresh: function(frm) {
+        let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
+            $wrapper.removeClass("w-100 alert alert-warning")
+            $wrapper.empty()
+        frm.set_intro("");
+        if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
+    }
+});
+
+function show_shift_handover(frm) {
+    if (frm.doc.custom_plan && frm.doc.custom_plan_code) {
+        frappe.call({
+                method: "tahp.doc_events.work_order.work_order_api.check_shift_handover",  
+            args: {
+                work_order: frm.doc.name,
+                custom_plan: frm.doc.custom_plan,
+                custom_plan_code: frm.doc.custom_plan_code
+            },
+            callback: function(r) {
+                if (r.message && r.message.warning) {
+                    let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
+                        $wrapper.addClass("w-100 alert alert-warning")
+                        $wrapper.empty()
+                        $wrapper.html(r.message.warning)
+                    }
+                    frm.set_intro(r.message.warning, "orange")
+                }
+        });
+    }
 }

@@ -12,7 +12,7 @@ fixtures = [
     {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
-    {"doctype": "Workflow Action"},
+    {"doctype": "Workflow Action Master"},
     {"doctype": "Workspace"},
     {"doctype": "Website Settings"},
     {"doctype": "System Settings"},
@@ -231,6 +231,9 @@ doc_events = {
         ],
         "before_insert": [
             "tahp.doc_events.stock_entry.before_insert.before_insert"
+        ],
+        "on_submit": [
+            "tahp.doc_events.stock_entry.on_submit.on_submit"
         ]
     },
     "Operation": {
@@ -244,6 +247,9 @@ doc_events = {
         ],
         "before_save": [
             "tahp.doc_events.work_order.before_save.before_save"
+        ],
+        "on_submit": [
+            "tahp.doc_events.work_order.on_submit.on_submit"
         ]
     },
     "Workstation": {
