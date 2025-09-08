@@ -4,7 +4,7 @@
   "doctype": "Workflow",
   "document_type": "Week Work Order",
   "is_active": 1,
-  "modified": "2025-09-05 15:02:00.947210",
+  "modified": "2025-09-07 18:16:42.889300",
   "name": "Week Work Order Workflow",
   "override_status": 0,
   "send_email_alert": 0,

@@ -1,1 +1,41 @@
-[]
+[
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 1,
+  "modified": "2025-09-08 09:47:11.818446",
+  "name": "Giám đốc",
+  "restrict_to_domain": null,
+  "role_name": "Giám đốc",
+  "two_factor_auth": 0
+ },
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 1,
+  "modified": "2025-09-08 09:47:08.893142",
+  "name": "Kế hoạch sản xuất",
+  "restrict_to_domain": null,
+  "role_name": "Kế hoạch sản xuất",
+  "two_factor_auth": 0
+ },
+ {
+  "desk_access": 1,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Role",
+  "home_page": null,
+  "is_custom": 1,
+  "modified": "2025-09-08 09:46:54.523902",
+  "name": "Phát triển công nghệ",
+  "restrict_to_domain": null,
+  "role_name": "Phát triển công nghệ",
+  "two_factor_auth": 0
+ }
+]
