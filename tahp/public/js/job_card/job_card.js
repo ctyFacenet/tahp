@@ -265,7 +265,7 @@ frappe.ui.form.on('Job Card', {
                 };
             }),
             edittable=false,
-            action = async () => await frm.events.update_team(frm),
+            action = async () => {await frm.events.update_team_async(frm)},
         )
 
         if (frm.doc.custom_downtime && frm.doc.custom_downtime.length > 0) {
@@ -471,8 +471,15 @@ frappe.ui.form.on('Job Card', {
 
         // Nút sửa
         if ((edittable || action) && frm.doc.docstatus === 0) {
-            let $editBtn = $('<button class="btn btn-secondary d-none d-md-table jc-edit-btn">Sửa</button>')
-            $header.append($editBtn)
+            if (data.length > 0) {
+                let $editBtn = $('<button class="btn btn-secondary d-none d-md-table jc-edit-btn">Sửa</button>')
+                $header.append($editBtn)
+            }
+
+            if (!edittable && action && data.length > 0) {
+                let $editBtn = $('<button class="btn btn-secondary d-md-none jc-edit-btn">Sửa</button>')       
+                $header.append($editBtn)                
+            }
 
             // let $editMobileBtn = $('<button class="btn btn-secondary d-md-none w-100 mt-2 jc-edit-btn jc-mobile-input">Sửa</button>')
             // $wrapper.append($editMobileBtn)
@@ -620,7 +627,7 @@ frappe.ui.form.on('Job Card', {
         })
 
         if (edittable === false && action) {
-             $wrapper.on("click", ".jc-edit-btn", async () => {await action()})
+             $wrapper.on("click", ".jc-edit-btn", action)
              return;
         }
 
@@ -968,6 +975,65 @@ frappe.ui.form.on('Job Card', {
             })
             d.show();
         });
+    },
+
+    update_team_async: async function(frm) {
+        // Lấy team bằng await
+        const response = await frappe.call({
+            method: "tahp.doc_events.job_card.job_card.get_team",
+            args: { job_card: frm.doc.name }
+        });
+        const team = response.message || [];
+
+        // Tạo dialog
+        const d = new frappe.ui.Dialog({
+            title: 'Danh sách nhân viên',
+            fields: [{
+                fieldname: "items",
+                fieldtype: "Table",
+                data: team,
+                in_place_edit: true,
+                fields: [
+                    {
+                        fieldname: "employee",
+                        label: __("Mã nhân viên"),
+                        fieldtype: "Link",
+                        options: "Employee",
+                        in_list_view: 1,
+                        onchange: async function() {
+                            const emp = await frappe.db.get_value("Employee", this.value, ['employee_name']);
+                            this.doc.employee_name = emp.message.employee_name;
+                            d.fields_dict.items.grid.refresh();
+                        }
+                    },
+                    {
+                        fieldname: "employee_name",
+                        label: __("Nhân viên"),
+                        fieldtype: "Data",
+                        in_list_view: 1,
+                        read_only: 1
+                    }
+                ]
+            }],
+            primary_action_label: "Xác nhận",
+            primary_action: async function() {
+                const values = d.get_values();
+                if (!values || !values.items || values.items.length === 0) {
+                    frappe.msgprint(__('Trong danh sách phải ít nhất có 1 thành viên'));
+                    return;
+                }
+
+                // Gọi API set_team bằng await
+                await frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.set_team",
+                    args: { job_card: frm.doc.name, team: values.items }
+                });
+
+                d.hide();
+            }
+        });
+
+        d.show();
     },
 
     change_employee: async function(frm, row) {
