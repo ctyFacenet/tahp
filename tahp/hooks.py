@@ -302,12 +302,13 @@ doc_events = {
 # 	],
 # }
 
-# This is my crontask
-# scheduler_events = {
-#     "all": [
-#         "tahp.doc_events.work_order.work_order_utils.create_new_qc_if_needed" 
-#     ]
-# }
+scheduler_events = {
+    "cron": {
+        "0-59/1 * * * *": [
+            "tahp.doc_events.work_order.work_order_utils.check_and_create_qc_for_job_cards"
+        ]
+    },
+}
 
 
 # Testing
