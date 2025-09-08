@@ -5,7 +5,7 @@ frappe.ui.form.on("Quality Inspection Reading", {
 
         // Lấy giá trị reading và công thức từ tài liệu chính
         const reading_value = row.reading_1;
-        const formula = frm.doc.acceptance_formula; // Giả định tên trường là này
+        const formula = frm.doc.acceptance_formula;
 
         if (!reading_value || !formula) {
             frappe.model.set_value(cdt, cdn, "status", "Rejected");

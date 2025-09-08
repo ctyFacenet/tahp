@@ -1,146 +1,147 @@
 import frappe
 from frappe.utils import nowdate, now_datetime
+import datetime
 
 @frappe.whitelist()
-def create_qc_and_notify(work_order_name):
+def create_qc_and_notify(job_card_name):
     """
-    Creates Quality Inspection documents for each operation and sends a notification.
+    Creates Quality Inspection documents for a specific Job Card and sends a notification.
     """
     try:
-        work_order = frappe.get_doc("Work Order", work_order_name, ignore_permissions=True)
+        job_card = frappe.get_doc("Job Card", job_card_name, ignore_permissions=True)
+        work_order = frappe.get_doc("Work Order", job_card.work_order, ignore_permissions=True)
         
-        if not work_order.custom_is_qc_tracked:
-            return "QC tracking is not enabled for this Work Order."
+        # Lấy Mẫu QC từ Operation Tracker
+        op_tracker = frappe.db.get_list(
+            "Operation Tracker",
+            filters={"operation": job_card.operation},
+            fields=["qc_template", "frequency"]
+        )
+        
+        if not op_tracker or not op_tracker[0].get("qc_template"):
+            frappe.throw(f"Không tìm thấy Mẫu QC cho Công đoạn: {job_card.operation}")
+        
+        inspection_template_name = op_tracker[0].get("qc_template")
 
-        qc_docs = []
-        for operation in work_order.operations:
-            if operation.custom_is_qc_tracked:
-                # Tìm Job Card (LSX Công đoạn) tương ứng với Work Order và Operation
-                job_card = frappe.get_list(
-                    "Job Card",
-                    filters={
-                        "work_order": work_order_name,
-                        "operation": operation.operation
-                    },
-                    fields=["name"]
-                )
-                
-                if not job_card:
-                    frappe.throw(f"Không tìm thấy Job Card cho Công đoạn: {operation.operation}")
-                
-                job_card_name = job_card[0].get("name")
+        # Create Quality Inspection document
+        qc_doc = frappe.new_doc("Quality Inspection")
+        qc_doc.reference_type = "Job Card"
+        
+        qc_doc.reference_name = job_card_name
+        qc_doc.quality_inspection_template = inspection_template_name
+        
+        qc_doc.item_code = work_order.production_item
+        qc_doc.inspection_type = "In Process"
+        qc_doc.work_order = job_card.work_order
+        qc_doc.operation = job_card.operation
+        qc_doc.inspected_by = frappe.session.user
+        qc_doc.sample_size = 1
 
-                # FIX: Lấy tên Mẫu QC từ trường 'qc_template' trên Operation Tracker
-                inspection_template_name = frappe.db.get_value(
-                    "Operation Tracker",
-                    {"operation": operation.operation},
-                    "qc_template"
-                )
-                
-                if not inspection_template_name:
-                    frappe.throw(f"Không tìm thấy Mẫu QC cho Công đoạn: {operation.operation}")
-
-                # Create Quality Inspection document
-                qc_doc = frappe.new_doc("Quality Inspection")
-                qc_doc.reference_type = "Job Card"
-                
-                qc_doc.reference_name = job_card_name
-                qc_doc.quality_inspection_template = inspection_template_name
-                
-                qc_doc.item_code = work_order.production_item
-                qc_doc.inspection_type = "In Process"
-                qc_doc.work_order = work_order_name
-                qc_doc.operation = operation.operation
-                qc_doc.inspected_by = frappe.session.user
-                qc_doc.sample_size = 1
-
-                qc_doc.insert(ignore_permissions=True)
-                qc_docs.append(qc_doc)
-                
-                # Gửi thông báo đến người quản lý QC
-                qc_users = frappe.db.get_list(
-                    "Has Role",
-                    filters={"role": "Quality Manager"},
-                    pluck="parent"
-                )
-
-                frappe.publish_realtime(
-                    "notification",
-                    {
-                        "subject": "Phiếu QC mới đã được tạo",
-                        "message": f"Một phiếu QC mới đã được tạo cho Công đoạn: {operation.operation} của Lệnh sản xuất: {work_order_name}. Vui lòng kiểm tra.",
-                        "alert_icon": "fa fa-check-circle",
-                        "alert_type": "info",
-                        "link": f"/app/quality-inspection/{qc_doc.name}",
-                        "for_user": qc_users
-                    }
-                )
-
+        qc_doc.insert(ignore_permissions=True)
+        
+        # Gửi thông báo đến người quản lý QC
+        qc_users = frappe.db.get_list(
+            "Has Role",
+            filters={"role": "Quality Manager"},
+            pluck="parent"
+        )
+        frappe.publish_realtime(
+            "notification",
+            {
+                "subject": "Phiếu QC mới đã được tạo",
+                "message": f"Một phiếu QC mới đã được tạo cho Công đoạn: {job_card.operation} của Lệnh sản xuất: {job_card.work_order}. Vui lòng kiểm tra.",
+                "alert_icon": "fa fa-check-circle",
+                "alert_type": "info",
+                "link": f"/app/quality-inspection/{qc_doc.name}",
+                "for_user": qc_users
+            }
+        )
         frappe.db.commit()
-        return f"Successfully created {len(qc_docs)} Quality Inspection documents."
+        return f"Successfully created Quality Inspection document for Job Card {job_card_name}."
 
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Error in create_qc_and_notify")
         frappe.db.rollback()
         return f"An error occurred: {str(e)}"
 
-def create_new_qc_if_needed():
+def check_and_create_qc_for_job_cards():
     """
-    Tạo các phiếu QC mới dựa trên tần suất (frequence) được lưu trữ
-    trên Operation Tracker và thời gian của phiếu QC cuối cùng đã được gửi.
+    Kiểm tra tất cả các Job Card đang hoạt động để xác định có cần tạo một phiếu QC mới không.
     """
     try:
-        # Lấy tất cả các Work Order đang hoạt động và có QC tracking
-        active_work_orders = frappe.get_list(
-            "Work Order",
-            filters={"docstatus": 1, "custom_is_qc_tracked": 1},
-            fields=["name"]
+        # Lấy tất cả các Job Card đang hoạt động (đã được gửi)
+        active_job_cards = frappe.get_list(
+            "Job Card",
+            filters={"docstatus": 1},
+            fields=["name", "creation", "operation"]
         )
 
-        for wo in active_work_orders:
-            work_order_name = wo.get("name")
+        for job_card_data in active_job_cards:
+            job_card_name = job_card_data.get("name")
+            job_card_creation = frappe.utils.get_datetime(job_card_data.get("creation"))
             
-            # Lấy phiếu QC mới nhất đã được gửi (submitted)
-            last_submitted_qc = frappe.get_list(
+            op_tracker_info = frappe.db.get_value(
+                "Operation Tracker",
+                filters={"operation": job_card_data.get("operation")},
+                fieldname=["frequency", "thời_gian_chờ_lần_đầu_phút"],
+                as_dict=True
+            )
+            
+            if not op_tracker_info or not op_tracker_info.get("frequency"):
+                continue
+            
+            frequence_minutes = op_tracker_info.get("frequency")
+            wait_time_minutes = op_tracker_info.get("thời_gian_chờ_lần_đầu_phút") or 0
+
+            # Kiểm tra xem có phiếu QC nào đã được tạo cho Job Card này chưa
+            last_qc_doc = frappe.get_list(
                 "Quality Inspection",
-                filters={"work_order": work_order_name, "docstatus": 1},
-                fields=["creation", "operation"],
+                filters={"reference_name": job_card_name},
+                fields=["creation"],
                 order_by="creation desc",
                 limit=1
             )
-            
-            if not last_submitted_qc:
-                # Nếu chưa có phiếu QC nào được gửi cho Work Order này, bỏ qua.
-                continue
 
-            # Lấy thông tin tần suất từ Operation Tracker
-            operation = last_submitted_qc[0].operation
-            frequence_minutes = frappe.db.get_value(
-                "Operation Tracker",
-                filters={"operation": operation},
-                fieldname="frequence"
-            )
-
-            # Nếu không tìm thấy tần suất, bỏ qua
-            if not frequence_minutes:
-                continue
-
-            last_qc_creation = now_datetime(last_submitted_qc[0].creation)
+            current_time = now_datetime()
             
-            # Tính toán khoảng thời gian đã trôi qua
-            time_elapsed = now_datetime() - last_qc_creation
-            
-            # So sánh khoảng thời gian đã trôi qua với tần suất yêu cầu
-            # Tần suất được lưu dưới dạng phút
-            if time_elapsed.total_seconds() >= (frequence_minutes * 60):
-                # Gọi hàm tạo phiếu QC mới mà chúng ta đã làm việc
-                frappe.call(
-                    method="your_app.your_module.create_qc_and_notify", # Thay thế bằng đường dẫn thực tế của bạn
-                    work_order_name=work_order_name
-                )
-        
+            # ĐIỀU KIỆN 1: TẠO PHIẾU QC LẦN ĐẦU TIÊN
+            # Nếu chưa có phiếu QC nào được tạo cho Job Card này
+            if not last_qc_doc:
+                # Kiểm tra xem đã đủ thời gian cho lần tạo đầu tiên chưa
+                first_possible_creation_time = job_card_creation + datetime.timedelta(minutes=wait_time_minutes)
+                
+                if current_time >= first_possible_creation_time:
+                    frappe.call(
+                        fn="tahp.doc_events.work_order.work_order_utils.create_qc_and_notify", 
+                        job_card_name=job_card_name
+                    )
+                    
+            # ĐIỀU KIỆN 2: TẠO CÁC PHIẾU QC TIẾP THEO
+            # Nếu đã có ít nhất một phiếu QC
+            else:
+                last_qc_creation = frappe.utils.get_datetime(last_qc_doc[0].get("creation"))
+                time_elapsed = current_time - last_qc_creation
+                required_interval = datetime.timedelta(minutes=frequence_minutes)
+                
+                if time_elapsed >= required_interval:
+                    frappe.call(
+                        fn="tahp.doc_events.work_order.work_order_utils.create_qc_and_notify",
+                        job_card_name=job_card_name
+                    )
         frappe.db.commit()
-    
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Error in create_new_qc_if_needed")
+        frappe.log_error(frappe.get_traceback(), "Error in check_and_create_qc_for_job_cards")
         frappe.db.rollback()
+
+def create_test_note():
+    """
+    Tạo một tài liệu Note mới để kiểm tra xem scheduler có hoạt động không.
+    """
+    try:
+        note_doc = frappe.new_doc("Note")
+        note_doc.title = "Test Scheduler: " + str(now_datetime())
+        note_doc.content = "Tác vụ tự động đã chạy thành công."
+        note_doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Lỗi khi tạo Ghi chú test")
