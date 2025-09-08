@@ -88,6 +88,7 @@ web_include_css = [
 
 doctype_js = {
     "Work Order": "/public/js/work_order/work_order.js",
+    "Quality Inspection": ["/public/js/quality_inspection/quality_inspection.js"],
     "Item": "/public/js/item/item.js",
     "Stock Entry": "/public/js/stock_entry/stock_entry.js",
     "Operation": "/public/js/operation/operation.js",
@@ -300,6 +301,14 @@ doc_events = {
 # 		"tahp.tasks.monthly"
 # 	],
 # }
+
+# This is my crontask
+# scheduler_events = {
+#     "all": [
+#         "tahp.doc_events.work_order.work_order_utils.create_new_qc_if_needed" 
+#     ]
+# }
+
 
 # Testing
 # -------

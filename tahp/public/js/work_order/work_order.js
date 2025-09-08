@@ -3,6 +3,44 @@ frappe.ui.form.on('Work Order', {
         frm.set_intro("");
         await finish_button(frm);
     },
+    production_item: async function(frm) {
+        await autofill_items(frm);
+    },
+
+    on_submit: async function(frm) {
+        // Only run the logic if the main QC checkbox is ticked
+        if (frm.doc.custom_is_qc_tracked) {
+            frappe.show_alert({
+                message: __('Đang tạo phiếu kiểm tra chất lượng...'),
+                indicator: 'blue'
+            });
+
+            // Call the Python method on the server
+            const response = await frappe.xcall("tahp.doc_events.work_order.work_order_utils.create_qc_and_notify", {
+                work_order_name: frm.doc.name
+            });
+
+            // Show a success or failure message
+            if (response.startsWith("Successfully")) {
+                frappe.show_alert({
+                    message: __(response),
+                    indicator: 'green'
+                });
+            } else {
+                frappe.show_alert({
+                    message: __('Tạo phiếu QC thất bại: ' + response),
+                    indicator: 'red'
+                });
+            }
+        }
+    },
+    // The rest of your existing event handlers and functions
+    custom_is_qc_tracked: async function(frm) {
+        await toggle_qc_tracking(frm);
+    },
+    production_item: async function(frm) {
+        await autofill_items(frm);
+    },
     bom_no: async function(frm) {
         await autofill_items(frm);
     }
