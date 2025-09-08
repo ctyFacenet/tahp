@@ -357,10 +357,16 @@ frappe.listview_settings["BOM"] = {
     // Toolbar
     $(listview.page.body).on("click", "#btn-add", () => frappe.new_doc("BOM"));
     $(listview.page.body).on("click", "#btn-copy", () =>
-      frappe.msgprint("Tính năng sao chép hàng loạt đang phát triển!")
+      frappe.show_alert({
+        message: "Tính năng sao chép hàng loạt đang phát triển!",
+        indicator: "warning",
+      })
     );
     $(listview.page.body).on("click", "#btn-delete", () =>
-      frappe.msgprint("Tính năng xoá hàng loạt đang phát triển!")
+      frappe.show_alert({
+        message: "Tính năng xoá hàng loạt đang phát triển!",
+        indicator: "warning",
+      })
     );
 
 
