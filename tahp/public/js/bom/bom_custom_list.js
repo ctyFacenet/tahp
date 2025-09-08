@@ -30,7 +30,7 @@ frappe.listview_settings["BOM"] = {
           <button id="toggle-filter" class="btn btn-sm">
                 <img src="/assets/tahp/images/filter_time.svg" alt="Filter" class="icon-btn">
           </button>
-         <div id="time-filter" class="collapsed">
+         <div id="time-filter">
     <ul class="year-list">
       ${[2025, 2024, 2023, 2022, 2021, 2020].map(
       (y) => `

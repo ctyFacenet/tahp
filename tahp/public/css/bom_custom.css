@@ -377,3 +377,7 @@
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
+
+.dt-scrollable__no-data .no-data-message {
+  left: 40% !important;
+}
