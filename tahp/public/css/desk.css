@@ -278,3 +278,17 @@ body[data-route="modern-menu"] .btn-back {
   vertical-align: middle;
   color: #3b3939;
 }
+
+#navbar-breadcrumbs li:last-child a {
+  color: rgba(0, 174, 238, 1) !important;
+  font-weight: 600;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+
+@media (min-width: 992px) {
+  .page-head .btn-back {
+    display: none !important;
+  }
+}
