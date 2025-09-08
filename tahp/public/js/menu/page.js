@@ -5,23 +5,11 @@ frappe.templates["page"] = `
 			<div class="col-md-4 col-sm-6 col-xs-7 page-title">
 				<!-- <div class="title-image hide hidden-md hidden-lg"></div> -->
 				<!-- title -->
-				<button class="btn-reset sidebar-toggle-btn">
-					<svg class="es-icon icon-md sidebar-toggle-placeholder">
-						<use href="#es-line-align-justify"></use>
-					</svg>
-					<span class="sidebar-toggle-icon">
-						<svg class="es-icon icon-md">
-							<use href="#es-line-sidebar-collapse">
-							</use>
-						</svg>
-					</span>
-				</button>
-				<button class="btn-reset menu-open-btn hide-side-section">
-					<svg class="es-icon icon-md sidebar-toggle-placeholder">
-						<use href="#es-line-align-justify"></use>
-					</svg>
-				</button>
+				
 				<div class="flex fill-width title-area">
+         <button type="button" class="btn-back mr-2" onclick="window.history.back();">
+          <i class="fa-solid fa-angle-left"></i>
+        </button>
 					<div>
 						<div class="flex">
 							<h3 class="ellipsis title-text"></h3>

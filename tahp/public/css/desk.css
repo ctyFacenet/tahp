@@ -194,3 +194,87 @@ body[data-route="modern-menu"] .btn-back {
   }
 
 }
+
+#navbar-breadcrumbs {
+  font-size: 18px !important;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+#navbar-breadcrumbs::-webkit-scrollbar {
+  height: 6px;
+  background: transparent !important;
+}
+
+#navbar-breadcrumbs::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+#navbar-breadcrumbs::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+
+#navbar-breadcrumbs::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+#navbar-breadcrumbs:hover::-webkit-scrollbar-thumb,
+#navbar-breadcrumbs:active::-webkit-scrollbar-thumb,
+#navbar-breadcrumbs:focus::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+#navbar-breadcrumbs:hover {
+  scrollbar-width: thin;
+}
+
+#navbar-breadcrumbs li {
+  display: inline-flex !important;
+  align-items: center;
+}
+
+#navbar-breadcrumbs a {
+  display: inline-flex !important;
+  align-items: center;
+  line-height: 1.2;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+#navbar-breadcrumbs a:before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 6px;
+  background: url("/assets/tahp/images/arrow_right.svg") no-repeat center center !important;
+  background-size: 0.8em 0.8em;
+}
+
+.page-head .btn-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.page-head .btn-back i {
+  font-size: clamp(16px, 2vw, 24px);
+  line-height: 1;
+  vertical-align: middle;
+  color: #3b3939;
+}
