@@ -38,7 +38,7 @@ frappe.query_reports["BOM Custom Search"] = {
 
         report.page.add_inner_button(__('Tạo BOM mới'), function() {
             frappe.new_doc('BOM', {
-                item: report.get_filter_value('item')
+                item: report.get_filter_value('item_code')
             })
             
             frappe.ui.form.on('BOM', {
@@ -56,7 +56,7 @@ frappe.query_reports["BOM Custom Search"] = {
         const base = default_formatter(value, row, column, data);
         return `<div class="d-flex justify-content-between align-items-center w-100 px-2">
                     ${base}
-                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 17px">Chọn</button>
+                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 17px;white-space:nowrap;">Chọn</button>
                 </div>`;
     },
 
@@ -73,13 +73,25 @@ function injectDatatableCSS() {
     const style = document.createElement('style');
     style.id = 'custom-dt-style';
     style.innerHTML = `
-        .dt-row-header .dt-cell__content { padding-inline: 0 !important; }
+        .dt-row-header .dt-cell__content { padding-inline: 0 !important;}
         .dt-scrollable .dt-cell__content { display: flex !important; align-items: center; justify-content: center; word-break: break-word; white-space: normal; text-overflow: ellipsis; overflow: hidden;padding-block:0px;}
         .dt-scrollable .dt-cell--col-6 .dt-cell__content {
             align-items: flex-start;
         }
+        .dt-scrollable .dt-cell--col-3 .dt-cell__content {
+            align-items: flex-start;
+        }
         .dt-scrollable .dt-cell--col-4 .dt-cell__content {
             justify-content: flex-start;
+        }
+        .dt-cell.dt-cell--header .dt-cell__content {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+        }
+        .datatable .dt-row {
+            height: auto !important;
         }
     `;
     document.head.appendChild(style);

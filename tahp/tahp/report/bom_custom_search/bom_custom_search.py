@@ -158,7 +158,7 @@ def get_columns(return_specs=False):
     columns = [
         {"label": "Hệ sản xuất", "fieldname": "custom_category", "fieldtype": "Link", "width": 110, "options": "Manufacturing Category", "align": "center"},
         {"label": "Công thức sản xuất (BOM)", "fieldname": "bom_name", "fieldtype": "Link", "options": "BOM", "width": 250, "freeze" : True},
-        {"label": "Mã thành phẩm", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 120},
+        {"label": "Mã thành phẩm", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 200},
         {"label": "Tên thành phẩm", "fieldname": "item_name", "fieldtype": "Data", "width": 220, "align": "left"},
         {"label": "Tên loại Gyps", "fieldname": "custom_gyps", "fieldtype": "Link", "options": "Manufacturing Category Material", "width": 110, "align": "left"},
         {"label": "Ghi chú", "fieldname": "custom_note", "fieldtype": "Data", "width": 300, "align": "left"},
