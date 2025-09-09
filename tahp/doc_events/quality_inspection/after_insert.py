@@ -30,9 +30,7 @@ def after_insert_qc(doc, method):
         return
 
     job_card = frappe.get_doc('Job Card', doc.reference_name)
-    print(job_card.name)
     work_order = job_card.work_order
-    print(work_order)
     shift_handover = frappe.get_all(
         "Shift Handover",
         filters = {'work_order': work_order, "workflow_state": "Draft"},
@@ -40,32 +38,29 @@ def after_insert_qc(doc, method):
         limit = 1
     )
    
-    
     if not shift_handover:
         return
-    
     sh_doc = frappe.get_doc('Shift Handover', shift_handover[0].name)
-    print(sh_doc.name)
-    # # map status eng -> vie
+   
+    # map status eng -> vie
     if doc.status == "Rejected":
         result = "Không đạt"
       
     elif doc.status == "Accepted":
         result = "Đạt"
-      
         
     else:
         result = doc.status 
-    
-    # append vao child doctype Shift Handover QC
-    sh_doc.append('list_qc', {
-        "operation": job_card.operation,
-        "qc_reference": doc.name,
-        'result': result,
-        "created_on": doc.creation 
+    try:
+        # append vao child doctype Shift Handover QC
+        sh_doc.append('list_qc', {
+            "operation": job_card.operation,
+            "qc_reference": doc.name,
+            'result': result,
+            "created_on": doc.creation 
+            
+        })
         
-    })
-    
-    
-    sh_doc.save(ignore_permissions=True)
-    frappe.db.commit()
+        sh_doc.save(ignore_permissions=True)
+    except Exception as e:
+        frappe.log_error(f"after_insert_qc error for QC {doc.name}: {str(e)}", "after_insert_qc")
