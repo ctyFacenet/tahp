@@ -369,8 +369,8 @@ def update_workstations(job_card, workstations):
                     if not doc.custom_team_table:
                         frappe.throw("Vui lòng thêm nhân viên trước")
 
-                    # if real_status in ["Problem", "Maintenance"]:
-                    #     frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
+                    if real_status in ["Problem", "Maintenance"]:
+                        frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
 
                     if not row.active:
                         if not doc.time_logs:

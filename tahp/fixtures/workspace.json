@@ -9038,7 +9038,7 @@
  },
  {
   "charts": [],
-  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"i77eXQpn3f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Week Work Order\",\"col\":3}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"QpUb8a1rnS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phương án KHSX\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}},{\"id\":\"O7BPepEwKX\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Biên bản giao ca\",\"col\":3}}]",
+  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"i77eXQpn3f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Week Work Order\",\"col\":3}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"QpUb8a1rnS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phương án KHSX\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}},{\"id\":\"O7BPepEwKX\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Biên bản giao ca\",\"col\":3}},{\"id\":\"g4UWoQiLNa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu kiểm tra thiết bị\",\"col\":3}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -9194,7 +9194,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-09-07 19:20:18.553753",
+  "modified": "2025-09-09 08:56:11.775380",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],
@@ -9264,6 +9264,23 @@
     "kanban_board": null,
     "label": "Phương án KHSX",
     "link_to": "WWO Plan",
+    "parent": "Manufacturing",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[]",
+    "type": "DocType",
+    "url": null
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Phiếu kiểm tra thiết bị",
+    "link_to": "Workstation Inspection",
     "parent": "Manufacturing",
     "parentfield": "shortcuts",
     "parenttype": "Workspace",

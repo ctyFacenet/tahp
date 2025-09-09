@@ -16,7 +16,8 @@
   "table",
   "job_card_list",
   "notes_1",
-  "notes_2"
+  "notes_2",
+  "amended_from"
  ],
  "fields": [
   {
@@ -87,12 +88,23 @@
   {
    "fieldname": "section_break_icom",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shift Handover",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-09-07 19:47:39.969825",
+ "modified": "2025-09-08 16:18:48.342948",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",
@@ -109,6 +121,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
@@ -121,6 +134,7 @@
    "report": 1,
    "role": "All",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

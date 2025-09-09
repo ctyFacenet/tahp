@@ -62,7 +62,7 @@ function setup_draft_buttons(frm) {
                 trigger_workflow_action(frm, "Handed Over");
             }
         );
-    }).addClass("btn-warning");
+    }).addClass("btn-primary");
 }
 
 // Nút cho trạng thái Handed Over → Completed
@@ -75,7 +75,7 @@ function setup_handed_over_buttons(frm) {
                 trigger_workflow_action(frm, "Completed");
             }
         );
-    }).addClass("btn-success");
+    }).addClass("btn-primary");
 }
 
 // Nút cho trạng thái Completed

@@ -11,15 +11,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-07 19:30:51.370900",
-  "name": "Đợi PTCN Duyệt",
-  "style": "Warning",
-  "workflow_state_name": "Đợi PTCN Duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
   "icon": "question-sign",
   "modified": "2025-08-07 20:24:40.511152",
   "name": "Pending",
@@ -57,15 +48,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-26 16:08:16.327593",
-  "name": "Handed Over",
-  "style": "",
-  "workflow_state_name": "Handed Over"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-08-26 16:08:27.412699",
   "name": "Completed",
   "style": "",
@@ -93,10 +75,19 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
+  "modified": "2025-08-26 16:08:16.327593",
+  "name": "Handed Over",
   "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
+  "workflow_state_name": "Handed Over"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:51.370900",
+  "name": "Đợi PTCN Duyệt",
+  "style": "Warning",
+  "workflow_state_name": "Đợi PTCN Duyệt"
  },
  {
   "docstatus": 0,
@@ -115,5 +106,14 @@
   "name": "Đã được PTCN duyệt",
   "style": "Info",
   "workflow_state_name": "Đã được PTCN duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
  }
 ]

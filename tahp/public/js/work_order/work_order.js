@@ -66,9 +66,6 @@ async function autofill_items(frm) {
 // Huy Section
 frappe.ui.form.on("Work Order", {
     refresh: function(frm) {
-        let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
-            $wrapper.removeClass("w-100 alert alert-warning")
-            $wrapper.empty()
         frm.set_intro("");
         if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
     }
@@ -76,22 +73,11 @@ frappe.ui.form.on("Work Order", {
 
 function show_shift_handover(frm) {
     if (frm.doc.custom_plan && frm.doc.custom_plan_code) {
-        frappe.call({
-                method: "tahp.doc_events.work_order.work_order_api.check_shift_handover",  
-            args: {
-                work_order: frm.doc.name,
-                custom_plan: frm.doc.custom_plan,
-                custom_plan_code: frm.doc.custom_plan_code
-            },
+        frappe.call({ method: "tahp.doc_events.work_order.work_order_api.check_shift_handover",  
+            args: { work_order: frm.doc.name, custom_plan: frm.doc.custom_plan, custom_plan_code: frm.doc.custom_plan_code },
             callback: function(r) {
-                if (r.message && r.message.warning) {
-                    let $wrapper = frm.$wrapper.find('[data-fieldname="custom_warn"]')
-                        $wrapper.addClass("w-100 alert alert-warning")
-                        $wrapper.empty()
-                        $wrapper.html(r.message.warning)
-                    }
-                    frm.set_intro(r.message.warning, "orange")
-                }
+                if (r.message && r.message.warning) { frm.set_intro(""); frm.set_intro(r.message.warning, "orange")}
+            }
         });
     }
 }
