@@ -10,7 +10,8 @@
   "section_break_mzhj",
   "work_order",
   "active",
-  "items"
+  "items",
+  "amended_from"
  ],
  "fields": [
   {
@@ -20,8 +21,7 @@
   {
    "collapsible": 1,
    "fieldname": "section_break_mzhj",
-   "fieldtype": "Section Break",
-   "hidden": 1
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "items",
@@ -39,12 +39,23 @@
    "fieldname": "active",
    "fieldtype": "Check",
    "label": "\u0110ang ch\u1ea1y"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Quality Card",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-09-09 15:40:42.317571",
+ "modified": "2025-09-09 15:49:47.849291",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Quality Card",
@@ -52,6 +63,7 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -61,9 +73,11 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -73,6 +87,7 @@
    "report": 1,
    "role": "All",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

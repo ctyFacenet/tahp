@@ -86,7 +86,7 @@ frappe.ui.form.on("Quality Card", {
         $wrapper.append($header);
 
         // Nút sửa
-        if ((edittable || action) && frm.doc.docstatus === 0) {
+        if ((edittable || action) && frm.doc.docstatus === 0 && frm.doc.active === 0) {
             if (data.length > 0) {
                 let $editBtn = $('<button class="btn btn-primary d-none d-md-table jc-edit-btn">Bắt đầu</button>')
                 $header.append($editBtn)

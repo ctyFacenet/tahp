@@ -72,4 +72,15 @@ def start(quality_card, items):
 			"is_done": d.get("is_done"),
 			"from_time": d.get("from_time"),
 		})
+	doc.active = True
 	doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def end(work_order):
+	qc_name = frappe.db.get_value("Quality Card", {"work_order": work_order}, "name")
+	if not qc_name: return
+	doc = frappe.get_doc("Quality Card", qc_name)
+	doc.active = False
+	if doc.docstatus == 0:
+		doc.submit()
+	return

@@ -1,5 +1,6 @@
 
 import frappe
+from tahp.tahp.doctype.quality_card.quality_card import end
 
 def on_submit(doc, method):
     if doc.stock_entry_type == 'Manufacture' and doc.work_order:
@@ -15,3 +16,6 @@ def on_submit(doc, method):
             handover_doc = frappe.get_doc('Shift Handover', handover.name)
             handover_doc.stock_entry = doc.name
             handover_doc.save(ignore_permissions=True)
+
+        if doc.work_order:
+            end(doc.work_order)
