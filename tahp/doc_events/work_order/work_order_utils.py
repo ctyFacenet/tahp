@@ -2,7 +2,6 @@ import frappe
 from frappe.utils import nowdate, now_datetime
 import datetime
 
-@frappe.whitelist()
 def create_qc_and_notify(job_card_name):
     """
     Tạo tài liệu Quality Inspection và gửi thông báo.
@@ -11,17 +10,18 @@ def create_qc_and_notify(job_card_name):
         job_card = frappe.get_doc("Job Card", job_card_name, ignore_permissions=True)
         work_order = frappe.get_doc("Work Order", job_card.work_order, ignore_permissions=True)
         
-        # Lấy Mẫu QC từ Operation Tracker
+        # Lấy Mẫu QC và Điều kiện từ Operation Tracker
         op_tracker = frappe.db.get_list(
             "Operation Tracker",
             filters={"operation": job_card.operation},
-            fields=["qc_template", "frequency"]
+            fields=["qc_template", "frequency", "condition"]
         )
         
         if not op_tracker or not op_tracker[0].get("qc_template"):
             frappe.throw(f"Không tìm thấy Mẫu QC cho Công đoạn: {job_card.operation}")
         
         inspection_template_name = op_tracker[0].get("qc_template")
+        condition = op_tracker[0].get("condition") # Lấy giá trị conditions
 
         # Create Quality Inspection document
         qc_doc = frappe.new_doc("Quality Inspection")
@@ -34,6 +34,7 @@ def create_qc_and_notify(job_card_name):
         qc_doc.operation = job_card.operation
         qc_doc.inspected_by = frappe.session.user
         qc_doc.sample_size = 1
+        qc_doc.custom_conditions = condition # Gán giá trị vào trường ẩn mới
         qc_doc.insert(ignore_permissions=True)
         
         subject = f"Phiếu QC mới ({qc_doc.name}) cho Lệnh SX: {job_card.work_order}"
@@ -82,20 +83,28 @@ Vui lòng đến kiểm tra chất lượng tại xưởng ngay.
 
 def check_and_create_qc_for_job_cards():
     """
-    Kiểm tra tất cả các Job Card đang hoạt động và chưa hoàn thành để tạo phiếu QC mới theo tần suất.
+    Kiểm tra tất cả các Job Card đang có trạng thái "Work In Progress" để tạo phiếu QC mới theo tần suất.
     """
     try:
-        # Lấy tất cả các Job Card đã được gửi (docstatus=1) và chưa hoàn thành.
-        # Lưu ý: "Completed" là trạng thái cuối cùng của Job Card. Bạn có thể thay đổi tùy theo DocType của mình.
-        active_job_cards = frappe.get_list(
+        # Lấy tất cả các Job Card đang trong quá trình sản xuất.
+        active_job_cards = frappe.db.get_list(
             "Job Card",
-            filters={"docstatus": 1, "status": ("!=", "Completed")},
+            filters={"docstatus": 0},
             fields=["name", "creation", "operation"]
         )
         
+        # Sửa lỗi: Rút gọn thông điệp log để không vượt quá giới hạn ký tự.
+        job_card_names = [jc.get("name") for jc in active_job_cards]
+        frappe.log_error(f"Danh sách Job Card được chọn: {', '.join(job_card_names)}", "Scheduler QC Debug")
+
         for job_card_data in active_job_cards:
             job_card_name = job_card_data.get("name")
             job_card_creation = frappe.utils.get_datetime(job_card_data.get("creation"))
+
+            # 
+            
+            # Thêm log để kiểm tra Job Card đang được xử lý
+            frappe.log_error(f"Đang xử lý Job Card: {job_card_name}", "Scheduler QC Debug")
             
             op_tracker_info = frappe.db.get_value(
                 "Operation Tracker",
@@ -135,7 +144,6 @@ def check_and_create_qc_for_job_cards():
                 time_elapsed = current_time - last_qc_creation
                 required_interval = datetime.timedelta(minutes=frequence_minutes)
                 
-                # Nếu đã có phiếu QC, tạo phiếu mới khi đủ thời gian, bất kể trạng thái của phiếu cũ.
                 if time_elapsed >= required_interval:
                     frappe.call(
                         fn="tahp.doc_events.work_order.work_order_utils.create_qc_and_notify",
@@ -145,16 +153,3 @@ def check_and_create_qc_for_job_cards():
         frappe.db.commit()
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Lỗi chung trong tác vụ định kỳ")
-
-def create_test_note():
-    """
-    Tạo một tài liệu Note mới để kiểm tra xem scheduler có hoạt động không.
-    """
-    try:
-        note_doc = frappe.new_doc("Note")
-        note_doc.title = "Test Scheduler: " + str(now_datetime())
-        note_doc.content = "Tác vụ tự động đã chạy thành công."
-        note_doc.insert(ignore_permissions=True)
-        frappe.db.commit()
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Lỗi khi tạo Ghi chú test")

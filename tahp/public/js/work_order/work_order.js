@@ -8,46 +8,46 @@ frappe.ui.form.on("Work Order", {
   },
 
   on_submit: async function (frm) {
-    if (frm.doc.custom_is_qc_tracked) {
-      frappe.show_alert({
-        message: __("Đang tạo phiếu kiểm tra chất lượng..."),
-        indicator: "blue",
-      });
+    // if (frm.doc.custom_is_qc_tracked) {
+    //   frappe.show_alert({
+    //     message: __("Đang tạo phiếu kiểm tra chất lượng..."),
+    //     indicator: "blue",
+    //   });
 
-      // Tìm tất cả Job Card liên quan đến Work Order này
-      const job_cards = await frappe.db.get_list("Job Card", {
-        filters: { work_order: frm.doc.name },
-        fields: ["name"],
-      });
+    //   // Tìm tất cả Job Card liên quan đến Work Order này
+    //   const job_cards = await frappe.db.get_list("Job Card", {
+    //     filters: { work_order: frm.doc.name },
+    //     fields: ["name"],
+    //   });
 
-      // Lặp qua từng Job Card và gọi hàm tạo QC cho nó
-      for (let job_card of job_cards) {
-        const response = await frappe.xcall(
-          "tahp.doc_events.work_order.work_order_utils.create_qc_and_notify",
-          {
-            job_card_name: job_card.name,
-          },
-        );
+    //   // Lặp qua từng Job Card và gọi hàm tạo QC cho nó
+    //   for (let job_card of job_cards) {
+    //     const response = await frappe.xcall(
+    //       "tahp.doc_events.work_order.work_order_utils.create_qc_and_notify",
+    //       {
+    //         job_card_name: job_card.name,
+    //       },
+    //     );
 
-        // Hiển thị thông báo thành công hoặc thất bại cho mỗi Job Card
-        if (response.startsWith("Successfully")) {
-          frappe.show_alert({
-            message: __(response),
-            indicator: "green",
-          });
-        } else {
-          frappe.show_alert({
-            message: __(
-              "Tạo phiếu QC thất bại cho Job Card " +
-                job_card.name +
-                ": " +
-                response,
-            ),
-            indicator: "red",
-          });
-        }
-      }
-    }
+    //     // Hiển thị thông báo thành công hoặc thất bại cho mỗi Job Card
+    //     if (response.startsWith("Successfully")) {
+    //       frappe.show_alert({
+    //         message: __(response),
+    //         indicator: "green",
+    //       });
+    //     } else {
+    //       frappe.show_alert({
+    //         message: __(
+    //           "Tạo phiếu QC thất bại cho Job Card " +
+    //             job_card.name +
+    //             ": " +
+    //             response,
+    //         ),
+    //         indicator: "red",
+    //       });
+    //     }
+    //   }
+    // }
   },
   // The rest of your existing event handlers and functions
   custom_is_qc_tracked: async function (frm) {
