@@ -76,14 +76,26 @@ function clean_table(frm, field) {
         });
     });
 
-    for (let ws of frm.fields_dict.items.grid.grid_rows) {
+    const rows = frm.fields_dict.items.grid.grid_rows;
+
+    for (let i = 0; i < rows.length; i++) {
+        const ws = rows[i];
         const is_heading = ws.doc.heading;
-        if (is_heading) {
-            ws.wrapper.find(".grid-static-col[data-fieldname='workstation'] .field-area input, .grid-static-col[data-fieldname='workstation'] .static-area")
-                .addClass("bold");
-        } else {
-            ws.wrapper.find(".grid-static-col[data-fieldname='workstation'] .field-area input, .grid-static-col[data-fieldname='workstation'] .static-area")
-                .removeClass("bold");
+
+        // Bold cho heading
+        const ws_field_idx = ws.docfields.findIndex(f => f.fieldname === 'workstation');
+        if (ws_field_idx !== -1) {
+            ws.docfields[ws_field_idx].bold = is_heading ? 1 : 0;
         }
+
+        // Read-only cho status: chỉ read-only nếu là heading và có con ngay sau
+        const status_field_idx = ws.docfields.findIndex(f => f.fieldname === 'status');
+        if (status_field_idx !== -1) {
+            const next_row = i + 1 < rows.length ? rows[i + 1] : null;
+            const next_is_not_heading = next_row ? !next_row.doc.heading : false;
+            ws.docfields[status_field_idx].read_only = is_heading && next_is_not_heading ? 1 : 0;
+        }
+
+        ws.grid.refresh();
     }
 }
