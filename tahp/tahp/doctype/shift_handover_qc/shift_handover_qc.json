@@ -16,33 +16,37 @@
    "fieldname": "operation",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "C\u00f4ng \u0111o\u1ea1n"
+   "label": "C\u00f4ng \u0111o\u1ea1n",
+   "read_only": 1
   },
   {
    "fieldname": "qc_reference",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "M\u00e3 phi\u1ebfu QC",
-   "options": "Quality Inspection"
+   "options": "Quality Inspection",
+   "read_only": 1
   },
   {
    "fieldname": "result",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "K\u1ebft qu\u1ea3"
+   "label": "K\u1ebft qu\u1ea3",
+   "read_only": 1
   },
   {
    "fieldname": "created_on",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Th\u1eddi gian t\u1ea1o"
+   "label": "Th\u1eddi gian t\u1ea1o",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-09 08:45:35.341561",
+ "modified": "2025-09-09 11:19:27.688298",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover QC",
