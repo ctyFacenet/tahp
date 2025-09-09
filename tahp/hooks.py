@@ -225,6 +225,11 @@ doc_events = {
             "tahp.doc_events.quality_inspection_template.before_save.before_save"
         ]
     },
+    "Quality Inspection": {
+        "after_insert": [
+            "tahp.doc_events.quality_inspection.after_insert.after_insert_qc"
+        ]
+    },
     "Stock Entry": {
         "after_insert": [
             "tahp.doc_events.stock_entry.after_insert.after_insert"

@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-09 08:23:26.279692",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "operation",
+  "qc_reference",
+  "result",
+  "created_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "operation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "C\u00f4ng \u0111o\u1ea1n"
+  },
+  {
+   "fieldname": "qc_reference",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 phi\u1ebfu QC",
+   "options": "Quality Inspection"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "K\u1ebft qu\u1ea3"
+  },
+  {
+   "fieldname": "created_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Th\u1eddi gian t\u1ea1o"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-09 08:45:35.341561",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Shift Handover QC",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

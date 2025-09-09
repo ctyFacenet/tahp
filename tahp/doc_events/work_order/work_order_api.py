@@ -35,6 +35,7 @@ def check_shift_handover(work_order, custom_plan, custom_plan_code):
             'Shift Handover',
             filters={'work_order': late_work_order.name},
             fields=['name', 'workflow_state']
+            
         )
         if shift_handover:
             for sh in shift_handover:

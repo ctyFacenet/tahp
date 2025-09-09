@@ -15,6 +15,7 @@
   "section_break_icom",
   "table",
   "job_card_list",
+  "list_qc",
   "notes_1",
   "notes_2"
  ],
@@ -87,12 +88,18 @@
   {
    "fieldname": "section_break_icom",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "list_qc",
+   "fieldtype": "Table",
+   "label": "Danh s\u00e1ch QC",
+   "options": "Shift Handover QC"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-07 19:47:39.969825",
+ "modified": "2025-09-09 10:07:50.461945",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",
