@@ -358,6 +358,8 @@ def update_workstations(job_card, workstations):
             workstation_doc.status = "Problem"
             workstation_doc.save()
         if status == "Chạy" or status == "Dừng":
+            if workstation_doc.status in ["Problem", "Maintenance"]:
+                frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
             workstation_doc.status = "Production"
             workstation_doc.save()
 
@@ -368,9 +370,6 @@ def update_workstations(job_card, workstations):
                     real_status = workstation_doc.status
                     if not doc.custom_team_table:
                         frappe.throw("Vui lòng thêm nhân viên trước")
-
-                    if real_status in ["Problem", "Maintenance"]:
-                        frappe.throw(f"Thiết bị {workstation} đang hỏng hoặc bảo trì, không thể chạy")
 
                     if not row.active:
                         if not doc.time_logs:

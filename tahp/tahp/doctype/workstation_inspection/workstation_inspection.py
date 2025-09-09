@@ -33,7 +33,8 @@ class WorkstationInspection(Document):
                     if all(st == "Hỏng" for st in children_statuses):
                         parent_doc.status = "Problem"
                     else:
-                        parent_doc.status = "Off"   # hoặc "Bình thường" nếu bạn muốn giữ nguyên label
+                        if parent_doc.status == "Problem":
+                            parent_doc.status = "Off"
             else:
                 parent_doc.status = "Problem" if parent.status == "Hỏng" else "Off"
             parent_doc.save(ignore_permissions=True)
@@ -49,8 +50,8 @@ class WorkstationInspection(Document):
             if ch.status == "Hỏng":
                 ws_doc.status = "Problem"
             elif ch.status == "Bình thường":
-                ws_doc.status = "Off"
-            print('here\n\n\n')
+                if ws_doc.status == "Problem":
+                    ws_doc.status = "Off"
             ws_doc.save(ignore_permissions=True)
 
 
