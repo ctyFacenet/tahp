@@ -1,0 +1,345 @@
+.machine-dashboard {
+  font-family: sans-serif;
+}
+
+.main-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.block-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 18px;
+  text-align: center;
+  color: #333;
+}
+
+.machine-block {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
+}
+
+.machine-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+
+.value.green {
+  font-size: 20px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.performance-card {
+  flex: 0 0 200px;
+  text-align: center;
+}
+
+.machine-progress {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 10px auto;
+}
+
+.machine-progress svg {
+  transform: rotate(-90deg);
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.time-card {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.time-card div {
+  margin: 6px 0;
+}
+
+.scrap {
+  color: red;
+  font-weight: bold;
+}
+
+.machine-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+
+.machine-block.half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.machine-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+@media (max-width: 1024px) {
+  .machine-row {
+    flex-wrap: wrap;
+  }
+
+  .machine-block.half {
+    flex: 1 1 100%;
+  }
+
+  .machine-card {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 16px;
+  }
+
+  .block-title {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .machine-card {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .row-info {
+    font-size: 13px;
+  }
+
+  .status {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .machine-progress svg {
+    width: 80px;
+    height: 80px;
+  }
+
+  .performance-gauge {
+    width: 100px;
+    height: 100px;
+  }
+
+  .progress-text {
+    font-size: 12px;
+  }
+}
+
+.performance-gauge {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.performance-gauge svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 6px
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+.machine-dashboard {
+  font-family: Arial, sans-serif;
+}
+
+.main-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.machine-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.machine-block.half {
+  flex: 1;
+}
+
+.machine-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fff;
+  flex: 1;
+  text-align: center;
+  /* display: flex; */
+  flex-direction: column;
+}
+
+.machine-card .label {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.machine-card .value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.machine-card .value.green {
+  color: #28a745;
+}
+
+.status {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.status.on {
+  background: #28a745;
+  color: #fff;
+}
+
+.status.off {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* Performance */
+.performance-section {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.performance-gauge {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.performance-times {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.production-card .row-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.production-card .row-info span.value {
+  font-weight: bold;
+}
+
+.production-card .row-info span.scrap {
+  color: red;
+}
+
+@media (max-width: 1024px) {
+  .machine-row {
+    flex-wrap: wrap;
+  }
+
+  .machine-block.half {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 16px;
+  }
+
+  .block-title {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .machine-card {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .performance-section {
+    flex-direction: column;
+  }
+
+  .performance-times {
+    text-align: center;
+    width: 100%;
+  }
+
+  .performance-gauge {
+    width: 100px;
+    height: 100px;
+  }
+
+  .progress-text {
+    font-size: 12px;
+  }
+}

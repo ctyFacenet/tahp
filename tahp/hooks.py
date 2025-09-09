@@ -43,7 +43,8 @@ app_include_css = [
     "/assets/tahp/css/theme.css",
     "/assets/tahp/css/custom_workspace.css",
     "/assets/tahp/css/bom_custom.css",
-    "/assets/tahp/css/custom_confirm.css"
+    "/assets/tahp/css/custom_confirm.css",
+    "/assets/tahp/css/workstation_dashboard.css"
 
 
 ]
