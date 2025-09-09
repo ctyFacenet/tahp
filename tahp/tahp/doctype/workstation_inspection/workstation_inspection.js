@@ -51,23 +51,11 @@ frappe.ui.form.on("Workstation Inspection", {
     }
 });
 
-frappe.ui.form.on("Workstation Inspection Item", {
-    items_add(frm, cdt, cdn) {
-        clean_table(frm)
-    },
-    items_remove(frm, cdt, cdn) {
-        clean_table(frm)
-    }
-});
-
-
 function clean_table(frm, field) {
     frm.set_df_property('items', 'in_place_edit', true);
+    frm.set_df_property('items', 'cannot_add_rows', true);
     field = frm.fields_dict.items
     const $wrapper = field.$wrapper;
-    $wrapper.find('.row-check').hide();
-    $wrapper.find('.row-index').hide();
-    $wrapper.find('.grid-heading-row .data-row.row .grid-static-col').last().remove();
 
     $wrapper.find('.grid-body .data-row.row').each(function() {
         const $lastCol = $(this).find('.grid-static-col').last();
@@ -98,4 +86,8 @@ function clean_table(frm, field) {
 
         ws.grid.refresh();
     }
+
+    $wrapper.find('.row-check').hide();
+    $wrapper.find('.row-index').hide();
+    $wrapper.find('.grid-heading-row .data-row.row .grid-static-col').last().remove();
 }
