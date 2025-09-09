@@ -1455,7 +1455,6 @@ frappe.ui.form.on('Job Card', {
             d.show();
         });
     }
-
 });
 
 

@@ -251,6 +251,9 @@ doc_events = {
         ],
         "on_submit": [
             "tahp.doc_events.work_order.on_submit.on_submit"
+        ],
+        "after_insert": [
+            "tahp.doc_events.work_order.after_insert.after_insert"
         ]
     },
     "Workstation": {

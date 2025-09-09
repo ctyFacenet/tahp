@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:QCARD.{DD}.{MM}.{YY}.{##}",
+ "creation": "2025-09-09 13:57:41.703584",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "display",
+  "section_break_mzhj",
+  "work_order",
+  "active",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "display",
+   "fieldtype": "HTML"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_mzhj",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "Quality Card Item"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "LSX Ca",
+   "options": "Work Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "\u0110ang ch\u1ea1y"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-09 15:40:42.317571",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Quality Card",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
