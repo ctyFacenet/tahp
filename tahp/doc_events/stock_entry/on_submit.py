@@ -17,5 +17,5 @@ def on_submit(doc, method):
             handover_doc.stock_entry = doc.name
             handover_doc.save(ignore_permissions=True)
 
-        if doc.work_order:
-            end(doc.work_order)
+        # if doc.work_order:
+        #     end(doc.work_order)

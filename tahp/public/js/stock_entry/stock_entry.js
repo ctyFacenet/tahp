@@ -21,6 +21,8 @@ frappe.ui.form.on('Stock Entry', {
             inputs.forEach(input => {
                 let row = frm.add_child('items');
                 row.s_warehouse = input.s_warehouse;
+                row.t_warehouse = input.t_warehouse ? input.t_warehouse : null,
+                row.is_scrap_item = input.t_warehouse ? 1 : null,
                 row.item_code = input.item_code;
                 row.item_name = input.item_name;
                 row.qty = input.qty;
