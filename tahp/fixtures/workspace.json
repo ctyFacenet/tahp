@@ -6584,7 +6584,7 @@
  },
  {
   "charts": [],
-  "content": "[{\"id\":\"EWGvDY6ZIL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Dữ liệu vận hành</b></span>\",\"col\":12}},{\"id\":\"7wX_RUs-Mw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu nhập kho\",\"col\":3}},{\"id\":\"_eRlTLZDaL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu xuất kho\",\"col\":3}},{\"id\":\"IgjUN0Ukth\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu chuyển kho\",\"col\":3}},{\"id\":\"PvGbRJiyVN\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Công cụ</b></span>\",\"col\":12}},{\"id\":\"vaf7tNUJnE\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tồn kho\",\"col\":3}},{\"id\":\"W59hxSqWz3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sổ nhập xuất kho\",\"col\":3}}]",
+  "content": "[{\"id\":\"EWGvDY6ZIL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Dữ liệu vận hành</b></span>\",\"col\":12}},{\"id\":\"7wX_RUs-Mw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu nhập kho\",\"col\":3}},{\"id\":\"_eRlTLZDaL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu xuất kho\",\"col\":3}},{\"id\":\"IgjUN0Ukth\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu chuyển kho\",\"col\":3}},{\"id\":\"CnF2gywsT0\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu nhập kho thành phẩm\",\"col\":3}},{\"id\":\"PvGbRJiyVN\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Công cụ</b></span>\",\"col\":12}},{\"id\":\"vaf7tNUJnE\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tồn kho\",\"col\":3}},{\"id\":\"W59hxSqWz3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sổ nhập xuất kho\",\"col\":3}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -7352,7 +7352,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-09-05 11:56:20.566074",
+  "modified": "2025-09-10 08:15:44.712640",
   "module": "Stock",
   "name": "Stock",
   "number_cards": [],
@@ -7363,6 +7363,23 @@
   "roles": [],
   "sequence_id": 7.0,
   "shortcuts": [
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Phiếu nhập kho thành phẩm",
+    "link_to": "Stock Entry",
+    "parent": "Stock",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "restrict_to_domain": null,
+    "stats_filter": "[[\"Stock Entry\",\"stock_entry_type\",\"=\",\"Manufacture\",false],[\"Stock Entry\",\"docstatus\",\"!=\",\"2\",false]]",
+    "type": "DocType",
+    "url": null
+   },
    {
     "color": "Grey",
     "doc_view": "List",

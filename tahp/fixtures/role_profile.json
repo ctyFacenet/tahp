@@ -518,7 +518,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-09 11:31:37.438239",
+  "modified": "2025-09-10 08:55:21.789662",
   "name": "Bảo trì",
   "role_profile": "Bảo trì",
   "roles": [
@@ -557,6 +557,12 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock Manager"
+   },
+   {
+    "parent": "Bảo trì",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Bảo trì"
    }
   ]
  }
