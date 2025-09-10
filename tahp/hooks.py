@@ -235,6 +235,9 @@ doc_events = {
         ],
         "on_submit": [
             "tahp.doc_events.stock_entry.on_submit.on_submit"
+        ],
+        "before_submit": [
+            "tahp.doc_events.stock_entry.before_submit.before_submit"
         ]
     },
     "Operation": {

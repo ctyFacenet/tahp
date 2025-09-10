@@ -565,5 +565,50 @@
     "role": "Bảo trì"
    }
   ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2025-09-10 11:16:59.130743",
+  "name": "Chủ kho",
+  "role_profile": "Chủ kho",
+  "roles": [
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing Manager"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing User"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Stock Manager"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Stock User"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Supplier"
+   }
+  ]
  }
 ]
