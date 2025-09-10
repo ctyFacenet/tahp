@@ -369,7 +369,7 @@
   font-weight: bold;
   font-size: 14px;
   text-align: center;
-  color: #fff;
+  color: #333;
   padding: 6px;
 }
 
@@ -491,9 +491,14 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   justify-content: center;
-  padding: 0 20px;
+  padding: 10px;
   margin: 0 auto;
   max-width: 1800px;
+  border: 1px solid rgba(217, 217, 217, 1);
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
 }
 
 
@@ -501,4 +506,136 @@
   #ws-cards {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+.ws-summary {
+  margin-top: 20px;
+  border-radius: 6px;
+  padding: 20px;
+  border: 1px solid rgba(217, 217, 217, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+  transition: overflow 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ws-summary:hover,
+.ws-summary:active {
+  overflow-x: auto;
+}
+
+
+.ws-summary-meta {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #333;
+  border: 1px solid rgba(217, 217, 217, 1);
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+}
+
+.ws-summary-meta span {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  font-weight: 500;
+}
+
+.ws-summary-meta span:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: #b5b4b4;
+}
+
+.ws-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 13px;
+  min-width: 800px;
+}
+
+.ws-summary-table th,
+.ws-summary-table td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  white-space: nowrap;
+
+}
+
+.ws-summary-table th {
+  background: rgba(204, 219, 235, 1);
+  font-weight: 600;
+}
+
+.ws-summary-table td.running {
+  background: #28a745;
+  color: #fff;
+}
+
+.ws-summary-table td.paused {
+  background: #fd7e14;
+  color: #fff;
+}
+
+.ws-summary-table td.error {
+  background: #dc3545;
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .ws-summary {
+    padding: 12px;
+  }
+
+  .ws-summary-table {
+    font-size: 12px;
+  }
+
+  .ws-summary-table th,
+  .ws-summary-table td {
+    padding: 5px 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ws-summary {
+    padding: 10px;
+  }
+
+  .ws-summary-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 12px;
+  }
+
+  .ws-summary-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 12px;
+  }
+
+  .ws-summary-table table {
+    width: max-content;
+    min-width: 600px;
+  }
+
+  #ws-page-size,
+  #ws-goto-page {
+    display: none !important;
+  }
+
 }

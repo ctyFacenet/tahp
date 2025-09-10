@@ -9,8 +9,8 @@ frappe.listview_settings['Workstation'] = {
 
     $(listview.page.body).html(`
       <div class="custom-ws-wrapper">
+        <div id="ws-summary-wrapper" class="mt-3"></div>
         <div class="row" id="ws-cards"></div>
-
         <div class="d-flex justify-content-between align-items-center mt-2 custom-footer">
           <div>
             <select id="ws-page-size" class="form-select form-select-sm">
@@ -27,26 +27,30 @@ frappe.listview_settings['Workstation'] = {
           </div>
         </div>
 
+
         <div class="text-center text-muted small mt-2">
           ©Copyright FaceNet. All Rights Reserved. Designed by FaceNet
         </div>
       </div>
     `);
-
     let page_size = 10,
       current_page = 1,
-      total_count = 0;
+      total_count = 0,
+      all_data = [];
 
+    // load data workstation
     function load_ws_data(page) {
       frappe.call({
         method: "tahp.doc_events.workstation.workstation.get_workstation_details",
         args: { input: "workspace-dashboard" }
       }).then(r => {
         if (r.message) {
-          total_count = r.message.length;
+          all_data = r.message;
+          total_count = all_data.length;
           let start = (page - 1) * page_size;
-          let paginated = r.message.slice(start, start + page_size);
+          let paginated = all_data.slice(start, start + page_size);
 
+          render_ws_summary(all_data);
           render_ws_cards(paginated);
           renderPagination(page, Math.ceil(total_count / page_size), total_count);
 
@@ -93,7 +97,6 @@ frappe.listview_settings['Workstation'] = {
       load_ws_data(current_page);
     });
 
-    // --- Event: click phân trang ---
     $(document).on("click", ".pagination .page-link", function (e) {
       e.preventDefault();
       let text = $(this).text();
@@ -124,6 +127,71 @@ frappe.listview_settings['Workstation'] = {
     load_ws_data(current_page);
   }
 };
+
+function render_ws_summary(machines) {
+  let groups = {};
+  machines.forEach(m => {
+    let group = m.cluster_name || m.workstation_name || "Khác";
+    if (!groups[group]) {
+      groups[group] = { running: 0, paused: 0, error: 0, total: 0 };
+    }
+    if (m.status === "Đang chạy" || m.status === "Running") groups[group].running++;
+    else if (m.status === "Tạm dừng" || m.status === "Paused") groups[group].paused++;
+    else if (m.status === "Error" || m.status === "Hỏng") groups[group].error++;
+    groups[group].total++;
+  });
+
+  let now = frappe.datetime.now_datetime();
+
+  let html = `
+    <div class="ws-summary">
+      <div class="ws-summary-meta">
+        <span>Thời gian hiện tại: <b>${now}</b></span>
+        <span>Tần suất cập nhật: <b>5 phút</b></span>
+        <span>Thời gian cập nhật mới nhất: <b>${now}</b></span>
+      </div>
+      <table class="ws-summary-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Trạng thái</th>
+            <th rowspan="2">Nhóm máy</th>`;
+  Object.keys(groups).forEach(g => {
+    html += `<th>${g}</th>`;
+  });
+  html += `<th rowspan="2">Tổng số nhóm line</th></tr></thead><tbody>`;
+
+  let states = [
+    { key: "running", label: "Đang chạy", cls: "running" },
+    { key: "paused", label: "Tạm dừng", cls: "paused" },
+    { key: "error", label: "Hỏng", cls: "error" },
+  ];
+
+  states.forEach(s => {
+    html += `<tr>
+      <td>Trạng thái</td>
+      <td>${s.label}</td>`;
+    let total = 0;
+    Object.keys(groups).forEach(g => {
+      let val = groups[g][s.key] || s.key === 'running' ? 1 : 0;
+      total += val;
+      html += `<td class="${s.cls}">${val}</td>`;
+    });
+    html += `<td>${total}</td></tr>`;
+  });
+
+  html += `<tr><td colspan="2">Tổng</td>`;
+  let grand_total = 0;
+  Object.keys(groups).forEach(g => {
+    let val = groups[g].total || 0;
+    grand_total += val;
+    html += `<td>${val}</td>`;
+  });
+  html += `<td>${grand_total}</td></tr>`;
+
+  html += `</tbody></table></div>`;
+
+  $("#ws-summary-wrapper").html(html);
+}
 
 function show_machine_modal(ws_name) {
   $(".modal").modal("hide");
