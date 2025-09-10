@@ -277,6 +277,7 @@ frappe.ui.form.on('Job Card', {
                     { label: 'Khoảng dừng', fieldname: 'duration', is_secondary: true },
                     { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
                     { label: 'Lý do', fieldname: 'reason', is_value: true, type: "string" },
+                    { label: 'Phân loại lý do', fieldname: 'group_name', is_unit: true, type: "string" },
                 ],
                 data=frm.doc.custom_downtime.map(d => {
                     const from_time = frappe.datetime.str_to_user(d.from_time, 'HH:mm:ss');
@@ -310,6 +311,7 @@ frappe.ui.form.on('Job Card', {
                         duration: duration_str,
                         workstation: workstation_str,
                         reason: reason_str,
+                        group_name: d.group_name,
                     };
                 }),
             )
@@ -1148,7 +1150,7 @@ frappe.ui.form.on('Job Card', {
             fields: [
                 {
                     fieldname: "group_name",
-                    label: __("Chọn nhóm"),
+                    label: __("Chọn phân loại"),
                     fieldtype: "Select",
                     options: groups.map(g => g.group_name)
                 },
@@ -1314,7 +1316,7 @@ frappe.ui.form.on('Job Card', {
                 fields: [
                     {
                         fieldname: "group_name",
-                        label: __("Chọn nhóm"),
+                        label: __("Chọn phân loại"),
                         fieldtype: "Select",
                         options: groups.map(g => g.group_name)
                     },

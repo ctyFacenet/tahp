@@ -1,3 +1,4 @@
+from collections import Counter
 import frappe
 import json
 
@@ -251,9 +252,9 @@ def set_workstations(job_card, workstations, start=False):
         if workstation_doc.status in ["Problem", "Maintenance"]:
             frappe.throw('Toàn bộ cụm thiết bị/thiết bị đang hỏng, không thể sử dụng')
             return
-        else:
-            workstation_doc.status = "Production"
-            workstation_doc.save(ignore_permissions=True)
+        # else:
+        #     workstation_doc.status = "Production"
+        #     workstation_doc.save(ignore_permissions=True)
 
     is_problem = all( workstation.get("status") in ["Problem", "Maintenance"] for workstation in workstations)
     if is_problem:
@@ -273,10 +274,10 @@ def set_workstations(job_card, workstations, start=False):
                 else:
                     data["status"] = "Chạy"
                 doc.append("custom_workstations", {**data, "from_time": from_time})
-                ws_doc = frappe.get_doc("Workstation", ws)
-                if ws_doc.name != workstation_doc.name:
-                    ws_doc.status = "Production"
-                    ws_doc.save(ignore_permissions=True)
+                # ws_doc = frappe.get_doc("Workstation", ws)
+                # if ws_doc.name != workstation_doc.name:
+                #     ws_doc.status = "Production"
+                #     ws_doc.save(ignore_permissions=True)
             doc.append("custom_workstation_table", data)
     doc.save(ignore_permissions=True)
 
@@ -385,7 +386,13 @@ def update_workstations(job_card, workstations):
                     if row.start_time:
                         second = int((from_time - row.start_time).total_seconds() * 1000)
                         row.time = (row.time or 0) + second
-                        ready.append({ "workstation": workstation, "from_time": from_time, "reason": reason, "is_danger": 1 if status == "Hỏng" else 0 })
+                        ready.append({
+                            "workstation": workstation,
+                            "from_time": from_time,
+                            "reason": reason,
+                            "is_danger": 1 if status == "Hỏng" else 0,
+                            "group_name": group_name
+                        })
 
                 row.status = status
 
@@ -416,10 +423,15 @@ def update_workstations(job_card, workstations):
     )
 
     if all_stopped:
+        reasons = [item.get("reason") for item in workstations if item.get("status") == "Dừng" and item.get("reason")]
+        groups = [item.get("group_name") for item in workstations if item.get("status") == "Dừng" and item.get("group_name")]
+        reason_text = Counter(reasons).most_common(1)[0][0] if reasons else None
+        group_text = Counter(groups).most_common(1)[0][0] if groups else None
         doc.append("custom_downtime", {
             "workstation": "Tất cả",
             "from_time": from_time,
-            "reason": reason,
+            "reason": reason_text,
+            "group_name": group_text,
             "is_danger": 0
         })
         doc.status = "On Hold"
