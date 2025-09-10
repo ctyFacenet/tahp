@@ -10,6 +10,36 @@ class ShiftHandover(Document):
    def autoname(self):
        pass
 
+@frappe.whitelist()
+def reject(name, comment):
+    doc = frappe.get_doc("Shift Handover", name)
+    wo_name = doc.work_order
+    wo_doc = frappe.get_doc("Work Order", wo_name)
+    shift_leader = wo_doc.custom_shift_leader
+    user = frappe.db.get_value("Employee", shift_leader, "user_id")
+
+    subject = f"Biên bản giao ca đã bị từ chối: {wo_name}"
+    frappe.get_doc({
+        "doctype": "Notification Log",
+        "for_user": user,
+        "subject": subject,
+        "email_content": comment,
+        "type": "Alert",
+        "document_type": "Shift Handover",
+        "document_name": doc.name
+    }).insert(ignore_permissions=True)
+
+    # Thêm comment vào Work Order (hoặc bạn đổi sang Shift Handover nếu muốn)
+    frappe.get_doc({
+        "doctype": "Comment",
+        "comment_type": "Comment",
+        "reference_doctype": "Shift Handover",
+        "reference_name": doc.name,
+        "content": f"Từ chối: {comment}",
+        "comment_email": frappe.session.user,
+        "comment_by": frappe.session.user_fullname
+    }).insert(ignore_permissions=True)
+
 def create_shift_handover(work_order_name):
     """
     Tạo mới một bản ghi Shift Handover dựa trên Work Order.

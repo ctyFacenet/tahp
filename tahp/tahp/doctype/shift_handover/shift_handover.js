@@ -66,7 +66,7 @@ function setup_draft_buttons(frm) {
 }
 
 // Nút cho trạng thái Handed Over → Completed
-function setup_handed_over_buttons(frm) {
+async function setup_handed_over_buttons(frm) {
     frm.add_custom_button("Nhận bàn giao", function() {
         frappe.confirm(
             "Bạn có chắc chắn muốn nhận bàn giao ca làm việc này?",
@@ -76,6 +76,32 @@ function setup_handed_over_buttons(frm) {
             }
         );
     }).addClass("btn-primary");
+    frm.add_custom_button("Từ chối", function() {
+        frappe.prompt(
+            [
+                {
+                    label: "Lý do từ chối",
+                    fieldname: "comment",
+                    fieldtype: "Small Text",
+                    reqd: 1
+                }
+            ],
+            async function(values) {
+                frm.selected_workflow_action = "Từ chối";
+                await frappe.call({
+                    method: "tahp.tahp.doctype.shift_handover.shift_handover.reject",
+                    args: {
+                        name: frm.doc.name,
+                        comment: values.comment
+                    }
+                });
+                trigger_workflow_action(frm, "Draft");
+            },
+            "Nhập lý do từ chối",
+            "Xác nhận"
+        );
+    });
+
 }
 
 // Nút cho trạng thái Completed

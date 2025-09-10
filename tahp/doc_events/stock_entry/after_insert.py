@@ -4,6 +4,7 @@ import calendar
 def after_insert(doc, method):
     if not doc.custom_code: set_code(doc)
     generate_qc(doc)
+    send_noti(doc)
 
 def generate_qc(doc):
     """
@@ -108,4 +109,26 @@ def set_code(doc):
     doc.custom_code = custom_code
     doc.save()
 
-    
+def send_noti(doc):
+    title_map = {
+        "Manufacture": "Nhập kho thành phẩm",
+        "Material Receipt": "Nhập kho",
+        "Material Issue": "Xuất kho",
+        "Material Transfer": "Chuyển kho"
+    }
+    title = title_map.get(doc.stock_entry_type, doc.stock_entry_type)
+    users = frappe.db.get_all(
+        "User",
+        filters={"role_profile_name": "Chủ kho", "enabled": 1},
+        pluck="name"
+    )
+    for user in users:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "for_user": user,
+            "subject": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
+            "email_content": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
+            "type": "Alert",
+            "document_type": "Stock Entry",
+            "document_name": doc.name
+        }).insert(ignore_permissions=True)

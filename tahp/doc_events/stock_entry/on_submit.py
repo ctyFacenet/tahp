@@ -19,3 +19,18 @@ def on_submit(doc, method):
 
         # if doc.work_order:
         #     end(doc.work_order)
+
+            wo_doc = frappe.get_doc("Work Order", doc.work_order)
+            shift_leader = wo_doc.custom_shift_leader
+            if not shift_leader: continue
+            user = frappe.db.get_value("Employee", shift_leader, "user_id")
+            if not user: continue
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "for_user": user,
+                "subject": "Vui lòng kiểm tra nội dung BBGC và gửi bàn giao",
+                "email_content": "Vui lòng kiểm tra nội dung BBGC và gửi bàn giao",
+                "type": "Alert",
+                "document_type": "Shift Handover",
+                "document_name": handover.name
+            }).insert(ignore_permissions=True)
