@@ -45,6 +45,8 @@ app_include_css = [
     "/assets/tahp/css/bom_custom.css",
     "/assets/tahp/css/custom_confirm.css",
     "/assets/tahp/css/workstation_dashboard.css",
+    "/assets/tahp/css/custom_nav.css",
+
     
 
 
@@ -58,6 +60,7 @@ app_include_js = [
     "/assets/tahp/js/theme.js",
     "/assets/tahp/js/custom_logout_redirect.js",
     "/assets/tahp/js/custom_confirm_modal.js",
+    "/assets/tahp/js/custom_nav.js",
     # "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     # "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
