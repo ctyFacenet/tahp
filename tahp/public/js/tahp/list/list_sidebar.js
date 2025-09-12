@@ -14,6 +14,11 @@ frappe.views.ListSidebar = class ListSidebar {
 		this.make();
 	}
 
+	async get_pages() {
+		let pages = await frappe.xcall("frappe.desk.desktop.get_workspace_sidebar_items")
+		return pages;
+	}
+
 	async make() {
 		var sidebar_content = frappe.render_template("list_sidebar", { doctype: this.doctype });
 
@@ -21,9 +26,46 @@ frappe.views.ListSidebar = class ListSidebar {
 			// .html(sidebar_content)
 			.appendTo(this.page.sidebar.empty());
 
-		let response = await frappe.xcall("frappe.desk.desktop.get_workspace_sidebar_items")
-		let pages = response.pages.filter(row => row.is_hidden === 0 && row.public).map(row => row.name)
-		console.log(pages)
+		this.sidebar_pages = !this.discard ? await this.get_pages() : this.sidebar_pages;
+		this.all_pages = this.sidebar_pages.pages;
+		this.all_pages.forEach((page) => {
+			page.is_editable = !page.public || this.has_access;
+		});
+		this.public_pages = this.all_pages.filter((page) => page.public);
+		this.private_pages = this.all_pages.filter((page) => !page.public);
+		this.sidebar_categories = [
+			{ id: "Personal", label: __("Personal", null, "Workspace Category") },
+			{ id: "Public", label: __("Public", null, "Workspace Category") },
+		];
+		this.sidebar_items = {
+			public: {},
+			private: {},
+		};
+		this.current_page = {};
+		this.indicator_colors = [
+			"green",
+			"cyan",
+			"blue",
+			"orange",
+			"yellow",
+			"gray",
+			"grey",
+			"red",
+			"pink",
+			"darkgrey",
+			"purple",
+			"light-blue",
+		];
+		if (this.all_pages) {
+			frappe.workspaces = {};
+			for (let page of this.all_pages) {
+				frappe.workspaces[frappe.router.slug(page.name)] = {
+					title: page.title,
+					public: page.public,
+				};
+			}
+			this.make_sidebar();
+		}
 
 		// this.setup_list_filter();
 		// this.setup_list_group_by();
@@ -50,12 +92,126 @@ frappe.views.ListSidebar = class ListSidebar {
 		// }
 	}
 
+	// prepare_sidebar(items, child_container, item_container) {
+	// 	items.forEach((item) => this.append_item(item, child_container));
+	// 	child_container.appendTo(item_container);
+	// }
+	remove_sidebar_skeleton() {
+		this.sidebar.removeClass("hidden");
+		$(".workspace-sidebar-skeleton").remove();
+	}
+
+	make_sidebar() {
+		if (this.sidebar.find(".standard-sidebar-section")[0]) {
+			this.sidebar.find(".standard-sidebar-section").remove();
+		}
+
+		this.sidebar_categories.forEach((category) => {
+			let root_pages = this.public_pages.filter(
+				(page) => page.parent_page == "" || page.parent_page == null
+			);
+			if (category.id != "Public") {
+				root_pages = this.private_pages.filter(
+					(page) => page.parent_page == "" || page.parent_page == null
+				);
+			}
+			root_pages = root_pages.uniqBy((d) => d.title);
+			this.build_sidebar_section(category, root_pages);
+		});
+
+		// Scroll sidebar to selected page if it is not in viewport.
+		this.sidebar.find(".selected").length &&
+			!frappe.dom.is_element_in_viewport(this.sidebar.find(".selected")) &&
+			this.sidebar.find(".selected")[0].scrollIntoView();
+
+		this.remove_sidebar_skeleton();
+	}
+
+	build_sidebar_section(category, root_pages) {
+		let sidebar_section = $(
+			`<div class="standard-sidebar-section nested-container" data-title="${category.id}"></div>`
+		);
+
+		let $title = $(`<button class="btn-reset standard-sidebar-label">
+			<span>${frappe.utils.icon("es-line-down", "xs")}</span>
+			<span class="section-title">${category.label}<span>
+		</div>`).appendTo(sidebar_section);
+		$title.attr({
+			"aria-label": __("Toggle Section: {0}", [category.label]),
+			"aria-expanded": "true",
+		});
+		this.prepare_sidebar(root_pages, sidebar_section, this.sidebar);
+
+		$title.on("click", (e) => {
+			const $e = $(e.target);
+			const href = $e.find("span use").attr("href");
+			const isCollapsed = href === "#es-line-down";
+			let icon = isCollapsed ? "#es-line-right-chevron" : "#es-line-down";
+			$e.find("span use").attr("href", icon);
+			$e.parent().find(".sidebar-item-container").toggleClass("hidden");
+			$e.attr("aria-expanded", String(!isCollapsed));
+		});
+
+		if (Object.keys(root_pages).length === 0) {
+			sidebar_section.addClass("hidden");
+		}
+
+		$(".item-anchor").on("click", () => {
+			$(".list-sidebar.hidden-xs.hidden-sm").removeClass("opened");
+			$(".close-sidebar").css("display", "none");
+			$("body").css("overflow", "auto");
+		});
+
+		if (
+			sidebar_section.find(".sidebar-item-container").length &&
+			sidebar_section.find("> [item-is-hidden='0']").length == 0
+		) {
+			sidebar_section.addClass("hidden show-in-edit-mode");
+		}
+	}
+	
 	prepare_sidebar(items, child_container, item_container) {
 		items.forEach((item) => this.append_item(item, child_container));
 		child_container.appendTo(item_container);
 	}
 
+	append_item(item, container) {
+		let is_current_page =
+			frappe.router.slug(item.title) == frappe.router.slug(this.get_page_to_show().name) &&
+			item.public == this.get_page_to_show().public;
+		item.selected = is_current_page;
+		if (is_current_page) {
+			this.current_page = { name: item.title, public: item.public };
+		}
+
+		let $item_container = this.sidebar_item_container(item);
+		let sidebar_control = $item_container.find(".sidebar-item-control");
+
+		let pages = item.public ? this.public_pages : this.private_pages;
+
+		let child_items = pages.filter((page) => page.parent_page == item.title);
+		if (child_items.length > 0) {
+			let child_container = $item_container.find(".sidebar-child-item");
+			child_container.addClass("hidden");
+			this.prepare_sidebar(child_items, child_container, $item_container);
+		}
+
+		$item_container.appendTo(container);
+		this.sidebar_items[item.public ? "public" : "private"][item.title] = $item_container;
+
+		if ($item_container.parent().hasClass("hidden") && is_current_page) {
+			$item_container.parent().toggleClass("hidden");
+		}
+
+		this.add_drop_icon(item, sidebar_control, $item_container);
+
+		if (child_items.length > 0) {
+			$item_container.find(".drop-icon").first().addClass("show-in-edit-mode");
+		}
+	}
+
 	sidebar_item_container(item) {
+		console.log(item)
 		item.indicator_color =
 			item.indicator_color || this.indicator_colors[Math.floor(Math.random() * 12)];
 
@@ -120,40 +276,32 @@ frappe.views.ListSidebar = class ListSidebar {
 		return { name: page, public: is_public };
 	}
 
-	append_item(item, container) {
-		let is_current_page =
-			frappe.router.slug(item.title) == frappe.router.slug(this.get_page_to_show().name) &&
-			item.public == this.get_page_to_show().public;
-		item.selected = is_current_page;
-		if (is_current_page) {
-			this.current_page = { name: item.title, public: item.public };
+	add_drop_icon(item, sidebar_control, item_container) {
+		let drop_icon = "es-line-down";
+		if (item_container.find(`[item-name="${this.current_page.name}"]`).length) {
+			drop_icon = "small-up";
 		}
 
-		let $item_container = this.sidebar_item_container(item);
-		let sidebar_control = $item_container.find(".sidebar-item-control");
-
-		// this.add_sidebar_actions(item, sidebar_control);
+		let $child_item_section = item_container.find(".sidebar-child-item");
+		let $drop_icon = $(`<button class="btn-reset drop-icon hidden">`)
+			.html(frappe.utils.icon(drop_icon, "sm"))
+			.appendTo(sidebar_control);
 		let pages = item.public ? this.public_pages : this.private_pages;
-
-		let child_items = pages.filter((page) => page.parent_page == item.title);
-		if (child_items.length > 0) {
-			let child_container = $item_container.find(".sidebar-child-item");
-			child_container.addClass("hidden");
-			this.prepare_sidebar(child_items, child_container, $item_container);
+		if (
+			pages.some(
+				(e) => e.parent_page == item.title && (e.is_hidden == 0 || !this.is_read_only)
+			)
+		) {
+			$drop_icon.removeClass("hidden");
 		}
-
-		$item_container.appendTo(container);
-		this.sidebar_items[item.public ? "public" : "private"][item.title] = $item_container;
-
-		if ($item_container.parent().hasClass("hidden") && is_current_page) {
-			$item_container.parent().toggleClass("hidden");
-		}
-
-		this.add_drop_icon(item, sidebar_control, $item_container);
-
-		if (child_items.length > 0) {
-			$item_container.find(".drop-icon").first().addClass("show-in-edit-mode");
-		}
+		$drop_icon.on("click", () => {
+			let icon =
+				$drop_icon.find("use").attr("href") === "#es-line-down"
+					? "#es-line-up"
+					: "#es-line-down";
+			$drop_icon.find("use").attr("href", icon);
+			$child_item_section.toggleClass("hidden");
+		});
 	}
 
 	setup_views() {

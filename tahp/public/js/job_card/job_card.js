@@ -280,9 +280,9 @@ frappe.ui.form.on('Job Card', {
                     { label: 'Phân loại lý do', fieldname: 'group_name', is_unit: true, type: "string" },
                 ],
                 data=frm.doc.custom_downtime.map(d => {
-                    const from_time = frappe.datetime.str_to_user(d.from_time, 'HH:mm:ss');
-                    const to_time = frappe.datetime.str_to_user(d.to_time, 'HH:mm:ss');
-                    const time_str = `${from_time} → ${to_time}`;
+                    const from_time = d.from_time ? d.from_time.slice(11, 19) : "";
+                    const to_time   = d.to_time   ? d.to_time.slice(11, 19)   : "";
+                    const time_str  = `${from_time} → ${to_time}`;
 
                     // Duration
                     let duration_str = '';
@@ -824,11 +824,10 @@ frappe.ui.form.on('Job Card', {
     complete_job_card: async function(frm) {
         if (frm.doc.custom_subtask) {
             let subtask_list = frm.doc.custom_subtask || [];
-            let in_progress_count = subtask_list.filter(t => t.done === "Đang thực hiện").length;
-
-            if (in_progress_count > 1) {
-                const message = `<div>Có nhiều hơn một đầu việc đang thực hiện.</div>
-                                <p>Bạn có chắc chắn muốn tiếp tục Submit không?</p>`;
+            let in_progress_count = subtask_list.filter(t => t.done === "Đang mở").length;
+            if (in_progress_count > 0) {
+                const message = `<div>Bạn chưa hoàn thành toàn bộ đầu việc của Công đoạn.</div>
+                                <p>Bạn có chắc chắn muốn tiếp tục kết thúc công đoạn không?</p>`;
 
                 await new Promise((resolve, reject) => {
                     frappe.confirm(message, resolve, () => {

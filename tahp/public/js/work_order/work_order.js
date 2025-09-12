@@ -3,9 +3,6 @@ frappe.ui.form.on('Work Order', {
         frm.set_intro("");
         await finish_button(frm);
     },
-    production_item: async function(frm) {
-        await autofill_items(frm);
-    },
     bom_no: async function(frm) {
         await autofill_items(frm);
     }
@@ -19,7 +16,7 @@ frappe.ui.form.on('Work Order Operation', {
         if (operation_doc) {
             frappe.model.set_value(cdt, cdn, 'workstation', operation_doc.workstation);
             frappe.model.set_value(cdt, cdn, 'sequence_id', 1);
-            if (operation_doc.custom_team && operation_doc.custom_team.length === 1) {
+            if (operation_doc.custom_team && operation_doc.custom_team.length > 0) {
                 frappe.model.set_value(cdt, cdn, 'custom_employee', operation_doc.custom_team[0].employee);
             }
         }
@@ -45,19 +42,11 @@ async function finish_button(frm) {
 
 async function autofill_items(frm) {
     setTimeout(async () => {
-        console.log(frm.doc.operations)
         for (let row of frm.doc.operations) {
             let op_doc = await frappe.db.get_doc("Operation", row.operation);
-            if (op_doc.custom_team && op_doc.custom_team.length === 1) {
+            if (op_doc.custom_team && op_doc.custom_team.length > 0) {
                 frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
             }
-            let trackers = await frappe.db.get_list('Operation Tracker', {
-                filters: { operation: row.operation, docstatus: 1 },
-                fields: ["name"],
-                order_by: "creation desc",
-                limit: 1
-            });
-            if (trackers.length > 0) frappe.model.set_value(row.doctype, row.name, 'custom_is_qc_tracked', 1);
         }
         frm.refresh_field("operations");
     }, 100);

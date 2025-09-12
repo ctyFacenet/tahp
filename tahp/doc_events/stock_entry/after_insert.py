@@ -126,7 +126,7 @@ def send_noti(doc):
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
-            "subject": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
+            "subject": f"Chủ kho vui lòng xác nhận phiếu <b style='font-weight:bold'>{title} - {doc.name}</b>",
             "email_content": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
             "type": "Alert",
             "document_type": "Stock Entry",
