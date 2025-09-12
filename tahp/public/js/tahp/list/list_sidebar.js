@@ -16,6 +16,8 @@ frappe.views.ListSidebar = class ListSidebar {
 
 	async get_pages() {
 		let pages = await frappe.xcall("frappe.desk.desktop.get_workspace_sidebar_items")
+		let response = await frappe.call("tahp.utils.get_workspace.get_workspace")
+		console.log(response)
 		return pages;
 	}
 
@@ -211,7 +213,6 @@ frappe.views.ListSidebar = class ListSidebar {
 	}
 
 	sidebar_item_container(item) {
-		console.log(item)
 		item.indicator_color =
 			item.indicator_color || this.indicator_colors[Math.floor(Math.random() * 12)];
 

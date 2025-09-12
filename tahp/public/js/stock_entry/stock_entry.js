@@ -38,8 +38,6 @@ frappe.ui.form.on('Stock Entry', {
                 row.conversion_factor = 1;
                 row.transfer_qty = input.qty;
                 row.set_basic_rate_manually = 1;
-                const grid_row = frm.fields_dict["items"].grid.grid_rows_by_docname[row.name];
-                grid_row.get_field("t_warehouse").df.read_only = 1;
             });
             }
             frm.refresh_field('items');
@@ -49,6 +47,9 @@ frappe.ui.form.on('Stock Entry', {
     refresh: function(frm) {
         frm.set_intro("")
         frm.events.set_warehouse_readonly(frm);
+        frm.$wrapper.find('.grid-add-multiple-rows').remove();
+        frm.$wrapper.find('.grid-download').remove();
+        frm.$wrapper.find('.grid-upload').remove();
         if (frm.doc.stock_entry_type) {
             let title = "";
 
@@ -87,11 +88,30 @@ frappe.ui.form.on('Stock Entry', {
             frm.fields_dict.items.grid.update_docfield_property('s_warehouse', 'read_only', 1);
         } else if (type === "Material Issue") {
             frm.fields_dict.items.grid.update_docfield_property('t_warehouse', 'read_only', 1);
+        } else if (type === "Manufacture") {
+            set_warehouse_readonly_by_finished(frm)
         }
-        frm.fields_dict.items.grid.refresh();        
+        frm.fields_dict.items.grid.refresh();
     }
 
 });
+
+function set_warehouse_readonly_by_finished(frm) {
+    frm.fields_dict.items.grid.grid_rows.forEach((grid_row) => {
+        const doc = grid_row.doc;
+
+        if (doc.is_finished_item) {
+            grid_row.wrapper.find('[data-fieldname="s_warehouse"]').css('pointer-events', 'none');
+            grid_row.wrapper.find('[data-fieldname="t_warehouse"]').css('pointer-events', '');
+        } else {
+            grid_row.wrapper.find('[data-fieldname="t_warehouse"]').css('pointer-events', 'none');
+            grid_row.wrapper.find('[data-fieldname="s_warehouse"]').css('pointer-events', '');
+        }
+    });
+
+    frm.fields_dict.items.grid.refresh();
+}
+
 
 frappe.ui.form.on('Stock Entry Detail', {
     qty: function(frm, cdt, cdn) {
@@ -99,7 +119,7 @@ frappe.ui.form.on('Stock Entry Detail', {
         if (row.is_finished_item) {
             frm.doc.fg_completed_qty = row.qty;
         }
-    }
+    },
 });
 
 
