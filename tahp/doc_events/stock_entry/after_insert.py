@@ -99,7 +99,6 @@ def set_code(doc):
     end_date = f"{year}-{month}-{last_day}"
 
     entries = frappe.db.get_all("Stock Entry", filters={
-        "docstatus": ["==", 1],
         "stock_entry_type": doc.stock_entry_type,
         "posting_date": ["between", [start_date, end_date]]
     })

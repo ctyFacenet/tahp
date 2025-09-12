@@ -130,7 +130,6 @@ async function set_code(frm) {
 
     const entries = await frappe.db.get_list("Stock Entry", {
         filters: [
-            ["docstatus", "=", 1],
             ["stock_entry_type", "=", frm.doc.stock_entry_type],
             ["posting_date", ">=", start_date],
             ["posting_date", "<=", end_date]
