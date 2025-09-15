@@ -1,5 +1,8 @@
-
 const workspaceCache = {};
+
+function slugify(str) {
+  return str ? str.toLowerCase().replace(/\s+/g, "-") : "";
+}
 
 function getItemIcon(item) {
   if ((item.link_type || item.type) === "Report") return "📊";
@@ -11,31 +14,26 @@ function getItemIcon(item) {
 
 function getRoute(item) {
   const type = (item.link_type || item.type || "").toLowerCase();
-
   if (!item.link_to) return "#";
 
   if (type === "doctype") {
-    return `/app/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+    return `/app/${slugify(item.link_to)}`;
   }
 
   if (type === "report") {
-    // if (item.is_query_report) {
-    return `/app/query-report/${encodeURIComponent(item.link_to).replace(/\s+/g, "-")}`;
-    // } else {
-    //   return `/app/report/${(item.doctype || "").toLowerCase().replace(/\s+/g, "-")}/${encodeURIComponent(item.link_to).replace(/\s+/g, "-")}`;
-    // }
+    return `/app/query-report/${encodeURIComponent(item.link_to)}`;
   }
 
   if (type === "page") {
-    return `/app/page/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+    return `/app/page/${slugify(item.link_to)}`;
   }
 
   if (type === "dashboard") {
-    return `/app/dashboard-view/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+    return `/app/dashboard-view/${slugify(item.link_to)}`;
   }
 
   // fallback
-  return `/app/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+  return `/app/${slugify(item.link_to)}`;
 }
 
 function createDropdown(wrapper) {
@@ -51,6 +49,7 @@ function createDropdown(wrapper) {
 function renderDropdownContent(dropdown, page) {
   dropdown.innerHTML = "";
 
+  // Shortcuts
   if (Array.isArray(page.shortcuts) && page.shortcuts.length > 0) {
     let shortcutsHeader = document.createElement("div");
     shortcutsHeader.classList.add("dropdown-header");
@@ -65,9 +64,9 @@ function renderDropdownContent(dropdown, page) {
     });
   }
 
+  // Links theo Card Break
   if (Array.isArray(page.links) && page.links.length > 0) {
     let currentGroup;
-
     page.links.forEach(item => {
       if (item.type === "Card Break") {
         currentGroup = document.createElement("div");
@@ -93,16 +92,12 @@ function renderDropdownContent(dropdown, page) {
     });
   }
 
-}
-async function loadWorkspaceData(workspaceName, dropdown) {
-
-  if (workspaceCache[workspaceName]) {
-    renderDropdownContent(dropdown, workspaceCache[workspaceName]);
-    return;
+  if (!dropdown.innerHTML.trim()) {
+    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
   }
+}
 
-  dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Đang tải...</div>`;
-
+async function preloadWorkspaces() {
   try {
     let response = await frappe.call({
       method: "tahp.utils.get_workspace.get_workspace",
@@ -110,22 +105,22 @@ async function loadWorkspaceData(workspaceName, dropdown) {
     });
 
     if (Array.isArray(response.message)) {
-
-      function slugify(str) {
-        return str.toLowerCase().replace(/\s+/g, "-");
-      }
-
-      const page = response.message.find(
-        p => slugify(p.name) === slugify(workspaceName)
-      );
-      if (page) {
-        workspaceCache[workspaceName] = page;
-        renderDropdownContent(dropdown, page);
-      }
+      response.message.forEach(page => {
+        workspaceCache[slugify(page.name)] = page;
+      });
+      console.log("⚡ Workspaces preloaded:", Object.keys(workspaceCache));
     }
   } catch (e) {
-    console.error("❌ Error:", e);
-    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Lỗi tải menu</div>`;
+    console.error("❌ Preload error:", e);
+  }
+}
+
+function loadWorkspaceData(workspaceName, dropdown) {
+  const page = workspaceCache[slugify(workspaceName)];
+  if (page) {
+    renderDropdownContent(dropdown, page);
+  } else {
+    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
   }
 }
 
@@ -152,7 +147,9 @@ function initDropdowns() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  await preloadWorkspaces();
+
   const observer = new MutationObserver((mutations, obs) => {
     if (document.querySelectorAll(".workspace-block").length) {
       initDropdowns();
