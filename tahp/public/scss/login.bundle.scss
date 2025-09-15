@@ -296,3 +296,9 @@ body {
     background: #1a4fb3 !important;
   }
 }
+
+@media (max-width: 767px) {
+  .login-footer .facenet-subtitle {
+    display: none;
+  }
+}
