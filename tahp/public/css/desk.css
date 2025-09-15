@@ -102,6 +102,7 @@ body[data-route="modern-menu"] .btn-back {
 
 .workspace-block.active {
   font-weight: bold;
+  border-bottom: 1px solid #4a90e2;
 }
 
 

@@ -53,7 +53,7 @@ function renderDropdownContent(dropdown, page) {
   if (Array.isArray(page.shortcuts) && page.shortcuts.length > 0) {
     let shortcutsHeader = document.createElement("div");
     shortcutsHeader.classList.add("dropdown-header");
-    shortcutsHeader.textContent = "Your Shortcuts";
+    shortcutsHeader.textContent = "Shortcuts";
     dropdown.appendChild(shortcutsHeader);
 
     page.shortcuts.forEach(item => {
@@ -106,6 +106,7 @@ async function preloadWorkspaces() {
 
     if (Array.isArray(response.message)) {
       response.message.forEach(page => {
+
         workspaceCache[slugify(page.name)] = page;
       });
       console.log("⚡ Workspaces preloaded:", Object.keys(workspaceCache));
