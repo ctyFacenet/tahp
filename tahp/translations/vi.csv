@@ -2850,7 +2850,7 @@ Insufficient Permissions for editing Report,Insufficient Permissions for editing
 Insufficient attachment limit,Insufficient attachment limit
 Int,Int
 Integration Request,Integration Request
-Integrations,Integrations
+Integrations,Tích hợp
 Integrations can use this field to set email delivery status,Integrations can use this field to set email delivery status
 Inter,Inter
 Interests,Interests
@@ -5134,7 +5134,7 @@ Too Many Requests,Too Many Requests
 Too many changes to database in single action.,Too many changes to database in single action.
 Too many queued background jobs ({0}). Please retry after some time.,Too many queued background jobs ({0}). Please retry after some time.
 "Too many users signed up recently, so the registration is disabled. Please try back in an hour","Too many users signed up recently, so the registration is disabled. Please try back in an hour"
-Tools,Tools
+Tools,Công cụ
 Top,Top
 Top 10,Top 10
 Top Bar Item,Top Bar Item
@@ -5361,7 +5361,7 @@ User {0} is not permitted to access this document.,User {0} is not permitted to 
 Userinfo URI,Userinfo URI
 Username,Username
 Username {0} already exists,Username {0} already exists
-Users,Users
+Users,Người dùng
 Users are only able to delete attached files if the document is either in draft or if the document is canceled and they are also able to delete the document.,Users are only able to delete attached files if the document is either in draft or if the document is canceled and they are also able to delete the document.
 Users assigned to the reference document will get points.,Users assigned to the reference document will get points.
 Users with role {0}:,Users with role {0}:
@@ -5471,7 +5471,7 @@ Webhook Secret,Webhook Secret
 Webhook Security,Webhook Security
 Webhook Trigger,Webhook Trigger
 Webhook URL,Webhook URL
-Website,Website
+Website,Trang Web
 Website Analytics,Website Analytics
 Website Manager,Website Manager
 Website Meta Tag,Website Meta Tag
@@ -6417,7 +6417,7 @@ Account: <b>{0}</b> is capital Work in progress and can not be updated by Journa
 Account: {0} can only be updated via Stock Transactions,Account: {0} can only be updated via Stock Transactions
 Account: {0} is not permitted under Payment Entry,Account: {0} is not permitted under Payment Entry
 Account: {0} with currency: {1} can not be selected,Account: {0} with currency: {1} can not be selected
-Accounting,Accounting
+Accounting,Kế toán
 Accounting Details,Accounting Details
 Accounting Dimension,Accounting Dimension
 Accounting Dimension <b>{0}</b> is required for 'Balance Sheet' account {1}.,Accounting Dimension <b>{0}</b> is required for 'Balance Sheet' account {1}.
@@ -6939,7 +6939,7 @@ Asset {0} must be submitted,Asset {0} must be submitted
 Asset's depreciation schedule updated after Asset Shift Allocation {0},Asset's depreciation schedule updated after Asset Shift Allocation {0}
 Asset's value adjusted after cancellation of Asset Value Adjustment {0},Asset's value adjusted after cancellation of Asset Value Adjustment {0}
 Asset's value adjusted after submission of Asset Value Adjustment {0},Asset's value adjusted after submission of Asset Value Adjustment {0}
-Assets,Assets
+Assets,Tài sản
 Assets not created for {0}. You will have to create asset manually.,Assets not created for {0}. You will have to create asset manually.
 "Assets, Depreciations, Repairs, and more.","Assets, Depreciations, Repairs, and more."
 Asset{is_plural} {assets_link} created for {item_code},Asset{is_plural} {assets_link} created for {item_code}
@@ -7327,7 +7327,7 @@ Bundle Qty,Bundle Qty
 Busy,Busy
 Buy,Buy
 Buyer of Goods and Services.,Buyer of Goods and Services.
-Buying,Buying
+Buying,Mua hàng
 Buying & Selling Settings,Buying & Selling Settings
 Buying Amount,Buying Amount
 Buying Price List,Buying Price List
@@ -8446,7 +8446,7 @@ E-Invoicing Information Missing,E-Invoicing Information Missing
 EAN,EAN
 EAN-12,EAN-12
 EAN-8,EAN-8
-ERPNext Settings,ERPNext Settings
+ERPNext Settings,Cài đặt ERPNext
 ERPNext User ID,ERPNext User ID
 Each Transaction,Each Transaction
 Earliest,Earliest
@@ -8710,7 +8710,7 @@ Finance Book Detail,Finance Book Detail
 Finance Book Id,Finance Book Id
 Finance Books,Finance Books
 Financial Ratios,Financial Ratios
-Financial Reports,Financial Reports
+Financial Reports,Báo cáo tài chính
 Financial Statements,Financial Statements
 Financial Year Begins On,Financial Year Begins On
 Financial reports will be generated using GL Entry doctypes (should be enabled if Period Closing Voucher is not posted for all years sequentially or missing),Financial reports will be generated using GL Entry doctypes (should be enabled if Period Closing Voucher is not posted for all years sequentially or missing)
@@ -10607,7 +10607,7 @@ Pay,Pay
 Pay To / Recd From,Pay To / Recd From
 Payable,Payable
 Payable Account,Payable Account
-Payables,Payables
+Payables,Các khoản phải trả
 Payer Settings,Payer Settings
 Payment,Payment
 Payment Account,Payment Account
@@ -11211,7 +11211,7 @@ Projected Qty,Projected Qty
 Projected Quantity,Projected Quantity
 Projected Quantity Formula,Projected Quantity Formula
 Projected qty,Projected qty
-Projects,Projects
+Projects,Dự án
 Projects Manager,Projects Manager
 Projects Settings,Projects Settings
 Projects User,Projects User
@@ -11485,7 +11485,7 @@ Receivable / Payable Account,Receivable / Payable Account
 Receivable Account,Receivable Account
 Receivable/Payable Account,Receivable/Payable Account
 Receivable/Payable Account: {0} doesn't belong to company {1},Receivable/Payable Account: {0} doesn't belong to company {1}
-Receivables,Receivables
+Receivables,Các khoản thu
 Receive,Receive
 Received Amount,Received Amount
 Received Amount (Company Currency),Received Amount (Company Currency)
@@ -12248,7 +12248,7 @@ Selected document must be in submitted state,Selected document must be in submit
 Self delivery,Self delivery
 Sell,Sell
 Sell Asset,Sell Asset
-Selling,Selling
+Selling,Bán hàng
 Selling Amount,Selling Amount
 Selling Price List,Selling Price List
 Selling Rate,Selling Rate
@@ -12809,7 +12809,7 @@ Supplier-Wise Sales Analytics,Supplier-Wise Sales Analytics
 Suppliers,Suppliers
 Supplies subject to the reverse charge provision,Supplies subject to the reverse charge provision
 Supply Raw Materials for Purchase,Supply Raw Materials for Purchase
-Support,Support
+Support,Hỗ trợ
 Support Hour Distribution,Support Hour Distribution
 Support Portal,Support Portal
 Support Search Source,Support Search Source
