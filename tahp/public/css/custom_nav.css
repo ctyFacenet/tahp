@@ -1,16 +1,27 @@
-.workspace-wrapper {
-  /* position: relative; */
-}
-
 .workspace-dropdown {
   display: none;
-  min-width: 220px;
+  min-width: 240px;
+  max-height: 400px;
+  overflow-y: auto;
   background: #fff !important;
   border: 1px solid #ccc;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 9999;
   padding: 4px 0;
-  border-top: 1px solid blue
+  border-top: 2px solid #4a90e2;
+}
+
+.workspace-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.workspace-dropdown::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.workspace-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .workspace-dropdown .dropdown-header {

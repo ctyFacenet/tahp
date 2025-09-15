@@ -1,7 +1,41 @@
-function stripHtml(html) {
-  let tmp = document.createElement("div");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
+
+const workspaceCache = {};
+
+function getItemIcon(item) {
+  if ((item.link_type || item.type) === "Report") return "📊";
+  if ((item.link_type || item.type) === "DocType") return "🗂️";
+  if ((item.link_type || item.type) === "Page") return "📄";
+  if ((item.link_type || item.type) === "Dashboard") return "📈";
+  return "📁";
+}
+
+function getRoute(item) {
+  const type = (item.link_type || item.type || "").toLowerCase();
+
+  if (!item.link_to) return "#";
+
+  if (type === "doctype") {
+    return `/app/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+  }
+
+  if (type === "report") {
+    // if (item.is_query_report) {
+    return `/app/query-report/${encodeURIComponent(item.link_to).replace(/\s+/g, "-")}`;
+    // } else {
+    //   return `/app/report/${(item.doctype || "").toLowerCase().replace(/\s+/g, "-")}/${encodeURIComponent(item.link_to).replace(/\s+/g, "-")}`;
+    // }
+  }
+
+  if (type === "page") {
+    return `/app/page/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+  }
+
+  if (type === "dashboard") {
+    return `/app/dashboard-view/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
+  }
+
+  // fallback
+  return `/app/${item.link_to.toLowerCase().replace(/\s+/g, "-")}`;
 }
 
 function createDropdown(wrapper) {
@@ -14,72 +48,85 @@ function createDropdown(wrapper) {
   return dropdown;
 }
 
-const workspaceCache = {};
-
-function renderDropdownContent(dropdown, content) {
+function renderDropdownContent(dropdown, page) {
   dropdown.innerHTML = "";
 
-  if (Array.isArray(content)) {
-    content.forEach(item => {
-      if (item.type === "header") {
+  if (Array.isArray(page.shortcuts) && page.shortcuts.length > 0) {
+    let shortcutsHeader = document.createElement("div");
+    shortcutsHeader.classList.add("dropdown-header");
+    shortcutsHeader.textContent = "Your Shortcuts";
+    dropdown.appendChild(shortcutsHeader);
+
+    page.shortcuts.forEach(item => {
+      let a = document.createElement("a");
+      a.href = getRoute(item);
+      a.innerHTML = `${getItemIcon(item)} ${item.label}`;
+      dropdown.appendChild(a);
+    });
+  }
+
+  if (Array.isArray(page.links) && page.links.length > 0) {
+    let currentGroup;
+
+    page.links.forEach(item => {
+      if (item.type === "Card Break") {
+        currentGroup = document.createElement("div");
+        currentGroup.classList.add("group");
+
         let header = document.createElement("div");
         header.classList.add("dropdown-header");
-        header.textContent = stripHtml(item.data.text || "");
-        dropdown.appendChild(header);
-      }
+        header.textContent = item.label || "Danh mục";
 
-      if (item.type === "card") {
+        currentGroup.appendChild(header);
+        dropdown.appendChild(currentGroup);
+      } else {
         let a = document.createElement("a");
-        a.href = `/app/${item.data.card_name}`;
-        a.innerHTML = `🗂️ ${item.data.card_name}`;
-        dropdown.appendChild(a);
+        a.href = getRoute(item);
+        a.innerHTML = `${getItemIcon(item)} ${item.label}`;
+
+        if (currentGroup) {
+          currentGroup.appendChild(a);
+        } else {
+          dropdown.appendChild(a);
+        }
       }
     });
   }
 
-  if (!dropdown.innerHTML.trim()) {
-    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
-  }
 }
+async function loadWorkspaceData(workspaceName, dropdown) {
 
-function loadWorkspaceData(workspaceName, dropdown) {
   if (workspaceCache[workspaceName]) {
-    console.log(`⚡ Lấy từ cache cho workspace: ${workspaceName}`);
     renderDropdownContent(dropdown, workspaceCache[workspaceName]);
     return;
   }
 
   dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Đang tải...</div>`;
 
-  frappe.call({
-    method: "frappe.desk.desktop.get_workspace_sidebar_items",
-    args: { workspace: workspaceName },
-    callback: function (r) {
-      console.log("✅ Submenu data received for", workspaceName, r);
+  try {
+    let response = await frappe.call({
+      method: "tahp.utils.get_workspace.get_workspace",
+      args: {}
+    });
 
-      if (r.message && r.message.pages) {
-        const page = r.message.pages.find(
-          p => p.name.toLowerCase() === workspaceName.toLowerCase()
-        );
+    if (Array.isArray(response.message)) {
 
-        if (page && page.content) {
-          let content = page.content;
+      function slugify(str) {
+        return str.toLowerCase().replace(/\s+/g, "-");
+      }
 
-          if (typeof content === "string") {
-            try {
-              content = JSON.parse(content);
-            } catch (e) {
-              console.error("❌ Parse content error:", e, content);
-              content = [];
-            }
-          }
-
-          workspaceCache[workspaceName] = content;
-          renderDropdownContent(dropdown, content);
-        }
+      const page = response.message.find(
+        p => slugify(p.name) === slugify(workspaceName)
+      );
+      if (page) {
+        workspaceCache[workspaceName] = page;
+        renderDropdownContent(dropdown, page);
       }
     }
-  });
+  } catch (e) {
+    console.error("❌ Error:", e);
+    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Lỗi tải menu</div>`;
+  }
 }
 
 function initDropdowns() {
@@ -95,14 +142,13 @@ function initDropdowns() {
 
     ws.addEventListener("mouseenter", () => {
       loadWorkspaceData(workspaceName, dropdown);
-      const rect = ws.getBoundingClientRect();
 
+      const rect = ws.getBoundingClientRect();
       dropdown.style.position = "fixed";
       dropdown.style.top = rect.bottom + "px";
       dropdown.style.left = rect.left + "px";
       dropdown.style.transform = "none";
     });
-
   });
 }
 
@@ -111,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelectorAll(".workspace-block").length) {
       initDropdowns();
       obs.disconnect();
-      console.log("🛑 Observer stopped");
+      console.log("🛑 Observer stopped - Dropdowns initialized");
     }
   });
 
