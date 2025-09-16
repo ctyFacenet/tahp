@@ -7,28 +7,24 @@
 frappe.query_reports["Báo cáo chốt sản lượng"] = {
     "filters": [
         {
-            "fieldname": "thang_chot_san_luong",
-            "label": __("Tháng chốt sản lượng"),
+            "fieldname": "year",
+            "label": __("Năm"),
             "fieldtype": "Data",
+            "default": frappe.datetime.now_date().split('-')[0],
+            "reqd": 1
         },
         {
-            "fieldname": "bo_phan_thuc_hien",
-            "label": __("Bộ phận thực hiện"),
-            "fieldtype": "Link",
-            "options": "Department",
-        },
-        {
-            "fieldname": "khoang_thoi_gian",
-            "label": __("Khoảng thời gian"),
+            "fieldname": "month",
+            "label": __("Tháng"),
             "fieldtype": "Select",
-            "options": "Ca\nNgày\nTuần\nTháng",
-            "default": "Ca", // Default value
+            "options": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12", // Dropdown
+            "default": frappe.datetime.now_date().split('-')[1] // Mặc định là tháng hiện tại
         },
         {
-            "fieldname": "ma_ca",
-            "label": __("Mã ca"),
+            "fieldname": "ca",
+            "label": __("Ca"),
             "fieldtype": "Link",
-            "options": "Shift", // Assuming you have a DocType for shifts
+            "options": "Shift",
         }
     ]
 };
