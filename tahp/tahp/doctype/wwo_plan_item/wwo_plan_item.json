@@ -20,7 +20,6 @@
    "columns": 1,
    "fieldname": "wwo",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "LSX Tu\u1ea7n"
   },
   {
@@ -31,7 +30,7 @@
    "label": "M\u1eb7t h\u00e0ng"
   },
   {
-   "columns": 1,
+   "columns": 2,
    "fieldname": "bom",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -62,7 +61,6 @@
    "columns": 1,
    "fieldname": "note",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Ghi ch\u00fa"
   },
   {

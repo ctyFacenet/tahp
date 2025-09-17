@@ -49,47 +49,44 @@ frappe.ui.form.on('WWO Plan Item', {
             }
         }, 100);
         
-        if (!frappe.user_roles.includes("Giám đốc")) return;
-        // Phần hiển thị nút nếu "Đợi GĐ duyệt"
-        if (row.approved === "Đợi GĐ duyệt") {
-            setTimeout(() => {
-                const rowWrapper = $(`[data-idx="${row.idx}"]`);
-                const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
+//         if (!frappe.user_roles.includes("Giám đốc")) return;
+//         // Phần hiển thị nút nếu "Đợi GĐ duyệt"
+//         if (row.approved === "Đợi GĐ duyệt") {
+//             setTimeout(() => {
+//                 const rowWrapper = $(`[data-idx="${row.idx}"]`);
+//                 const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
+                
+//                 approvedField.html(`
+//                     <div class="d-flex flex-column p-2">
+//                         <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
+//                         <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
+//                         <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
+//                     </div>
+//                 `);
+//                 approvedField.css('pointer-events', 'none');
+//                 approvedField.find('.btn').css('pointer-events', 'auto');
+//                 // Gắn click handler
+//                 $('.btn-custom').off('click').on('click', function(e) {
+//                     e.preventDefault();
+//                     e.stopPropagation();
+//                     e.stopImmediatePropagation();
+//                     const action = $(this).attr('name');
+//                     const wwo = $(this).val();
 
-                approvedField.html(`
-                    <div class="d-flex flex-column p-2">
-                        <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
-                        <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
-                        <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
-                    </div>
-                `);
+//                     const actionHandlerMap = {
+//                         'tu-choi-khsx': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Nháp', 'Nhập lý do từ chối KHSX', 'Đã từ chối KHSX', 'KHSX', 'WWO bị từ chối KHSX', cdt, cdn),
+//                         'tu-choi-ptcn': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Đợi PTCN duyệt', 'Nhập lý do từ chối PTCN', 'Đã từ chối PTCN', 'PTCN', 'WWO bị từ chối PTCN', cdt, cdn),
+//                         'duyet': (frm, wwo) => approved_mobile(frm, wwo, cdt, cdn)
+//                     };
 
-                approvedField.css('pointer-events', 'none');
-                approvedField.find('.btn').css('pointer-events', 'auto');
-
-                // Gắn click handler
-                $('.btn-custom').off('click').on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-
-                    const action = $(this).attr('name');
-                    const wwo = $(this).val();
-
-                    const actionHandlerMap = {
-                        'tu-choi-khsx': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Nháp', 'Nhập lý do từ chối KHSX', 'Đã từ chối KHSX', 'KHSX', 'WWO bị từ chối KHSX', cdt, cdn),
-                        'tu-choi-ptcn': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Đợi PTCN duyệt', 'Nhập lý do từ chối PTCN', 'Đã từ chối PTCN', 'PTCN', 'WWO bị từ chối PTCN', cdt, cdn),
-                        'duyet': (frm, wwo) => approved_mobile(frm, wwo, cdt, cdn)
-                    };
-
-                    if (actionHandlerMap[action]) {
-                        actionHandlerMap[action](frm, wwo);
-                    }
-                });
-            }, 100);
-        }
-    }
-});
+//                     if (actionHandlerMap[action]) {
+//                         actionHandlerMap[action](frm, wwo);
+//                     }
+//                 });
+//             }, 100);
+//         }
+//     }
+// });
 
 function setup_ui(frm) {
     $(frm.page.wrapper).find('.btn-open-row, .form-message-container').hide();
@@ -101,6 +98,9 @@ function setup_ui(frm) {
     frm.set_df_property('items', 'read_only', true);
 }
 
+function add_wwo(frm) {
+    
+}
 function hook_css_cleanup() {
     if (window._wwo_css_hooked) return;
     window._wwo_css_hooked = true;
@@ -121,6 +121,10 @@ function setup_css() {
         .prop('type', 'text/css')
         .prop('id', 'wwo-css')
         .html(`
+            .col.grid-static-col.d-flex.justify-content-center {display:none!important;}
+            .form-grid {border:2px solid #101010ff; border-radius:4px; box-shadow:none; margin-bottom:20px;}
+            .grid-row, .grid-heading-row {border-bottom:1px solid #101010ff;}
+            .rows .grid-row { padding-bottom: 20px;padding-top: 20px;}
             .rows .btn { pointer-events: auto; }
         
             .btn-custom {
@@ -199,8 +203,7 @@ function setup_hook(frm) {
     }
 }
 
-function generate_data(frm, week) {
-    
+async function generate_data(frm, week) {
     if (frm.doc.docstatus !== 0) {
         setup_hook(frm);
         return;
@@ -230,22 +233,30 @@ async function setup_button(frm) {
     if (window.innerWidth <= 768) return;
     if (!frappe.user_roles.includes("Giám đốc")) {
         return};
-    const $wrapper = frm.fields_dict.items.grid.wrapper;
-
+    const wrapper = frm.fields_dict.items.grid.wrapper;
     $('[data-fieldname="approved"]').addClass('d-flex justify-content-center align-items-center p-0');
-
-    $wrapper.find('[data-fieldname="approved"]').each(function () {
+    wrapper.find('.grid-body [data-fieldname="approved"]').each(function () {
         const $cell = $(this);
         const cellValue = $cell.find('.static-area').text().trim();
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
-        if (cellValue === "Đợi GĐ duyệt") {
-            $cell.find('.static-area').html(`
-                <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
-                <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
-                <button class="btn btn-primary btn-sm btn-custom" name="duyet2" value="${rowData.wwo}">Duyệt</button>
-            `);
-        }
+        html = cellValue === "Đợi GĐ duyệt" 
+        ? 
+        `<button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
+        <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
+        <button class="btn btn-primary btn-sm btn-custom" name="duyet2" value="${rowData.wwo}">Duyệt</button>`
+        : ` `
+        const row = $cell.closest('.grid-row');
+        row.prepend(`<div class = "data-row row d-flex justify-content-between align-items-center p-0"> 
+            <div> ${rowData.wwo} </div>
+            <div> 
+                ${html}  
+            </div>
+            </div>`)
+        row.append(`<div class = "data-row row d-flex justify-content-between align-items-center p-0"> 
+            <div> ${rowData.note?rowData.note: "Không có ghi chú"} </div>
+            </div>`)
+        $cell.find('.static-area').hide();
     });
 
     // Gắn sự kiện xử lý click cho các nút
@@ -396,7 +407,6 @@ async function process_wwo_mobile(frm, wwo, state, message, alert_message, role,
                 frm.refresh_field('items');
                 frm.fields_dict["items"].refresh();
                 frappe.show_alert(alert_message);
-
                 $('.modal').off('hide.bs.modal');
                 dialog.hide();
             } catch (error) {
@@ -631,7 +641,6 @@ function setup_bom_tooltip_events() {
     $bomLinks.on('mouseenter', async function () {
         const bomName = $(this).text().trim();
         if (!bomName || bomName === "CTSX") return;
-
         const tooltipContent = $(this).attr('data-tooltip-content');
         if (tooltipContent) {
             $('#custom-tooltip').text(tooltipContent).show();
@@ -698,7 +707,6 @@ function setup_item_tooltip_events() {
     $itemLinks.on('mouseenter', async function () {
         const itemCode = $(this).text().trim();
         if (!itemCode || itemCode === "Mặt hàng") return;
-
         const tooltipContent = $(this).attr('data-tooltip-content');
         if (tooltipContent) {
             $('#custom-tooltip').text(tooltipContent).show();
@@ -706,6 +714,7 @@ function setup_item_tooltip_events() {
         }
 
         try {
+           
             const item = await frappe.db.get_doc('Item', itemCode);
             let tooltipText = `Mã: ${item.item_code}\nTên: ${item.item_name || ''}\nNhóm: ${item.item_group || ''}`;
             $('#custom-tooltip').text(tooltipText).show();
