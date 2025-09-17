@@ -8,36 +8,12 @@ frappe.ui.form.on('BOM', {
 
     refresh: async function(frm) {
         console.log('refresh')
-        frm.set_df_property('custom_category_materials', 'read_only', 1);
+        frm.set_intro("");
         frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_sub_items.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_params.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_params_out.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.operations.grid.wrapper.find('.btn-open-row').hide();
-
-
-        if (frm.doc.docstatus === 0 && !frm.doc.custom_category) {
-            const doc = await frappe.call('tahp.tahp.doctype.manufacturing_category.manufacturing_category.get');
-            let categories = (doc.message.items || []).map(r => r.category).filter(c => c);
-            frm.set_df_property('custom_category', 'options', ["\n"].concat(categories));
-
-            if (frm.doc.custom_category) {
-                let row = (doc.message.items || []).find(r => r.category === frm.doc.custom_category);
-
-                if (row) {
-                    frm.set_df_property('custom_category_materials', 'read_only', 0);
-                    frm.set_value('custom_category_materials', row.materials || '');
-                    frm.refresh_field('custom_category_materials');
-
-                    frm.set_value('custom_qc_template', row.qc_template || null);
-                    frm.set_value('custom_qc_template_out', row.qc_template_out || null);
-
-                    // Fill lại bảng QC
-                    await fill_params(frm, "custom_qc_template", "custom_params");
-                    await fill_params(frm, "custom_qc_template_out", "custom_params_out");
-                }
-            }
-        }
     },
 
     with_operations: function(frm) {
@@ -46,30 +22,50 @@ frappe.ui.form.on('BOM', {
 
     custom_category: async function(frm) {
         let selected_cat = frm.doc.custom_category;
-
-        // Reset bảng và field trước khi làm gì khác
-        frm.set_value('custom_category_materials', '');
-        frm.set_df_property('custom_category_materials', 'read_only', 1);
-
         if (!selected_cat) return;
 
-        // Lấy danh sách category từ server
-        const doc = await frappe.call('tahp.tahp.doctype.manufacturing_category.manufacturing_category.get');
-        let row = (doc.message.items || []).find(r => r.category === selected_cat);
-
-        if (row) {
-            frm.set_df_property('custom_category_materials', 'read_only', 0);
-            frm.set_value('custom_category_materials', row.materials || '');
-            frm.refresh_field('custom_category_materials');
-            
-            frm.set_value('custom_qc_template', row.qc_template || null);
-            frm.set_value('custom_qc_template_out', row.qc_template_out || null);
-
-        }
+        let doc = await frappe.db.get_doc("Manufacturing Category", frm.doc.custom_category)
+        frm.set_value('custom_qc_template', doc.qc_template)
+        frm.set_value('custom_qc_template_out', doc.qc_template_out)
     },
 
     custom_update_category: function(frm) {
-        frappe.set_route("Form", "Manufacturing Category", "Manufacturing Category");
+        frm.events.update_category(frm);
+    },
+
+    update_category: async function(frm) {
+        let d = new frappe.ui.Dialog({
+            title: `Cập nhật Hệ sản xuất: ${frm.doc.custom_category}`,
+            fields: [
+                {
+                    label: "Mẫu QC đầu vào",
+                    fieldname: "qc_template",
+                    fieldtype: "Link",
+                    options: "Quality Inspection Template"
+                },
+                {
+                    label: "Mẫu QC đầu ra",
+                    fieldname: "qc_template_out",
+                    fieldtype: "Link",
+                    options: "Quality Inspection Template"
+                }
+            ],
+            primary_action_label: "Xác nhận",
+            primary_action(values) {
+                if (!frm.doc.custom_qc_template) frm.set_value("custom_qc_template", values.qc_template)
+                if (!frm.doc.custom_qc_template_out) frm.set_value("custom_qc_template_out", values.qc_template_out);
+                frappe.db.set_value("Manufacturing Category",frm.doc.custom_category,{qc_template: values.qc_template, qc_template_out: values.qc_template_out})
+                d.hide();
+            }
+        });
+
+        doc = await frappe.db.get_doc("Manufacturing Category", frm.doc.custom_category)
+        d.set_values({
+            qc_template: doc.qc_template,
+            qc_template_out: doc.qc_template_out
+        });
+
+        d.show();        
     }
 });
 
@@ -122,7 +118,6 @@ frappe.ui.form.on('BOM Operation', {
 
 async function fill_params(frm, template_field, table_field) {
     frm.clear_table(table_field);
-
     let template_name = frm.doc[template_field];
     if (template_name) {
         let template = await frappe.db.get_doc('Quality Inspection Template', template_name);

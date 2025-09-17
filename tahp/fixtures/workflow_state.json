@@ -3,18 +3,9 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:49.076313",
-  "name": "Đã được PTCN duyệt",
-  "style": "",
-  "workflow_state_name": "Đã được PTCN duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-21 17:01:37.910709",
+  "modified": "2025-09-07 19:30:47.694399",
   "name": "Đã hủy bỏ",
-  "style": "",
+  "style": "Danger",
   "workflow_state_name": "Đã hủy bỏ"
  },
  {
@@ -48,27 +39,54 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
+  "modified": "2025-08-26 16:08:05.160131",
+  "name": "Ready to Handover",
   "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
+  "workflow_state_name": "Ready to Handover"
  },
  {
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:01:16.154504",
-  "name": "Duyệt xong",
+  "modified": "2025-08-26 16:08:27.412699",
+  "name": "Completed",
   "style": "",
+  "workflow_state_name": "Completed"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-20 11:33:13.534352",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:40.758642",
+  "name": "Duyệt xong",
+  "style": "Success",
   "workflow_state_name": "Duyệt xong"
  },
  {
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:39.942681",
-  "name": "Đợi PTCN Duyệt",
+  "modified": "2025-08-26 16:08:16.327593",
+  "name": "Handed Over",
   "style": "",
+  "workflow_state_name": "Handed Over"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:51.370900",
+  "name": "Đợi PTCN Duyệt",
+  "style": "Warning",
   "workflow_state_name": "Đợi PTCN Duyệt"
  },
  {
@@ -79,5 +97,23 @@
   "name": "Nháp",
   "style": "",
   "workflow_state_name": "Nháp"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:37.079586",
+  "name": "Đã được PTCN duyệt",
+  "style": "Info",
+  "workflow_state_name": "Đã được PTCN duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
  }
 ]

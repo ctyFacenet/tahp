@@ -8,6 +8,7 @@ frappe.custom_utils_dynamic_filters = function(report, filters, callback) {
             fieldtype: filter.fieldtype,
             options: filter.options || null,
             default: filter.default || null,
+            hidden: filter.hidden || null,
             change: function() {
                 const value = field.get_value();
                 if (field_values[filter.fieldname] !== value) {

@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class ManufacturingCategoryItem(Document):
+class WorkstationInspectionOption(Document):
 	pass

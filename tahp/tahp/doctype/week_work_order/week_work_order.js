@@ -8,26 +8,15 @@
 // });
 frappe.ui.form.on('Week Work Order', {
 	refresh: async function(frm) {
-	    console.log('refresh')
 	    validate_roles(frm);
 	    show_duplicate(frm);
 	    await update_quantity(frm);
-// 		$('.sidebar-toggle-placeholder').click();
-		$('.form-message-container').hide();
-
-		
-		const sidebar = document.querySelector('.col-lg-2.layout-side-section');
-        const toggleBtn = document.querySelector('.sidebar-toggle-icon');
         
         if (frm.doc.docstatus === 1) {
             const has_incomplete_row = (frm.doc.items || []).some(row => (row.got_qty || 0) < (row.qty || 0));
             if (has_incomplete_row) {
                 frm.add_custom_button('Tạo LSX Ca', () => open_create_shift_dialog(frm)).addClass("btn-primary");
             }
-        }
-    
-        if (sidebar && toggleBtn && getComputedStyle(sidebar).display !== 'none' && window.innerWidth > 768) {
-            toggleBtn.click();
         }
 
 		frm.fields_dict['items'].grid.get_field('bom').get_query = function (doc, cdt, cdn) {
@@ -88,7 +77,6 @@ frappe.ui.form.on('Week Work Order', {
     },
     onload: function(frm) {
         show_duplicate(frm);
-        console.log('onload');
         frm.set_query('bom', function(){
              return {
                  filters: {
@@ -96,11 +84,6 @@ frappe.ui.form.on('Week Work Order', {
                 }
             }
         })
-        const sidebar = document.querySelector('.col-lg-2.layout-side-section');
-        const toggleBtn = document.querySelector('.sidebar-toggle-icon');
-        if (sidebar && toggleBtn && getComputedStyle(sidebar).display !== 'none' && window.innerWidth > 768) {
-            toggleBtn.click();
-        }
     },
     before_workflow_action: async function (frm) {
         if (!frm.doc.items.length) {
@@ -109,7 +92,7 @@ frappe.ui.form.on('Week Work Order', {
             return;
         }
 
-        if (frm.doc.workflow_state === "Đợi PTCN duyệt" && frm.selected_workflow_action !== "Trả về KHSX") {
+        if (frm.doc.workflow_state === "Đợi PTCN Duyệt" && frm.selected_workflow_action !== "Trả về KHSX") {
             let missing_bom = frm.doc.items.some(row => row.scrap != 1 && !row.bom);
             if (missing_bom) {
                 frappe.dom.unfreeze();
@@ -125,10 +108,8 @@ frappe.ui.form.on('Week Work Order', {
         
         if (frm.doc.workflow_state === "Đã được PTCN duyệt" && frm.selected_workflow_action === "Gửi GĐ") {
             frappe.dom.unfreeze();
-            console.log('check wwo')
             // const ok = true;
             let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
-            console.log('res', res)
             const { ok, messages } = res;
             if (!ok) {
                 const table = missing_material(messages);
@@ -169,7 +150,7 @@ frappe.ui.form.on('Week Work Order', {
                 "WWO Plan",
                 frm.doc.plan
             );
-        } else if (frm.doc.workflow_state === "Đợi PTCN duyệt") {
+        } else if (frm.doc.workflow_state === "Đợi PTCN Duyệt") {
             await notify_role(
                 "Phát triển công nghệ",
                 `LSX Tuần ${frm.doc.name} đang cần PTCN xét duyệt công nghệ`,
@@ -212,7 +193,6 @@ frappe.ui.form.on('Week Work Order Item', {
                 console.error(err);
             }
         }
-        console.log(row.scrap)
         frm.refresh_field('item');
         validate_roles(frm);
     },
@@ -229,7 +209,7 @@ frappe.ui.form.on('Week Work Order Item', {
         let row = locals[cdt][cdn];
         if (
             row.scrap != 1 &&
-            frm.doc.workflow_state === "Đợi PTCN duyệt" &&
+            frm.doc.workflow_state === "Đợi PTCN Duyệt" &&
             frm.selected_workflow_action !== "Trả về KHSX" &&
             row.bom
         ) {
@@ -244,7 +224,6 @@ frappe.ui.form.on('Week Work Order Item', {
         }
         
         if (frm.doc.workflow_state === "Đã được PTCN duyệt" && !row.bom) {
-            console.log('hi')
             frappe.model.set_value(cdt, cdn, 'bom', row.__original_bom || '');
         }
     },
@@ -309,7 +288,7 @@ function validate_roles(frm) {
             const $btn = $(this);
             $btn.empty()
         });
-    } else if (state === "Đợi PTCN duyệt") {
+    } else if (state === "Đợi PTCN Duyệt") {
         if (frappe.user_roles.includes('Phát triển công nghệ')) {
             locked_fields = item_fields.filter(f => f !== 'bom');
             $('.btn-open-row').each(function() {
@@ -338,9 +317,9 @@ function validate_roles(frm) {
                     const rowData = frm.doc.items.find(r => r.idx == rowIdx);
             
                     // Mở report BOM Search với item tương ứng
-                    frappe.set_route('query-report', 'BOM Search Custom', {
+                    frappe.set_route('query-report', 'BOM Custom Search', {
                         week_work_order: frm.doc.name,
-                        item: rowData.item
+                        item_code: rowData.item
                     });
                 });
             });
@@ -598,16 +577,34 @@ async function open_create_shift_dialog(frm) {
                 const operations = await Promise.all(
                     bom_doc.operations.map(async (op) => {
                         const operation_doc = await frappe.db.get_doc('Operation', op.operation);
+                        let custom_employee = null;
+                        let tracker = null;
+                        if (operation_doc.custom_team && operation_doc.custom_team.length === 1) custom_employee = operation_doc.custom_team[0].employee
+                        let trackers = await frappe.db.get_list('Operation Tracker', {
+                            filters: { operation: op.operation, docstatus: 1 },
+                            fields: ["name"],
+                            order_by: "creation desc",
+                            limit: 1
+                        });
+                        if (trackers.length > 0) tracker = 1
                         return {
                             operation: op.operation,
-                            // workstation: op.workstation,
-                            workstation_type: op.workstation_type,
-                            description: op.description,
+                            workstation: op.workstation,
                             time_in_mins: op.time_in_mins,
-                            // workstation: operation_doc.workstation
+                            sequence_id: op.sequence_id,
+                            custom_employee: custom_employee,
+                            custom_is_qc_tracked: tracker
                         };
                     })
                 );
+
+                for (let row of operations) {
+                    let op_doc = await frappe.db.get_doc("Operation", row.operation);
+                    if (op_doc.custom_team && op_doc.custom_team.length === 1) {
+                        frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
+                    }
+
+                }
         
                 const wo_doc = {
                     doctype: 'Work Order',
@@ -620,7 +617,7 @@ async function open_create_shift_dialog(frm) {
                     custom_shift: values.shift,
                     custom_shift_leader: values.shift_leader,
                     custom_plan: frm.doc.name,
-                    custom_worker_qty: values.worker_qty,
+                    custom_employee_count: values.worker_qty,
                     custom_plan_code: values.selected_row,
                     operations: operations
                 };

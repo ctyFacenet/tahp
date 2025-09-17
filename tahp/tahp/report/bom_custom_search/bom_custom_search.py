@@ -16,10 +16,11 @@ def execute(filters=None):
         bom_filters["item"] = filters["item_code"]
     if filters.get("custom_category"):
         bom_filters["custom_category"] = filters["custom_category"]
-    if filters.get("custom_category_materials"):
-        bom_filters["custom_category_materials"] = filters["custom_category_materials"]
+    if filters.get("custom_gyps"):
+        bom_filters["custom_gyps"] = filters["custom_gyps"]
 
     boms = frappe.db.get_all("BOM", filters=bom_filters, fields=["name", "item"])
+    indent = 0
     for bom in boms:
         doc = frappe.get_doc("BOM", bom.name)
 
@@ -30,7 +31,7 @@ def execute(filters=None):
             "item_name": frappe.get_value("Item", doc.item, "item_name") or "",
             "custom_density_normal": doc.custom_density_normal,
             "custom_category": doc.custom_category or "Không xác định",
-            "custom_category_materials": doc.custom_category_materials,
+            "custom_gyps": doc.custom_gyps,
         }
 
         for child in doc.custom_params or []:
@@ -78,24 +79,24 @@ def execute(filters=None):
     # --- Summary: đếm số BOM theo custom_category ---
     # category_counter = Counter(row["custom_category"] for row in data)
     # total_boms = len(data)
-    summary = [
+    # summary = [
     #     {"label": f"{cat}", "value": count} for cat, count in category_counter.items()
-    ]
+    # ]
     # summary.append({"label": "Tổng BOM", "value": total_boms})
 
-    # --- Chart: hiển thị số BOM theo custom_category ---
-    chart = {
-        # "data": {
-        #     "labels": list(category_counter.keys()),
-        #     "datasets": [
-        #         {
-        #             "name": "Số BOM",
-        #             "values": list(category_counter.values())
-        #         }
-        #     ]
-        # },
-        # "type": "bar"  # có thể đổi sang pie hoặc line
-    }
+    # # --- Chart: hiển thị số BOM theo custom_category ---
+    # chart = {
+    #     "data": {
+    #         "labels": list(category_counter.keys()),
+    #         "datasets": [
+    #             {
+    #                 "name": "Số BOM",
+    #                 "values": list(category_counter.values())
+    #             }
+    #         ]
+    #     },
+    #     "type": "bar"  # có thể đổi sang pie hoặc line
+    # }
 
     message = []
 
@@ -155,14 +156,12 @@ def match_value(fkey, fval, row):
 @frappe.whitelist()
 def get_columns(return_specs=False):
     """Fetch BOM để lấy specs và build columns động"""
-    raw_category = frappe.call("tahp.tahp.doctype.manufacturing_category.manufacturing_category.get")
-    categories = [''] + [item.category for item in raw_category.items]
     columns = [
-        {"label": "Hệ sản xuất", "fieldname": "custom_category", "fieldtype": "Select", "width": 110, "options": categories, "align": "center"},
-        {"label": "Công thức sản xuất (BOM)", "fieldname": "bom_name", "fieldtype": "Link", "options": "BOM", "width": 250},
-        {"label": "Mã thành phẩm", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 120},
-        {"label": "Tên thành phẩm", "fieldname": "item_name", "fieldtype": "Data", "width": 250, "align": "left"},
-        {"label": "Loại NL", "fieldname": "custom_category_materials", "fieldtype": "Data", "width": 120},
+        {"label": "Hệ sản xuất", "fieldname": "custom_category", "fieldtype": "Link", "width": 110, "options": "Manufacturing Category", "align": "center"},
+        {"label": "Công thức sản xuất (BOM)", "fieldname": "bom_name", "fieldtype": "Link", "options": "BOM", "width": 250, "freeze" : True},
+        {"label": "Mã thành phẩm", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 200},
+        {"label": "Tên thành phẩm", "fieldname": "item_name", "fieldtype": "Data", "width": 220, "align": "left"},
+        {"label": "Tên loại Gyps", "fieldname": "custom_gyps", "fieldtype": "Link", "options": "Manufacturing Category Material", "width": 110, "align": "left"},
         {"label": "Ghi chú", "fieldname": "custom_note", "fieldtype": "Data", "width": 300, "align": "left"},
         {"label": "Tỷ trọng", "fieldname": "custom_density_normal", "fieldtype": "Data", "width": 90, "align": "center"},
     ]
@@ -221,9 +220,9 @@ def get_filter_columns():
     """Lấy filters từ get_columns nhưng lược bớt field không cần"""
     columns, _, _ = get_columns(return_specs=True)
     
-    exclude = ["bom_name", "custom_category_materials","custom_note"]
+    exclude = ["bom_name", "custom_category","custom_note"]
 
-    filters = []
+    filters = [{"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1}]
     for column in columns:
         if column["fieldname"] in exclude:
             continue

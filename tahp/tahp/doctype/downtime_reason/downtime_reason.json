@@ -12,7 +12,7 @@
   {
    "fieldname": "group",
    "fieldtype": "Table",
-   "label": "C\u00e1c nh\u00f3m l\u00fd do",
+   "label": "Danh s\u00e1ch ph\u00e2n lo\u1ea1i",
    "options": "Downtime Reason Group"
   },
   {
@@ -27,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-01 16:02:14.547074",
+ "modified": "2025-09-10 10:18:37.604150",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Downtime Reason",

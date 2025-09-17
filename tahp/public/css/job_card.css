@@ -131,6 +131,15 @@
     /* max-width: 3.5ch; */
 }
 
+.jc-tb-mobile-value-new {
+    font-size: 1.25rem;
+    padding: 5px 10px;
+    max-width: 10ch;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
 .jc-edit-editing {
     font-size: 1.25rem;
     padding: 5px 10px;

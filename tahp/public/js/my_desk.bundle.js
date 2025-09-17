@@ -5,3 +5,6 @@ import "./tahp/ui/page.js";
 import "./tahp/ui/page.html";
 import "./tahp/custom/workspace.js";
 import "./tahp/custom/link.js";
+import "./tahp/views/reports/report_view.js";
+import "./tahp/views/reports/query_report.js";
+import "./tahp/custom/report.js";

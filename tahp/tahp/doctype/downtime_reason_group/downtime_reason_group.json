@@ -14,13 +14,13 @@
    "fieldname": "group_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "T\u00ean nh\u00f3m"
+   "label": "T\u00ean ph\u00e2n lo\u1ea1i"
   },
   {
    "fieldname": "group_code",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "M\u00e3 nh\u00f3m",
+   "label": "M\u00e3 ph\u00e2n lo\u1ea1i",
    "unique": 1
   }
  ],
@@ -28,7 +28,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-01 16:56:35.999323",
+ "modified": "2025-09-10 10:17:58.022077",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Downtime Reason Group",

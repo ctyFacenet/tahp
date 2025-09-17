@@ -22,31 +22,32 @@ frappe.ui.form.on('WWO Plan', {
     }
 });
 
-// frappe.ui.form.on('WWO Plan Item', {
-//     form_render: function(frm, cdt, cdn) {
-//         const row = locals[cdt][cdn];
-//         console.log(row)
-//         // Đổi các field thành link
-//         // setTimeout(() => {
-//         //     const rowWrapper = $(`[data-idx="${row.idx}"]`);
+frappe.ui.form.on('WWO Plan Item', {
+    form_render: function(frm, cdt, cdn) {
+        const row = locals[cdt][cdn];
 
-//         //     // Ghi đè WWO
-//         //     const wwoField = rowWrapper.find(`[data-fieldname="wwo"] .control-value`);
-//         //     if (row.wwo && wwoField.length) {
-//         //         wwoField.html(`<a href="/app/week-work-order/${row.wwo}" target="_blank">${row.wwo}</a>`);
-//         //     }
-//         //     // Ghi đè Item
-//         //     const itemField = rowWrapper.find(`[data-fieldname="item"] .control-value`);
-//         //     if (row.item && itemField.length) {
-//         //         itemField.html(`<a href="/app/item/${row.item}" target="_blank">${row.item}</a>`);
-//         //     }
+        // Đổi các field thành link
+        setTimeout(() => {
+            const rowWrapper = $(`[data-idx="${row.idx}"]`);
 
-//         //     // Ghi đè BOM
-//         //     const bomField = rowWrapper.find(`[data-fieldname="bom"] .control-value`);
-//         //     if (row.bom && bomField.length) {
-//         //         bomField.html(`<a href="/app/bom/${row.bom}" target="_blank">${row.bom}</a>`);
-//         //     }
-//         // }, 100);
+            // Ghi đè WWO
+            const wwoField = rowWrapper.find(`[data-fieldname="wwo"] .control-value`);
+            if (row.wwo && wwoField.length) {
+                wwoField.html(`<a href="/app/week-work-order/${row.wwo}" target="_blank">${row.wwo}</a>`);
+            }
+
+            // Ghi đè Item
+            const itemField = rowWrapper.find(`[data-fieldname="item"] .control-value`);
+            if (row.item && itemField.length) {
+                itemField.html(`<a href="/app/item/${row.item}" target="_blank">${row.item}</a>`);
+            }
+
+            // Ghi đè BOM
+            const bomField = rowWrapper.find(`[data-fieldname="bom"] .control-value`);
+            if (row.bom && bomField.length) {
+                bomField.html(`<a href="/app/bom/${row.bom}" target="_blank">${row.bom}</a>`);
+            }
+        }, 100);
         
 //         if (!frappe.user_roles.includes("Giám đốc")) return;
 //         // Phần hiển thị nút nếu "Đợi GĐ duyệt"
@@ -88,30 +89,13 @@ frappe.ui.form.on('WWO Plan', {
 // });
 
 function setup_ui(frm) {
-    // Giao diện rộng và ẩn các thành phần không cần thiết
-    document.body.classList.add('full-width');
-    // $('.col-lg-2.layout-side-section, .sidebar-toggle-btn, .btn-open-row').hide();
-    // $('.sidebar-toggle-placeholder').click();
-    $('.btn-open-row, .form-message-container').hide();
+    $(frm.page.wrapper).find('.btn-open-row, .form-message-container').hide();
     frm.page.btn_primary.hide();
-    const sidebar = document.querySelector('.col-lg-2.layout-side-section');
-    const toggleBtn = document.querySelector('.sidebar-toggle-icon');
-    if (sidebar && toggleBtn && getComputedStyle(sidebar).display !== 'none') {
-        if (window.innerWidth > 768) {
-            toggleBtn.click();
-        }
-    }
-
-    // Cấm can thiệp vào bảng
-    frm.set_df_property('items', 'cannot_add_rows', false);
-    frm.set_df_property('items', 'cannot_delete_rows', false);
-    frm.set_df_property('items', 'cannot_delete_all_rows', false);
-    frm.set_df_property('items', 'cannot_edit_rows', false);
-    frm.set_df_property('items', 'read_only', false);
-    frm.set_df_property('items', 'in_place_edit', false);
-    frm.add_custom_button('Thêm phương án LSX', () => add_wwo(frm)).addClass("btn-primary");
-   // $('.col.grid-static-col.d-flex.justify-content-center').css({'visibility':'hidden'});
-    console.log(frm)
+    frm.set_df_property('items', 'cannot_add_rows', true);
+    frm.set_df_property('items', 'cannot_delete_rows', true);
+    frm.set_df_property('items', 'cannot_delete_all_rows', true);
+    frm.set_df_property('items', 'cannot_edit_rows', true);
+    frm.set_df_property('items', 'read_only', true);
 }
 
 function add_wwo(frm) {
@@ -196,8 +180,8 @@ function setup_hook(frm) {
 
     if (window.innerWidth > 768) {
         setTimeout(() => {
-            $('.rows').css('pointer-events', 'none');
-            $('.rows .btn').css('pointer-events', 'auto');
+            $(frm.page.wrapper).find('.rows').css('pointer-events', 'none');
+            $(frm.page.wrapper).find('.rows .btn').css('pointer-events', 'auto');
             setup_bom_tooltip_events();
             setup_item_tooltip_events();
             setup_wwo_link_events();
@@ -227,7 +211,7 @@ async function generate_data(frm, week) {
     else {
         frappe.model.clear_table(frm.doc, 'items');
         week.forEach(week => {
-            week.items.forEach(async function(row, index) {
+            week.items.forEach((row, index) => {
                 frm.add_child('items', {
                     wwo: index === 0 ? week.name : "",
                     approved: index === 0 ? week.workflow_state : "",
@@ -246,7 +230,6 @@ async function generate_data(frm, week) {
 }
 
 async function setup_button(frm) {
-    console.log('setup_button', window.innerWidth)
     if (window.innerWidth <= 768) return;
     if (!frappe.user_roles.includes("Giám đốc")) {
         return};
@@ -333,7 +316,6 @@ async function setup_note(frm) {
                     $cell.attr('data-tooltip-content', note);
                 })
                 .catch(err => {
-                    console.warn(`Không thể lấy note từ WWO ${wwo}:`, err);
                     $cell.find('.static-area').text('Xem ghi chú');
                     $cell.attr('data-tooltip-content', 'Không có ghi chú');
                 });
@@ -428,7 +410,6 @@ async function process_wwo_mobile(frm, wwo, state, message, alert_message, role,
                 $('.modal').off('hide.bs.modal');
                 dialog.hide();
             } catch (error) {
-                console.error("Lỗi xử lý:", error);
                 frappe.msgprint("Đã xảy ra lỗi khi xử lý. Vui lòng thử lại.");
             }
         },

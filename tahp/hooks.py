@@ -12,12 +12,13 @@ fixtures = [
     {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
-    {"doctype": "Workflow Action"},
+    {"doctype": "Workflow Action Master"},
     {"doctype": "Workspace"},
     {"doctype": "Website Settings"},
     {"doctype": "System Settings"},
     {"doctype": "Custom HTML Block"},
     {"doctype": "Downtime Reason"},
+    {"doctype": "Role Profile"},
 ]
 
 # required_apps = []
@@ -41,18 +42,29 @@ app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
+    "/assets/tahp/css/report.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
-    "override.bundle.js",
     "/assets/tahp/js/tahp/form/controls/datepicker_i18n.js",
     "/assets/tahp/js/tahp/form/controls/date.js",
     "/assets/tahp/js/customize_form/fast_export.js",
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
+
+    # "/assets/tahp/js/work_order/work_order.js",
+    # "/assets/tahp/js/item/item.js",
+    # "/assets/tahp/js/stock_entry/stock_entry.js",
+    # "/assets/tahp/js/operation/operation.js",
+    # "/assets/tahp/js/routing/routing.js",
+    # "/assets/tahp/js/bom/bom.js",
+    # "/assets/tahp/js/warehouse/warehouse.js",
+    # "/assets/tahp/js/job_card/job_card.js",
+    # "/assets/tahp/js/employee/employee.js",
+    # "/assets/tahp/js/workstation/workstation.js",
 ]
 
 # include js, css files in header of web template
@@ -76,16 +88,16 @@ web_include_css = [
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 
 doctype_js = {
-    "Work Order": ["/public/js/work_order/work_order.js"],
-    "Item": ["/public/js/item/item.js"],
-    "Stock Entry": ["/public/js/stock_entry/stock_entry.js"],
-    "Operation": ["/public/js/operation/operation.js"],
-    "Routing": ["/public/js/routing/routing.js"],
-    "BOM": ["/public/js/bom/bom.js"],
-    "Warehouse": ["/public/js/warehouse/warehouse.js"],
-    "Job Card": ["/public/js/job_card/job_card.js"],
-    "Employee": ["/public/js/employee/employee.js"],
-    "Workstation": ["/public/js/workstation/workstation.js"]
+    "Work Order": "/public/js/work_order/work_order.js",
+    "Item": "/public/js/item/item.js",
+    "Stock Entry": "/public/js/stock_entry/stock_entry.js",
+    "Operation": "/public/js/operation/operation.js",
+    "Routing": "/public/js/routing/routing.js",
+    "BOM": "/public/js/bom/bom.js",
+    "Warehouse": "/public/js/warehouse/warehouse.js",
+    "Job Card": "/public/js/job_card/job_card.js",
+    "Employee": "/public/js/employee/employee.js",
+    "Workstation": "/public/js/workstation/workstation.js"
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -93,7 +105,8 @@ doctype_js = {
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
 doctype_list_js = {
-    "Workstation": ["public/js/workstation/workstation_list.js"]
+    "Workstation": ["public/js/workstation/workstation_list.js"],
+    "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
 }
 
 # doctype_js = {
@@ -220,6 +233,12 @@ doc_events = {
         ],
         "before_insert": [
             "tahp.doc_events.stock_entry.before_insert.before_insert"
+        ],
+        "on_submit": [
+            "tahp.doc_events.stock_entry.on_submit.on_submit"
+        ],
+        "before_submit": [
+            "tahp.doc_events.stock_entry.before_submit.before_submit"
         ]
     },
     "Operation": {
@@ -233,6 +252,12 @@ doc_events = {
         ],
         "before_save": [
             "tahp.doc_events.work_order.before_save.before_save"
+        ],
+        "on_submit": [
+            "tahp.doc_events.work_order.on_submit.on_submit"
+        ],
+        "after_insert": [
+            "tahp.doc_events.work_order.after_insert.after_insert"
         ]
     },
     "Workstation": {

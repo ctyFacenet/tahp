@@ -18,7 +18,7 @@
  ],
  "fields": [
   {
-   "columns": 1,
+   "columns": 2,
    "fieldname": "item",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -27,7 +27,7 @@
    "reqd": 1
   },
   {
-   "columns": 1,
+   "columns": 2,
    "fieldname": "bom",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -97,7 +97,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-21 16:57:59.940918",
+ "modified": "2025-09-07 18:59:38.934635",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order Item",

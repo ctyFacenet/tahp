@@ -1,31 +1,42 @@
 frappe.query_reports["BOM Custom Search"] = {
+    filters: [
+        {"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1},
+        {"fieldname": "item_code", "label": "Item", "fieldtype": "Data","hidden": 1},
+    ],
     onload: async function(report) {
-        injectDatatableCSS();
         report.page.set_title("Tìm kiếm BOM");
+        injectDatatableCSS(report);
+
+        const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
+        if (res?.message) {
+            res.message.forEach(f => {
+                if (f.fieldname === 'week_work_order') {
+                    f.default = report.get_filter_value('week_work_order');
+                }
+                if (f.fieldname === 'item_code') {
+                    f.default = report.get_filter_value('item_code');
+                }
+            });
+            frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(report, () => merge_columns(report)));
+        }
 
         // Override refresh
         const original_refresh = report.refresh;
         report.refresh = function() {
             original_refresh.apply(this, arguments);
-            waitForDataTableReady(() => {
-                merge_columns();
+            waitForDataTableReady(report, () => {
+                merge_columns(report);
                 setTimeout(() => {
-                    $('.dt-row.vrow').last().find('.dt-cell__content')
+                    report.page.wrapper.find('.dt-row.vrow').last().find('.dt-cell__content')
                         .css('border-bottom', '1px solid #dcdcdc');
                 }, 0);
-                selectBOM(report)
+                selectBOM(report);
             });
         };
 
-        // Load filter columns  
-        const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
-        if (res?.message) {
-            frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(() => merge_columns()));
-        }
-
         report.page.add_inner_button(__('Tạo BOM mới'), function() {
             frappe.new_doc('BOM', {
-                item: report.get_filter_value('item')
+                item: report.get_filter_value('item_code')
             })
             
             frappe.ui.form.on('BOM', {
@@ -43,53 +54,72 @@ frappe.query_reports["BOM Custom Search"] = {
         const base = default_formatter(value, row, column, data);
         return `<div class="d-flex justify-content-between align-items-center w-100 px-2">
                     ${base}
-                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 17px">Chọn</button>
+                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 15px;white-space:nowrap;">Chọn</button>
                 </div>`;
     },
 
     get_datatable_options(options) {
-        return { ...options, cellHeight: 50 };
+        return { ...options, cellHeight: 40 };
     }
 };
 
-// ----------------------- Utility Functions -----------------------
-
-function injectDatatableCSS() {
+function injectDatatableCSS(report) {
+    if (report.page.title != "Tìm kiếm BOM") return;
+    const wrapper = report.page.wrapper;
+    wrapper.find(".dt-row.dt-row-header").css({"pointer-events":"none"});
     if ($('#custom-dt-style').length) return;
+    
     const style = document.createElement('style');
     style.id = 'custom-dt-style';
     style.innerHTML = `
-        .dt-row-header .dt-cell__content { padding-inline: 0 !important; }
-        .dt-scrollable .dt-cell__content { display: flex !important; align-items: center; justify-content: center; word-break: break-word; white-space: normal; text-overflow: ellipsis; overflow: hidden;padding-block:0px;}
-        .dt-scrollable .dt-cell--col-6 .dt-cell__content {
-            align-items: flex-start;
+        #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-6 .dt-cell__content { align-items: flex-start; }
+        #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-3 .dt-cell__content { align-items: flex-start; }
+        #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-4 .dt-cell__content { justify-content: flex-start; }
+        #${wrapper.attr("id")} .dt-cell.dt-cell--header .dt-cell__content {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
         }
-        .dt-scrollable .dt-cell--col-4 .dt-cell__content {
-            justify-content: flex-start;
+        #${wrapper.attr("id")} .dt-cell--col-2 .dt-cell__content a {
+            flex: 0 0 75%;
+            max-width: 75%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        #${wrapper.attr("id")} .dt-cell--col-2 .dt-cell__content button {
+            flex: 0 0 25%;
+            max-width: 25%;
+            text-align: center;
+            white-space: nowrap;
         }
     `;
-    document.head.appendChild(style);
+
+    // append trực tiếp vào wrapper thay vì head
+    wrapper.append(style);
 }
 
-function waitForDataTableReady(callback) {
+
+function waitForDataTableReady(report, callback) {
+    const wrapper = report.page.wrapper[0];
     const observer = new MutationObserver((mutations, obs) => {
-        if ($('.dt-header').length && $('.dt-row-header').length) {
+        if (report.page.wrapper.find('.dt-header').length && report.page.wrapper.find('.dt-row-header').length) {
             obs.disconnect();
             callback();
         }
     });
-    observer.observe(document.querySelector('.report-wrapper') || document.body, { childList: true, subtree: true });
+    observer.observe(wrapper.querySelector('.report-wrapper') || wrapper, { childList: true, subtree: true });
 }
 
-function merge_columns() {
-    const dtHeader = $('.dt-header');
+function merge_columns(report) {
+    const wrapper = report.page.wrapper;
+    const dtHeader = wrapper.find('.dt-header');
     dtHeader.css('width', 'fit-content');
     dtHeader.find('.dt-row-header-clone, .dt-row-filter').remove();
-    $('.report-footer').hide();
+    wrapper.find('.report-footer').hide();
 
-    const dtRowHeader = $('.dt-row-header');
-    dtRowHeader.find('.dt-cell__content').addClass('text-center font-weight-bold');
-
+    const dtRowHeader = wrapper.find('.dt-row-header');
     const newRow = dtRowHeader.clone().addClass('dt-row-header-clone');
 
     const groups = { in: [], out: [] };
@@ -135,9 +165,6 @@ function selectBOM(report) {
     report.page.wrapper.off('click', '.select-bom').on('click', '.select-bom', async e => {
         const bomName = e.currentTarget.dataset.bom;
         const itemCode = e.currentTarget.dataset.item;
-        msgprint(`BOM: ${bomName} - Mặt hàng: ${itemCode}`)
-        return;
-
         try {
             const docname = report.get_filter_value('week_work_order');
             if (!docname) return frappe.show_alert({ message: 'Không xác định được LSX', indicator: 'red' });

@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-09 08:59:32.676410",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "workstation",
+  "status",
+  "heading"
+ ],
+ "fields": [
+  {
+   "columns": 6,
+   "fieldname": "workstation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Thi\u1ebft b\u1ecb",
+   "read_only": 1
+  },
+  {
+   "columns": 4,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "\nH\u1ecfng\nB\u00ecnh th\u01b0\u1eddng"
+  },
+  {
+   "default": "0",
+   "fieldname": "heading",
+   "fieldtype": "Check",
+   "hidden": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-09 09:59:33.664378",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Workstation Inspection Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

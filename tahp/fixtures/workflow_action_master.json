@@ -1,0 +1,79 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-08-07 20:24:40.524744",
+  "name": "Approve",
+  "workflow_action_name": "Approve"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-08-07 20:24:40.525460",
+  "name": "Reject",
+  "workflow_action_name": "Reject"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-08-07 20:24:40.526485",
+  "name": "Review",
+  "workflow_action_name": "Review"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:05.744985",
+  "name": "Bàn Giao",
+  "workflow_action_name": "Bàn Giao"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:14.320069",
+  "name": "Nhận bàn giao",
+  "workflow_action_name": "Nhận bàn giao"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:43.517625",
+  "name": "Gửi PTCN",
+  "workflow_action_name": "Gửi PTCN"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:06.529842",
+  "name": "Hủy trình",
+  "workflow_action_name": "Hủy trình"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:16.313543",
+  "name": "Trả về PTCN",
+  "workflow_action_name": "Trả về PTCN"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:48.039604",
+  "name": "Gửi KHSX",
+  "workflow_action_name": "Gửi KHSX"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:54.383149",
+  "name": "Trả về KHSX",
+  "workflow_action_name": "Trả về KHSX"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:01.412193",
+  "name": "Gửi GĐ",
+  "workflow_action_name": "Gửi GĐ"
+ }
+]

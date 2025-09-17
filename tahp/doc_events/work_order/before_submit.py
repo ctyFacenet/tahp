@@ -1,9 +1,11 @@
 import frappe
+from tahp.doc_events.work_order.work_order_api import execute_shift_handover
 
 def before_submit(doc, method):
     check_shift_leader(doc)
     check_workstation(doc)
     warn_workstation(doc)
+    execute_shift_handover(doc)
     doc.status = "In Process"
 
 def check_shift_leader(doc):
@@ -174,6 +176,24 @@ def add_input(work_order):
                     "s_warehouse": warehouse,
                     "description": "Phụ gia tiêu hao trong SX"
                 })
+
+    bom_no = frappe.db.get_value("Work Order", work_order, "bom_no")
+    bom_doc = frappe.get_doc("BOM", bom_no)
+    if bom_doc.custom_sub_items:
+        for row in bom_doc.custom_sub_items:
+            item_group = frappe.db.get_value("Item", row.item_code, "item_group")
+            warehouse = frappe.db.get_value(
+                "Item Default",
+                {"parent": item_group},
+                "default_warehouse"
+            )
+            result.append({
+                "item_code": row.item_code,
+                "item_name": row.item_name,
+                "uom": row.stock_uom,
+                "t_warehouse": warehouse,
+                "description": "Phụ phẩm trong SX"
+            })
 
     return result
 
