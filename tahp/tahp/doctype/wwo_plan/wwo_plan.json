@@ -35,7 +35,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-08 14:42:22.021693",
+ "modified": "2025-09-16 11:46:24.647788",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "WWO Plan",
@@ -55,7 +55,6 @@
    "write": 1
   },
   {
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -64,9 +63,7 @@
    "read": 1,
    "report": 1,
    "role": "All",
-   "select": 1,
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],
