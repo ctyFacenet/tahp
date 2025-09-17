@@ -148,16 +148,27 @@ async function set_code(frm) {
     const start_date = `${year}-${month}-01`;
     const end_date = `${year}-${month}-${lastDay}`;
 
+    // Lấy bản ghi mới nhất theo custom_code
     const entries = await frappe.db.get_list("Stock Entry", {
         filters: [
             ["stock_entry_type", "=", frm.doc.stock_entry_type],
             ["posting_date", ">=", start_date],
-            ["posting_date", "<=", end_date]
+            ["posting_date", "<=", end_date],
+            ["custom_code", "like", `${code}.${year}.${month}.%`]
         ],
-        fields: ["name"]
+        fields: ["custom_code"],
+        order_by: "custom_code desc",
+        limit: 1
     });
 
-    const index = entries.length + 1;
-    const custom_code = `${code}.${year}.${month}.${String(index).padStart(4, '0')}`;
+    let next_index = 1;
+    if (entries.length > 0 && entries[0].custom_code) {
+        const last_code = entries[0].custom_code;
+        const parts = last_code.split(".");
+        const last_number = parseInt(parts[3] || "0", 10);
+        next_index = last_number + 1;
+    }
+
+    const custom_code = `${code}.${year}.${month}.${String(next_index).padStart(4, '0')}`;
     frm.set_value('custom_code', custom_code);
 }

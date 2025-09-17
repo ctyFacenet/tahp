@@ -3,6 +3,9 @@ frappe.ui.form.on('Work Order', {
         frm.set_intro("");
         await finish_button(frm);
     },
+    onload: async function(frm) {
+        await autofill_items(frm);
+    },
     bom_no: async function(frm) {
         await autofill_items(frm);
     }
