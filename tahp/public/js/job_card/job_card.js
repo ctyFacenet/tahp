@@ -1214,7 +1214,7 @@ frappe.ui.form.on('Job Card', {
             }
 
             let filtered = items.filter(i => i.group_name === group_name && i.operation === ws);
-            if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name);
+            if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
 
             if (filtered.length > 0) {
                 reason_field.wrapper.style.display = '';
@@ -1323,7 +1323,7 @@ frappe.ui.form.on('Job Card', {
                         fieldname: "reason",
                         label: __("Lý do dừng"),
                         fieldtype: "Select",
-                        options: [""],
+                        options: items.map(i => i.reason),
                         in_place_edit: 1
                     },
                     {
@@ -1370,9 +1370,8 @@ frappe.ui.form.on('Job Card', {
                     return;
                 }
 
-                // lọc lý do theo group, ưu tiên theo operation nếu trùng
                 let filtered = items.filter(i => i.group_name === group_name && ws_list.includes(i.operation));
-                if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name);
+                if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
 
                 if (filtered.length > 0) {
                     reason_field.wrapper.style.display = '';
