@@ -27,24 +27,28 @@ const props = defineProps({
 
     <ListView :columns="columns" :rows="rows" :row-key="rowKey">
       <template #group-header="{ group }">
-        <div
-          class="flex items-center justify-between cursor-pointer bg-gray-100 px-2 py-1 font-semibold"
-          @click="group.collapsed = !group.collapsed"
-        >
-          <span>{{ group.group }} ({{ group.rows.length }})</span>
-        </div>
+        <slot name="group-header" :group="group">
+          <div
+            class="flex items-center justify-between cursor-pointer bg-gray-100 px-2 py-1 font-semibold"
+            @click="group.collapsed = !group.collapsed"
+          >
+            <span>{{ group.group }} ({{ group.rows.length }})</span>
+          </div>
+        </slot>
       </template>
 
       <template #cell="{ item, column }">
-        <span v-if="column.key === 'status'">
-          <span
-            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-            :class="item === 'Tắt' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
-          >
-            ● {{ item }}
+        <slot name="cell" :item="item" :column="column">
+          <span v-if="column.key === 'status'">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+              :class="item === 'Off' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
+            >
+              ● {{ item }}
+            </span>
           </span>
-        </span>
-        <span v-else>{{ item }}</span>
+          <span v-else>{{ item }}</span>
+        </slot>
       </template>
     </ListView>
   </div>

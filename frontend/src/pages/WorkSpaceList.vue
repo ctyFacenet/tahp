@@ -1,53 +1,58 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { call } from 'frappe-ui'
+import { call } from 'frappe-ui' 
 import GroupedListView from '@/components/GroupedListView.vue'
 
-const columns = [
-  { label: 'ID', key: 'id' },
-  { label: 'Loại thiết bị', key: 'type' },
-  { label: 'Trạng thái', key: 'status' },
-  { label: 'Là cụm thiết bị', key: 'is_dev_cluster' },
-  { label: 'Thuộc về cụm thiết bị cha', key: 'is_dev_cluster_parent' },
-]
-
+const columns = ref([])
 const grouped_rows = ref([])
 
-async function fetchData() {
+async function loadData() {
   try {
-    const res = await call('tahp.doc_events.workstation.workstation.get_workstation_details', {
-      input: 'workspace-dashboard',
+    const res = await call('frappe.client.get_list', {
+      doctype: 'Workstation',
+      fields: ['name', 'workstation_type', 'status', 'custom_is_parent', 'custom_parent'],
+      limit_page_length: 50
     })
 
-    if (res) {
-      const grouped = {}
+    if (res && res.length > 0) {
+      const defaultCols = [
+        { label: 'ID', key: 'name' },
+        { label: 'Trạng thái', key: 'status' },
+      ]
 
-      res.forEach((item) => {
-        const groupName = item.cluster_name || 'Cụm khác'
+      const dynamicCols = Object.keys(res[0])
+        .filter(k => k !== 'name' && k !== 'status')
+        .map(k => ({
+          label: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+          key: k,
+        }))
+
+      columns.value = [...defaultCols, ...dynamicCols]
+      
+      const grouped = {}
+      res.forEach(item => {
+        const groupName = item.workstation_type || 'Cụm khác'
         if (!grouped[groupName]) {
           grouped[groupName] = {
             group: groupName,
             collapsed: false,
-            rows: [],
+            rows: []
           }
         }
         grouped[groupName].rows.push({
-          id: item.workstation_name || item.name,
-          type: item.item_code || item.operation || 'Không rõ',
-          status: item.status === 'off' ? 'Tắt' : 'Bật',
-          is_dev_cluster: 'Có',
-          is_dev_cluster_parent: 'Có',
+          ...item,
+          id: item.name
         })
       })
 
       grouped_rows.value = Object.values(grouped)
     }
   } catch (err) {
-    console.error('Lỗi khi gọi API:', err)
+    console.error('❌ Lỗi khi load:', err)
   }
 }
 
-onMounted(fetchData)
+onMounted(loadData)
 </script>
 
 <template>
@@ -56,5 +61,27 @@ onMounted(fetchData)
     :columns="columns"
     :rows="grouped_rows"
     row-key="id"
-  />
+  >
+    <template #cell="{ item, column }">
+      <span v-if="column.key === 'status'">
+        <span
+          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+          :class="item === 'Off' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
+        >
+          ● {{ item }}
+        </span>
+      </span>
+
+      <span v-else-if="column.key === 'custom_is_parent'">
+        <input
+          type="checkbox"
+          class="w-4 h-4 text-gray-500 rounded-sm cursor-not-allowed accent-gray-600"
+          :checked="item == 1"
+          disabled
+        />
+      </span>
+
+      <span v-else>{{ item }}</span>
+    </template>
+  </GroupedListView>
 </template>
