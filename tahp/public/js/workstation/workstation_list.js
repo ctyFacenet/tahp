@@ -1,130 +1,144 @@
-frappe.listview_settings['Workstation'] = {
-  refresh: async function (listview) {
-    frappe.custom_utils_primary_action(listview, '+ Tạo nhanh', async () => {
-      create_workstations(listview);
-    });
+// frappe.listview_settings['Workstation'] = {
+//   refresh: async function (listview) {
+//     frappe.custom_utils_primary_action(listview, '+ Tạo nhanh', async () => {
+//       create_workstations(listview);
+//     });
 
+//     listview.page.clear_inner_toolbar();
+//     listview.page.set_title("Dashboard giám sát tổng quan máy");
+
+//     $(listview.page.body).html(`
+//       <div class="custom-ws-wrapper">
+//         <div id="ws-summary-wrapper" class="mt-3"></div>
+//         <div class="row" id="ws-cards"></div>
+//         <div class="d-flex justify-content-between align-items-center mt-2 custom-footer">
+//           <div>
+//             <select id="ws-page-size" class="form-select form-select-sm">
+//               <option value="10">10/Trang</option>
+//               <option value="20">20/Trang</option>
+//               <option value="50">50/Trang</option>
+//               <option value="100">100/Trang</option>
+//             </select>
+//           </div>
+//           <div class="pagination-wrapper"></div>
+//           <div class="d-flex align-items-center gap-2">
+//             <span class="mr-2">Đi đến trang</span>
+//             <input type="number" id="ws-goto-page" class="form-control form-control-sm" style="width:80px;">
+//           </div>
+//         </div>
+
+
+//         <div class="text-center text-muted small mt-2">
+//           ©Copyright FaceNet. All Rights Reserved. Designed by FaceNet
+//         </div>
+//       </div>
+//     `);
+//     let page_size = 10,
+//       current_page = 1,
+//       total_count = 0,
+//       all_data = [];
+
+//     // load data workstation
+//     function load_ws_data(page) {
+//       frappe.call({
+//         method: "tahp.doc_events.workstation.workstation.get_workstation_details",
+//         args: { input: "workspace-dashboard" }
+//       }).then(r => {
+//         if (r.message) {
+//           all_data = r.message;
+//           total_count = all_data.length;
+//           let start = (page - 1) * page_size;
+//           let paginated = all_data.slice(start, start + page_size);
+
+//           render_ws_summary(all_data);
+//           render_ws_cards(paginated);
+//           renderPagination(page, Math.ceil(total_count / page_size), total_count);
+
+//           $("#ws-cards").off("click", ".ws-card-body");
+//           $("#ws-cards").on("click", ".ws-card-body", function () {
+//             let ws_name = $(this).closest(".ws-card").attr("data-name");
+//             show_machine_modal(ws_name);
+//           });
+//         }
+//       });
+//     }
+
+//     function renderPagination(current_page, total_pages, total_count) {
+//       let html = `<span>Trang số ${current_page} của ${total_pages} (${total_count} bản ghi)</span>`;
+//       html += `<ul class="pagination">`;
+//       html += `<li><a href="#" class="page-link prev ${current_page === 1 ? "disabled" : ""}">&lt;</a></li>`;
+
+//       let start = Math.max(1, current_page - 2);
+//       let end = Math.min(total_pages, current_page + 2);
+
+//       if (start > 1) {
+//         html += `<li><a href="#" class="page-link">1</a></li>`;
+//         if (start > 2) html += `<li><span class="page-ellipsis">...</span></li>`;
+//       }
+
+//       for (let i = start; i <= end; i++) {
+//         html += `<li><a href="#" class="page-link ${i === current_page ? "active" : ""}">${i}</a></li>`;
+//       }
+
+//       if (end < total_pages) {
+//         if (end < total_pages - 1) html += `<li><span class="page-ellipsis">...</span></li>`;
+//         html += `<li><a href="#" class="page-link">${total_pages}</a></li>`;
+//       }
+
+//       html += `<li><a href="#" class="page-link next ${current_page === total_pages ? "disabled" : ""}">&gt;</a></li>`;
+//       html += `</ul>`;
+
+//       $(".pagination-wrapper").html(html);
+//     }
+
+//     $(listview.page.body).on("change", "#ws-page-size", (e) => {
+//       page_size = parseInt($(e.target).val());
+//       current_page = 1;
+//       load_ws_data(current_page);
+//     });
+
+//     $(document).on("click", ".pagination .page-link", function (e) {
+//       e.preventDefault();
+//       let text = $(this).text();
+//       if ($(this).hasClass("disabled")) return;
+
+//       let total_pages = Math.ceil(total_count / page_size);
+//       if (text === "<") {
+//         if (current_page > 1) current_page--;
+//       } else if (text === ">") {
+//         if (current_page < total_pages) current_page++;
+//       } else {
+//         current_page = parseInt(text);
+//       }
+//       load_ws_data(current_page);
+//     });
+
+//     $(listview.page.body).on("keypress", "#ws-goto-page", (e) => {
+//       if (e.which === 13) {
+//         let total_pages = Math.ceil(total_count / page_size);
+//         let target = parseInt($(e.target).val());
+//         if (target >= 1 && target <= total_pages) {
+//           current_page = target;
+//           load_ws_data(current_page);
+//         } else frappe.msgprint(`Số trang không hợp lệ (1 - ${total_pages})`);
+//       }
+//     });
+
+//     load_ws_data(current_page);
+//   }
+// };
+
+
+frappe.listview_settings['Workstation'] = {
+  refresh: function (listview) {
     listview.page.clear_inner_toolbar();
-    listview.page.set_title("Dashboard giám sát tổng quan máy");
+    listview.page.set_title("Thiết bị / Cụm thiết bị");
 
     $(listview.page.body).html(`
-      <div class="custom-ws-wrapper">
-        <div id="ws-summary-wrapper" class="mt-3"></div>
-        <div class="row" id="ws-cards"></div>
-        <div class="d-flex justify-content-between align-items-center mt-2 custom-footer">
-          <div>
-            <select id="ws-page-size" class="form-select form-select-sm">
-              <option value="10">10/Trang</option>
-              <option value="20">20/Trang</option>
-              <option value="50">50/Trang</option>
-              <option value="100">100/Trang</option>
-            </select>
-          </div>
-          <div class="pagination-wrapper"></div>
-          <div class="d-flex align-items-center gap-2">
-            <span class="mr-2">Đi đến trang</span>
-            <input type="number" id="ws-goto-page" class="form-control form-control-sm" style="width:80px;">
-          </div>
-        </div>
-
-
-        <div class="text-center text-muted small mt-2">
-          ©Copyright FaceNet. All Rights Reserved. Designed by FaceNet
-        </div>
-      </div>
+      <iframe src="/frontend/workspace/list" 
+        style="width:100%;height:calc(100vh - 120px);border:none;">
+      </iframe>
     `);
-    let page_size = 10,
-      current_page = 1,
-      total_count = 0,
-      all_data = [];
-
-    // load data workstation
-    function load_ws_data(page) {
-      frappe.call({
-        method: "tahp.doc_events.workstation.workstation.get_workstation_details",
-        args: { input: "workspace-dashboard" }
-      }).then(r => {
-        if (r.message) {
-          all_data = r.message;
-          total_count = all_data.length;
-          let start = (page - 1) * page_size;
-          let paginated = all_data.slice(start, start + page_size);
-
-          render_ws_summary(all_data);
-          render_ws_cards(paginated);
-          renderPagination(page, Math.ceil(total_count / page_size), total_count);
-
-          $("#ws-cards").off("click", ".ws-card-body");
-          $("#ws-cards").on("click", ".ws-card-body", function () {
-            let ws_name = $(this).closest(".ws-card").attr("data-name");
-            show_machine_modal(ws_name);
-          });
-        }
-      });
-    }
-
-    function renderPagination(current_page, total_pages, total_count) {
-      let html = `<span>Trang số ${current_page} của ${total_pages} (${total_count} bản ghi)</span>`;
-      html += `<ul class="pagination">`;
-      html += `<li><a href="#" class="page-link prev ${current_page === 1 ? "disabled" : ""}">&lt;</a></li>`;
-
-      let start = Math.max(1, current_page - 2);
-      let end = Math.min(total_pages, current_page + 2);
-
-      if (start > 1) {
-        html += `<li><a href="#" class="page-link">1</a></li>`;
-        if (start > 2) html += `<li><span class="page-ellipsis">...</span></li>`;
-      }
-
-      for (let i = start; i <= end; i++) {
-        html += `<li><a href="#" class="page-link ${i === current_page ? "active" : ""}">${i}</a></li>`;
-      }
-
-      if (end < total_pages) {
-        if (end < total_pages - 1) html += `<li><span class="page-ellipsis">...</span></li>`;
-        html += `<li><a href="#" class="page-link">${total_pages}</a></li>`;
-      }
-
-      html += `<li><a href="#" class="page-link next ${current_page === total_pages ? "disabled" : ""}">&gt;</a></li>`;
-      html += `</ul>`;
-
-      $(".pagination-wrapper").html(html);
-    }
-
-    $(listview.page.body).on("change", "#ws-page-size", (e) => {
-      page_size = parseInt($(e.target).val());
-      current_page = 1;
-      load_ws_data(current_page);
-    });
-
-    $(document).on("click", ".pagination .page-link", function (e) {
-      e.preventDefault();
-      let text = $(this).text();
-      if ($(this).hasClass("disabled")) return;
-
-      let total_pages = Math.ceil(total_count / page_size);
-      if (text === "<") {
-        if (current_page > 1) current_page--;
-      } else if (text === ">") {
-        if (current_page < total_pages) current_page++;
-      } else {
-        current_page = parseInt(text);
-      }
-      load_ws_data(current_page);
-    });
-
-    $(listview.page.body).on("keypress", "#ws-goto-page", (e) => {
-      if (e.which === 13) {
-        let total_pages = Math.ceil(total_count / page_size);
-        let target = parseInt($(e.target).val());
-        if (target >= 1 && target <= total_pages) {
-          current_page = target;
-          load_ws_data(current_page);
-        } else frappe.msgprint(`Số trang không hợp lệ (1 - ${total_pages})`);
-      }
-    });
-
-    load_ws_data(current_page);
   }
 };
 
