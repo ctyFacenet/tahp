@@ -20,6 +20,7 @@ def execute(filters=None):
         bom_filters["custom_gyps"] = filters["custom_gyps"]
 
     boms = frappe.db.get_all("BOM", filters=bom_filters, fields=["name", "item"])
+    indent = 0
     for bom in boms:
         doc = frappe.get_doc("BOM", bom.name)
 

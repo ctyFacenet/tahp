@@ -1,6 +1,9 @@
 import DataTable from "frappe-datatable";
 
-class CustomDataTable extends DataTable {
+export default class CustomDataTable extends DataTable {
+    // render() {
+    //     super.render();
+    // }
     render() {
         super.render();
         this.bodyScrollable.addEventListener("scroll", (e) => {
@@ -25,8 +28,111 @@ class CustomDataTable extends DataTable {
             });
         });
 
-        // xử lý body = sticky
         this.applyStickyColumns(4);
+    }
+
+    // freezeRightColumn() {
+    //     // Xóa event listener cũ nếu có
+    //     if (this.scrollSyncHandler) {
+    //         this.bodyScrollable.removeEventListener('scroll', this.scrollSyncHandler);
+    //     }
+    //     if (this.stickyObserver) {
+    //         this.stickyObserver.disconnect();
+    //     }
+
+    //     const colIndex = this.datamanager.columns.length - 1;
+
+    //     // Cache DOM header và body cells
+    //     const headerCell = this.wrapper.querySelector(`.dt-header .dt-cell--col-${colIndex}`);
+    //     const filterCell = this.wrapper.querySelector(`.dt-row-filter .dt-cell--col-${colIndex}`);
+    //     const bodyCells = this.wrapper.querySelectorAll(`.dt-row .dt-cell--col-${colIndex}`);
+
+    //     const applySticky = (el, zIndex = 5) => {
+    //         if (!el) return;
+    //         el.style.position = 'sticky';
+    //         el.style.right = '0px';
+    //         el.style.zIndex = zIndex;
+    //         el.style.background = '#fff';
+    //     };
+
+    //     // Header, filter, body
+    //     applySticky(headerCell, 20);
+    //     applySticky(filterCell, 15);
+    //     bodyCells.forEach(cell => applySticky(cell, 5));
+
+    //     // Function để sync transform
+    //     const syncTransform = (scrollLeft = null) => {
+    //         const currentScrollLeft = scrollLeft !== null ? scrollLeft : (this.bodyScrollable.scrollLeft || 0);
+    //         const currentHeaderCell = this.wrapper.querySelector(`.dt-header .dt-cell--col-${this.datamanager.columns.length - 1}`);
+    //         const currentFilterCell = this.wrapper.querySelector(`.dt-row-filter .dt-cell--col-${this.datamanager.columns.length - 1}`);
+            
+    //         [currentHeaderCell, currentFilterCell].forEach(el => {
+    //             if (el) {
+    //                 // Force reset transform để tránh accumulate
+    //                 el.style.transform = '';
+    //                 el.style.transform = `translateX(${currentScrollLeft}px)`;
+    //             }
+    //         });
+    //     };
+
+    //     // Đồng bộ scroll position ban đầu
+    //     syncTransform();
+
+    //     // Tạo scroll handler
+    //     this.scrollSyncHandler = (e) => {
+    //         const scrollLeft = e.target.scrollLeft;
+    //         syncTransform(scrollLeft);
+    //     };
+
+    //     // MutationObserver để theo dõi thay đổi DOM
+    //     this.stickyObserver = new MutationObserver((mutations) => {
+    //         let shouldSync = false;
+            
+    //         mutations.forEach((mutation) => {
+    //             // Kiểm tra nếu có thay đổi về attributes hoặc childList
+    //             if (mutation.type === 'attributes' || mutation.type === 'childList') {
+    //                 // Kiểm tra nếu có liên quan đến sticky column
+    //                 const target = mutation.target;
+    //                 if (target.classList && target.classList.contains(`dt-cell--col-${this.datamanager.columns.length - 1}`)) {
+    //                     shouldSync = true;
+    //                 }
+    //                 // Hoặc nếu có thay đổi trong header/filter
+    //                 if (target.closest('.dt-header') || target.closest('.dt-row-filter')) {
+    //                     shouldSync = true;
+    //                 }
+    //             }
+    //         });
+
+    //         if (shouldSync) {
+    //             // Delay nhỏ để đảm bảo DOM đã stable
+    //             requestAnimationFrame(() => {
+    //                 syncTransform();
+    //             });
+    //         }
+    //     });
+
+    //     // Observe changes trên wrapper
+    //     this.stickyObserver.observe(this.wrapper, {
+    //         childList: true,
+    //         subtree: true,
+    //         attributes: true,
+    //         attributeFilter: ['style', 'class']
+    //     });
+
+    //     // Gắn event listener mới
+    //     this.bodyScrollable.addEventListener('scroll', this.scrollSyncHandler);
+    // }
+
+    // Thêm method để cleanup khi cần
+    cleanupStickyColumn() {
+        if (this.scrollSyncHandler) {
+            this.bodyScrollable.removeEventListener('scroll', this.scrollSyncHandler);
+            this.scrollSyncHandler = null;
+        }
+        if (this.stickyObserver) {
+            this.stickyObserver.disconnect();
+            this.stickyObserver = null;
+        }
     }
 
     applyStickyColumns(count) {
@@ -114,7 +220,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.QueryReport {
             if (this.report_settings.get_datatable_options) {
                 datatable_options = this.report_settings.get_datatable_options(datatable_options);
             }
-
             if (this.page_name == "query-report/BOM Custom Search") {
                 const isDesktop = window.innerWidth >= 768; // ngưỡng tùy chỉnh
 

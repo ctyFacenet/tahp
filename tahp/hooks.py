@@ -42,6 +42,7 @@ app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
+    "/assets/tahp/css/report.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
@@ -386,3 +387,5 @@ scheduler_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+after_migrate = "tahp.cleanup.cleanup_custom"
