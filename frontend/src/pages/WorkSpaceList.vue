@@ -6,14 +6,23 @@ import GroupedListView from '@/components/GroupedListView.vue'
 const columns = ref([])
 const grouped_rows = ref([])
 
+const labelMap = {
+  name: 'ID',
+  status: 'Trạng thái',
+  workstation_name:' Tên thiết bị/cụm thiết bị',
+  workstation_type: 'Loại thiết bị',
+  custom_is_parent: 'Là cụm thiết bị',
+  custom_parent: 'Thuộc về cụm thiết bị cha',
+}
+
 async function loadData() {
   try {
     const res = await call('frappe.client.get_list', {
       doctype: 'Workstation',
-      fields: ['name', 'workstation_type', 'status', 'custom_is_parent', 'custom_parent'],
+      fields: ['name', 'workstation_name','workstation_type', 'status', 'custom_is_parent', 'custom_parent'],
       limit_page_length: 50
     })
-
+    
     if (res && res.length > 0) {
       const defaultCols = [
         { label: 'ID', key: 'name' },
@@ -23,7 +32,7 @@ async function loadData() {
       const dynamicCols = Object.keys(res[0])
         .filter(k => k !== 'name' && k !== 'status')
         .map(k => ({
-          label: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+          label: labelMap[k] || k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
           key: k,
         }))
 
@@ -46,6 +55,7 @@ async function loadData() {
       })
 
       grouped_rows.value = Object.values(grouped)
+      
     }
   } catch (err) {
     console.error('❌ Lỗi khi load:', err)
