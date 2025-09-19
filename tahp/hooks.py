@@ -43,6 +43,7 @@ app_include_css = [
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
     "/assets/tahp/css/report.css",
+    "/assets/tahp/js/tahp/custom/datatable/style.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"

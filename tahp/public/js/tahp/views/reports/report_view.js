@@ -1,8 +1,8 @@
 /**
  * frappe.views.ReportView
  */
-import DataTable from "frappe-datatable";
-// import DataTable from "../../custom/report"
+// import DataTable from "frappe-datatable";
+import DataTable from "../../custom/datatable/datatable"
 
 window.DataTable = DataTable;
 frappe.provide("frappe.views");
@@ -1798,7 +1798,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 				delete frappe.route_options["_group_by"];
 			} catch (e) {
 				console.warn("Failed to parse group by from URL", e);
-			}
+			}frappe-bench/apps/tahp
 		}
 
 		return super.parse_filters_from_route_options();

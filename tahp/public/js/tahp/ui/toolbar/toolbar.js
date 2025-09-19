@@ -136,10 +136,22 @@ frappe.ui.toolbar.Toolbar = class {
 
 			$(".dropdown-help .dropdown-menu").on("click", "a", show_results);
 			// $(".navbar-title").text(__(frappe.get_route_str().split('/')[1]));
-			let doctype_text = frappe.get_route_str().split('/')[1]; // "Work Order"
-			let doctype_slug = doctype_text.toLowerCase().replace(/\s+/g, '-');
-			$(".navbar-title").text(__(doctype_text)).attr("href", "/app/" + doctype_slug);
+			let route_str = frappe.get_route_str() || "";
+			if (route_str.includes("/")) {
+				let doctype_text = route_str.split('/')[1]; // "Work Order"
+				let doctype_slug = doctype_text.toLowerCase().replace(/\s+/g, '-');
+				$(".navbar-title").text(__(doctype_text)).attr("href", "/app/" + doctype_slug);
+			} else {
+				let doctype_text = route_str;
+				doctype_text = doctype_text
+					.toLowerCase()
+					.split('-')
+					.map(w => w.charAt(0).toUpperCase() + w.slice(1))
+					.join(' ');
+				$(".navbar-title").text(__(doctype_text));
 
+			}
+			
 
 			let current_workspace_name = frappe.get_route_str().split('/')[1] || '';
 
