@@ -17,6 +17,11 @@ const routes = [
     name: "Workspace List",
     path: "/workspace/list",
     component: () => import("@/pages/WorkSpaceList.vue"),
+  },
+  {
+    name: "ProductionInfo Dialog",
+    path: "/dialog/info",
+    component: () => import("@/pages/TestDialog.vue"),
   }
 ]
 

@@ -37,8 +37,9 @@ const props = defineProps({
         </slot>
       </template>
 
-      <template #cell="{ item, column }">
-        <slot name="cell" :item="item" :column="column">
+     <template #cell="{ item, column, row }">
+      <div @click="$emit('row-click', row)" class="cursor-pointer">
+        <slot name="cell" :item="item" :column="column" :row="row">
           <span v-if="column.key === 'status'">
             <span
               class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
@@ -49,7 +50,8 @@ const props = defineProps({
           </span>
           <span v-else>{{ item }}</span>
         </slot>
-      </template>
+      </div>
+     </template>
     </ListView>
   </div>
 </template>

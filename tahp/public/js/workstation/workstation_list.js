@@ -10,7 +10,7 @@ frappe.listview_settings['Workstation'] = {
     $(listview.page.body).html(`
        <div class="custom-ws-wrapper">
         <iframe src="/frontend/workspace/list" 
-        style="width:100%;height:calc(100vh - 120px);border:none;">
+          style="width:100%;height:calc(100vh - 120px);border:none;">
         </iframe>
         <div id="ws-summary-wrapper" class="mt-3"></div>
         <div class="row" id="ws-cards"></div>

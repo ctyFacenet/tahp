@@ -1,68 +1,91 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { call } from 'frappe-ui' 
-import GroupedListView from '@/components/GroupedListView.vue'
+import { ref, onMounted } from "vue";
+import { call } from "frappe-ui";
+import GroupedListView from "@/components/GroupedListView.vue";
+import ProductionInfoDialog from "@/components/ProductionInfoDialog.vue";
 
-const columns = ref([])
-const grouped_rows = ref([])
+const columns = ref([]);
+const grouped_rows = ref([]);
+
+const dialogRef = ref(null);
 
 const labelMap = {
-  name: 'ID',
-  status: 'Trạng thái',
-  workstation_name:' Tên thiết bị/cụm thiết bị',
-  workstation_type: 'Loại thiết bị',
-  custom_is_parent: 'Là cụm thiết bị',
-  custom_parent: 'Thuộc về cụm thiết bị cha',
-}
+  name: "ID",
+  status: "Trạng thái",
+  workstation_name: "Tên thiết bị/cụm thiết bị",
+  workstation_type: "Loại thiết bị",
+  custom_is_parent: "Là cụm thiết bị",
+  custom_parent: "Thuộc về cụm thiết bị cha",
+};
 
-async function loadData() {
+const loadData = async () => {
   try {
-    const res = await call('frappe.client.get_list', {
-      doctype: 'Workstation',
-      fields: ['name', 'workstation_name','workstation_type', 'status', 'custom_is_parent', 'custom_parent'],
-      limit_page_length: 50
-    })
-    
+    const res = await call("frappe.client.get_list", {
+      doctype: "Workstation",
+      fields: [
+        "name",
+        "workstation_name",
+        "workstation_type",
+        "status",
+        "custom_is_parent",
+        "custom_parent",
+      ],
+      limit_page_length: 50,
+    });
+
     if (res && res.length > 0) {
       const defaultCols = [
-        { label: 'ID', key: 'name' },
-        { label: 'Trạng thái', key: 'status' },
-      ]
+        { label: "ID", key: "name" },
+        { label: "Trạng thái", key: "status" },
+      ];
 
       const dynamicCols = Object.keys(res[0])
-        .filter(k => k !== 'name' && k !== 'status')
-        .map(k => ({
-          label: labelMap[k] || k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        .filter((k) => k !== "name" && k !== "status")
+        .map((k) => ({
+          label:
+            labelMap[k] ||
+            k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
           key: k,
-        }))
+        }));
 
-      columns.value = [...defaultCols, ...dynamicCols]
-      
-      const grouped = {}
-      res.forEach(item => {
-        const groupName = item.workstation_type || 'Cụm khác'
+      columns.value = [...defaultCols, ...dynamicCols];
+
+      const grouped = {};
+      res.forEach((item) => {
+        const groupName = item.workstation_type || "Cụm khác";
         if (!grouped[groupName]) {
           grouped[groupName] = {
             group: groupName,
             collapsed: false,
-            rows: []
-          }
+            rows: [],
+          };
         }
+
         grouped[groupName].rows.push({
           ...item,
-          id: item.name
-        })
-      })
+          id: item.name,
+        });
+      });
 
-      grouped_rows.value = Object.values(grouped)
-      
+      grouped_rows.value = Object.values(grouped);
     }
   } catch (err) {
-    console.error('❌ Lỗi khi load:', err)
+    console.error("❌ Lỗi khi load:", err);
   }
-}
+};
 
-onMounted(loadData)
+
+const handleRowClick = (row) => {
+  dialogRef.value.open();
+  return;
+  if (!row?.workstation_name) return;
+  const url = `/app/workstation/${encodeURIComponent(row.workstation_name)}`;
+  window.top.location.href = url;
+};
+
+onMounted(() => {
+  loadData();
+});
 </script>
 
 <template>
@@ -71,12 +94,17 @@ onMounted(loadData)
     :columns="columns"
     :rows="grouped_rows"
     row-key="id"
+    @row-click="handleRowClick"
   >
     <template #cell="{ item, column }">
       <span v-if="column.key === 'status'">
         <span
           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-          :class="item === 'Off' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'"
+          :class="
+            item === 'Off'
+              ? 'bg-red-100 text-red-800'
+              : 'bg-green-100 text-green-800'
+          "
         >
           ● {{ item }}
         </span>
@@ -94,4 +122,6 @@ onMounted(loadData)
       <span v-else>{{ item }}</span>
     </template>
   </GroupedListView>
+  <ProductionInfoDialog ref="dialogRef" />
+
 </template>
