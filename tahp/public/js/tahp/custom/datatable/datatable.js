@@ -22,7 +22,6 @@ let defaultComponents = {
 class DataTable {
     constructor(wrapper, options) {
         DataTable.instances++;
-        console.log('hi report')
         if (typeof wrapper === 'string') {
             // css selector
             wrapper = document.querySelector(wrapper);
@@ -163,8 +162,7 @@ class DataTable {
     }
 
     render() {
-        this.title.empty();
-        this.charts.empty();
+        ['.dt-title', '.dt-charts'].forEach(s => this.wrapper.querySelector(s).innerHTML = "");
         this.renderHeader();
         this.renderBody();
     }
