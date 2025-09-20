@@ -4,11 +4,9 @@
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50"
   >
     <div
-      class="bg-white w-[1500px] rounded-lg shadow-xl overflow-hidden max-h-[100vh] flex flex-col"
+      class="bg-white w-full h-full sm:w-[95%] sm:h-auto lg:w-[1500px] rounded-lg shadow-xl overflow-hidden max-h-[100vh] flex flex-col"
     >
-      <div
-        class="flex items-center justify-between border-b px-4 py-2 bg-gray-50"
-      >
+      <div class="flex items-center justify-between border-b px-4 py-2 bg-gray-50">
         <h2 class="text-lg font-semibold flex items-center space-x-2">
           <span>ℹ️</span>
           <span>Thông tin công đoạn</span>
@@ -18,7 +16,7 @@
 
       <div class="p-4 space-y-4 overflow-y-auto flex-1">
         <div class="border border-gray-300 rounded-md p-4 bg-white space-y-4">
-          <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div v-for="(val, label) in headerFields" :key="label">
               <label class="block text-gray-600 text-xs mb-1">{{ label }}</label>
               <input
@@ -31,99 +29,69 @@
 
           <div>
             <label class="block text-gray-700 text-sm mb-1">Trạng thái</label>
-            <button
-              class="w-1/2 bg-cyan-500 text-white text-sm font-medium py-2 rounded-sm"
-            >
+            <button class="w-full sm:w-1/2 lg:w-[calc(25%-10px)] bg-cyan-500 text-white text-sm font-medium py-2 rounded-sm">
               {{ status }}
             </button>
           </div>
         </div>
 
-       <div class="p-4 space-y-4 border border-gray-300 rounded-md ">
-         <div class="flex rounded-sm overflow-hidden text-sm font-medium">
-          <button
-            v-for="tab in tabs"
-            :key="tab"
-            @click="activeTab = tab"
-            :class="[
-              'flex-1 text-center py-2',
-              activeTab === tab
-                ? 'bg-gray-50 text-cyan-600 border-b-2 border-cyan-500'
-                : 'bg-white text-gray-400 hover:text-cyan-600'
-            ]"
-          >
-            <span>{{ tab }}</span>
-            <span
-              v-if="activeTab === tab"
-              class="ml-1 text-cyan-500 text-3xl inline-block"
-            >
-              ⟳
-            </span>
-          </button>
-        </div>
-
-        <div v-if="activeTab === 'ĐẦU VÀO'">
-          <DataTable :columns="colsInput" :rows="rowsInput" />
-        </div>
-
-        <div v-if="activeTab === 'SẢN XUẤT'">
-          <div class="flex space-x-6 mb-2 text-sm font-medium">
+        <div class="p-4 space-y-4 border border-gray-300 rounded-md">
+          <div class="flex flex-wrap rounded-sm overflow-hidden text-sm font-medium">
             <button
-              :class="subTab === 'result' ? 'text-cyan-600 underline' : 'text-gray-500'"
-              @click="subTab = 'result'"
+              v-for="tab in tabs"
+              :key="tab"
+              @click="activeTab = tab"
+              :class="[
+                'flex-1 text-center py-2',
+                activeTab === tab
+                  ? 'bg-gray-50 text-cyan-600 border-b-2 border-cyan-500'
+                  : 'bg-white text-gray-400 hover:text-cyan-600'
+              ]"
             >
-              Kết quả sản xuất
-            </button>
-            <button
-              :class="subTab === 'reason' ? 'text-cyan-600 underline' : 'text-gray-500'"
-              @click="subTab = 'reason'"
-            >
-              Nguyên nhân dừng máy
-            </button>
-            <button
-              :class="subTab === 'scrap' ? 'text-cyan-600 underline' : 'text-gray-500'"
-              @click="subTab = 'scrap'"
-            >
-              Danh sách phế
+              <span>{{ tab }}</span>
+              <span v-if="activeTab === tab" class="ml-1 text-cyan-500 text-2xl sm:text-3xl inline-block">
+                ⟳
+              </span>
             </button>
           </div>
 
-          <DataTable
-            v-if="subTab === 'result'"
-            :columns="colsResult"
-            :rows="rowsResult"
-            :footer="footerResult"
-          />
-
-          <DataTable
-            v-else-if="subTab === 'reason'"
-            :columns="colsReason"
-            :rows="rowsReason"
-          />
-
-          <DataTable v-else :columns="colsScrap" :rows="rowsScrap" />
-        </div>
-
-        <div v-if="activeTab === 'IN TEM'">
-          <FormPrintLabel :formData="formLabel" />
-          <div class="mt-4 text-right">
-            <button class="bg-cyan-600 text-white px-4 py-1 rounded">
-              In tem
-            </button>
+          <div v-if="activeTab === 'ĐẦU VÀO'">
+            <DataTable :columns="colsInput" :rows="rowsInput" />
           </div>
-        </div>
 
-        <div v-if="activeTab === 'HỦY TEM'">
-          <DataTable :columns="colsCancel" :rows="rowsCancel" />
+          <div v-if="activeTab === 'SẢN XUẤT'">
+            <div class="flex flex-wrap space-x-4 mb-2 text-sm font-medium">
+              <button :class="subTab === 'result' ? 'text-cyan-600 underline' : 'text-gray-500'" @click="subTab = 'result'">
+                Kết quả sản xuất
+              </button>
+              <button :class="subTab === 'reason' ? 'text-cyan-600 underline' : 'text-gray-500'" @click="subTab = 'reason'">
+                Nguyên nhân dừng máy
+              </button>
+              <button :class="subTab === 'scrap' ? 'text-cyan-600 underline' : 'text-gray-500'" @click="subTab = 'scrap'">
+                Danh sách phế
+              </button>
+            </div>
+
+            <DataTable v-if="subTab === 'result'" :columns="colsResult" :rows="rowsResult" :footer="footerResult" />
+            <DataTable v-else-if="subTab === 'reason'" :columns="colsReason" :rows="rowsReason" />
+            <DataTable v-else :columns="colsScrap" :rows="rowsScrap" />
+          </div>
+
+          <div v-if="activeTab === 'IN TEM'">
+            <FormPrintLabel v-model="formLabel" />
+            <div class="mt-4 text-right">
+              <button class="bg-cyan-600 text-white px-4 py-1 rounded">In tem</button>
+            </div>
+          </div>
+
+          <div v-if="activeTab === 'HỦY TEM'">
+            <DataTable :columns="colsCancel" :rows="rowsCancel" />
+          </div>
         </div>
       </div>
 
-       </div>
       <div class="border-t px-4 py-2 text-right bg-gray-50">
-        <button
-          @click="close"
-          class="px-4 py-1 rounded bg-gray-200 hover:bg-gray-300"
-        >
+        <button @click="close" class="px-4 py-1 rounded bg-gray-200 hover:bg-gray-300">
           Đóng
         </button>
       </div>
@@ -132,7 +100,6 @@
 </template>
 
 <script setup>
-
 import { ref, defineExpose } from "vue"
 import DataTable from "./partials/DataTable.vue"
 import FormPrintLabel from "./partials/FormPrintLabel.vue"
@@ -189,18 +156,24 @@ const rowsCancel = [
   ["2","200000000000369375","Bình thường","BTP.DAYDONG5.6A","20250628","51","Kg","Nguyễn Thị Uyên","🚫"]
 ]
 
-const formLabel = {
-  maQr: "200000000000369371",
-  maBtp: "BTP.DAYDONG5.6A",
-  maLenh: "WO_EIAW015_A_25_2506.43",
-  ca: "Ca 1",
-  may: "CAN1",
-  nhom: "CAN1.1",
-  soLuong: 52,
-  dvt: "Kg",
-  nhanVien: "Nguyễn Thị Uyên",
-  ngayIn: "28/06/2025"
-}
+const formLabel = ref({
+  qrCode: "200000000000369371",
+  btpCode: "BTP.DAYDONG5.6A",
+  orderCode: "WO_EIAW015_A_25_2506.43",
+  operationCode: "CAN",
+  lot: "20250719",
+  materialLot: "NVL_20250719.2",
+  shift: "Ca 1",
+  machine: "CAN1",
+  lineGroup: "CAN1.1",
+  quantity: 52,
+  unit: "Kg",
+  operator: "Nguyễn Thị Uyên",
+  printDate: "28/06/2025",
+  ballWeight: "",
+  classification: "OK",
+  errorName: "",
+})
 
 function open() { visible.value = true }
 function close() { visible.value = false }

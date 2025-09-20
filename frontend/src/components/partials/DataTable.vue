@@ -1,12 +1,12 @@
 <template>
-  <div class="overflow-x-auto">
-    <table class="w-full border-collapse text-sm">
+  <div class="overflow-x-auto w-full">
+    <table class="min-w-full border-collapse text-xs sm:text-sm">
       <thead class="bg-blue-200">
         <tr>
           <th
             v-for="col in columns"
             :key="col"
-            class="border border-gray-100 px-2 py-1 text-center font-medium"
+            class="border border-gray-300 px-2 py-2 text-center font-medium whitespace-nowrap min-w-[120px]"
           >
             {{ col }}
           </th>
@@ -14,11 +14,15 @@
       </thead>
 
       <tbody>
-        <tr v-for="(row, i) in rows" :key="i" class="hover:bg-gray-50">
+        <tr
+          v-for="(row, i) in rows"
+          :key="i"
+          class="hover:bg-gray-50"
+        >
           <td
             v-for="(cell, j) in row"
             :key="j"
-            class="border border-gray-100 px-2 py-1 text-center"
+            class="border border-gray-300 px-2 py-2 text-center whitespace-nowrap min-w-[120px]"
           >
             {{ cell }}
           </td>
@@ -30,7 +34,7 @@
           <td
             v-for="(cell, j) in footer"
             :key="'footer-' + j"
-            class="border border-gray-300 px-2 py-1 text-center"
+            class="border border-gray-300 px-2 py-2 text-center whitespace-nowrap min-w-[120px]"
             :class="[isNumber(cell) ? 'text-red-600' : '']"
           >
             {{ cell }}
@@ -40,6 +44,7 @@
     </table>
   </div>
 </template>
+
 
 <script setup>
 defineProps({
