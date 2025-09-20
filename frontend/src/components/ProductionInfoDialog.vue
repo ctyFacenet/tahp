@@ -50,7 +50,7 @@
             >
               <span>{{ tab }}</span>
               <span v-if="activeTab === tab" class="ml-1 text-cyan-500 text-2xl sm:text-3xl inline-block">
-                ⟳
+                ※
               </span>
             </button>
           </div>

@@ -4,9 +4,10 @@
       <thead class="bg-blue-200">
         <tr>
           <th
-            v-for="col in columns"
+            v-for="(col, index) in columns"
             :key="col"
             class="border border-gray-300 px-2 py-2 text-center font-medium whitespace-nowrap min-w-[120px]"
+            :class="index === 0 ? 'sticky left-0 z-10 bg-blue-200' : ''"
           >
             {{ col }}
           </th>
@@ -23,6 +24,7 @@
             v-for="(cell, j) in row"
             :key="j"
             class="border border-gray-300 px-2 py-2 text-center whitespace-nowrap min-w-[120px]"
+            :class="j === 0 ? 'sticky left-0 z-10 bg-white' : ''"
           >
             {{ cell }}
           </td>
@@ -35,7 +37,7 @@
             v-for="(cell, j) in footer"
             :key="'footer-' + j"
             class="border border-gray-300 px-2 py-2 text-center whitespace-nowrap min-w-[120px]"
-            :class="[isNumber(cell) ? 'text-red-600' : '']"
+            :class="[j === 0 ? 'sticky left-0 z-10 bg-gray-50' : '', isNumber(cell) ? 'text-red-600' : '']"
           >
             {{ cell }}
           </td>
@@ -44,7 +46,6 @@
     </table>
   </div>
 </template>
-
 
 <script setup>
 defineProps({
