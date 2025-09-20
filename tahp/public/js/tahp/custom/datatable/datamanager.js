@@ -14,27 +14,64 @@ export default class DataManager {
         this.options.filterRows = nextTick(this.options.filterRows, this);
     }
 
-    init(data, columns) {
-        if (!data) {
-            data = this.options.data;
-        }
-        if (columns) {
-            this.options.columns = columns;
-        }
-
-        this.data = data;
-
-        this.rowCount = 0;
-        this.columns = [];
-        this.rows = [];
-
-        this.prepareColumns();
-        this.validateData(this.data);
-        this.rows = this.prepareRows(this.data);
-        this.prepareTreeRows();
-        this.prepareRowView();
-        this.prepareNumericColumns();
+init(data, columns) {
+    if (!data) {
+        data = this.options.data;
     }
+    if (columns) {
+        this.options.columns = columns;
+    }
+
+    this.data = data;
+
+    // --- Đảm bảo có column Action ---
+    if (this.options.hasAction) {
+        this.options.columns.push({
+            fieldname: "action",
+            name: "Thao tác",
+            editable: false,
+            align: "center",
+            width: 120
+        });
+    }
+
+    if (this.options.hasAction) {
+        for (let row of this.data) {
+            const { name, doctype } = row[0] || {};
+            const hasAction = row.some(cell => cell.button === "action");
+
+            if (!hasAction && name && doctype) {
+                row.push({
+                    name,
+                    doctype,
+                    button: "action",
+                    content: `
+                        <button class="btn btn-warning action-edit mr-2" 
+                            data-name="${name}" data-doctype="${doctype}">
+                            Sửa
+                        </button>
+                        <button class="btn btn-danger action-delete" 
+                            data-name="${name}" data-doctype="${doctype}">
+                            Xóa
+                        </button>
+                    `,
+                    editable: false
+                });
+            }
+        }
+    }
+
+    this.rowCount = 0;
+    this.columns = [];
+    this.rows = [];
+
+    this.prepareColumns();
+    this.validateData(this.data);
+    this.rows = this.prepareRows(this.data);
+    this.prepareTreeRows();
+    this.prepareRowView();
+    this.prepareNumericColumns();
+}
 
     // computed property
     get currentSort() {

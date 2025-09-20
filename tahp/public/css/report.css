@@ -14,7 +14,7 @@
   --dt-border-color: var(--table-border-color);
   --dt-border-radius: var(--border-radius);
   --dt-header-cell-bg: var(--subtle-fg);
-  --dt-selection-highlight-color: var(--highlight-color);
+  --dt-selection-highlight-color: #d8e2ff;;
   background-color: var(--bg-color);
   margin-left: -5px;
   margin-top: 0px;
@@ -150,7 +150,7 @@
   padding: 0.5rem;
 }
 .datatable .dt-scrollable--highlight-all .dt-cell__content {
-  background: var(--dt-selection-highlight-color);
+  background-color: var(--dt-selection-highlight-color);
 }
 .datatable .dt-cell--focus .dt-cell__content {
   border-color: var(--gray-200);
@@ -173,7 +173,6 @@
 }
 
 .dt-scrollable--highlight-all {
-  background-color: #fffce7;
   background-color: var(--dt-selection-highlight-color);
 }
 

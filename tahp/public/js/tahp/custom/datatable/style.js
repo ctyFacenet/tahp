@@ -67,49 +67,60 @@ export default class Style {
     //     });
     // }
 
-    bindScrollHeader() {
-        this._settingHeaderPosition = false;
+bindScrollHeader() {
+    this._settingHeaderPosition = false;
 
-        $.on(this.bodyScrollable, 'scroll', (e) => {
-            if (this._settingHeaderPosition) return;
+    $.on(this.bodyScrollable, 'scroll', (e) => {
+        if (this._settingHeaderPosition) return;
 
-            this._settingHeaderPosition = true;
+        this._settingHeaderPosition = true;
 
-            requestAnimationFrame(() => {
-                const left = -e.target.scrollLeft;
+        requestAnimationFrame(() => {
+            const left = -e.target.scrollLeft;
 
-                // thay vì translate cả header
-                // -> translate từng cell, bỏ qua sticky-right
-                const headerCells = this.header.querySelectorAll('.dt-cell');
-                headerCells.forEach(cell => {
-                    if (cell.classList.contains('sticky-right')) {
-                        // không dịch cột cuối cùng
+            // header
+            const headerCells = this.header.querySelectorAll('.dt-cell');
+            headerCells.forEach(cell => {
+                if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
+                    // không dịch cột cuối và cột sticky-left
+                    if (window.innerWidth >= 768) {
                         cell.style.transform = '';
+                        cell.style.zIndex = 2;  
                     } else {
                         cell.style.transform = `translateX(${left}px)`;
                     }
-                });
-
-                // footer nếu có cũng tương tự
-                const footerCells = this.footer?.querySelectorAll('.dt-cell') || [];
-                footerCells.forEach(cell => {
-                    if (cell.classList.contains('sticky-right')) {
-                        cell.style.transform = '';
-                    } else {
-                        cell.style.transform = `translateX(${left}px)`;
-                    }
-                });
-
-                if (this.instance.noData) {
-                    $.style($('.no-data-message'), {
-                        left: `${this.instance.wrapper.clientWidth / 2 - left}px`
-                    });
+                } else {
+                    cell.style.transform = `translateX(${left}px)`;
                 }
-
-                this._settingHeaderPosition = false;
             });
+
+            // footer
+            const footerCells = this.footer?.querySelectorAll('.dt-cell') || [];
+            footerCells.forEach(cell => {
+                if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
+                    if (window.innerWidth >= 768) {
+                        cell.style.transform = '';
+                        cell.style.zIndex = 2;
+                    } else {
+                        cell.style.transform = `translateX(${left}px)`;
+                    }
+
+                } else {
+                    cell.style.transform = `translateX(${left}px)`;
+                }
+            });
+
+            if (this.instance.noData) {
+                $.style($('.no-data-message'), {
+                    left: `${this.instance.wrapper.clientWidth / 2 - left}px`
+                });
+            }
+
+            this._settingHeaderPosition = false;
         });
-    }
+    });
+}
+
 
 
     onWindowResize() {

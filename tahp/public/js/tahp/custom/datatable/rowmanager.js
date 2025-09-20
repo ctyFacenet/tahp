@@ -139,7 +139,7 @@ export default class RowManager {
         const checkedRows = this.getCheckedRows();
         const count = checkedRows.length;
         if (count > 0) {
-            let message = this.instance.translate('{count} rows selected', {
+            let message = this.instance.translate('Đã chọn {count} dòng', {
                 count: count
             });
             this.bodyRenderer.showToastMessage(message);
@@ -351,7 +351,11 @@ export default class RowManager {
         
         const lastColIndex = this.datamanager.getColumnCount() - 1;
         const rowHTML = row.map(cell => {
-            if (cell.colIndex === lastColIndex) cell.freezeClass = "sticky-right";
+            if (this.options.freezeIndex !== undefined && cell.colIndex <= this.options.freezeIndex) {
+                cell.freezeLeft = "sticky-left";
+            }
+
+            if (cell.colIndex === lastColIndex && this.options.hasAction) cell.freezeRight = "sticky-right";
             return this.cellmanager.getCellHTML(cell);
         }).join('');
 

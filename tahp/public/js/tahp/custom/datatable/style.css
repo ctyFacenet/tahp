@@ -327,16 +327,24 @@ body.dt-resize {
     cursor: col-resize;
 }
 
-.sticky-left {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  background: #fff;
+.odd-row {
+    background: #f3f3f3
 }
 
-.sticky-right {
-  position: sticky;
-  right: 0;
-  z-index: 2;
-  background: #fff;
+@media (max-width: 767px) {
+  .sticky-left {
+    position: relative !important;
+    left: auto !important;
+    z-index: auto !important;
+  }
+
+  .sticky-right {
+    position: relative !important;
+    right: auto !important;
+    z-index: auto !important;
+  }
+}
+
+.dt-toast__message {
+    color: white;
 }

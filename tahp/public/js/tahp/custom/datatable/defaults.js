@@ -68,6 +68,8 @@ export default function getDefaultOptions(instance) {
         pasteFromClipboard: false,
         showTotalRow: false,
         direction: 'ltr',
-        disableReorderColumn: false
+        disableReorderColumn: false,
+        freezeIndex: null,
+        hasAction: null
     };
 };

@@ -554,7 +554,6 @@ export default class CellManager {
                     if (done && done.then) {
                         // revert to oldValue if promise fails
                         done.catch((e) => {
-                            console.log(e);
                             this.updateCell(colIndex, rowIndex, oldValue);
                         });
                     }
@@ -810,10 +809,10 @@ export default class CellManager {
             isFilter,
             isTotalRow
         });
-        if (cell.freezeClass) console.log(cell)
         const row = this.datamanager.getRow(rowIndex);
 
         const isBodyCell = !(isHeader || isFilter || isTotalRow);
+        const isEvenRow = isBodyCell && rowIndex % 2 !== 0;
         const className = [
             'dt-cell',
             'dt-cell--col-' + colIndex,
@@ -823,11 +822,18 @@ export default class CellManager {
             isHeader ? `dt-cell--header-${colIndex}` : '',
             isFilter ? 'dt-cell--filter' : '',
             isBodyCell && (row && row.meta.isTreeNodeClose) ? 'dt-cell--tree-close' : '',
-            cell.freezeClass ? cell.freezeClass : ''
+            cell.freezeRight ? cell.freezeRight : '',
+            cell.freezeLeft ? cell.freezeLeft : '',
+            isEvenRow ? 'odd-row' : ''
         ].filter(Boolean).join(' '); 
 
+        let style = '';
+        if (cell.freezeRight) {
+            style += `position: sticky; right: 0; z-index: 2;`;
+        }
+
         return `
-            <div class="${className}" ${dataAttr} tabindex="0">
+            <div class="${className}" ${dataAttr} style="${style}" tabindex="0">
                 ${this.getCellContent(cell)}
             </div>
         `;

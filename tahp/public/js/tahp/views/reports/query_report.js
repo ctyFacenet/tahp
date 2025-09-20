@@ -1,6 +1,7 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 // MIT License. See license.txt
-import DataTable from "frappe-datatable";
+// import DataTable from "frappe-datatable";
+import DataTable from "../../custom/datatable/datatable"
 
 // Expose DataTable globally to allow customizations.
 window.DataTable = DataTable;
@@ -997,7 +998,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 				translations: frappe.utils.datatable.get_translations(),
 				treeView: this.tree_report,
 				layout: "fixed",
-				cellHeight: 33,
+				cellHeight: 40,
 				showTotalRow: this.raw_data.add_total_row && !this.report_settings.tree,
 				direction: frappe.utils.is_rtl() ? "rtl" : "ltr",
 				hooks: {

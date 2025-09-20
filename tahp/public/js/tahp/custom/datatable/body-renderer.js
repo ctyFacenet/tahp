@@ -67,6 +67,21 @@ export default class BodyRenderer {
         this.renderRows(rows);
         // setDimensions requires atleast 1 row to exist in dom
         this.instance.setDimensions();
+        const freezeCells = this.bodyScrollable.querySelectorAll('.sticky-left');
+        freezeCells.forEach(cell => {
+            const colIndex = parseInt(cell.className.match(/dt-cell--col-(\d+)/)[1]);
+            let left = 0;
+
+            // Tính tổng width các cột bên trái freeze
+            for (let i = 0; i < colIndex; i++) {
+                const prevCell = this.bodyScrollable.querySelector(`.dt-cell--col-${i}`);
+                if (prevCell) left += prevCell.getBoundingClientRect().width;
+            }
+
+            cell.style.position = 'sticky';
+            cell.style.left = left + 'px';
+            cell.style.zIndex = 2;
+        });
     }
 
     renderFooter() {
