@@ -113,6 +113,8 @@ class DataTable {
     prepareDom() {
         this.wrapper.innerHTML = `
             <div class="datatable" dir="${this.options.direction}">
+                <div class="dt-charts"></div>
+                <div class="dt-title"></div>
                 <div class="dt-header"></div>
                 <div class="dt-scrollable"></div>
                 <div class="dt-footer"></div>
@@ -128,6 +130,8 @@ class DataTable {
         `;
 
         this.datatableWrapper = $('.datatable', this.wrapper);
+        this.title = $('.dt-title', this.wrapper);
+        this.charts = $('.dt-charts', this.wrapper);
         this.header = $('.dt-header', this.wrapper);
         this.footer = $('.dt-footer', this.wrapper);
         this.bodyScrollable = $('.dt-scrollable', this.wrapper);
@@ -159,6 +163,8 @@ class DataTable {
     }
 
     render() {
+        this.title.empty();
+        this.charts.empty();
         this.renderHeader();
         this.renderBody();
     }
