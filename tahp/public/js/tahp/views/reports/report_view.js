@@ -1,8 +1,8 @@
 /**
  * frappe.views.ReportView
  */
-import DataTable from "frappe-datatable";
-// import DataTable from "../../custom/report"
+// import DataTable from "frappe-datatable";
+import DataTable from "../../custom/datatable/datatable"
 
 window.DataTable = DataTable;
 frappe.provide("frappe.views");
@@ -60,13 +60,42 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		this.page.main.addClass("report-view");
 	}
 
-	setup_events() {
-		const me = this;
-		if (this.list_view_settings?.disable_auto_refresh) {
+	setup_realtime_updates() {
+		this.pending_document_refreshes = [];
+
+		if (this.list_view_settings?.disable_auto_refresh || this.realtime_events_setup) {
 			return;
 		}
 		frappe.realtime.doctype_subscribe(this.doctype);
-		frappe.realtime.on("list_update", (data) => this.on_update(data));
+		frappe.realtime.off("list_update");
+		frappe.realtime.on("list_update", (data) => {
+			if (data?.doctype !== this.doctype) {
+				return;
+			}
+			console.log('hi')
+
+			// if some bulk operation is happening by selecting list items, don't refresh
+			if (this.$checks && this.$checks.length) {
+				return;
+			}
+
+			if (this.avoid_realtime_update()) {
+				return;
+			}
+
+			this.on_update(data)
+		});
+		this.realtime_events_setup = true;
+	}
+
+	setup_events() {
+		const me = this;
+		// if (this.list_view_settings?.disable_auto_refresh) {
+		// 	return;
+		// }
+		// frappe.realtime.doctype_subscribe(this.doctype);
+		// frappe.realtime.on("list_update", () => this.datatable.refresh());
+		this.setup_realtime_updates()
 		this.page.actions_btn_group.on("show.bs.dropdown", () => {
 			me.toggle_workflow_actions();
 		});
@@ -249,7 +278,6 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		} else if (this.chart) {
 			this.refresh_charts();
 		}
-
 		if (this.datatable && !force) {
 			this.datatable.refresh(this.get_data(this.data), this.columns);
 			return;
@@ -285,7 +313,6 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 
 	update_row(doc, flash_row) {
 		const to_refresh = [];
-
 		this.data = this.data.map((d, i) => {
 			if (d.name === doc.name) {
 				for (let fieldname in d) {
@@ -339,7 +366,9 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			translations: frappe.utils.datatable.get_translations(),
 			checkboxColumn: true,
 			inlineFilters: true,
+			hasAction: true,
 			treeView: true,
+			freezeIndex: 2,
 			direction: frappe.utils.is_rtl() ? "rtl" : "ltr",
 			events: {
 				onRemoveColumn: (column) => {
@@ -433,8 +462,51 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		document.querySelectorAll(".dt-scrollable").forEach(el => {
 			el.style.width = "";
 		});
+
+        // 2. Sau khi DataTable khởi tạo xong → bind sự kiện
+        const wrapper = this.$datatable_wrapper[0];
+        wrapper.addEventListener("click", (e) => {
+            if (e.target.classList.contains("action-edit")) {
+                const { name, doctype } = e.target.dataset;
+                this.editFunction(name, doctype);
+            }
+            if (e.target.classList.contains("action-delete")) {
+                const { name, doctype } = e.target.dataset;
+                this.deleteFunction(name, doctype);
+            }
+        });
 	}
 
+	editFunction(name, doctype) {
+		// Điều hướng tới form để chỉnh sửa
+		frappe.set_route("Form", doctype, name);
+	}
+
+	deleteFunction(name, doctype) {
+		// Xác nhận trước khi xoá
+		frappe.confirm(
+			`Bạn có chắc muốn xoá <b>${doctype}</b> ${name}?`,
+			() => {
+				frappe.db.delete_doc(doctype, name)
+					.then(() => {
+						frappe.show_alert({
+							message: __("Đã xoá thành công"),
+							indicator: "green"
+						});
+						// reload lại trang / datatable tuỳ bạn
+						frappe.reload_doc(doctype);
+					})
+					.catch(err => {
+						frappe.msgprint({
+							title: __("Lỗi khi xoá"),
+							message: err.message,
+							indicator: "red"
+						});
+					});
+			}
+		);
+	}
+	
 	toggle_charts() {
 		// add
 		if (!this.chart) {
@@ -1079,7 +1151,6 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		if (this.columns) {
 			column_widths = this.get_column_widths();
 		}
-
 		this.columns = [];
 		this.columns_map = {};
 
@@ -1270,6 +1341,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 
 	build_row(d) {
 		return this.columns.map((col) => {
+			if (!col.docfield) return
 			if (col.docfield.parent !== this.doctype) {
 				// child table field
 				const cdt_field = (f) => `${col.docfield.parent}:${f}`;
@@ -1798,7 +1870,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 				delete frappe.route_options["_group_by"];
 			} catch (e) {
 				console.warn("Failed to parse group by from URL", e);
-			}
+			}frappe-bench/apps/tahp
 		}
 
 		return super.parse_filters_from_route_options();
