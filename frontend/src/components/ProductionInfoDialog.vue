@@ -29,7 +29,7 @@
 
           <div>
             <label class="block text-gray-700 text-sm mb-1">Trạng thái</label>
-            <button class="w-full sm:w-1/2 lg:w-[calc(25%-10px)] bg-cyan-500 text-white text-sm font-medium py-2 rounded-sm">
+            <button class="w-full sm:w-1/2 lg:w-[calc(25%-11px)] bg-cyan-500 text-white text-sm font-medium py-2 rounded-sm">
               {{ status }}
             </button>
           </div>

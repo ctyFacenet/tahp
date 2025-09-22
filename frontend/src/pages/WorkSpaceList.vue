@@ -1,12 +1,11 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { call } from "frappe-ui";
 import GroupedListView from "@/components/GroupedListView.vue";
 import ProductionInfoDialog from "@/components/ProductionInfoDialog.vue";
+import { getWorkstations } from "@/services/workstationService.js";
 
 const columns = ref([]);
 const grouped_rows = ref([]);
-
 const dialogRef = ref(null);
 
 const labelMap = {
@@ -20,18 +19,7 @@ const labelMap = {
 
 const loadData = async () => {
   try {
-    const res = await call("frappe.client.get_list", {
-      doctype: "Workstation",
-      fields: [
-        "name",
-        "workstation_name",
-        "workstation_type",
-        "status",
-        "custom_is_parent",
-        "custom_parent",
-      ],
-      limit_page_length: 50,
-    });
+     const res = await getWorkstations();
 
     if (res && res.length > 0) {
       const defaultCols = [
