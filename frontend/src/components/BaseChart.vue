@@ -41,9 +41,8 @@ Chart.register(
 
 const customDoughnutLabels = {
   id: "customDoughnutLabels",
-  afterDatasetsDraw(chart, args, opts) {
+  afterDatasetsDraw(chart) {
     if (chart.config.type !== "doughnut") return;
-
     const { ctx } = chart;
     const dataset = chart.data.datasets[0];
     if (!dataset) return;
@@ -66,26 +65,21 @@ const customDoughnutLabels = {
     ctx.globalCompositeOperation = "destination-over";
     ctx.font = "12px sans-serif";
     ctx.textBaseline = "middle";
-
     meta.data.forEach((el, i) => {
       const val = dataset.data[i];
       if (!val) return;
 
       const percentage = ((val / total) * 100).toFixed(2) + "%";
       const color = dataset.backgroundColor[i];
-
       const { x, y } = el.tooltipPosition();
       const midAngle = (el.startAngle + el.endAngle) / 2;
-
       const xLine = Math.cos(midAngle) * (el.outerRadius + 15) + el.x;
       const yLine = Math.sin(midAngle) * (el.outerRadius + 15) + el.y;
-
       const alignRight = xLine > el.x;
       const xText = xLine + (alignRight ? 12 : -12);
 
       ctx.textAlign = alignRight ? "left" : "right";
       ctx.strokeStyle = color;
-
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(xLine, yLine);
@@ -95,11 +89,9 @@ const customDoughnutLabels = {
       ctx.fillStyle = color;
       ctx.fillText(`${val} (${percentage})`, xText, yLine);
     });
-
     ctx.restore();
   },
 };
-
 
 const props = defineProps({
   type: String,

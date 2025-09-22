@@ -1,32 +1,29 @@
 <template>
-  <div class="flex">
-    <div class="w-[15%]">
+  <div class="bg-white min-h-screen flex flex-col md:flex-row">
+    <div class="w-full md:w-[35%] lg:w-[15%] p-2 mt-8">
       <TreeFilter />
     </div>
 
-    <div class="flex-1">
-      <h2 class="text-center font-bold text-lg mb-4 mt-4">Báo cáo tỷ lệ phế</h2>
-      <div class="grid grid-cols-3 gap-4 mb-6 rounded-sm shadow p-4 mr-5">
-        <div class="bg-white p-8 h-[350px]">
+    <div class="flex-1 p-2 md:p-4">
+      <h2 class="text-center font-bold text-lg mb-4 mt-2 md:mt-4">
+        Báo cáo tỷ lệ phế
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 rounded-sm shadow p-4 gap-4 mb-6">
+        <div class="p-4 h-[250px] sm:h-[300px] lg:h-[350px]">
           <BaseChart type="line" :data="lineData" :options="lineOptions" />
         </div>
 
-        <div class="bg-white rounded-sm shadow p-4 h-[350px]">
-          <BaseChart
-            type="doughnut"
-            :data="doughnutData"
-            :options="doughnutOptions"
-          />
+        <div class="p-4 h-[250px] sm:h-[300px] lg:h-[350px] shadow rounded-sm">
+          <BaseChart type="doughnut" :data="doughnutData" :options="doughnutOptions" />
         </div>
 
-        <div class="bg-white rounded-sm shadow p-4 h-[350px]">
+        <div class="p-4 h-[250px] sm:h-[300px] lg:h-[350px] shadow rounded-sm">
           <BaseChart type="bar" :data="barData" :options="barOptions" />
         </div>
       </div>
 
-      <div class="bg-white mr-5">
-        <DefectTable :rows="tableRows" />
-      </div>
+      <DefectTable :rows="tableRows" />
     </div>
   </div>
 </template>
@@ -237,7 +234,7 @@ const tableRows = [
   {
     process: "KEOTIEU",
     code: "DT.DK01",
-    name: "Đường kính to, nhỏ",
+    name: "Đường kính to, nhỏ, méo ngoài tiêu chuẩn",
     symptom: "Không đạt chuẩn",
     cause: "Không kiểm tra dies",
     qty: 52,
@@ -246,6 +243,22 @@ const tableRows = [
     machine: "KEOTIEU1",
     line: "KEOTIEU.1",
     operator: "Trần Tiến Đạt",
-  },
+  }
 ];
+
+for (let i = 6; i <= 100; i++) {
+  tableRows.push({
+    process: i % 2 === 0 ? "KEOTIEU" : "MAHZ",
+    code: `CODE${i}`,
+    name: i % 2 === 0 ? "Đường kính bất thường" : "Ngoại quan mờ",
+    symptom: i % 2 === 0 ? "Không đạt chuẩn" : "Xỉn màu",
+    cause: i % 2 === 0 ? "Sai thông số máy" : "Ống hơi lỗi",
+    qty: 40 + i,
+    unit: "kg",
+    order: `WO_EIAW020_A_${i}_2506.${i}`,
+    machine: i % 2 === 0 ? `KEOTIEU${i}` : `HZ${i}`,
+    line: i % 2 === 0 ? `KEOTIEU.${i}` : `HZ.${i}`,
+    operator: i % 2 === 0 ? "Nguyễn Văn C" : "Trần Tiến Đạt",
+  });
+}
 </script>

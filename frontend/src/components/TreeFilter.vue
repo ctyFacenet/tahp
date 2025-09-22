@@ -1,22 +1,22 @@
 <template>
-  <div class="bg-white p-6">
+  <div class="bg-white p-4 w-full">
     <div class="mb-4">
-      <label class="block text-md">Ngày bắt đầu - kết thúc</label>
+      <label class="block text-md font-medium mb-1">Ngày bắt đầu - kết thúc</label>
       <a-range-picker
         v-model:value="dateRange"
         format="DD/MM/YYYY"
         class="w-full"
-        :placeholder="['16/09/2020', '17/09/2021']"
+        :placeholder="['Ngày bắt đầu', 'Ngày kết thúc']"
         :suffix-icon="null"
       />
     </div>
 
-    <div class="border rounded-sm p-2 max-h-80 overflow-y-auto">
+    <div class="border rounded-sm p-2 max-h-96 overflow-y-auto">
       <a-tree
         checkable
         :tree-data="treeData"
         v-model:checkedKeys="checkedKeys"
-        defaultExpandAll
+        :defaultExpandedKeys="[]"
       />
     </div>
   </div>

@@ -1,80 +1,74 @@
 <template>
-  <div class="bg-white rounded-sm shadow p-4">
-     <table class="min-w-full border border-gray-200 text-sm">
-      <thead>
-        <tr class="bg-blue-100 text-gray-700">
-          <th class="px-2 py-2 border">STT</th>
-          <th
-            v-for="col in columns"
-            :key="col.key"
-            class="px-2 py-2 border font-semibold"
-          >
-            <div class="flex items-center justify-between">
-              <span>{{ col.title }}</span>
-            <img
-                src="@/assets/icons/filter.svg"
-                alt="filter"
-                class="w-3 h-3 ml-1 cursor-pointer"
-              />
-            </div>
-          </th>
-        </tr>
+  <div class="rounded-sm shadow p-4">
+    <div class="overflow-x-auto">
+      <table class="min-w-full border border-gray-200 text-xs sm:text-sm">
+        <thead>
+          <tr class="bg-blue-100 text-gray-700">
+            <th class="px-2 py-2 border">STT</th>
+            <th v-for="col in columns" :key="col.key" class="px-2 py-2 border font-semibold">
+              <div class="flex items-center justify-between">
+                <span>{{ col.title }}</span>
+                <img src="@/assets/icons/filter.svg" alt="filter" class="w-3 h-3 ml-1 cursor-pointer" />
+              </div>
+            </th>
+          </tr>
 
-        <tr>
-          <th class="px-2 py-1 border"></th>
-          <th v-for="col in columns" :key="col.key" class="px-2 py-1 border">
-            <div class="flex items-center">
-            <img
-                src="@/assets/icons/search.svg"
-                alt="search"
-                class="w-3 h-3 mr-2"
-              />
-              <input
-                v-model="filters[col.key]"
-                type="text"
-                class="w-full border-none px-2 py-1 text-xs"
-              />
-            </div>
-          </th>
-        </tr>
-      </thead>
+          <tr>
+            <th class="px-2 py-1 border"></th>
+            <th v-for="col in columns" :key="col.key" class="px-2 py-1 border">
+              <div class="flex items-center">
+                <img src="@/assets/icons/search.svg" alt="search" class="w-3 h-3 mr-2" />
+                <input
+                  v-model="filters[col.key]"
+                  type="text"
+                  class="w-full border-none px-2 py-1 text-xs"
+                />
+              </div>
+            </th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr
-          v-for="(row, index) in paginatedRows"
-          :key="row.code"
-          class="hover:bg-gray-50"
-        >
-          <td class="px-2 py-1 border">
-            {{ (currentPage - 1) * pageSize + index + 1 }}
-          </td>
-          <td
-            v-for="col in columns"
-            :key="col.key"
-            class="px-2 py-1 border"
-          >
-            {{ row[col.key] }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <tbody>
+          <tr v-for="(row, index) in paginatedRows" :key="row.code" class="hover:bg-gray-50">
+            <td class="px-2 py-1 border">
+              {{ (currentPage - 1) * pageSize + index + 1 }}
+            </td>
+            <td v-for="col in columns" :key="col.key" class="px-2 py-1 border">
+              {{ row[col.key] }}
+            </td>
+          </tr>
 
-    <div class="flex justify-between items-center mt-4">
+          <tr v-if="paginatedRows.length === 0">
+            <td
+              :colspan="columns.length + 1"
+              class="text-center py-6 text-gray-500 italic border"
+            >
+              Không có dữ liệu
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-between items-center mt-4 flex-wrap gap-2">
       <a-select
         v-model:value="pageSize"
         :options="pageSizeOptions"
-        style="width: 100px"
+        class="hidden sm:block w-[100px]"
         @change="onPageSizeChange"
       />
 
-      <a-pagination
-        v-model:current="currentPage"
-        :total="filteredRows.length"
-        :pageSize="pageSize"
-        @change="onPageChange"
-      />
+      <div class="w-full flex justify-center sm:w-auto">
+        <a-pagination
+          v-model:current="currentPage"
+          :total="filteredRows.length"
+          :pageSize="pageSize"
+          @change="onPageChange"
+          :showSizeChanger="false"
+        />
+      </div>
 
-      <div class="flex items-center gap-2">
+      <div class="hidden sm:flex items-center gap-2">
         <span class="text-sm">Đi đến trang</span>
         <a-input-number
           v-model:value="goToPage"
@@ -92,14 +86,12 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed } from "vue";
 
 const props = defineProps({
-  rows: {
-    type: Array,
-    required: true,
-  },
+  rows: { type: Array, required: true },
 });
 
 const columns = [
@@ -119,13 +111,13 @@ const columns = [
 const filters = ref({});
 columns.forEach((col) => (filters.value[col.key] = ""));
 
-const filteredRows = computed(() => {
-  return props.rows.filter((row) =>
+const filteredRows = computed(() =>
+  props.rows.filter((row) =>
     columns.every((col) =>
       row[col.key]?.toString().toLowerCase().includes(filters.value[col.key].toLowerCase())
     )
-  );
-});
+  )
+);
 
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -137,9 +129,7 @@ const pageSizeOptions = [
   { label: "50/Trang", value: 50 },
 ];
 
-const onPageChange = (page) => {
-  currentPage.value = page;
-};
+const onPageChange = (page) => (currentPage.value = page);
 
 const onPageSizeChange = (size) => {
   pageSize.value = size;
