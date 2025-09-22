@@ -348,3 +348,8 @@ body.dt-resize {
 .dt-toast__message {
     color: white;
 }
+
+.dt-title {
+    text-align: center;
+    font-size: 2rem;
+}

@@ -70,6 +70,8 @@ export default function getDefaultOptions(instance) {
         direction: 'ltr',
         disableReorderColumn: false,
         freezeIndex: null,
-        hasAction: null
+        hasAction: null,
+        title: null,
+        styleTitle: null
     };
 };

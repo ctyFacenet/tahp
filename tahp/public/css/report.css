@@ -477,3 +477,24 @@
 body.dt-resize {
   cursor: col-resize;
 }
+
+.chart-wrapper {
+  padding: 0rem;
+}
+
+.report-summary {
+  padding: 0rem;
+}
+
+.chart-js-col {
+	flex: 1 1 calc(50% - 16px); /* desktop: 2 chart 1 hàng */
+	box-sizing: border-box;
+	padding: 8px;
+	height: 400px; /* hoặc dùng this.chartjsOptions.chart_height */
+}
+
+@media (max-width: 767px) {
+  .jc-col {
+    flex: 0 0 100%;
+  }
+}

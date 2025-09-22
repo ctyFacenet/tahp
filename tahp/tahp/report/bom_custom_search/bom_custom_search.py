@@ -84,7 +84,7 @@ def execute(filters=None):
     # ]
     # summary.append({"label": "Tổng BOM", "value": total_boms})
 
-    # # --- Chart: hiển thị số BOM theo custom_category ---
+    # # # --- Chart: hiển thị số BOM theo custom_category ---
     # chart = {
     #     "data": {
     #         "labels": list(category_counter.keys()),
@@ -98,7 +98,7 @@ def execute(filters=None):
     #     "type": "bar"  # có thể đổi sang pie hoặc line
     # }
 
-    message = []
+    # message = []
 
     # return columns, data, message, chart, summary
     return columns, data

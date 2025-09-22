@@ -278,7 +278,6 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		} else if (this.chart) {
 			this.refresh_charts();
 		}
-
 		if (this.datatable && !force) {
 			this.datatable.refresh(this.get_data(this.data), this.columns);
 			return;
@@ -507,6 +506,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			}
 		);
 	}
+	
 	toggle_charts() {
 		// add
 		if (!this.chart) {
