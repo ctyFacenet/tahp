@@ -3,7 +3,8 @@ import { createApp } from "vue"
 import App from "./App.vue"
 import router from "./router"
 import { initSocket } from "./socket"
-
+import Antd from "ant-design-vue";
+import "ant-design-vue/dist/reset.css";
 import {
   Alert,
   Badge,
@@ -39,6 +40,8 @@ setConfig("resourceFetcher", frappeRequest)
 app.use(router)
 app.use(resourcesPlugin)
 app.use(pageMetaPlugin)
+
+app.use(Antd);
 
 const socket = initSocket()
 app.config.globalProperties.$socket = socket

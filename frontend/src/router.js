@@ -22,6 +22,11 @@ const routes = [
     name: "ProductionInfo Dialog",
     path: "/dialog/info",
     component: () => import("@/pages/TestDialog.vue"),
+  },
+  {
+    name: "Statistical Report",
+    path: "/report",
+    component: () => import("@/pages/StatisticalReport.vue"),
   }
 ]
 
