@@ -1,5 +1,37 @@
 # Copyright (c) 2025, FaceNet and contributors
 # For license information, please see license.txt
+"""
+    Downtime Report Module 
+
+    Mục đích:
+    - Tính toán và tổng hợp dữ liệu thời gian dừng máy (downtime) từ Job Card và Work Order trong Frappe/ERPNext.
+    - Trả về dữ liệu dạng bảng (columns, data) và biểu đồ (labels, values, colors) theo thiết bị, cụm máy, nhóm nguyên nhân, và nguyên nhân chi tiết.
+
+    Hàm chính:
+    1. color_from_text(text): Tạo màu duy nhất từ chuỗi text (sử dụng MD5 hash + HLS -> RGB)
+    2. normalize_dates(from_date, to_date): Chuẩn hóa các ngày từ filter, đảm bảo from_date <= to_date
+    3. execute(filters=None): Lấy dữ liệu downtime theo filters, trả về (columns, data, message)
+    4. downtime_machine_group_data(filters=None): Tổng hợp thời gian downtime theo cụm máy
+    5. downtime_equipment_name_data(filters=None): Tổng hợp top thiết bị có thời gian downtime nhiều nhất
+    6. downtime_reason_group_data(filters=None): Tổng hợp thời gian downtime theo nhóm nguyên nhân
+    7. downtime_reason_detail_data(filters=None): Tổng hợp top nguyên nhân gây downtime
+
+    Filters có thể sử dụng:
+    - from_date, to_date
+    - reason_group, reason_detail
+    - category, machine_group, equipment_name
+
+    Trả về:
+    - execute(): columns, data, message
+    - Các hàm *_data(): dict với keys: labels, values, colors
+
+    Ghi chú:
+    - Thời gian downtime được tính theo giờ (3600 giây = 1 giờ)
+    - Dữ liệu lấy từ Job Card và Work Order, lọc theo các field phù hợp
+    - Màu cho biểu đồ được sinh từ tên thiết bị, nhóm máy hoặc nguyên nhân
+    - Các hàm *_data() có thể dùng trực tiếp để vẽ chart trong Frappe/ERPNext
+"""
+
 
 from datetime import timedelta
 import json
@@ -66,6 +98,7 @@ def execute(filters=None):
     columns = [
         {"label": "Tên thiết bị", "fieldname": "equipment_name", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         {"label": "Cụm máy", "fieldname": "machine_group", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
+        {"label": "Hệ", "fieldname": "category", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         {"label": "Mã ca", "fieldname": "shift_code", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         {"label": "Ngày", "fieldname": "date", "fieldtype": "Date", 'dropdown': False, 'sortable': False},
         {"label": "Thời gian bắt đầu dừng", "fieldname": "start_time", "fieldtype": "Time", 'dropdown': False, 'sortable': False},
@@ -74,7 +107,6 @@ def execute(filters=None):
         {"label": "Nhóm nguyên nhân", "fieldname": "reason_group", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         {"label": "Nguyên nhân", "fieldname": "reason_detail", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         {"label": "Người ghi nhận", "fieldname": "recorder", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
-        {"label": "Hệ", "fieldname": "category", "fieldtype": "Data", 'dropdown': False, 'sortable': False},
         
     ]
 
@@ -124,7 +156,7 @@ def execute(filters=None):
                 continue
             
             # Lọc theo hệ(category)
-            if filters.get("category") and doc.operation != filters["category"]:
+            if filters.get("category") and doc_wo_order.custom_category != filters["category"]:
                 continue
 
           
@@ -141,7 +173,7 @@ def execute(filters=None):
                 'reason_group': dt.group_name,
                 'reason_detail': dt.reason,
                 'recorder': doc.time_logs[0].employee if (doc.time_logs and len(doc.time_logs) > 0 and doc.time_logs[0].employee) else None,
-                'category': doc.operation,
+                'category': doc_wo_order.custom_category,
             })
 
     

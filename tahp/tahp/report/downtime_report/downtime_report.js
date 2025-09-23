@@ -1,3 +1,31 @@
+/**
+ * Báo cáo dừng máy ("Downtime Report") .
+ * 
+ * Đây là cấu hình cho query report bao gồm:
+ *  - Các filter: from_date, to_date, reason_group, reason_detail, category, machine_group, equipment_name
+ *  - Các hàm callback khi filter thay đổi (on_change)
+ *  - onload: hàm setup giao diện khi báo cáo được load
+ *  - load_manufacturing_categories: load danh sách Category từ DB và cập nhật filter
+ *  - setup_select_events: setup sự kiện cho dropdown chọn "Theo thiết bị" hoặc "Theo nguyên nhân"
+ *  - hide_all_charts, show_reason_charts, show_device_charts: quản lý hiển thị chart
+ *  - setup_title_observer, add_custom_title: thêm tiêu đề tuỳ chỉnh cho báo cáo
+ * 
+ * Charts:
+ *  - draw_column_chart / draw_horizontal_chart: biểu đồ theo thiết bị
+ *  - draw_column_chart1 / draw_horizontal_chart1: biểu đồ theo nguyên nhân
+ * 
+ * Các tính năng bổ sung:
+ *  - Dropdown Top N trên chart
+ *  - Progress bar hiển thị % thời gian downtime
+ *  - Xử lý click vào chart để set filter động
+ *  - Refresh dữ liệu khi filter thay đổi
+ * 
+ * Lưu ý:
+ *  - Sử dụng Chart.js với plugin ChartDataLabels
+ *  - on_change filter có delay 200ms để đảm bảo DOM đã cập nhật
+ *  - Dữ liệu gọi qua frappe.call API với method tương ứng
+ */
+
 frappe.query_reports["Downtime Report"] = {
     _initialized: false,
     "filters": [
@@ -148,9 +176,6 @@ frappe.query_reports["Downtime Report"] = {
             this.setup_select_events(report);
         }
         
-        
-        
-        
         setTimeout(() => {
             this.show_reason_charts();
             // Đánh dấu là đã khởi tạo xong
@@ -172,7 +197,7 @@ frappe.query_reports["Downtime Report"] = {
                 const manufacturing_filter = report.get_filter("category");
                 if (manufacturing_filter) {
                    
-                    const options = records.map(r => r.name);
+                    const options = [''].concat(records.map(r => r.name));
                     
                     manufacturing_filter.df.options = options;
                     
@@ -286,7 +311,7 @@ async function draw_column_chart() {
   
     let reportWrapper = document.querySelector(".form-message");
     if (!reportWrapper) {
-        console.warn("Không tìm thấy .form-message");
+        // console.warn("Không tìm thấy .form-message");
         return;
     }
 
@@ -418,7 +443,7 @@ async function draw_column_chart() {
             });
         }
     } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
+        // console.error("Lỗi khi gọi API:", err);
     }
 }
 
@@ -427,7 +452,7 @@ async function draw_horizontal_chart() {
 
     let chartContainer = document.querySelector(".form-message");
     if (!chartContainer) {
-        console.warn("Không tìm thấy div.form-message");
+        // console.warn("Không tìm thấy div.form-message");
         return;
     }
     chartContainer.classList.add("d-flex");
@@ -653,7 +678,7 @@ async function draw_horizontal_chart() {
         } 
         
     } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
+        // console.error("Lỗi khi gọi API:", err);
     }
 }
 
@@ -667,7 +692,7 @@ async function draw_column_chart1() {
    
     let reportWrapper = document.querySelector(".form-message");
     if (!reportWrapper) {
-        console.warn("Không tìm thấy .form-message");
+        // console.warn("Không tìm thấy .form-message");
         return;
     }
 
@@ -800,7 +825,7 @@ async function draw_column_chart1() {
             });
         }
     } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
+        // console.error("Lỗi khi gọi API:", err);
     }
 }
 
@@ -810,7 +835,7 @@ async function draw_horizontal_chart1() {
 
     let chartContainer = document.querySelector(".form-message");
     if (!chartContainer) {
-        console.warn("Không tìm thấy div.form-message");
+        // console.warn("Không tìm thấy div.form-message");
         return;
     }
     chartContainer.classList.add("d-flex");
@@ -1067,6 +1092,6 @@ async function draw_horizontal_chart1() {
             // });
         }
     } catch (err) {
-        console.error("Lỗi khi gọi API:", err);
+        // console.error("Lỗi khi gọi API:", err);
     }
 }
