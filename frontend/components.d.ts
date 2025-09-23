@@ -9,8 +9,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseChart: typeof import('./src/components/BaseChart.vue')['default']
+    BaseTable: typeof import('./src/components/BaseTable.vue')['default']
     DataTable: typeof import('./src/components/partials/DataTable.vue')['default']
-    DefectTable: typeof import('./src/components/DefectTable.vue')['default']
     FormPrintLabel: typeof import('./src/components/partials/FormPrintLabel.vue')['default']
     GroupedListView: typeof import('./src/components/GroupedListView.vue')['default']
     ProductionInfoDialog: typeof import('./src/components/ProductionInfoDialog.vue')['default']

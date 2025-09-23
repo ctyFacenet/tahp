@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <DefectTable :rows="tableRows" :columns="defectColumns"/>
+      <BaseTable :rows="tableRows" :columns="defectColumns"/>
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@
 <script setup>
 import BaseChart from "@/components/BaseChart.vue";
 import TreeFilter from "@/components/TreeFilter.vue";
-import DefectTable from "@/components/DefectTable.vue";
+import BaseTable from "@/components/BaseTable.vue";
 
 const lineData = {
   labels: ["2024", "2025", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],

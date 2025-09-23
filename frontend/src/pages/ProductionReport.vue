@@ -17,7 +17,7 @@
     </div>
 
     <div class="mt-6 p-4">
-      <DefectTable :rows="productionRows" :columns="productionColumns" />
+      <BaseTable :rows="productionRows" :columns="productionColumns" />
     </div>
   </div>
 </template>
@@ -25,7 +25,7 @@
 <script setup>
 import BaseChart from "@/components/BaseChart.vue";
 import TreeFilter from "@/components/TreeFilter.vue";
-import DefectTable from "@/components/DefectTable.vue";
+import BaseTable from "@/components/BaseTable.vue";
 
 
 const productionChartData = {
