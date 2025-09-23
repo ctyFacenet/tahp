@@ -7,7 +7,7 @@
         <TreeFilter :showDateFilter="true" />
       </div>
 
-      <div class="lg:col-span-4 p-4 border rounded shadow">
+      <div class="lg:col-span-4 p-4 border rounded mr-4">
         <BaseChart
           type="bar"
           :data="productionChartData"
