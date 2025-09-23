@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <DefectTable :rows="tableRows" />
+      <DefectTable :rows="tableRows" :columns="defectColumns"/>
     </div>
   </div>
 </template>
@@ -262,4 +262,19 @@ for (let i = 6; i <= 100; i++) {
     operator: i % 2 === 0 ? "Nguyễn Văn C" : "Trần Tiến Đạt",
   });
 }
+
+const defectColumns = [
+  { title: "Công đoạn", key: "process" },
+  { title: "Mã lỗi", key: "code" },
+  { title: "Tên lỗi", key: "name" },
+  { title: "Triệu chứng", key: "symptom" },
+  { title: "Nguyên nhân", key: "cause" },
+  { title: "Số lượng", key: "qty" },
+  { title: "Đơn vị", key: "unit" },
+  { title: "Lệnh sản xuất", key: "order" },
+  { title: "Máy", key: "machine" },
+  { title: "Line", key: "line" },
+  { title: "Người vận hành", key: "operator" },
+];
+
 </script>

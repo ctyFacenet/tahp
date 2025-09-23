@@ -23,20 +23,37 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+
+const props = defineProps({
+  showDateFilter: { type: Boolean, default: false },
+});
 
 const dateRange = ref([]);
-const checkedKeys = ref(["2025-6"]);
+const checkedKeys = ref([]);
 
 const years = [2025, 2024, 2023, 2022, 2021, 2020];
-const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
-const treeData = years.map((year) => ({
-  title: `Năm ${year}`,
-  key: `${year}`,
-  children: months.map((m) => ({
-    title: `Tháng ${m}`,
-    key: `${year}-${m}`,
-  })),
-}));
+const getDaysInMonth = (year, month) => {
+  if (month === 2) return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28;
+  return [4, 6, 9, 11].includes(month) ? 30 : 31;
+};
+
+const treeData = computed(() =>
+  years.map((year) => ({
+    title: `Năm ${year}`,
+    key: `${year}`,
+    children: months.map((m) => ({
+      title: `Tháng ${m}`,
+      key: `${year}-${m}`,
+      children: props.showDateFilter
+        ? Array.from({ length: getDaysInMonth(year, m) }, (_, d) => ({
+            title: `Ngày ${d + 1}`,
+            key: `${year}-${m}-${d + 1}`,
+          }))
+        : undefined,
+    })),
+  }))
+);
 </script>

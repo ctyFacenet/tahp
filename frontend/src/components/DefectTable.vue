@@ -5,19 +5,35 @@
         <thead>
           <tr class="bg-blue-100 text-gray-700">
             <th class="px-2 py-2 border">STT</th>
-            <th v-for="col in columns" :key="col.key" class="px-2 py-2 border font-semibold">
+            <th
+              v-for="col in columns"
+              :key="col.key"
+              class="px-2 py-2 border font-semibold"
+            >
               <div class="flex items-center justify-between">
                 <span>{{ col.title }}</span>
-                <img src="@/assets/icons/filter.svg" alt="filter" class="w-3 h-3 ml-1 cursor-pointer" />
+                <img
+                  src="@/assets/icons/filter.svg"
+                  alt="filter"
+                  class="w-3 h-3 ml-1 cursor-pointer"
+                />
               </div>
             </th>
           </tr>
 
           <tr>
             <th class="px-2 py-1 border"></th>
-            <th v-for="col in columns" :key="col.key" class="px-2 py-1 border">
+            <th
+              v-for="col in columns"
+              :key="col.key"
+              class="px-2 py-1 border"
+            >
               <div class="flex items-center">
-                <img src="@/assets/icons/search.svg" alt="search" class="w-3 h-3 mr-2" />
+                <img
+                  src="@/assets/icons/search.svg"
+                  alt="search"
+                  class="w-3 h-3 mr-2"
+                />
                 <input
                   v-model="filters[col.key]"
                   type="text"
@@ -29,7 +45,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="(row, index) in paginatedRows" :key="row.code" class="hover:bg-gray-50">
+          <tr
+            v-for="(row, index) in paginatedRows"
+            :key="index"
+            class="hover:bg-gray-50"
+          >
             <td class="px-2 py-1 border">
               {{ (currentPage - 1) * pageSize + index + 1 }}
             </td>
@@ -86,35 +106,24 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed } from "vue";
 
 const props = defineProps({
   rows: { type: Array, required: true },
+  columns: { type: Array, required: true },
 });
 
-const columns = [
-  { title: "Công đoạn", key: "process" },
-  { title: "Mã lỗi", key: "code" },
-  { title: "Tên lỗi", key: "name" },
-  { title: "Triệu chứng", key: "symptom" },
-  { title: "Nguyên nhân", key: "cause" },
-  { title: "Số lượng", key: "qty" },
-  { title: "Đơn vị", key: "unit" },
-  { title: "Lệnh sản xuất", key: "order" },
-  { title: "Máy", key: "machine" },
-  { title: "Line", key: "line" },
-  { title: "Người vận hành", key: "operator" },
-];
-
 const filters = ref({});
-columns.forEach((col) => (filters.value[col.key] = ""));
+props.columns.forEach((col) => (filters.value[col.key] = ""));
 
 const filteredRows = computed(() =>
   props.rows.filter((row) =>
-    columns.every((col) =>
-      row[col.key]?.toString().toLowerCase().includes(filters.value[col.key].toLowerCase())
+    props.columns.every((col) =>
+      row[col.key]
+        ?.toString()
+        .toLowerCase()
+        .includes(filters.value[col.key].toLowerCase())
     )
   )
 );
@@ -128,7 +137,6 @@ const pageSizeOptions = [
   { label: "20/Trang", value: 20 },
   { label: "50/Trang", value: 50 },
   { label: "100/Trang", value: 100 },
-
 ];
 
 const onPageChange = (page) => (currentPage.value = page);
@@ -139,7 +147,10 @@ const onPageSizeChange = (size) => {
 };
 
 const jumpToPage = () => {
-  if (goToPage.value >= 1 && goToPage.value <= Math.ceil(filteredRows.value.length / pageSize.value)) {
+  if (
+    goToPage.value >= 1 &&
+    goToPage.value <= Math.ceil(filteredRows.value.length / pageSize.value)
+  ) {
     currentPage.value = goToPage.value;
   }
 };
