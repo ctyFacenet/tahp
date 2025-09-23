@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onBeforeUnmount } from "vue";
 import {
   Chart,
   LineElement,
@@ -43,6 +43,7 @@ const customDoughnutLabels = {
   id: "customDoughnutLabels",
   afterDatasetsDraw(chart) {
     if (chart.config.type !== "doughnut") return;
+
     const { ctx } = chart;
     const dataset = chart.data.datasets[0];
     if (!dataset) return;
@@ -65,6 +66,7 @@ const customDoughnutLabels = {
     ctx.globalCompositeOperation = "destination-over";
     ctx.font = "12px sans-serif";
     ctx.textBaseline = "middle";
+
     meta.data.forEach((el, i) => {
       const val = dataset.data[i];
       if (!val) return;
@@ -73,13 +75,16 @@ const customDoughnutLabels = {
       const color = dataset.backgroundColor[i];
       const { x, y } = el.tooltipPosition();
       const midAngle = (el.startAngle + el.endAngle) / 2;
+
       const xLine = Math.cos(midAngle) * (el.outerRadius + 15) + el.x;
       const yLine = Math.sin(midAngle) * (el.outerRadius + 15) + el.y;
+
       const alignRight = xLine > el.x;
       const xText = xLine + (alignRight ? 12 : -12);
 
       ctx.textAlign = alignRight ? "left" : "right";
       ctx.strokeStyle = color;
+
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(xLine, yLine);
@@ -89,24 +94,47 @@ const customDoughnutLabels = {
       ctx.fillStyle = color;
       ctx.fillText(`${val} (${percentage})`, xText, yLine);
     });
+
     ctx.restore();
   },
 };
 
 const props = defineProps({
-  type: String,
-  data: Object,
-  options: Object,
+  type: { type: String, required: true },
+  data: { type: Object, required: true },
+  options: { type: Object, default: () => ({}) },
 });
 
 const canvas = ref(null);
 let chart;
 
+const mergeOptions = (options) => {
+  return {
+    ...options,
+    plugins: {
+      ...options.plugins,
+      tooltip: {
+        backgroundColor: "#fff",
+        titleColor: "#000",
+        bodyColor: "#000",
+        borderWidth: 1,
+        borderColor: (ctx) =>
+          ctx.tooltipItems?.[0]
+            ? ctx.chart.data.datasets[0].backgroundColor[
+                ctx.tooltipItems[0].dataIndex
+              ]
+            : "#ccc",
+        callbacks: options.plugins?.tooltip?.callbacks ?? {},
+      },
+    },
+  };
+};
+
 onMounted(() => {
   chart = new Chart(canvas.value, {
     type: props.type,
     data: props.data,
-    options: props.options,
+    options: mergeOptions(props.options),
     plugins: [customDoughnutLabels],
   });
 });
@@ -114,9 +142,17 @@ onMounted(() => {
 watch(
   () => props.data,
   (newData) => {
-    chart.data = newData;
-    chart.update();
+    if (chart) {
+      chart.data = newData;
+      chart.update();
+    }
   },
   { deep: true }
 );
+
+onBeforeUnmount(() => {
+  if (chart) {
+    chart.destroy();
+  }
+});
 </script>

@@ -54,7 +54,7 @@
       <a-select
         v-model:value="pageSize"
         :options="pageSizeOptions"
-        class="hidden sm:block w-[100px]"
+        class="hidden sm:block w-[105px]"
         @change="onPageSizeChange"
       />
 
@@ -127,6 +127,8 @@ const pageSizeOptions = [
   { label: "10/Trang", value: 10 },
   { label: "20/Trang", value: 20 },
   { label: "50/Trang", value: 50 },
+  { label: "100/Trang", value: 100 },
+
 ];
 
 const onPageChange = (page) => (currentPage.value = page);

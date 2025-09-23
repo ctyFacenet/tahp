@@ -29,7 +29,7 @@ const dateRange = ref([]);
 const checkedKeys = ref(["2025-6"]);
 
 const years = [2025, 2024, 2023, 2022, 2021, 2020];
-const months = [1, 2, 3, 4, 5, 6];
+const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 const treeData = years.map((year) => ({
   title: `Năm ${year}`,
