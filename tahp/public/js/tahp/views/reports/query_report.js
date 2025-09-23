@@ -1,6 +1,7 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 // MIT License. See license.txt
-import DataTable from "frappe-datatable";
+// import DataTable from "frappe-datatable";
+import DataTable from "../../custom/datatable/datatable"
 
 // Expose DataTable globally to allow customizations.
 window.DataTable = DataTable;
@@ -8,6 +9,7 @@ window.DataTable = DataTable;
 frappe.provide("frappe.widget.utils");
 frappe.provide("frappe.views");
 frappe.provide("frappe.query_reports");
+frappe.require("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js");
 
 frappe.standard_pages["query-report"] = function () {
 	var wrapper = frappe.container.add_page("query-report");
@@ -50,9 +52,9 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 	setup_defaults() {
 		this.route = frappe.get_route();
 		this.page_name = frappe.get_route_str();
-
-		// Setup buttons
+		this.chartjsOptions = {number_per_row: 2, chart_height: 400}
 		this.primary_action = null;
+		this.charts = []
 
 		// throttle refresh for 300ms
 		this.refresh = frappe.utils.throttle(this.refresh, 300);
@@ -136,6 +138,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 	}
 
 	load() {
+		this.charts = []
 		if (frappe.get_route().length < 2) {
 			this.toggle_nothing_to_show(true);
 			return;
@@ -168,7 +171,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		this.menu_items = this.get_menu_items();
 		this.datatable = null;
 		this.export_dialog = null;
-
 		frappe.run_serially([
 			() => this.get_report_doc(),
 			() => this.get_report_settings(),
@@ -653,7 +655,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		if (this.prepared_report_name) {
 			filters.prepared_report_name = this.prepared_report_name;
 		}
-
 		return new Promise((resolve) => {
 			this.last_ajax = frappe.call({
 				method: "frappe.desk.query_report.run",
@@ -727,10 +728,14 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 							this.chart_options && this.render_chart(this.chart_options);
 						}
 					}
+					this.render_chart_js()
 					this.render_datatable();
 					this.add_chart_buttons_to_toolbar(true);
 					this.add_card_button_to_toolbar();
 					this.$report.show();
+					document.querySelectorAll(".dt-scrollable").forEach(el => {
+						el.style.width = "";
+					});
 				} else {
 					this.data = [];
 					this.toggle_nothing_to_show(true);
@@ -958,7 +963,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		this.data = this.prepare_data(data.result);
 		this.linked_doctypes = this.get_linked_doctypes();
 		this.tree_report = this.data.some((d) => "indent" in d);
-		console.log(this.tree_report)
 	}
 
 	render_datatable() {
@@ -997,7 +1001,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 				translations: frappe.utils.datatable.get_translations(),
 				treeView: this.tree_report,
 				layout: "fixed",
-				cellHeight: 33,
+				cellHeight: 40,
 				showTotalRow: this.raw_data.add_total_row && !this.report_settings.tree,
 				direction: frappe.utils.is_rtl() ? "rtl" : "ltr",
 				hooks: {
@@ -1073,6 +1077,51 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		this.$chart.show();
 		this.chart = new frappe.Chart(this.$chart[0], options);
 	}
+
+	render_chart_js() {
+		// Nếu có chart object cũ thì destroy hết trước
+		if (this.chart && Array.isArray(this.chart)) {
+			this.chart.forEach(c => {
+				if (c && typeof c.destroy === "function") {
+					c.destroy();
+				}
+			});
+		}
+		this.chart = [];
+
+		// Xóa sạch DOM cũ
+		this.$chart.empty();
+		this.$chart.hide().show(); // trick refresh DOM
+
+		console.log('render js');
+
+		const numberPerRow = (this.chartjsOptions?.number_per_row) || 2;
+		const chartHeight = (this.chartjsOptions?.chart_height) || 400;
+		const gap = 16;
+
+		if (!this.charts) return;
+		this.charts.forEach((chartInfo) => {
+			// tạo column div cho chart
+			const $col = $('<div></div>').css({
+				boxSizing: 'border-box',
+				flex: `0 0 calc(${100 / numberPerRow}% - ${(gap * (numberPerRow - 1)) / numberPerRow}px)`,
+				padding: '8px',
+				height: chartHeight + 'px'
+			}).appendTo(this.$chart);
+
+			// thêm canvas
+			const canvas = $('<canvas></canvas>').css({
+				width: '100%',
+				height: '100%'
+			}).appendTo($col)[0];
+
+			// render chart mới
+			const ctx = canvas.getContext('2d');
+			const chartObj = new Chart(ctx, chartInfo.options);
+			this.chart.push(chartObj); // lưu lại để destroy sau này
+		});
+	}
+
 
 	open_create_chart_dialog() {
 		const me = this;
@@ -1961,12 +2010,11 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 			.insertAfter(page_form);
 
 		this.$summary = $(`<div class="report-summary"></div>`).hide().appendTo(this.page.main);
+		this.$chart = $('<div class="chart-wrapper d-flex flex-wrap">').appendTo(this.page.main);
 
-		this.$chart = $('<div class="chart-wrapper">').hide().appendTo(this.page.main);
-
-		this.$loading = $(this.message_div("")).hide().appendTo(this.page.main);
+		this.$loading = $(this.message_div("")).appendTo(this.page.main);
 		this.$report = $('<div class="report-wrapper">').appendTo(this.page.main);
-		this.$message = $(this.message_div("")).hide().appendTo(this.page.main);
+		this.$message = $(this.message_div("")).appendTo(this.page.main);
 	}
 
 	show_status(status_message) {
@@ -2054,7 +2102,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 
 	toggle_report(flag) {
 		this.$report.toggle(flag);
-		this.$chart.toggle(flag);
 		this.$summary.toggle(flag);
 	}
 

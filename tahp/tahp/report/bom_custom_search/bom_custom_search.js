@@ -59,7 +59,7 @@ frappe.query_reports["BOM Custom Search"] = {
     },
 
     get_datatable_options(options) {
-        return { ...options, cellHeight: 40 };
+        return { ...options, freezeIndex: 2};
     }
 };
 
