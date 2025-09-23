@@ -43,7 +43,8 @@ app_include_css = [
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
     "/assets/tahp/css/report.css",
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
@@ -54,6 +55,7 @@ app_include_js = [
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
+    "/assets/tahp/node_modules/chart.js/dist/chart.umd.js"
 
     # "/assets/tahp/js/work_order/work_order.js",
     # "/assets/tahp/js/item/item.js",
