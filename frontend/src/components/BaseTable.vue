@@ -70,7 +70,7 @@
       </table>
     </div>
 
-    <div class="flex justify-between items-center mt-4 flex-wrap gap-2">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 gap-4">
       <a-select
         v-model:value="pageSize"
         :options="pageSizeOptions"
@@ -78,7 +78,11 @@
         @change="onPageSizeChange"
       />
 
-      <div class="w-full flex justify-center sm:w-auto">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-center sm:text-left">
+        <span class="text-sm hidden sm:inline">
+          {{ `Trang số ${currentPage} của ${totalPages} (${filteredRows.length} bản ghi)` }}
+        </span>
+
         <a-pagination
           v-model:current="currentPage"
           :total="filteredRows.length"
@@ -88,19 +92,19 @@
         />
       </div>
 
-      <div class="hidden sm:flex items-center gap-2">
+      <div class="hidden sm:flex items-center gap-2 justify-center sm:justify-start">
         <span class="text-sm">Đi đến trang</span>
         <a-input-number
           v-model:value="goToPage"
           :min="1"
-          :max="Math.ceil(filteredRows.length / pageSize)"
+          :max="totalPages"
           @pressEnter="jumpToPage"
           style="width: 70px"
         />
       </div>
     </div>
 
-    <div class="text-center mt-4 text-gray-500 text-sm">
+    <div class="text-center mt-4 text-black text-sm">
       ©Copyright FaceNet. All Rights Reserved. Designed by FaceNet
     </div>
   </div>
@@ -158,5 +162,9 @@ const jumpToPage = () => {
 const paginatedRows = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   return filteredRows.value.slice(start, start + pageSize.value);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredRows.value.length / pageSize.value) || 1;
 });
 </script>
