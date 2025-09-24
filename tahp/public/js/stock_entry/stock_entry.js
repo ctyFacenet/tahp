@@ -8,27 +8,47 @@ frappe.ui.form.on('Stock Entry', {
         await set_code(frm);
     },
 
+    // autofill_input: async function(frm) {
+    //     if (!frm.is_new() || !frm.doc.work_order) return;
+    //     const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
+    //     if (inputs && inputs.length) {
+    //         inputs.forEach(input => {
+    //             let row = frm.add_child('items');
+    //             row.s_warehouse = input.s_warehouse;
+    //             row.t_warehouse = input.t_warehouse ? input.t_warehouse : null,
+    //             row.is_scrap_item = input.t_warehouse ? 1 : null,
+    //             row.item_code = input.item_code;
+    //             row.item_name = input.item_name;
+    //             row.qty = input.qty;
+    //             row.uom = input.uom;
+    //             row.description = input.description;
+    //             row.conversion_factor = 1;
+    //             row.transfer_qty = input.qty;
+    //             row.set_basic_rate_manually = 1;
+    //         });
+    //         }
+    //         frm.refresh_field('items');
+    //     frm.refresh_field('items');
+    // },
+
     autofill_input: async function(frm) {
         if (!frm.is_new() || !frm.doc.work_order) return;
-        const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
+
+        const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', {
+            work_order: frm.doc.work_order
+        });
+
         if (inputs && inputs.length) {
             inputs.forEach(input => {
-                let row = frm.add_child('items');
-                row.s_warehouse = input.s_warehouse;
-                row.t_warehouse = input.t_warehouse ? input.t_warehouse : null,
-                row.is_scrap_item = input.t_warehouse ? 1 : null,
-                row.item_code = input.item_code;
-                row.item_name = input.item_name;
-                row.qty = input.qty;
-                row.uom = input.uom;
-                row.description = input.description;
-                row.conversion_factor = 1;
-                row.transfer_qty = input.qty;
-                row.set_basic_rate_manually = 1;
+                let existing = frm.doc.items.find(item => item.item_code === input.item_code);
+                if (existing) {
+                    existing.qty += input.qty;
+                    existing.transfer_qty += input.qty;
+                }
             });
-            }
+
             frm.refresh_field('items');
-        frm.refresh_field('items');
+        }
     },
 
     refresh: function(frm) {

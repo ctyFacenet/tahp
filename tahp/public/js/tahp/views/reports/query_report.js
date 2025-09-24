@@ -1079,46 +1079,44 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 	}
 
 	render_chart_js() {
-		// Nếu có chart object cũ thì destroy hết trước
 		if (this.chart && Array.isArray(this.chart)) {
 			this.chart.forEach(c => {
-				if (c && typeof c.destroy === "function") {
-					c.destroy();
-				}
+				if (c && typeof c.destroy === "function") c.destroy();
 			});
 		}
 		this.chart = [];
-
-		// Xóa sạch DOM cũ
 		this.$chart.empty();
 		this.$chart.hide().show(); // trick refresh DOM
-
-		console.log('render js');
 
 		const numberPerRow = (this.chartjsOptions?.number_per_row) || 2;
 		const chartHeight = (this.chartjsOptions?.chart_height) || 400;
 		const gap = 16;
 
 		if (!this.charts) return;
+
 		this.charts.forEach((chartInfo) => {
-			// tạo column div cho chart
 			const $col = $('<div></div>').css({
 				boxSizing: 'border-box',
-				flex: `0 0 calc(${100 / numberPerRow}% - ${(gap * (numberPerRow - 1)) / numberPerRow}px)`,
+				flex: `1 1 calc(${100 / numberPerRow}% - ${(gap * (numberPerRow - 1)) / numberPerRow}px)`,
+				minWidth: '300px',
 				padding: '8px',
-				height: chartHeight + 'px'
-			}).appendTo(this.$chart);
+				position: 'relative'
+			}).addClass('chart-js-col').appendTo(this.$chart);
 
-			// thêm canvas
 			const canvas = $('<canvas></canvas>').css({
 				width: '100%',
-				height: '100%'
+				maxHeight: chartHeight + 'px'
 			}).appendTo($col)[0];
 
-			// render chart mới
 			const ctx = canvas.getContext('2d');
+			chartInfo.options = { ...chartInfo.options, maintainAspectRatio: false, responsive: true };
 			const chartObj = new Chart(ctx, chartInfo.options);
-			this.chart.push(chartObj); // lưu lại để destroy sau này
+			this.chart.push(chartObj);
+		});
+
+		// Resize all charts khi window thay đổi kích thước
+		$(window).off('resize.chartjs').on('resize.chartjs', () => {
+			this.chart.forEach(c => c.resize());
 		});
 	}
 

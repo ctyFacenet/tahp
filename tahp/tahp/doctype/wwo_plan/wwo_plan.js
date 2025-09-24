@@ -53,22 +53,22 @@ frappe.ui.form.on('WWO Plan Item', {
         // Phần hiển thị nút nếu "Đợi GĐ duyệt"
         if (row.approved === "Đợi GĐ duyệt") {
             setTimeout(() => {
-                const rowWrapper = $(`[data-idx="${row.idx}"]`);
-                const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
+                    const rowWrapper = $(`[data-idx="${row.idx}"]`);
+                    const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
 
-                approvedField.html(`
-                    <div class="d-flex flex-column p-2">
-                        <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
-                        <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
-                        <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
-                    </div>
-                `);
+                    approvedField.html(`
+                        <div class="d-flex flex-column p-2">
+                            <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
+                            <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
+                            <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
+                        </div>
+                    `);
 
-                approvedField.css('pointer-events', 'none');
-                approvedField.find('.btn').css('pointer-events', 'auto');
+                    approvedField.css('pointer-events', 'none');
+                    approvedField.find('.btn').css('pointer-events', 'auto');
 
-                // Gắn click handler
-                $('.btn-custom').off('click').on('click', function(e) {
+                    // Gắn click handler
+                    $('.btn-custom').off('click').on('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();

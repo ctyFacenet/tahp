@@ -487,14 +487,20 @@ body.dt-resize {
 }
 
 .chart-js-col {
-	flex: 1 1 calc(50% - 16px); /* desktop: 2 chart 1 hàng */
-	box-sizing: border-box;
-	padding: 8px;
-	height: 400px; /* hoặc dùng this.chartjsOptions.chart_height */
+  min-width: 300px; /* hoặc số px hợp lý để khi nhỏ hơn thì tự wrap */
 }
+
+/* Nếu muốn mobile 1 cột */
+@media (max-width: 768px) {
+  .chart-js-col {
+    flex: 0 0 100% !important;
+  }
+}
+
 
 @media (max-width: 767px) {
   .jc-col {
     flex: 0 0 100%;
   }
 }
+

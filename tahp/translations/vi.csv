@@ -12611,7 +12611,7 @@ Stock Closing,Stock Closing
 Stock Consumed During Repair,Stock Consumed During Repair
 Stock Consumption Details,Stock Consumption Details
 Stock Details,Stock Details
-Stock Entries already created for Work Order {0}: {1},Stock Entries already created for Work Order {0}: {1}
+Stock Entries already created for Work Order {0}: {1},Phiếu nhập thành phẩm cho LSX ca {0} đã tồn tại: {1}
 Stock Entry (Outward GIT),Stock Entry (Outward GIT)
 Stock Entry Child,Stock Entry Child
 Stock Entry Detail,Stock Entry Detail

@@ -134,12 +134,28 @@ def warn_workstation(doc):
 @frappe.whitelist()
 def check_status(work_order):
     work_order_doc = frappe.get_doc("Work Order", work_order)
-    if work_order_doc.docstatus != 1: return False
+    if work_order_doc.docstatus != 1:
+        return False
 
+    # Kiểm tra Job Cards
     job_cards = frappe.db.get_all("Job Card", filters={"work_order": work_order_doc.name, "docstatus":1})
-    if len(job_cards) == len(work_order_doc.operations):
-        return True
-    return False
+    if len(job_cards) != len(work_order_doc.operations):
+        return False
+
+    # Kiểm tra Stock Entry dạng Manufacture đã tồn tại chưa
+    stock_entry = frappe.db.get_value("Stock Entry", 
+        filters={
+            "work_order": work_order_doc.name,
+            "stock_entry_type": "Manufacture",
+            "docstatus": 0
+        }, 
+        fieldname="name"
+    )
+
+    if stock_entry:
+        return stock_entry  # trả về name của Stock Entry nếu đã tồn tại
+    return True  # chưa có Stock Entry
+
 
 @frappe.whitelist()
 def add_input(work_order):
