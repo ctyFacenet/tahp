@@ -2,6 +2,39 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
+  "modified": "2025-09-12 15:48:13.119753",
+  "name": "Công nhân",
+  "role_profile": "Công nhân",
+  "roles": [
+   {
+    "parent": "Công nhân",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Công nhân",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing Manager"
+   },
+   {
+    "parent": "Công nhân",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing User"
+   },
+   {
+    "parent": "Công nhân",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Stock Manager"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
   "modified": "2025-08-07 20:27:13.017114",
   "name": "Inventory",
   "role_profile": "Inventory",

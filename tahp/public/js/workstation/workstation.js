@@ -21,5 +21,14 @@ frappe.ui.form.on("Workstation", {
             });
             d.show();
         }
+    },
+    custom_inspection: function(frm) {
+        frappe.new_doc("Workstation Inspection", {
+            workstations: [
+                {
+                    workstation: frm.doc.custom_parent || frm.doc.name
+                }
+            ]            
+        })
     }
 });

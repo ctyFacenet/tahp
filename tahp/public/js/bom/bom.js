@@ -7,13 +7,17 @@ frappe.ui.form.on('BOM', {
     },
 
     refresh: async function(frm) {
-        console.log('refresh')
         frm.set_intro("");
         frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_sub_items.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_params.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.custom_params_out.grid.wrapper.find('.btn-open-row').hide();
         frm.fields_dict.operations.grid.wrapper.find('.btn-open-row').hide();
+        if (frm.doc.items && frm.doc.items.length > 0) {
+            frm.doc.items.forEach(d => {
+                control_operation(frm, d.doctype, d.name);
+            });
+        }
     },
 
     with_operations: function(frm) {
@@ -66,7 +70,7 @@ frappe.ui.form.on('BOM', {
         });
 
         d.show();        
-    }
+    },
 });
 
 frappe.ui.form.on('BOM Item', {
@@ -89,8 +93,106 @@ frappe.ui.form.on('BOM Item', {
     },
     items_add(frm, cdt, cdn) {
         frm.fields_dict.items.grid.wrapper.find('.btn-open-row').hide();
-    }
+        control_operation(frm, cdt, cdn)
+    },
 })
+
+function control_operation(frm, cdt, cdn) {
+    const row = locals[cdt][cdn];
+    const rowWrapper = $(`[data-idx="${row.idx}"]`);
+    const approvedField = rowWrapper.find(`[data-fieldname="custom_action"]`);
+
+    // Parse JSON trong custom_operations
+    let selectedOps = [];
+    try {
+        selectedOps = row.custom_operations ? JSON.parse(row.custom_operations) : [];
+    } catch (e) {
+        selectedOps = [];
+    }
+
+    let btnLabel = selectedOps.length > 0
+        ? `Đã chọn ${selectedOps.length} công đoạn`
+        : "Chọn công đoạn";
+
+    // Render button
+    approvedField.html(`
+        <button class="btn btn-op btn-sm w-100" value="${row.idx}">
+            ${btnLabel}
+        </button>
+    `);
+
+    approvedField.css({
+        'pointer-events': 'none !important',
+        'padding': 'var(--grid-padding) !important'
+    });
+    approvedField.find('.btn').css('pointer-events', 'auto');
+
+    // Click handler mở dialog
+    approvedField.find('.btn-op').off('click').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (frm.doc.docstatus === 0) {
+            let dialog = new frappe.ui.Dialog({
+                title: 'Chọn công đoạn muốn theo dõi SL',
+                fields: [
+                    {
+                        fieldname: 'operations',
+                        label: 'Công đoạn',
+                        fieldtype: 'MultiSelectPills',
+                        options: frm.doc.operations.map(r => r.operation),
+                        default: selectedOps   // đọc từ JSON
+                    }
+                ],
+                primary_action_label: 'Xác nhận',
+                primary_action(values) {
+                    // Lưu lại JSON string
+                    row.custom_operations = JSON.stringify(values.operations || []);
+                    frm.refresh_field("items");
+
+                    // Đánh dấu form dirty
+                    frm.dirty();
+
+                    // Cập nhật lại UI button
+                    control_operation(frm, cdt, cdn);
+
+                    dialog.hide();
+                }
+            });
+
+            dialog.show();
+        } else {
+            let dialog = new frappe.ui.Dialog({
+                title: 'Danh sách công đoạn đã chọn',
+                fields: [
+                    {
+                        fieldname: 'ops_html',
+                        fieldtype: 'HTML',
+                        options: selectedOps.length > 0
+                            ? `<ul style="padding-left:16px; margin:0;font-size:15px;">${selectedOps.map(op => `<li>${op}</li>`).join("")}</ul>`
+                            : '<p><i>Không có công đoạn nào</i></p>'
+                    }
+                ]
+            });
+            dialog.show();            
+        }
+
+    });
+
+    // Cho child row tự dãn dòng
+    frm.fields_dict["items"].grid.wrapper.find('.grid-row').each(function () {
+        const row = $(this);
+        row.css({
+            "height": "auto",
+            "white-space": "normal"
+        });
+        row.find("div").css({
+            "height": "auto",
+            "white-space": "normal"
+        });
+    });
+}
+
 
 frappe.ui.form.on('BOM Sub Items', {
     custom_sub_items_add(frm, cdt, cdn) {

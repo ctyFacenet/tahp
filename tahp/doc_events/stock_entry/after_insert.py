@@ -2,9 +2,9 @@ import frappe
 import calendar
 
 def after_insert(doc, method):
-    if not doc.custom_code: set_code(doc)
     generate_qc(doc)
     send_noti(doc)
+    autofill_shift_handover(doc)
 
 def generate_qc(doc):
     """
@@ -69,46 +69,6 @@ def generate_qc(doc):
         
         doc.save(ignore_permissions=True)
 
-def set_code(doc):
-    """
-    Tạo mã chứng từ (custom_code) cho Stock Entry.
-
-    - Mỗi loại chứng từ có tiền tố riêng:
-        * Material Receipt → NK
-        * Material Issue   → XK
-        * Manufacture      → SX
-        * Loại khác        → UNK
-    - Định dạng: <CODE>.<NĂM>.<THÁNG>.<SỐ THỨ TỰ>, ví dụ: NK.2025.08.0001
-    - Số thứ tự tính theo số chứng từ đã duyệt cùng loại và cùng tháng, cùng năm.
-
-    Tham số:
-    - doc (Document): Stock Entry hiện tại.
-    """
-    map = {
-        "Material Receipt": "NK",
-        "Material Issue": "XK",
-        "Manufacture": "SX"
-    }
-
-    code = map[doc.stock_entry_type] if doc.stock_entry_type in map else 'UNK'
-    today = frappe.utils.get_datetime()
-    year = today.year
-    month = f"{today.month:02d}"
-    last_day = calendar.monthrange(year, today.month)[1]
-    start_date = f"{year}-{month}-01"
-    end_date = f"{year}-{month}-{last_day}"
-
-    entries = frappe.db.get_all("Stock Entry", filters={
-        "docstatus": ["==", 1],
-        "stock_entry_type": doc.stock_entry_type,
-        "posting_date": ["between", [start_date, end_date]]
-    })
-
-    index = len(entries) + 1
-    custom_code = f"{code}.{year}.{month}.{index:04d}"
-    doc.custom_code = custom_code
-    doc.save()
-
 def send_noti(doc):
     title_map = {
         "Manufacture": "Nhập kho thành phẩm",
@@ -126,9 +86,37 @@ def send_noti(doc):
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
-            "subject": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
+            "subject": f"Chủ kho vui lòng xác nhận phiếu <b style='font-weight:bold'>{title} - {doc.name}</b>",
             "email_content": f"Chủ kho vui lòng xác nhận phiếu {title} - {doc.name}",
             "type": "Alert",
             "document_type": "Stock Entry",
             "document_name": doc.name
         }).insert(ignore_permissions=True)
+
+def autofill_shift_handover(doc):
+    if doc.stock_entry_type == 'Manufacture' and doc.work_order:
+        shift_handovers = frappe.db.get_all(
+            'Shift Handover',
+            filters={'work_order': doc.work_order},
+            fields=['name']
+        )
+        
+        for handover in shift_handovers:
+            handover_doc = frappe.get_doc('Shift Handover', handover.name)
+            if not handover_doc.stock_entry:
+                handover_doc.stock_entry = doc.name
+                handover_doc.save(ignore_permissions=True)
+                wo_doc = frappe.get_doc("Work Order", doc.work_order)
+                shift_leader = wo_doc.custom_shift_leader
+                if not shift_leader: continue
+                user = frappe.db.get_value("Employee", shift_leader, "user_id")
+                if not user: continue
+                frappe.get_doc({
+                    "doctype": "Notification Log",
+                    "for_user": user,
+                    "subject": f"Vui lòng kiểm tra nội dung BBGC ca {handover.name} và gửi bàn giao",
+                    "email_content": "Vui lòng kiểm tra nội dung BBGC và gửi bàn giao",
+                    "type": "Alert",
+                    "document_type": "Shift Handover",
+                    "document_name": handover.name
+                }).insert(ignore_permissions=True)

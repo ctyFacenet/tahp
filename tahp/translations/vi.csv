@@ -745,8 +745,8 @@ Not Equals,Không bằng
 Equals,Bằng với
 Export,Xuất dữ liệu
 Help,Trợ giúp
-Has Variants,Có nhiều phiên bản
-Variant Of,Thuộc phiên bản
+Has Variants,Có nhiều mẫu mã
+Variant Of,Thuộc mẫu mã
 "A Product or a Service that is bought, sold or kept in stock.","Một sản phẩm hoặc dịch vụ được mua, bán hoặc lưu kho."
 An Item Group is a way to classify items based on types.,Nhóm mặt hàng là cách phân loại các mặt hàng theo loại.
 A logical Warehouse against which stock entries are made.,Một kho logic được dùng để ghi nhận các nghiệp vụ nhập/xuất kho.
@@ -5613,8 +5613,8 @@ You cannot create a dashboard chart from single DocTypes,You cannot create a das
 You cannot give review points to yourself,You cannot give review points to yourself
 You cannot unset 'Read Only' for field {0},You cannot unset 'Read Only' for field {0}
 You changed the value of {0} {1},You changed the value of {0} {1}
-You changed the values for {0},You changed the values for {0}
-You changed the values for {0} {1},You changed the values for {0} {1}
+You changed the values for {0},Bạn đã thay đổi giá trị của {0}
+You changed the values for {0} {1},Bạn đã thay đổi giá trị của {0} {1}
 You changed {0} to {1},You changed {0} to {1}
 You do not have Read or Select Permissions for {},You do not have Read or Select Permissions for {}
 You do not have enough permissions to complete the action,You do not have enough permissions to complete the action
@@ -5662,8 +5662,8 @@ You removed attachment {0},You removed attachment {0}
 You seem good to go!,You seem good to go!
 You seem to have written your name instead of your email. Please enter a valid email address so that we can get back.,You seem to have written your name instead of your email. Please enter a valid email address so that we can get back.
 You selected Draft or Cancelled documents,You selected Draft or Cancelled documents
-You submitted this document,You submitted this document
-You submitted this document {0},You submitted this document {0}
+You submitted this document,Bạn đã xác nhận bản ghi này
+You submitted this document {0},Bạn đã xác nhận bản ghi này {0}
 You unfollowed this document,You unfollowed this document
 You viewed this,You viewed this
 "Your CSV file is being generated and will appear in the Attachments section once ready. Additionally, you will get notified when the file is available for download.","Your CSV file is being generated and will appear in the Attachments section once ready. Additionally, you will get notified when the file is available for download."
@@ -5875,7 +5875,7 @@ remove,remove
 remove-circle,remove-circle
 remove-sign,remove-sign
 removed rows for {0},removed rows for {0}
-renamed from {0} to {1},renamed from {0} to {1}
+renamed from {0} to {1},đã được đổi tên từ {0} sang {1}
 repeat,repeat
 report,report
 resize-full,resize-full
@@ -6347,7 +6347,7 @@ AMC Expiry Date,AMC Expiry Date
 API Details,API Details
 AWB Number,AWB Number
 Abbr,Abbr
-Abbreviation,Abbreviation
+Abbreviation,Ký tự đại diện
 Abbreviation already used for another company,Abbreviation already used for another company
 Abbreviation is mandatory,Abbreviation is mandatory
 Abbreviation: {0} must appear only once,Abbreviation: {0} must appear only once
@@ -6969,13 +6969,13 @@ Attach CSV File,Attach CSV File
 Attach custom Chart of Accounts file,Attach custom Chart of Accounts file
 Attendance & Leaves,Attendance & Leaves
 Attendance Device ID (Biometric/RF tag ID),Attendance Device ID (Biometric/RF tag ID)
-Attribute,Attribute
-Attribute Name,Attribute Name
-Attribute Value,Attribute Value
+Attribute,Thuộc tính
+Attribute Name,Tên thuộc tính
+Attribute Value,Giá trị thuộc tính
 Attribute table is mandatory,Attribute table is mandatory
 Attribute value: {0} must appear only once,Attribute value: {0} must appear only once
 Attribute {0} selected multiple times in Attributes Table,Attribute {0} selected multiple times in Attributes Table
-Attributes,Attributes
+Attributes,Thuộc tính
 Auditor,Auditor
 Authentication Failed,Authentication Failed
 Authorised By,Authorised By
@@ -7826,7 +7826,7 @@ Create Employee records.,Create Employee records.
 Create Grouped Asset,Create Grouped Asset
 Create Inter Company Journal Entry,Create Inter Company Journal Entry
 Create Invoices,Create Invoices
-Create Job Card,Create Job Card
+Create Job Card,Tạo LSX công đoạn
 Create Job Card based on Batch Size,Create Job Card based on Batch Size
 Create Journal Entries,Create Journal Entries
 Create Journal Entry,Create Journal Entry
@@ -7863,8 +7863,8 @@ Create Timesheet,Create Timesheet
 Create User,Create User
 Create User Permission,Create User Permission
 Create Users,Create Users
-Create Variant,Create Variant
-Create Variants,Create Variants
+Create Variant,Tạo mẫu mã mới
+Create Variants,Tạo mẫu mã mới
 Create Workstation,Create Workstation
 Create Your First Purchase Invoice,Create Your First Purchase Invoice
 Create Your First Sales Invoice,Create Your First Sales Invoice
@@ -9288,7 +9288,7 @@ Installing presets,Installing presets
 Instruction,Instruction
 Insufficient Capacity,Insufficient Capacity
 Insufficient Permissions,Insufficient Permissions
-Insufficient Stock,Insufficient Stock
+Insufficient Stock,Thiếu hàng tồn kho
 Insufficient Stock for Batch,Insufficient Stock for Batch
 Insurance Company,Insurance Company
 Insurance Details,Insurance Details
@@ -9475,9 +9475,9 @@ Item 3,Item 3
 Item 4,Item 4
 Item 5,Item 5
 Item Alternative,Item Alternative
-Item Attribute,Item Attribute
-Item Attribute Value,Item Attribute Value
-Item Attribute Values,Item Attribute Values
+Item Attribute,Thuộc tính mặt hàng
+Item Attribute Value,Giá trị thuộc tính của mặt hàng
+Item Attribute Values,Giá trị thuộc tính của mặt hàng
 Item Barcode,Item Barcode
 Item Cart,Item Cart
 Item Code (Final Product),Item Code (Final Product)
@@ -9609,7 +9609,7 @@ Job Worker Contact,Job Worker Contact
 Job Worker Delivery Note,Job Worker Delivery Note
 Job Worker Name,Job Worker Name
 Job Worker Warehouse,Job Worker Warehouse
-Job card {0} created,Job card {0} created
+Job card {0} created,LSX Công đoạn {0} đã được tạo
 Job: {0} has been triggered for processing failed transactions,Job: {0} has been triggered for processing failed transactions
 Joining,Joining
 Journal Entries,Journal Entries
@@ -10045,7 +10045,7 @@ Multi-level BOM Creator,Multi-level BOM Creator
 Multiple Loyalty Programs found for Customer {}. Please select manually.,Multiple Loyalty Programs found for Customer {}. Please select manually.
 "Multiple Price Rules exists with same criteria, please resolve conflict by assigning priority. Price Rules: {0}","Multiple Price Rules exists with same criteria, please resolve conflict by assigning priority. Price Rules: {0}"
 Multiple Tier Program,Multiple Tier Program
-Multiple Variants,Multiple Variants
+Multiple Variants,Tạo mẫu mã khác của mặt hàng
 Multiple Warehouse Accounts,Multiple Warehouse Accounts
 Multiple fiscal years exist for the date {0}. Please set company in Fiscal Year,Multiple fiscal years exist for the date {0}. Please set company in Fiscal Year
 Multiple items cannot be marked as finished item,Multiple items cannot be marked as finished item
@@ -10258,7 +10258,7 @@ Number of days that the subscriber has to pay invoices generated by this subscri
 "Number of new Cost Center, it will be included in the cost center name as a prefix","Number of new Cost Center, it will be included in the cost center name as a prefix"
 Numeric,Numeric
 Numeric Inspection,Numeric Inspection
-Numeric Values,Numeric Values
+Numeric Values,Giá trị số
 Numero has not set in the XML file,Numero has not set in the XML file
 O+,O+
 O-,O-
@@ -10944,7 +10944,7 @@ Please select a valid Purchase Order that is configured for Subcontracting.,Plea
 Please select a value for {0} quotation_to {1},Please select a value for {0} quotation_to {1}
 Please select an item code before setting the warehouse.,Please select an item code before setting the warehouse.
 Please select atleast one item to continue,Please select atleast one item to continue
-Please select atleast one operation to create Job Card,Please select atleast one operation to create Job Card
+Please select atleast one operation to create Job Card,Vui lòng chọn ít nhất một công đoạn để tạo LSX công đoạn
 Please select correct account,Please select correct account
 Please select date,Please select date
 Please select either the Item or Warehouse or Warehouse Type filter to generate the report.,Please select either the Item or Warehouse or Warehouse Type filter to generate the report.
@@ -12171,7 +12171,7 @@ See all open tickets,See all open tickets
 Select Accounting Dimension.,Select Accounting Dimension.
 Select Alternate Item,Select Alternate Item
 Select Alternative Items for Sales Order,Select Alternative Items for Sales Order
-Select Attribute Values,Select Attribute Values
+Select Attribute Values,Chọn các thuộc tính của mẫu mã
 Select BOM,Select BOM
 Select BOM and Qty for Production,Select BOM and Qty for Production
 "Select BOM, Qty and For Warehouse","Select BOM, Qty and For Warehouse"
@@ -12219,7 +12219,7 @@ Select an Item Group.,Select an Item Group.
 Select an account to print in account currency,Select an account to print in account currency
 Select an invoice to load summary data,Select an invoice to load summary data
 Select an item from each set to be used in the Sales Order.,Select an item from each set to be used in the Sales Order.
-Select at least one value from each of the attributes.,Select at least one value from each of the attributes.
+Select at least one value from each of the attributes.,Chọn ít nhất một thuộc tính trong danh sách thuộc tính
 Select change amount account,Select change amount account
 Select company first,Select company first
 Select company name first.,Select company name first.
@@ -12611,7 +12611,7 @@ Stock Closing,Stock Closing
 Stock Consumed During Repair,Stock Consumed During Repair
 Stock Consumption Details,Stock Consumption Details
 Stock Details,Stock Details
-Stock Entries already created for Work Order {0}: {1},Stock Entries already created for Work Order {0}: {1}
+Stock Entries already created for Work Order {0}: {1},Phiếu nhập thành phẩm cho LSX ca {0} đã tồn tại: {1}
 Stock Entry (Outward GIT),Stock Entry (Outward GIT)
 Stock Entry Child,Stock Entry Child
 Stock Entry Detail,Stock Entry Detail
@@ -13963,9 +13963,9 @@ you must select Capital Work in Progress Account in accounts table,you must sele
 {0} units of {1} are required in {2} with the inventory dimension: {3} ({4}) on {5} {6} for {7} to complete the transaction.,{0} units of {1} are required in {2} with the inventory dimension: {3} ({4}) on {5} {6} for {7} to complete the transaction.
 {0} units of {1} needed in {2} on {3} {4} for {5} to complete this transaction.,{0} units of {1} needed in {2} on {3} {4} for {5} to complete this transaction.
 {0} units of {1} needed in {2} on {3} {4} to complete this transaction.,{0} units of {1} needed in {2} on {3} {4} to complete this transaction.
-{0} units of {1} needed in {2} to complete this transaction.,{0} units of {1} needed in {2} to complete this transaction.
+{0} units of {1} needed in {2} to complete this transaction.,Phát hiện trong kho {2} đang thiếu {0} đơn vị mặt hàng {1}
 {0} valid serial nos for Item {1},{0} valid serial nos for Item {1}
-{0} variants created.,{0} variants created.
+{0} variants created., Đã tạo {0} mẫu mã mới
 {0} will be given as discount.,{0} will be given as discount.
 {0} {1},{0} {1}
 {0} {1} Manually,{0} {1} Manually
@@ -14040,3 +14040,4 @@ Manufacturing Category, Hệ sản xuất
 Manufacturing Category Material, Gyps của hệ
 Workstation Inspection, Phiếu kiểm tra thiết bị
 Handed Over, Đã bàn giao
+Production Closing Report, Báo cáo chốt sản lượng

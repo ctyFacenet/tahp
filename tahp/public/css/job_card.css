@@ -164,6 +164,10 @@
     flex-wrap: nowrap;
 }
 
+.jc-comment:hover {
+     background: #f3f3f3;
+}
+
 jc-tb-right > input {
     width: 100%;
 }
@@ -189,11 +193,13 @@ th {
 }
 
 @media (min-width: 768px) {
-    .jc-col.d1 { flex: 0 0 calc((25% - (2 * var(--jc-gap) / 4))); } 
-    .jc-col.d2 { flex: 0 0 calc((50% - (2 * var(--jc-gap) / 2))); }
-    .jc-col.d3 { flex: 0 0 calc((45% - (2 * var(--jc-gap) / 2))); }
-    .jc-col.d4 { flex: 0 0 calc((30% - (2 * var(--jc-gap) / 2))); }
-    .jc-col.half { flex: 0 0 calc(50% - var(--jc-gap) / 2); }
+    .jc-col.col-25 { flex: 0 0 calc((25% - (2 * var(--jc-gap) / 4))); } 
+    .jc-col.col-45 { flex: 0 0 calc((45% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.col-30 { flex: 0 0 calc((30% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.col-20 { flex: 0 0 calc((20% - (2 * var(--jc-gap) / 2))); }
+    .jc-col.col-75 { flex: 0 0 calc(75% - (2 * var(--jc-gap) / 2)); }
+    .jc-col.col-50 { flex: 0 0 calc(50% - var(--jc-gap) / 2); }
+    .jc-col.col-25s { flex: 0 0 calc(25% - (3 * var(--jc-gap) / 4)); }
 }
 
 @media (max-width: 767px) {

@@ -113,3 +113,11 @@ body .container {
     font-weight: bold;
 }
 
+.btn-op {
+    background: #f8f8f8;
+    transition: background 0.2s;
+    padding: 0px;
+}
+.btn-op:hover {
+    background: #cfcfcfcc;
+}

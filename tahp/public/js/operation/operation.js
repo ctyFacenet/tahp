@@ -29,7 +29,6 @@ frappe.ui.form.on('Operation', {
 
 function allow_workstation(frm) {
         const read_only = frm.doc.custom_is_parent ? false : !frm.doc.custom_is_parent;
-        console.log(read_only)
         frm.fields_dict.custom_configs.grid.update_docfield_property('workstation', 'read_only', read_only);
         frm.fields_dict.custom_subtasks.grid.update_docfield_property('workstation', 'read_only', read_only);
 }

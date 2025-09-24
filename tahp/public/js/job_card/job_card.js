@@ -41,27 +41,54 @@ frappe.ui.form.on('Job Card', {
         $wrapper.empty()
         $wrapper.addClass("jc-layout d-flex flex-wrap w-100")
 
+        let $row0 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
+        let $col0 = $(`<div class="jc-col jc-comment text-center w-100 bold" style="cursor:pointer">Thêm bình luận</div>`)
+        $row0.append($col0);
+
         let $row1 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
-        let $row2 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
+        let $row2 = $(`<div class="jc-container d-flex flex-wrap w-100 justify-content-start"></div>`)
         let $row3 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
+        let $row4 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
 
         // Row 1
-        let $col1 = $(`<div class="jc-col d1 order-1"></div>`)
-        let $col2 = $(`<div class="jc-col d3 order-2"></div>`)
-        let $col3 = $(`<div class="jc-col d4 order-3"></div>`)
+        let $col1 = $(`<div class="jc-col col-25"></div>`)
+        let $col2 = $(`<div class="jc-col col-45"></div>`)
+        let $col3 = $(`<div class="jc-col col-30 d-none d-md-block"></div>`)
         $row1.append($col1, $col2, $col3)
+        // $row1.append($col1, $col2)
 
         // Row 2
-        let $col4 = $(`<div class="jc-col half order-4"></div>`).append(`<div class="jc-title">Đầu vào phụ gia</div>`)
-        let $col5 = $(`<div class="jc-col half order-5"></div>`).append(`<div class="jc-title">Đầu vào đo bằng đồng hồ</div>`)
-        $row2.append($col4, $col5)
+        for (let workstation of frm.doc.custom_workstation_table) {
+            let $col = $(`<div class="jc-col col-25s"></div>`)
+            data = frm.doc.custom_config_table.filter(r => r.workstation === workstation.workstation)
+            frm.events.define_table(
+                frm, $col, `Cấu hình ${workstation.workstation}`,
+                columns = [
+                    { label: 'Cấu hình', fieldname: 'config_name', is_primary: true },
+                    { label: 'Đơn vị', fieldname: 'unit', is_unit: true},
+                    { label: 'Giá trị', fieldname: 'config_value', is_value: true },
+                ],
+                data = data,
+                edittable=true,
+                action="update_configs",
+                action_param=workstation.workstation
+            )
+            $row2.append($col)
+        }
 
         // Row 3
-        let $col6 = $(`<div class="jc-col half order-6"></div>`)
-        let $col7 = $(`<div class="jc-col half order-7"></div>`).append(`<div class="jc-title">Lịch sử dừng máy</div>`)
-        $row3.append($col6, $col7)
+        let $col4 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào phụ gia</div>`)
+        let $col5 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào đo bằng đồng hồ</div>`)
+        $row3.append($col4, $col5)
 
-        $wrapper.append($row1, $row2, $row3)
+        // Row 4
+        let $col6 = $(`<div class="jc-col col-50"></div>`)
+        let $col7 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Lịch sử dừng máy</div>`)
+        $row4.append($col6, $col7)
+
+        if (frm.doc.custom_workstation_table && frm.doc.custom_workstation_table.length > 0) $wrapper.append($row0, $row1, $row2, $row3, $row4)
+        else $wrapper.append($row0, $row1, $row3, $row4)
+
         frm.events.define_controller(frm, $col1)
 
         frm.events.define_table(
@@ -161,22 +188,22 @@ frappe.ui.form.on('Job Card', {
         frm.__workstation_timer = setInterval(() => frm.events.update_workstations_timer_display(frm, $col2), 1000);
         frm.events.update_workstations_timer_display(frm, $col2)
 
-        frm.events.define_table(
-            frm, $col3, 'Cấu hình',
-            columns=[
-                { label: 'Cấu hình', fieldname: 'config_name', is_primary: true },
-                { label: 'Giá trị', fieldname: 'config_value', is_value: true },
-                { label: 'Đơn vị', fieldname: 'unit', is_unit: true},
-                { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
-            ],
-            data= (frm.doc.custom_config_table || []).map(row => ({
-                config_name: row.config_name,
-                unit: row.unit,
-                config_value: row.config_value,
-                workstation: row.workstation ? row.workstation : "Áp dụng tất cả" })),
-            edittable=true,
-            action="update_configs"
-        )
+        // frm.events.define_table(
+        //     frm, $col3, 'Cấu hình',
+        //     columns=[
+        //         { label: 'Cấu hình', fieldname: 'config_name', is_primary: true },
+        //         { label: 'Giá trị', fieldname: 'config_value', is_value: true },
+        //         { label: 'Đơn vị', fieldname: 'unit', is_unit: true},
+        //         { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
+        //     ],
+        //     data= (frm.doc.custom_config_table || []).map(row => ({
+        //         config_name: row.config_name,
+        //         unit: row.unit,
+        //         config_value: row.config_value,
+        //         workstation: row.workstation ? row.workstation : "Áp dụng tất cả" })),
+        //     edittable=true,
+        //     action="update_configs"
+        // )
 
         let has_input = frm.doc.custom_input_table.find(row=>!row.is_meter)
         if (has_input) {
@@ -280,9 +307,9 @@ frappe.ui.form.on('Job Card', {
                     { label: 'Phân loại lý do', fieldname: 'group_name', is_unit: true, type: "string" },
                 ],
                 data=frm.doc.custom_downtime.map(d => {
-                    const from_time = frappe.datetime.str_to_user(d.from_time, 'HH:mm:ss');
-                    const to_time = frappe.datetime.str_to_user(d.to_time, 'HH:mm:ss');
-                    const time_str = `${from_time} → ${to_time}`;
+                    const from_time = d.from_time ? d.from_time.slice(11, 19) : "";
+                    const to_time   = d.to_time   ? d.to_time.slice(11, 19)   : "";
+                    const time_str  = `${from_time} → ${to_time}`;
 
                     // Duration
                     let duration_str = '';
@@ -316,6 +343,313 @@ frappe.ui.form.on('Job Card', {
                 }),
             )
         }
+
+        frm.events.create_chart(frm, $col3)
+        frm.events.update_comment(frm, $col0)
+    },
+
+    update_comment: async function (frm, $col0) {
+        let r = await frappe.call({
+            method: "tahp.doc_events.job_card.job_card.check_ptcn_role",
+        });
+        if (!r.message) $col0.hide();
+        $col0.on("click", function () {
+            frappe.prompt(
+                [
+                    {
+                        label: "Điền bình luận",
+                        fieldname: "comment",
+                        fieldtype: "Small Text",
+                        reqd: 1
+                    }
+                ],
+                async function (values) {
+                    try {
+                        await frappe.call({
+                            method: "tahp.doc_events.job_card.job_card.update_comment",
+                            args: {
+                                docname: frm.doc.name,
+                                comment: values.comment
+                            }
+                        });
+                    } catch (err) {
+                        frappe.msgprint(__("Có lỗi xảy ra khi xử lý"));
+                        console.error(err);
+                    }
+                },
+                "Thêm bình luận",
+                "Gửi"
+            );
+        });
+    },
+
+
+    create_chart(frm, $col3) {
+        const inputs = frm.doc.custom_inputs || [];
+
+        const itemNameMap = {};
+        (frm.doc.custom_input_table || []).forEach(row => {
+            itemNameMap[row.item_code] = row.item_name;
+        });
+
+        // Lấy toàn bộ label (chỉ HH:MM:SS, không ngày tháng)
+        const labels = [...new Set(
+            inputs.map(i => new Date(i.from_time).toLocaleTimeString('en-GB', { hour12: false }))
+        )];
+
+        // Màu hiện đại với gradient
+        const modernColors = [
+            { border: '#FF6B6B', bg: 'rgba(255, 107, 107, 0.1)' }, // Red
+            { border: '#4ECDC4', bg: 'rgba(78, 205, 196, 0.1)' }, // Teal
+            { border: '#45B7D1', bg: 'rgba(69, 183, 209, 0.1)' }, // Blue
+            { border: '#96CEB4', bg: 'rgba(150, 206, 180, 0.1)' }, // Green
+            { border: '#FFEAA7', bg: 'rgba(255, 234, 167, 0.1)' }, // Yellow
+            { border: '#DDA0DD', bg: 'rgba(221, 160, 221, 0.1)' }, // Purple
+            { border: '#98D8C8', bg: 'rgba(152, 216, 200, 0.1)' }, // Mint
+            { border: '#F7DC6F', bg: 'rgba(247, 220, 111, 0.1)' }, // Gold
+            { border: '#BB8FCE', bg: 'rgba(187, 143, 206, 0.1)' }, // Lavender
+            { border: '#85C1E9', bg: 'rgba(133, 193, 233, 0.1)' }  // Light Blue
+        ];
+
+        let colorIndex = 0;
+
+        const datasetsMap = {};
+
+        // Tạo datasets với dữ liệu ban đầu
+        inputs.forEach(row => {
+            const timeLabel = new Date(row.from_time).toLocaleTimeString('en-GB', { hour12: false });
+
+            if (!datasetsMap[row.item_code]) {
+                const color = modernColors[colorIndex % modernColors.length];
+                colorIndex++;
+
+                datasetsMap[row.item_code] = {
+                    // lấy tên từ bảng custom_input_table
+                    label: `${row.item_code}: ${itemNameMap[row.item_code] || 'Unknown'}`,
+                    data: Array(labels.length).fill(null),
+                    borderWidth: 3,
+                    borderColor: color.border,
+                    backgroundColor: color.bg,
+                    fill: true, // Bật fill để có nền gradient
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: color.border,
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverBackgroundColor: color.border,
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3
+                };
+            }
+
+            const idx = labels.indexOf(timeLabel);
+            if (idx !== -1) {
+                datasetsMap[row.item_code].data[idx] = row.qty;
+            }
+        });
+
+        // Fill giá trị thiếu bằng giá trị trước đó gần nhất
+        Object.keys(datasetsMap).forEach(itemCode => {
+            const data = datasetsMap[itemCode].data;
+            let lastValue = null;
+            
+            for (let i = 0; i < data.length; i++) {
+                if (data[i] !== null) {
+                    lastValue = data[i];
+                } else if (lastValue !== null) {
+                    // Nếu không có giá trị tại vị trí này và có giá trị trước đó
+                    data[i] = lastValue;
+                }
+            }
+        });
+
+        const datasets = Object.values(datasetsMap);
+
+        // Xóa chart cũ nếu có
+        if (window.myChart) {
+            window.myChart.destroy();
+        }
+
+        // Xóa resize observer cũ nếu có
+        if (window.chartResizeObserver) {
+            window.chartResizeObserver.disconnect();
+        }
+
+        // Vẽ chart với Chart.js
+        $col3.empty(); 
+
+        // Tạo container div cho chart
+        const chartContainer = document.createElement("div");
+        chartContainer.style.position = 'relative';
+        chartContainer.style.height = '250px';
+        chartContainer.style.width = '100%';
+        $col3.append(chartContainer);
+
+        // Tạo thẻ canvas mới
+        const canvas = document.createElement("canvas");
+        chartContainer.appendChild(canvas);
+
+        // Lấy context từ canvas
+        const ctx = canvas.getContext("2d");
+
+        // Tạo gradient cho background
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(250, 250, 255, 0.8)');
+        gradient.addColorStop(1, 'rgba(240, 248, 255, 0.2)');
+
+        window.myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Biểu đồ theo dõi số lượng tiêu hao',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#2c3e50',
+                        padding: {
+                            bottom: 5
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: { 
+                                size: 12,
+                                weight: '500'
+                            },
+                            color: '#2c3e50',
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(45, 52, 73, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#4ECDC4',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        titleFont: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Thời gian',
+                            color: '#2c3e50',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#5a6c7d',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Số lượng',
+                            color: '#2c3e50',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#5a6c7d',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 8
+                    }
+                }
+            }
+        });
+
+        // Thêm ResizeObserver để theo dõi thay đổi kích thước container
+        if (window.ResizeObserver) {
+            window.chartResizeObserver = new ResizeObserver(entries => {
+                if (window.myChart) {
+                    // Đợi một chút để DOM cập nhật xong
+                    setTimeout(() => {
+                        window.myChart.resize();
+                    }, 100);
+                }
+            });
+            
+            window.chartResizeObserver.observe($col3[0]);
+        }
+
+        // Fallback: Lắng nghe sự kiện resize của window
+        const handleResize = () => {
+            if (window.myChart) {
+                setTimeout(() => {
+                    window.myChart.resize();
+                }, 150);
+            }
+        };
+
+        // Xóa listener cũ nếu có
+        if (window.chartResizeHandler) {
+            window.removeEventListener('resize', window.chartResizeHandler);
+        }
+
+        window.chartResizeHandler = handleResize;
+        window.addEventListener('resize', handleResize);
     },
 
     update_workstations_timer_display(frm, $wrapper) {
@@ -461,7 +795,7 @@ frappe.ui.form.on('Job Card', {
         })
     },
 
-    define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null) {
+    define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null, action_param=null) {
 
         // Header
         let $header = $(`
@@ -633,57 +967,6 @@ frappe.ui.form.on('Job Card', {
              return;
         }
 
-        // let editing = false;
-        // $wrapper.on("click", ".jc-edit-btn", function() {
-        //     editing = !editing;
-        //     const $btn = $(this);
-
-        //     if (editing) {
-        //         mobileInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
-        //         if (mobileInputs[0]) scrollAndFocus(mobileInputs, 0);
-        //         $btn.text('Lưu').addClass('jc-edit-btn-save');
-
-        //         mobileInputs.forEach(($input, index) => {
-        //             $input.off('keydown.nextFocus');
-        //             $input.on('keydown.nextFocus', function(e) {
-        //                 if (e.key === 'Enter' || e.keyCode === 13) {
-        //                     e.preventDefault();
-        //                     const nextIndex = index + 1;
-        //                     if (nextIndex < mobileInputs.length) scrollAndFocus(mobileInputs, nextIndex);
-        //                     else $btn.trigger('click');
-        //                 }
-        //             });
-        //         });
-
-        //         desktopInputs.forEach($input => $input.prop('disabled', false).addClass('jc-edit-editing'));
-        //         if (desktopInputs[0]) scrollAndFocus(desktopInputs, 0);
-        //         $btn.text('Lưu').addClass('jc-edit-btn-save');
-
-        //         desktopInputs.forEach(($input, index) => {
-        //             $input.off('keydown.nextFocus');
-        //             $input.on('keydown.nextFocus', function(e) {
-        //                 if (e.key === 'Enter' || e.keyCode === 13) {
-        //                     e.preventDefault();
-        //                     const nextIndex = index + 1;
-        //                     if (nextIndex < desktopInputs.length) scrollAndFocus(desktopInputs, nextIndex);
-        //                     else $btn.trigger('click');
-        //                 }
-        //             });
-        //         });
-
-        //     } else {
-        //         const isMobileBtn = $btn.hasClass('jc-mobile-input');
-        //         const inputs = isMobileBtn ? mobileInputs : desktopInputs;
-        //         desktopInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
-        //         mobileInputs.forEach($input => $input.prop('disabled', true).removeClass('jc-edit-editing'));
-        //         $btn.text('Sửa').removeClass('jc-edit-btn-save');
-        //         if (action) {
-        //             const result = covertAllData(data, inputs);
-        //             frm.events[action](frm, result)
-        //         }
-        //     }
-        // });
-
         // ----- XỬ LÝ CHẾ ĐỘ EDIT -----
         if (frm.doc.docstatus != 0) return;
         let editing = false;
@@ -715,7 +998,7 @@ frappe.ui.form.on('Job Card', {
                                 "Lưu thay đổi?",
                                 () => {
                                     const result = covertAllData(data, inputs);
-                                    if (action) frm.events[action](frm, result);
+                                    if (action) frm.events[action](frm, result, action_param);;
                                     disableEditing(inputs, $btn);
                                 },
                                 () => { disableEditing(inputs, $btn); }
@@ -754,17 +1037,23 @@ frappe.ui.form.on('Job Card', {
     },
 
     start_job_card: async function(frm) {
-        const workstations_ready = (frm.doc.custom_workstation_table || []).filter(
-            row => row.status === "Sẵn sàng"
-        );
-        if (workstations_ready.length === 0) return;
-        const ws_first = workstations_ready[0];
-        if (!ws_first.start_time) {
-            await frm.events.update_team(frm);
-            await frm.events.transfer_job_card(frm);
+        if (
+            !frm.doc.custom_workstation_table || 
+            !frm.doc.custom_workstation_table.length
+        ) {
+            await frm.events.start_workstations(frm);
         }
 
-        const workstations = workstations_ready.map(row => ({
+        if (
+            !frm.doc.custom_team_table ||
+            !frm.doc.custom_team_table.length
+        ) {
+            await frm.events.update_team(frm);
+        }
+
+        await frm.events.transfer_job_card(frm);
+
+        const workstations = frm.doc.custom_workstation_table.map(row => ({
             ...row,
             status: "Chạy"
         }));
@@ -824,11 +1113,10 @@ frappe.ui.form.on('Job Card', {
     complete_job_card: async function(frm) {
         if (frm.doc.custom_subtask) {
             let subtask_list = frm.doc.custom_subtask || [];
-            let in_progress_count = subtask_list.filter(t => t.done === "Đang thực hiện").length;
-
-            if (in_progress_count > 1) {
-                const message = `<div>Có nhiều hơn một đầu việc đang thực hiện.</div>
-                                <p>Bạn có chắc chắn muốn tiếp tục Submit không?</p>`;
+            let in_progress_count = subtask_list.filter(t => t.done === "Đang mở").length;
+            if (in_progress_count > 0) {
+                const message = `<div>Bạn chưa hoàn thành toàn bộ đầu việc của Công đoạn.</div>
+                                <p>Bạn có chắc chắn muốn tiếp tục kết thúc công đoạn không?</p>`;
 
                 await new Promise((resolve, reject) => {
                     frappe.confirm(message, resolve, () => {
@@ -905,6 +1193,51 @@ frappe.ui.form.on('Job Card', {
         });
     },
 
+    start_workstations: async function(frm) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let workstations = (await frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.get_workstations",
+                    args: { job_card: frm.doc.name }
+                })).message;
+
+                const d = new frappe.ui.Dialog({
+                    title: 'Chọn thiết bị',
+                    fields: [{ fieldname: "html_table", fieldtype: "HTML" }],
+                    primary_action_label: "Tiếp tục",
+                    primary_action: async () => {
+                        await frappe.call({
+                            method: "tahp.doc_events.job_card.job_card.set_workstations",
+                            args: { job_card: frm.doc.name, workstations }
+                        });
+                        d.hide(); resolve();
+                    },
+                });
+
+                d.show();
+
+                const renderTable = () => {
+                    const html = `<table class="table table-bordered">
+                        <thead style="background: #eee"><tr><th>Tên thiết bị</th><th>Hành động</th></tr></thead>
+                        <tbody>${workstations.map((ws,i) =>
+                            `<tr>
+                                <td>${ws.workstation}</td>
+                                <td><button class="btn btn-xs btn-danger" data-idx="${i}">Xóa</button></td>
+                            </tr>`).join('')}</tbody>
+                    </table>`;
+                    d.fields_dict.html_table.$wrapper.html(html);
+                    d.fields_dict.html_table.$wrapper.find('button').click(e => {
+                        const i = $(e.currentTarget).data('idx');
+                        workstations.splice(i,1);
+                        renderTable();
+                    });
+                };
+
+                renderTable();
+            } catch (err) { reject(err); }
+        });
+    },
+
     update_team: async function(frm) {
         return new Promise(async (resolve, reject) => {
             if (frm.doc.custom_team_table && frm.doc.custom_team_table.length > 0) {
@@ -953,7 +1286,7 @@ frappe.ui.form.on('Job Card', {
                         }
                     ]
                 }],
-                primary_action_label: "Xác nhận",
+                primary_action_label: "Tiếp tục",
                 primary_action: async function() {
                     const values = d.get_values();
                     if (!values || !values.items || values.items.length === 0) {
@@ -1092,17 +1425,20 @@ frappe.ui.form.on('Job Card', {
         }
     },
 
-    update_configs: async function(frm, data) {
-        const existingConfigs = frm.doc.custom_config_table.reduce((map, item) => {
-            map[item.config_key] = item.config_value;
-            return map;
-        }, {});
-        const updatedConfigs = data.filter(item => existingConfigs[item.config_key] !== item.config_value)
-        if (updatedConfigs.length === 0) return
+    update_configs: async function(frm, data, workstation) {
+        if (!workstation) return;
+
+        const updatedConfigs = data
+            .filter(item => item.workstation === workstation)
+            .filter(item => frm.doc.custom_config_table[item.config_key] !== item.config_value);
+
+        if (updatedConfigs.length === 0) return;
+
         await frappe.call({
             method: "tahp.doc_events.job_card.job_card.set_configs",
             args: {
                 job_card: frm.doc.name,
+                workstation: workstation,
                 configs: updatedConfigs
             }
         });
@@ -1215,7 +1551,7 @@ frappe.ui.form.on('Job Card', {
             }
 
             let filtered = items.filter(i => i.group_name === group_name && i.operation === ws);
-            if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name);
+            if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
 
             if (filtered.length > 0) {
                 reason_field.wrapper.style.display = '';
@@ -1324,7 +1660,7 @@ frappe.ui.form.on('Job Card', {
                         fieldname: "reason",
                         label: __("Lý do dừng"),
                         fieldtype: "Select",
-                        options: [""],
+                        options: items.map(i => i.reason),
                         in_place_edit: 1
                     },
                     {
@@ -1371,9 +1707,8 @@ frappe.ui.form.on('Job Card', {
                     return;
                 }
 
-                // lọc lý do theo group, ưu tiên theo operation nếu trùng
                 let filtered = items.filter(i => i.group_name === group_name && ws_list.includes(i.operation));
-                if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name);
+                if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
 
                 if (filtered.length > 0) {
                     reason_field.wrapper.style.display = '';
@@ -1490,4 +1825,22 @@ function covertAllData(data, inputs) {
         return newRow;
     });
     return newData;
+}
+
+function cleanerTable(dialog) {
+    const $wrapper = dialog.$wrapper;
+
+    // Header - cột cuối cùng
+    const $headerLastCol = $wrapper.find('.grid-heading-row .data-row.row .grid-static-col').last();
+    $headerLastCol.removeClass(function(index, className) {
+        return (className.match(/col-xs-\d+/g) || []).join(' ');
+    });
+
+    // Body - từng row
+    $wrapper.find('.grid-body .data-row.row').each(function() {
+        const $lastCol = $(this).find('.grid-static-col').last();
+        $lastCol.removeClass(function(index, className) {
+            return (className.match(/col-xs-\d+/g) || []).join(' ');
+        });
+    });
 }

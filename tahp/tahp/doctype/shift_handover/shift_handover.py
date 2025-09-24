@@ -18,7 +18,7 @@ def reject(name, comment):
     shift_leader = wo_doc.custom_shift_leader
     user = frappe.db.get_value("Employee", shift_leader, "user_id")
 
-    subject = f"Biên bản giao ca đã bị từ chối: {wo_name}"
+    subject = f"Biên bản giao ca đã bị từ chối: <b style='font-weight:bold'>{wo_name}</b>. Lý do: {comment}"
     frappe.get_doc({
         "doctype": "Notification Log",
         "for_user": user,
@@ -39,6 +39,9 @@ def reject(name, comment):
         "comment_email": frappe.session.user,
         "comment_by": frappe.session.user_fullname
     }).insert(ignore_permissions=True)
+    doc.workflow_state = "Draft"
+    doc.save(ignore_permissions=True)
+
 
 def create_shift_handover(work_order_name):
     """
@@ -89,29 +92,22 @@ def create_shift_handover(work_order_name):
         operation_doc = frappe.get_doc('Operation', op.operation)
         print('check1')
         shift_handover.append("table", {
-                                        
-                                "caption": operation_doc.name,
-                                "status":'',
-                                "safe": '',
-                                "clean": '',
-                                'is_header': 1
-                                
-                            })
+            "caption": operation_doc.name,
+            "status":'',
+            "safe": '',
+            "clean": '',
+            'is_header': 1
+            
+        })
         if hasattr(operation_doc, 'custom_subtasks') and operation_doc.custom_subtasks:
-               
                 subtasks = operation_doc.custom_subtasks
-                
-                # Duyệt qua từng row trong child table
                 for subtask_row in subtasks:
                     if hasattr(subtask_row, 'reason') and subtask_row.reason:
-                       
                         reason = subtask_row.reason.strip()
                         if reason :
-                           
                             shift_handover.append("table", {
                                 "caption": reason,
                                 'is_header': 0
-                               
                             })
                
        

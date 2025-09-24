@@ -42,6 +42,8 @@ app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
+    "/assets/tahp/css/report.css",
+    "/assets/tahp/js/tahp/custom/datatable/style.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
@@ -88,6 +90,7 @@ web_include_css = [
 
 doctype_js = {
     "Work Order": "/public/js/work_order/work_order.js",
+    "Quality Inspection": ["/public/js/quality_inspection/quality_inspection.js"],
     "Item": "/public/js/item/item.js",
     "Stock Entry": "/public/js/stock_entry/stock_entry.js",
     "Operation": "/public/js/operation/operation.js",
@@ -106,6 +109,7 @@ doctype_js = {
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
+    "Job Card": ["public/js/job_card/job_card_list.js"]
 }
 
 # doctype_js = {
@@ -233,9 +237,6 @@ doc_events = {
         "before_insert": [
             "tahp.doc_events.stock_entry.before_insert.before_insert"
         ],
-        "on_submit": [
-            "tahp.doc_events.stock_entry.on_submit.on_submit"
-        ],
         "before_submit": [
             "tahp.doc_events.stock_entry.before_submit.before_submit"
         ]
@@ -300,6 +301,15 @@ doc_events = {
 # 		"tahp.tasks.monthly"
 # 	],
 # }
+
+scheduler_events = {
+    # "cron": {
+    #     "0-59/1 * * * *": [
+    #         "tahp.doc_events.work_order.work_order_utils.check_and_create_qc_for_job_cards"
+    #     ]
+    # },
+}
+
 
 # Testing
 # -------
@@ -376,3 +386,5 @@ doc_events = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+after_migrate = "tahp.cleanup.cleanup_custom"
