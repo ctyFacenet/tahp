@@ -28,7 +28,6 @@ export default defineConfig({
       output: {
         format: "iife",
         entryFileNames: "index.js",
-        chunkFileNames: "chunks/[name].js",
         assetFileNames: "assets/[name][extname]"
       }
     }
@@ -46,3 +45,5 @@ export default defineConfig({
     allowedHosts: true,
   },
 })
+
+
