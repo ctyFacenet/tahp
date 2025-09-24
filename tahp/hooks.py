@@ -305,11 +305,11 @@ doc_events = {
 # }
 
 scheduler_events = {
-    # "cron": {
-    #     "0-59/1 * * * *": [
-    #         "tahp.doc_events.work_order.work_order_utils.check_and_create_qc_for_job_cards"
-    #     ]
-    # },
+    "cron": {
+        "* * * * *": [
+            "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.add_inspection"
+        ]
+    },
 }
 
 

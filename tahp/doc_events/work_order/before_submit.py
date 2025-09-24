@@ -156,7 +156,6 @@ def check_status(work_order):
         return stock_entry  # trả về name của Stock Entry nếu đã tồn tại
     return True  # chưa có Stock Entry
 
-
 @frappe.whitelist()
 def add_input(work_order):
     """

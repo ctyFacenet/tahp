@@ -9055,7 +9055,7 @@
  },
  {
   "charts": [],
-  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"i77eXQpn3f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Week Work Order\",\"col\":3}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"QpUb8a1rnS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phương án KHSX\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}},{\"id\":\"O7BPepEwKX\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Biên bản giao ca\",\"col\":3}},{\"id\":\"g4UWoQiLNa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu kiểm tra thiết bị\",\"col\":3}}]",
+  "content": "[{\"id\":\"csBCiDglCE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dữ liệu vận hành</span>\",\"col\":12}},{\"id\":\"i77eXQpn3f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Week Work Order\",\"col\":3}},{\"id\":\"OtMcArFRa5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tìm kiếm BOM\",\"col\":3}},{\"id\":\"QpUb8a1rnS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phương án KHSX\",\"col\":3}},{\"id\":\"69KKosI6Hg\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Work Order\",\"col\":3}},{\"id\":\"PwndxuIpB3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"LRhGV9GAov\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Nhập kho thành phẩm\",\"col\":3}},{\"id\":\"O7BPepEwKX\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Biên bản giao ca\",\"col\":3}},{\"id\":\"g4UWoQiLNa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Phiếu kiểm tra thiết bị\",\"col\":3}},{\"id\":\"nui7CNiMY0\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"C3KPz-82sw\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Báo cáo sản xuất</b></span>\",\"col\":12}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -9211,7 +9211,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-09-09 08:56:11.775380",
+  "modified": "2025-09-24 16:02:50.803494",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],

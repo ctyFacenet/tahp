@@ -2,6 +2,7 @@ from collections import Counter
 import frappe
 import json
 from frappe.utils import now_datetime, flt
+from tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection import generate_inspection
 
 @frappe.whitelist()
 def get_team(job_card):
@@ -318,6 +319,7 @@ def update_workstations(job_card, workstations):
 
                     if not row.active:
                         if not doc.time_logs:
+                            generate_inspection(doc.name, doc.operation, from_time)
                             doc.append("time_logs", {"employee": doc.custom_team_table[0].employee, "from_time": from_time, "completed_qty": doc.for_quantity})
                         
                         if len(doc.custom_subtask) == 1:
@@ -609,7 +611,6 @@ def send_noti_workstation(operation, workstation, job_card):
                 "document_type": "Job Card",
                 "document_name": doc.name
             }).insert(ignore_permissions=True)
-
 
 @frappe.whitelist()
 def update_comment(docname, comment):
