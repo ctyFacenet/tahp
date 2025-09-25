@@ -1,6 +1,8 @@
 from collections import Counter
 import frappe
 import json
+from frappe.utils import now_datetime, flt
+from tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection import generate_inspection
 
 @frappe.whitelist()
 def get_team(job_card):
@@ -9,15 +11,27 @@ def get_team(job_card):
     operation = doc.operation
     team = doc.custom_team_table
     if not team:
-        current_user = frappe.session.user
-        current_employee = frappe.db.get_value("Employee", {"user_id":current_user}, ["name", "employee_name"])
-        if current_employee: 
-            result.append({"employee": current_employee[0], "employee_name": current_employee[1]})
+        emp_code = []
         operation_doc = frappe.get_doc("Operation", operation)
         if getattr(operation_doc, "custom_team", None):
             for emp in operation_doc.custom_team:
-                if emp.employee != current_employee[0]:
+                if emp.employee and emp.employee not in emp_code:
                     result.append({"employee": emp.employee, "employee_name": emp.employee_name})
+                    emp_code.append(emp.employee)
+
+        if len(result) == 0:
+            wo_doc = frappe.get_doc("Work Order", doc.work_order)
+            for op in wo_doc.operations:
+                if op.operation == operation and op.custom_employee and op.custom_employee not in emp_code:
+                     emp = frappe.get_doc("Employee", op.custom_employee)
+                     result.append({"employee": emp.employee, "employee_name": emp.employee_name})
+
+            if len(result) == 0:
+                current_user = frappe.session.user
+                current_employee = frappe.db.get_value("Employee", {"user_id":current_user}, ["name", "employee_name"])
+                if current_employee and current_employee[0] not in emp_code: 
+                    result.append({"employee": current_employee[0], "employee_name": current_employee[1]})
+
     else:
         for row in team:
             result.append({
@@ -165,180 +179,112 @@ def pause_member(job_card, employee):
 
 @frappe.whitelist()
 def get_workstations(job_card):
-    """
-    Lấy thông tin workstation cho Job Card:
-    - Kiểm tra production_capacity và số Job Card đang Work In Progress.
-    - Quản lý trạng thái máy, máy con theo logic mới.
-    """
     result = []
     doc = frappe.get_doc("Job Card", job_card)
-
-    # Mapping trạng thái mới
-    status_map = {
-        "Off": "Sẵn sàng",
-        "Production": "Chạy",
-    }
-    
-    # Lấy workstation chính
     workstation = frappe.get_doc("Workstation", doc.workstation)
-
-    # Kiểm tra production_capacity
-    if workstation.production_capacity:
-        # Số lượng Job Card đang WIP trên workstation này (trừ job card hiện tại)
-        wip_count = frappe.db.count(
-            "Job Card",
-            filters={
-                "workstation": doc.workstation,
-                "status": "Work In Progress",
-                "name": ["!=", doc.name]
-            }
-        )
-        if wip_count >= workstation.production_capacity:
-            frappe.throw(f"{'Cụm thiết bị' if workstation.custom_is_parent else 'Thiết bị'} {workstation.name} đã đạt tối đa công suất")
-
-    # Nếu không phải máy parent
-    if not workstation.custom_is_parent:
-        if workstation.status in status_map:
-            mapped_status = status_map[workstation.status]
-        else:
-            mapped_status = "Hỏng"  # Mặc định
-        result.append({
-            "workstation": workstation.name,
-            "status": mapped_status
-        })
-
-    # Lấy danh sách máy con
-    children = frappe.db.get_all(
-        "Workstation",
-        filters={"custom_parent": doc.workstation},
-        fields=["name", "status"]
-    )
-
-    for child in children:
-        # Nếu máy con đang Off => Sẵn sàng
-        if child.status == "Off":
-            mapped_status = "Sẵn sàng"
-        elif child.status == "Production":
-            running_count = frappe.db.count(
-                "Job Card Workstation",
-                filters={
+    if workstation.custom_is_parent:
+        all_problem = 0
+        all_busy = 0
+        children = frappe.db.get_all("Workstation", filters={"custom_parent": doc.workstation}, fields=["name", "status"])
+        for child in children:
+            if child.status == "Off":
+                result.append({
                     "workstation": child.name,
-                    "parenttype": "Job Card",
-                    "parent": ["!=", doc.name],
-                    "status": "Chạy"
+                    "status": "Sẵn sàng"
+                })
+            elif child.status in ["Problem", "Maintenance"]:
+                all_problem += 1
+            elif child.status == "Production":
+                all_busy += 1
+
+        if all_problem == len(children):
+            frappe.throw("Tất cả các máy trong cụm đều đang hỏng và đang được bảo trì")
+        if all_busy == len(children):
+            frappe.throw("Tất cả các máy trong cụm đều đang bận")
+    else:
+        if workstation.status == "Production":
+            wip_count = frappe.db.count(
+                "Job Card",
+                filters={
+                    "workstation": doc.workstation,
+                    "status": "Work In Progress",
+                    "name": ["!=", doc.name]
                 }
             )
-            if running_count < workstation.production_capacity:
-                mapped_status = "Sẵn sàng"
-            else:
-                mapped_status = "Bận"
-        else:
-            mapped_status = "Hỏng"
-
-        result.append({
-            "workstation": child.name,
-            "status": mapped_status
-        })
+            if wip_count >= workstation.production_capacity:
+                frappe.throw(f"Thiết bị {workstation.name} đã đạt tối đa công suất")
+        elif workstation.status == "Hỏng":
+            frappe.throw(f"Thiết bị {workstation.name} đang bị hỏng")
+        elif workstation.status == "Off":
+            result.append({
+                "workstation": workstation.name,
+                "status": "Sẵn sàng"
+            })            
 
     return result
 
 @frappe.whitelist()
-def set_workstations(job_card, workstations, start=False):
+def set_workstations(job_card, workstations):
     doc = frappe.get_doc("Job Card", job_card)
     from_time = frappe.utils.now_datetime()
     if isinstance(workstations, str): workstations = json.loads(workstations)
-    workstation_doc = frappe.get_doc("Workstation", doc.workstation)
-    if workstation_doc:
-        if workstation_doc.status in ["Problem", "Maintenance"]:
-            frappe.throw('Toàn bộ cụm thiết bị/thiết bị đang hỏng, không thể sử dụng')
-            return
-        # else:
-        #     workstation_doc.status = "Production"
-        #     workstation_doc.save(ignore_permissions=True)
-
-    is_problem = all( workstation.get("status") in ["Problem", "Maintenance"] for workstation in workstations)
-    if is_problem:
-        frappe.throw('Toàn bộ thiết bị đều đang hỏng hoặc cần bảo trì')
-        return
-    
     doc.custom_workstation_table = []
     doc.custom_workstations = []
-    for workstation in workstations:
-        if workstation.get("workstation") and workstation.get("status"):
-            status = workstation.get("status")
-            ws = workstation.get("workstation")
-            data = { "workstation": ws, "status": status }
-            if status not in ["Hỏng", "Bận"]:
-                if not start:  
-                    data["status"] = "Sẵn sàng"
-                else:
-                    data["status"] = "Chạy"
-                doc.append("custom_workstations", {**data, "from_time": from_time})
-                # ws_doc = frappe.get_doc("Workstation", ws)
-                # if ws_doc.name != workstation_doc.name:
-                #     ws_doc.status = "Production"
-                #     ws_doc.save(ignore_permissions=True)
-            doc.append("custom_workstation_table", data)
+
+    for ws in workstations:
+        if ws.get("workstation") and ws.get("status"):
+            status = ws.get("status")
+            if status == "Sẵn sàng":
+                ws_status = "Sẵn sàng"
+            doc.append("custom_workstation_table", {"workstation": ws["workstation"], "status": ws_status})
+            doc.append("custom_workstations", {"workstation": ws["workstation"], "status": ws_status, "from_time": from_time})
     doc.save(ignore_permissions=True)
+    set_configs(job_card)
 
 @frappe.whitelist()
-def get_configs(job_card):
-    result = []
+def set_configs(job_card, configs=None, workstation=None):
     doc = frappe.get_doc("Job Card", job_card)
-    configs = doc.custom_config_table
-    if not configs:
+    from_time = frappe.utils.now_datetime()
+    raw_configs = doc.custom_config_table
+
+    if not raw_configs:
         operation_doc = frappe.get_doc("Operation", doc.operation)
         if getattr(operation_doc, "custom_configs", None):
             for config in operation_doc.custom_configs:
-                    result.append({
+                if config.workstation is None:
+                    for ws in doc.custom_workstation_table:
+                        doc.append("custom_config_table", {
+                            "config_name": config.config_name, 
+                            "config_value": config.config_default, 
+                            "unit": config.unit, 
+                            "workstation": ws.workstation
+                        })
+                else:
+                    doc.append("custom_config_table", {
                         "config_name": config.config_name, 
                         "config_value": config.config_default, 
                         "unit": config.unit, 
-                        "workstation": getattr(config, "workstation", None) or None},)
-    else:
-        for row in configs:
-            result.append({
-                "config_name": row.config_name,
-                "config_value": row.config_value,
-                "unit": row.unit,
-                "workstation": getattr(row, "workstation", None) or None
-            })        
-    return result
+                        "workstation": getattr(config, "workstation")
+                    })
+        doc.save(ignore_permissions=True)
+        return
 
-@frappe.whitelist()
-def set_configs(job_card, configs):
-    doc = frappe.get_doc("Job Card", job_card)
-    from_time = frappe.utils.now_datetime()
     if isinstance(configs, str): configs = json.loads(configs)
-
     updated = False
-
-    for i, config in enumerate(configs):
-        if not config.get("config_name") or not config.get("config_value"):
-            continue
-
-        data = {
-            "config_name": config.get("config_name"),
-            "config_value": config.get("config_value"),
-            "workstation": config.get("workstation"),
-            "unit": config.get("unit"),
-        }
-
-        # Lấy bản ghi cũ tại vị trí i
-        old_row = (doc.custom_config_table[i] if doc.custom_config_table and i < len(doc.custom_config_table) else None)
-        if old_row:
-            if old_row.config_name != data["config_name"] or old_row.config_value != data["config_value"] or old_row.workstation != data["workstation"]:
-                doc.append("custom_configs", {**data, "from_time": from_time})
-                old_row.config_name = data["config_name"]
-                old_row.config_value = data["config_value"]
-                old_row.workstation = data["workstation"]
-                old_row.unit = data["unit"]
+    for config in configs:
+        for row in doc.custom_config_table:
+            if not config.get('config_value'): continue
+            if row.config_name == config.get("config_name") and row.config_value != str(config.get("config_value")) and row.workstation == workstation:
+                doc.append("custom_configs", {
+                    "config_name": row.config_name,
+                    "config_value": config.get("config_value") if config.get("config_value") else 0,
+                    "unit": row.unit,
+                    "workstation": row.workstation,
+                    "from_time": from_time
+                })
+                row.config_value = config.get("config_value")
                 updated = True
-        else:
-            # Nếu bảng hiện tại ngắn hơn configs, append thêm mới
-            doc.append("custom_configs", {**data, "from_time": from_time})
-            doc.append("custom_config_table", data)
-            updated = True
+                break
 
     if updated:
         doc.save(ignore_permissions=True)
@@ -353,9 +299,9 @@ def update_workstations(job_card, workstations):
         workstation = item.get("workstation")
         reason = item.get("reason")
         group_name = item.get("group_name", "")
-        ready = []
         workstation_doc = frappe.get_doc("Workstation", workstation)
         if status == "Hỏng":
+            send_noti_workstation(doc.operation, workstation_doc.name, job_card)
             workstation_doc.status = "Problem"
             workstation_doc.save()
         if status == "Chạy" or status == "Dừng":
@@ -368,12 +314,12 @@ def update_workstations(job_card, workstations):
         for row in doc.custom_workstation_table:
             if row.workstation == workstation:
                 if status == "Chạy":
-                    real_status = workstation_doc.status
                     if not doc.custom_team_table:
                         frappe.throw("Vui lòng thêm nhân viên trước")
 
                     if not row.active:
                         if not doc.time_logs:
+                            generate_inspection(doc.name, doc.operation, from_time)
                             doc.append("time_logs", {"employee": doc.custom_team_table[0].employee, "from_time": from_time, "completed_qty": doc.for_quantity})
                         
                         if len(doc.custom_subtask) == 1:
@@ -386,16 +332,15 @@ def update_workstations(job_card, workstations):
                     if row.start_time:
                         second = int((from_time - row.start_time).total_seconds() * 1000)
                         row.time = (row.time or 0) + second
-                        ready.append({
+                        doc.append("custom_downtime", {
                             "workstation": workstation,
                             "from_time": from_time,
                             "reason": reason,
                             "is_danger": 1 if status == "Hỏng" else 0,
-                            "group_name": group_name
+                            "group_name": "Dừng do hỏng" if status == "Hỏng" else group_name
                         })
 
                 row.status = status
-
 
     for item in doc.custom_downtime:
         for workstation in workstations:
@@ -404,39 +349,15 @@ def update_workstations(job_card, workstations):
                 item.duration = frappe.utils.time_diff_in_seconds(item.to_time, item.from_time)
                 break
 
-    all_running = all(
-        row.status == "Chạy" for row in doc.custom_workstation_table 
-        if row.status not in ["Hỏng", "Bận"]
-    )
-    if all_running:
-        for item in doc.custom_downtime:
-            if item.workstation == "Tất cả" and not item.to_time:
-                item.to_time = from_time
-                item.duration = frappe.utils.time_diff_in_seconds(item.to_time, item.from_time)
-        doc.status = "In Progress"
-
-
-    workstation_names = [item.get("workstation") for item in workstations]
     all_stopped = all(
         row.status == "Dừng" for row in doc.custom_workstation_table 
         if row.status not in ["Hỏng", "Bận"]
     )
 
     if all_stopped:
-        reasons = [item.get("reason") for item in workstations if item.get("status") == "Dừng" and item.get("reason")]
-        groups = [item.get("group_name") for item in workstations if item.get("status") == "Dừng" and item.get("group_name")]
-        reason_text = Counter(reasons).most_common(1)[0][0] if reasons else None
-        group_text = Counter(groups).most_common(1)[0][0] if groups else None
-        doc.append("custom_downtime", {
-            "workstation": "Tất cả",
-            "from_time": from_time,
-            "reason": reason_text,
-            "group_name": group_text,
-            "is_danger": 0
-        })
         doc.status = "On Hold"
     else:
-        for r in ready: doc.append("custom_downtime", r)
+        doc.status = "In Progress"
     doc.save()
 
 @frappe.whitelist()
@@ -449,51 +370,55 @@ def set_inputs(job_card, inputs=None):
     - Cập nhật custom_input_table
     - Thêm dòng y hệt vào custom_inputs với from_time
     """
-
-    import json
-    from frappe.utils import now_datetime, flt
-
     doc = frappe.get_doc("Job Card", job_card)
-
-    if not doc.operation:
-        return
-
-    operation = frappe.get_doc("Operation", doc.operation)
-    if not operation.get("custom_inputs"):
-        return
+    if not doc.operation: return
     
     from_time = now_datetime()
     changed = False
 
-    # Nếu custom_input_table trống, nạp dữ liệu từ operation
     if not doc.custom_input_table:
-        for op_input in operation.custom_inputs:
-            item = frappe.get_doc("Item", op_input.item_code)
-            new_row = {
-                "item_code": op_input.item_code,
-                "item_name": op_input.item_name,
-                "is_meter": op_input.is_meter,
-                "uom": item.stock_uom
-            }
+        wo = frappe.get_doc("Work Order", doc.work_order)
+        bom = frappe.get_doc("BOM", wo.bom_no)
 
-            if op_input.is_meter:
-                new_row["unit_per_reading"] = item.get("custom_unit_per_reading")
+        for bom_item in bom.items:
+            print(bom_item)
+            try:
+                item_ops = json.loads(bom_item.custom_operations or "[]")
+                if isinstance(item_ops, str):
+                    item_ops = [item_ops]
+            except:
+                item_ops = []
+            if any(op == doc.operation for op in item_ops):
+                item_doc = frappe.get_doc("Item", bom_item.item_code)
+                is_meter = item_doc.get("custom_is_meter") or False
+                unit_per_reading = item_doc.get("custom_unit_per_reading") if is_meter else None
 
-            doc.append("custom_input_table", new_row)
+                new_row = {
+                    "item_code": bom_item.item_code,
+                    "item_name": bom_item.item_name,
+                    "is_meter": is_meter,
+                    "uom": item_doc.stock_uom,
+                    "unit_per_reading": unit_per_reading
+                }
 
-            # Append luôn vào custom_inputs
-            doc.append("custom_inputs", {
-                "item_code": new_row["item_code"],
-                "item_name": new_row["item_name"],
-                "is_meter": new_row["is_meter"],
-                "uom": new_row["uom"],
-                "qty": getattr(new_row, "qty", 0),
-                "meter": getattr(new_row, "meter", 0),
-                "meter_out": getattr(new_row, "meter_out", 0),
-                "unit_per_reading": getattr(new_row, "unit_per_reading", None),
-                "from_time": from_time
-            })
+                doc.append("custom_input_table", new_row)
 
+                doc.append("custom_inputs", {
+                    "item_code": new_row["item_code"],
+                    "item_name": new_row["item_name"],
+                    "is_meter": new_row["is_meter"],
+                    "uom": new_row["uom"],
+                    "qty": getattr(new_row, "qty", 0),
+                    "meter": getattr(new_row, "meter", 0),
+                    "meter_out": getattr(new_row, "meter_out", 0),
+                    "unit_per_reading": getattr(new_row, "unit_per_reading", None),
+                    "from_time": from_time
+                })
+
+            print(doc.operation, doc.operation in item_ops, item_ops)
+            for r in doc.custom_inputs:
+                print(r.item_code, r.item_name, r.is_meter, r.qty, r.unit_per_reading)
+        
         doc.save(ignore_permissions=True)
         return
 
@@ -545,6 +470,7 @@ def set_subtask(job_card, reason=None):
       đồng thời chuyển subtask trước đó từ In Progress thành Completed
     """
     doc = frappe.get_doc("Job Card", job_card)
+    from_time = frappe.utils.now_datetime()
     if not doc.operation:
         return
 
@@ -556,9 +482,9 @@ def set_subtask(job_card, reason=None):
         else:
             for subtask in operation.custom_subtasks:
                 if subtask.reason:
-                    doc.append("custom_subtask", { "reason": subtask.reason, "workstation": subtask.workstation, })
+                    doc.append("custom_subtask", { "reason": subtask.reason, "workstation": subtask.workstation, "from_time": from_time })
             if len(doc.custom_subtask) == 0:
-                doc.append("custom_subtask", { "reason": doc.operation,})
+                doc.append("custom_subtask", { "reason": doc.operation, "from_time": from_time})
         doc.save(ignore_permissions=True)
         return
 
@@ -627,19 +553,18 @@ def submit(job_card):
     shift_leader = wo_doc.custom_shift_leader
     user = frappe.db.get_value("Employee", shift_leader, "user_id")
 
-    other_incomplete = frappe.get_all(
+    job_card_count = frappe.db.count(
         "Job Card",
         filters={
             "work_order": wo_name,
-            "name": ["!=", job_card],
-            "status": ["!=", "Completed"],
-            "docstatus": ["<", 2]   # loại bỏ hủy
-        },
-        fields=["name"]
+            "docstatus": 1  # chỉ lấy job card đã submit
+        }
     )
 
-    if not other_incomplete:  # tức là không còn job card nào chưa hoàn thành
-        subject = f"Đã hoàn thành toàn bộ công đoạn của LSX Ca: {wo_name}"
+    operation_count = len(wo_doc.operations)
+
+    if job_card_count + 1 == operation_count:  # tức là không còn job card nào chưa hoàn thành
+        subject = f"Đã hoàn thành toàn bộ công đoạn của LSX Ca: <b style='font-weight:bold'>{wo_name}</b>"
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
@@ -650,9 +575,121 @@ def submit(job_card):
             "document_name": wo_name
         }).insert(ignore_permissions=True)
 
-
     # 8. Submit
     doc.submit()
 
+    inspection_name = frappe.db.get_value(
+        "Operation Tracker Inspection", 
+        {"job_card": doc.name}, 
+        "name"
+    )
+    if inspection_name:
+        inspection = frappe.get_doc("Operation Tracker Inspection", inspection_name)
+        inspection.submit()
 
-    
+@frappe.whitelist()
+def send_noti_workstation(operation, workstation, job_card):
+    users = frappe.db.get_all(
+        "User",
+        filters={"role_profile_name": "Bảo trì", "enabled": 1},
+        pluck="name"
+    )
+    for user in users:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "for_user": user,
+            "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Vui lòng kiểm tra!",
+            "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Vui lòng kiểm tra!",
+            "document_type": "Workstation",
+            "document_name": workstation,
+            "type": "Alert",
+        }).insert(ignore_permissions=True)
+
+    doc = frappe.get_doc("Job Card", job_card)
+    wo_doc = frappe.get_doc("Work Order", doc.work_order)
+    shift_leader = wo_doc.custom_shift_leader
+    if shift_leader:
+        user = frappe.db.get_value("Employee", shift_leader, "user_id")
+        if user:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "for_user": user,
+                "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
+                "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
+                "document_type": "Job Card",
+                "document_name": doc.name
+            }).insert(ignore_permissions=True)
+
+@frappe.whitelist()
+def update_comment(docname, comment):
+    role_exists = frappe.db.exists("Role", "Phát triển công nghệ")
+    if role_exists and "Phát triển công nghệ" not in frappe.get_roles(frappe.session.user):
+        return
+
+    frappe.get_doc({
+        "doctype": "Comment",
+        "comment_type": "Comment",
+        "reference_doctype": "Job Card",
+        "reference_name": docname,
+        "content": comment,
+        "comment_email": frappe.session.user,
+        "comment_by": frappe.session.user_fullname
+    }).insert(ignore_permissions=True)
+
+    job_card = frappe.get_doc("Job Card", docname)
+    current_time = now_datetime().strftime("[%H:%M]")
+    if job_card.custom_team_table:
+        first_emp = job_card.custom_team_table[0].employee
+        if first_emp:
+            emp = frappe.get_doc("Employee", first_emp)
+            if emp.user_id:
+                frappe.get_doc({
+                    "doctype": "Notification Log",
+                    "for_user": emp.user_id,
+                    "subject": f"<b style='font-weight:bold'>{current_time}</b> PTCN gửi phản ánh tại công đoạn <b style='font-weight:bold'>{job_card.operation}</b>: {comment}",
+                    "email_content": f"{current_time} PTCN gửi phản ánh tại công đoạn {job_card.operation}: {comment}",
+                    "document_type": "Job Card",
+                    "document_name": docname,
+                    "type": "Alert"
+                }).insert(ignore_permissions=True)
+    return {"status": "success"}
+
+@frappe.whitelist()
+def check_ptcn_role():
+    role_name = "Phát triển công nghệ"
+    if not frappe.db.exists("Role", role_name):
+        return True
+
+    direct_roles = frappe.get_all(
+        "Has Role",
+        filters={
+            "parent": frappe.session.user,
+            "role": role_name
+        },
+        pluck="role"
+    )
+
+    return bool(direct_roles)
+
+@frappe.whitelist()
+def update_feedback(docname):
+    doc = frappe.get_doc("Job Card", docname)
+    pending_feedback = [fb for fb in doc.custom_tracker if not fb.to_time]
+    if not pending_feedback: return
+    latest_fb = sorted(pending_feedback, key=lambda x: x.from_time, reverse=True)[0]
+    latest_fb.to_time = now_datetime()
+    doc.save(ignore_permissions=True)
+
+    inspections = frappe.get_all(
+        "Operation Tracker Inspection",
+        filters={"job_card": docname},
+        fields=["name"]
+    )
+    for insp in inspections:
+        insp_doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
+        update = False
+        for row in insp_doc.items:
+            if row.feedback_id and row.feedback_id == latest_fb.feedback_id:
+                row.sent = True
+                update = True
+        if update: insp_doc.save(ignore_permissions=True)

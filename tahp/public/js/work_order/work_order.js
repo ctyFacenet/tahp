@@ -3,7 +3,7 @@ frappe.ui.form.on('Work Order', {
         frm.set_intro("");
         await finish_button(frm);
     },
-    production_item: async function(frm) {
+    onload: async function(frm) {
         await autofill_items(frm);
     },
     bom_no: async function(frm) {
@@ -19,7 +19,7 @@ frappe.ui.form.on('Work Order Operation', {
         if (operation_doc) {
             frappe.model.set_value(cdt, cdn, 'workstation', operation_doc.workstation);
             frappe.model.set_value(cdt, cdn, 'sequence_id', 1);
-            if (operation_doc.custom_team && operation_doc.custom_team.length === 1) {
+            if (operation_doc.custom_team && operation_doc.custom_team.length > 0) {
                 frappe.model.set_value(cdt, cdn, 'custom_employee', operation_doc.custom_team[0].employee);
             }
         }
@@ -32,32 +32,27 @@ async function finish_button(frm) {
     const response = await frappe.call({method: "tahp.doc_events.work_order.before_submit.check_status", args: {work_order: frm.doc.name}})
     if (response.message) {
         frm.add_custom_button(__('Hoàn thành'), async function () {
-            const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
-                work_order_id: frm.doc.name,
-                purpose: "Manufacture",
-                qty: frm.doc.qty
-            });
-            frappe.model.sync(stock_entry);
-            frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+            if (typeof response.message === "string") frappe.set_route("Form", "Stock Entry", response.message)
+            else {
+                const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
+                    work_order_id: frm.doc.name,
+                    purpose: "Manufacture",
+                    qty: frm.doc.qty
+                });
+                frappe.model.sync(stock_entry);
+                frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+            }
         }).addClass('btn-primary')
     }
 }
 
 async function autofill_items(frm) {
     setTimeout(async () => {
-        console.log(frm.doc.operations)
         for (let row of frm.doc.operations) {
             let op_doc = await frappe.db.get_doc("Operation", row.operation);
-            if (op_doc.custom_team && op_doc.custom_team.length === 1) {
+            if (op_doc.custom_team && op_doc.custom_team.length > 0) {
                 frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
             }
-            let trackers = await frappe.db.get_list('Operation Tracker', {
-                filters: { operation: row.operation, docstatus: 1 },
-                fields: ["name"],
-                order_by: "creation desc",
-                limit: 1
-            });
-            if (trackers.length > 0) frappe.model.set_value(row.doctype, row.name, 'custom_is_qc_tracked', 1);
         }
         frm.refresh_field("operations");
     }, 100);

@@ -1,0 +1,152 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:OTI-{######}",
+ "creation": "2025-09-24 18:44:38.019719",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "control",
+  "display",
+  "chi_ti\u1ebft_tab",
+  "operation",
+  "job_card",
+  "frequency",
+  "column_break_andz",
+  "employee",
+  "start_time",
+  "next_time",
+  "section_break_pbds",
+  "items",
+  "parameters",
+  "section_break_kdph",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_kdph",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Operation Tracker Inspection",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_andz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "job_card.operation",
+   "fieldname": "operation",
+   "fieldtype": "Link",
+   "label": "C\u00f4ng \u0111o\u1ea1n",
+   "options": "Operation"
+  },
+  {
+   "fieldname": "section_break_pbds",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "display",
+   "fieldtype": "HTML"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "Operation Tracker Inspection Item"
+  },
+  {
+   "fieldname": "job_card",
+   "fieldtype": "Link",
+   "label": "LSX C\u00f4ng \u0111o\u1ea1n",
+   "options": "Job Card"
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Data",
+   "label": "T\u1ea7n su\u1ea5t"
+  },
+  {
+   "fieldname": "next_time",
+   "fieldtype": "Datetime",
+   "label": "Th\u1eddi \u0111i\u1ec3m ti\u1ebfp theo"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Th\u1eddi \u0111i\u1ec3m b\u1eaft \u0111\u1ea7u"
+  },
+  {
+   "fieldname": "parameters",
+   "fieldtype": "Table",
+   "options": "Operation Tracker Inspection Parameter"
+  },
+  {
+   "fieldname": "control",
+   "fieldtype": "Tab Break",
+   "label": "\u0110i\u1ec1u khi\u1ec3n"
+  },
+  {
+   "fieldname": "chi_ti\u1ebft_tab",
+   "fieldtype": "Tab Break",
+   "label": "Chi ti\u1ebft"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nh\u00e2n vi\u00ean",
+   "options": "Employee"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-09-25 16:49:30.123731",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Operation Tracker Inspection",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "operation"
+}

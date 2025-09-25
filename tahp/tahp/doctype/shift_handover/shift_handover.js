@@ -14,23 +14,7 @@
  */
 frappe.ui.form.on("Shift Handover", {
     refresh: function(frm) {
-        if (frm.doc.workflow_state) {
-            //  check docstatus Stock Entry
-            if (frm.doc.stock_entry) {
-                frappe.db.get_value("Stock Entry", frm.doc.stock_entry, "docstatus")
-                    .then(r => {
-                        if (r.message && r.message.docstatus === 1) {
-                            setup_button(frm); // run khi Stock Entry đã Submit
-                        } else {
-                            console.log("no button");
-                        }
-                    });
-            } else {
-                // không có Stock Entry thì không hiện nút
-                console.log("no button");
-            }
-        }
-        // frm.page.set_primary_action('Xin chào', ()=>{})
+        if (frm.doc.work_order) setup_button(frm);
         $(frm.page.wrapper).find('.actions-btn-group').hide();
     },
 });
@@ -40,9 +24,6 @@ function setup_button(frm) {
         case 'Draft':
             setup_draft_buttons(frm);
             break;
-        // case 'Ready to Handover':
-        //     setup_ready_buttons(frm);
-        //     break;
         case 'Handed Over':
             setup_handed_over_buttons(frm);
             break;
@@ -95,7 +76,6 @@ async function setup_handed_over_buttons(frm) {
                         comment: values.comment
                     }
                 });
-                trigger_workflow_action(frm, "Draft");
             },
             "Nhập lý do từ chối",
             "Xác nhận"

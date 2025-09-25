@@ -4,6 +4,7 @@
 import frappe
 
 
+@frappe.whitelist()
 def execute(filters=None):
     columns = [
         "Mã mặt hàng:Link/Item:150",
@@ -13,7 +14,7 @@ def execute(filters=None):
         "Nhóm mặt hàng:Link/Item Group:220"
     ]
 
-    data = frappe.db.sql("""
+    data = frappe.db.sql(f"""
         SELECT
             a.item_code,
             a.item_name,
