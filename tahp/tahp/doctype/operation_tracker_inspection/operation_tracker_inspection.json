@@ -6,15 +6,19 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "control",
+  "display",
+  "chi_ti\u1ebft_tab",
   "operation",
+  "job_card",
   "frequency",
   "column_break_andz",
-  "job_card",
+  "employee",
   "start_time",
   "next_time",
   "section_break_pbds",
-  "display",
   "items",
+  "parameters",
   "section_break_kdph",
   "amended_from"
  ],
@@ -53,6 +57,7 @@
    "fieldtype": "HTML"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "items",
    "fieldtype": "Table",
    "options": "Operation Tracker Inspection Item"
@@ -77,13 +82,34 @@
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "label": "Th\u1eddi \u0111i\u1ec3m b\u1eaft \u0111\u1ea7u"
+  },
+  {
+   "fieldname": "parameters",
+   "fieldtype": "Table",
+   "options": "Operation Tracker Inspection Parameter"
+  },
+  {
+   "fieldname": "control",
+   "fieldtype": "Tab Break",
+   "label": "\u0110i\u1ec1u khi\u1ec3n"
+  },
+  {
+   "fieldname": "chi_ti\u1ebft_tab",
+   "fieldtype": "Tab Break",
+   "label": "Chi ti\u1ebft"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nh\u00e2n vi\u00ean",
+   "options": "Employee"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-24 20:41:32.990671",
+ "modified": "2025-09-25 16:49:30.123731",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Inspection",

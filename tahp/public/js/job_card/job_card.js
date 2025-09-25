@@ -188,23 +188,6 @@ frappe.ui.form.on('Job Card', {
         frm.__workstation_timer = setInterval(() => frm.events.update_workstations_timer_display(frm, $col2), 1000);
         frm.events.update_workstations_timer_display(frm, $col2)
 
-        // frm.events.define_table(
-        //     frm, $col3, 'Cấu hình',
-        //     columns=[
-        //         { label: 'Cấu hình', fieldname: 'config_name', is_primary: true },
-        //         { label: 'Giá trị', fieldname: 'config_value', is_value: true },
-        //         { label: 'Đơn vị', fieldname: 'unit', is_unit: true},
-        //         { label: 'Thiết bị', fieldname: 'workstation', is_secondary: true },
-        //     ],
-        //     data= (frm.doc.custom_config_table || []).map(row => ({
-        //         config_name: row.config_name,
-        //         unit: row.unit,
-        //         config_value: row.config_value,
-        //         workstation: row.workstation ? row.workstation : "Áp dụng tất cả" })),
-        //     edittable=true,
-        //     action="update_configs"
-        // )
-
         let has_input = frm.doc.custom_input_table.find(row=>!row.is_meter)
         if (has_input) {
             $col4.empty()
@@ -345,44 +328,70 @@ frappe.ui.form.on('Job Card', {
         }
 
         frm.events.create_chart(frm, $col3)
-        frm.events.update_comment(frm, $col0)
+        frm.events.update_feedback(frm, $col0)
     },
 
-    update_comment: async function (frm, $col0) {
-        let r = await frappe.call({
-            method: "tahp.doc_events.job_card.job_card.check_ptcn_role",
-        });
-        if (!r.message) $col0.hide();
-        $col0.on("click", function () {
-            frappe.prompt(
-                [
-                    {
-                        label: "Điền bình luận",
-                        fieldname: "comment",
-                        fieldtype: "Small Text",
-                        reqd: 1
-                    }
-                ],
-                async function (values) {
-                    try {
-                        await frappe.call({
-                            method: "tahp.doc_events.job_card.job_card.update_comment",
-                            args: {
-                                docname: frm.doc.name,
-                                comment: values.comment
-                            }
-                        });
-                    } catch (err) {
-                        frappe.msgprint(__("Có lỗi xảy ra khi xử lý"));
-                        console.error(err);
-                    }
-                },
-                "Thêm bình luận",
-                "Gửi"
-            );
-        });
-    },
+    // update_comment: async function (frm, $col0) {
+    //     let r = await frappe.call({
+    //         method: "tahp.doc_events.job_card.job_card.check_ptcn_role",
+    //     });
+    //     if (!r.message) $col0.hide();
+    //     $col0.on("click", function () {
+    //         frappe.prompt(
+    //             [
+    //                 {
+    //                     label: "Điền bình luận",
+    //                     fieldname: "comment",
+    //                     fieldtype: "Small Text",
+    //                     reqd: 1
+    //                 }
+    //             ],
+    //             async function (values) {
+    //                 try {
+    //                     await frappe.call({
+    //                         method: "tahp.doc_events.job_card.job_card.update_comment",
+    //                         args: {
+    //                             docname: frm.doc.name,
+    //                             comment: values.comment
+    //                         }
+    //                     });
+    //                 } catch (err) {
+    //                     frappe.msgprint(__("Có lỗi xảy ra khi xử lý"));
+    //                     console.error(err);
+    //                 }
+    //             },
+    //             "Thêm bình luận",
+    //             "Gửi"
+    //         );
+    //     });
+    // },
 
+    update_feedback: async function(frm, $col0) {
+        const tracker = frm.doc.custom_tracker;
+        if (!tracker || !tracker.length) {
+            $col0.hide();
+            return;
+        }
+
+        const latest_feedback = tracker[tracker.length - 1]; // lấy dòng cuối cùng
+
+        if (!latest_feedback.to_time) {
+            $col0.html(`
+                Yêu cầu từ PTCN: ${latest_feedback.feedback} <br>
+                <small style="color:#3b82f6; cursor:pointer">Nhấn vào để xác nhận</small>
+            `);
+
+            $col0.off("click").on("click", async function () {
+                await frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.update_feedback",
+                    args: { docname: frm.doc.name }
+                });
+                frappe.show_alert("Đã xác nhận yêu cầu từ PTCN");
+            });
+        } else {
+            $col0.hide();
+        }
+    },
 
     create_chart(frm, $col3) {
         const inputs = frm.doc.custom_inputs || [];

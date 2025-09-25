@@ -575,9 +575,17 @@ def submit(job_card):
             "document_name": wo_name
         }).insert(ignore_permissions=True)
 
-
     # 8. Submit
     doc.submit()
+
+    inspection_name = frappe.db.get_value(
+        "Operation Tracker Inspection", 
+        {"job_card": doc.name}, 
+        "name"
+    )
+    if inspection_name:
+        inspection = frappe.get_doc("Operation Tracker Inspection", inspection_name)
+        inspection.submit()
 
 @frappe.whitelist()
 def send_noti_workstation(operation, workstation, job_card):
@@ -662,3 +670,26 @@ def check_ptcn_role():
     )
 
     return bool(direct_roles)
+
+@frappe.whitelist()
+def update_feedback(docname):
+    doc = frappe.get_doc("Job Card", docname)
+    pending_feedback = [fb for fb in doc.custom_tracker if not fb.to_time]
+    if not pending_feedback: return
+    latest_fb = sorted(pending_feedback, key=lambda x: x.from_time, reverse=True)[0]
+    latest_fb.to_time = now_datetime()
+    doc.save(ignore_permissions=True)
+
+    inspections = frappe.get_all(
+        "Operation Tracker Inspection",
+        filters={"job_card": docname},
+        fields=["name"]
+    )
+    for insp in inspections:
+        insp_doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
+        update = False
+        for row in insp_doc.items:
+            if row.feedback_id and row.feedback_id == latest_fb.feedback_id:
+                row.sent = True
+                update = True
+        if update: insp_doc.save(ignore_permissions=True)

@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-25 15:50:06.290148",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "feedback",
+  "from_time",
+  "to_time",
+  "feedback_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "feedback",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Y\u00eau c\u1ea7u"
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "G\u1eedi l\u00fac"
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "X\u00e1c nh\u1eadn l\u00fac"
+  },
+  {
+   "fieldname": "feedback_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-25 17:07:48.449545",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Job Card Tracker",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

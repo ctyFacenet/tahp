@@ -3,6 +3,33 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2025-09-15 11:44:47.323583",
+  "name": "Gửi KDTM",
+  "style": "",
+  "workflow_state_name": "Gửi KDTM"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 12:01:14.786397",
+  "name": "Được TCKT duyệt",
+  "style": "",
+  "workflow_state_name": "Được TCKT duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 13:43:36.680731",
+  "name": "GĐ đã duyệt",
+  "style": "",
+  "workflow_state_name": "GĐ đã duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-09-07 19:30:47.694399",
   "name": "Đã hủy bỏ",
   "style": "Danger",
@@ -115,5 +142,95 @@
   "name": "Handed Over",
   "style": "Warning",
   "workflow_state_name": "Handed Over"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 11:51:32.381659",
+  "name": "Không được KDTM chọn",
+  "style": "",
+  "workflow_state_name": "Không được KDTM chọn"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 13:40:49.839282",
+  "name": "Chờ KDTM duyệt",
+  "style": "",
+  "workflow_state_name": "Chờ KDTM duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 11:41:54.263319",
+  "name": "Đã tạo",
+  "style": "",
+  "workflow_state_name": "Đã tạo"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 11:46:58.829918",
+  "name": "Được KDTM chọn",
+  "style": "",
+  "workflow_state_name": "Được KDTM chọn"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 13:37:55.499873",
+  "name": "Được TCKT chọn",
+  "style": "",
+  "workflow_state_name": "Được TCKT chọn"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 11:54:11.779782",
+  "name": "Chờ TCKT duyệt",
+  "style": "",
+  "workflow_state_name": "Chờ TCKT duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 08:38:38.131193",
+  "name": "Đợi KHSX duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi KHSX duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 08:47:09.606235",
+  "name": "Đợi TPBT duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi TPBT duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 09:45:56.855590",
+  "name": "Chờ GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Chờ GĐ duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 08:50:39.941349",
+  "name": "Đợi thủ kho duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi thủ kho duyệt"
  }
 ]

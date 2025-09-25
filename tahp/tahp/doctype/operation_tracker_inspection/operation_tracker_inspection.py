@@ -1,13 +1,13 @@
-# Copyright (c) 2025, FaceNet and contributors
-# For license information, please see license.txt
-
 import frappe
+import json
 from datetime import timedelta
 from frappe.model.document import Document
+from frappe.utils import now_datetime, get_datetime
 
 
 class OperationTrackerInspection(Document):
 	pass
+
 
 @frappe.whitelist()
 def generate_inspection(job_card, operation, from_time):
@@ -20,8 +20,144 @@ def generate_inspection(job_card, operation, from_time):
 			inspection.start_time = from_time
 			inspection.frequency = row.frequency
 			inspection.next_time = from_time + timedelta(minutes=row.frequency)
+			inspection.employee = row.employee
+
+			if row.qc_template:
+				template_doc = frappe.get_doc("Quality Inspection Template", row.qc_template)
+				for spec in template_doc.item_quality_inspection_parameter:
+					inspection.append("parameters", {
+						"specification": spec.specification,
+						"unit": spec.custom_unit
+					})
+
 			inspection.insert(ignore_permissions=True)
 
-@frappe.whitelist()
 def add_inspection():
-	print('hi')
+	now = now_datetime()
+
+	inspections = frappe.get_all(
+		"Operation Tracker Inspection",
+		filters={"docstatus": 0},
+		fields=["name", "next_time", "job_card", "operation"]
+	)
+
+	for insp in inspections:
+		doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
+		jc_status = frappe.get_value("Job Card", doc.job_card, "docstatus")
+		if jc_status != 0:
+			continue
+		if now < doc.next_time:
+			continue
+
+		doc.next_time = now + timedelta(minutes=int(doc.frequency))
+		user, employee_name = frappe.db.get_value(
+			"Employee",
+			doc.employee,
+			["user_id", "employee_name"]
+		)
+		frappe.get_doc({
+			"doctype": "Notification Log",
+			"for_user": user,
+			"subject": f"Yêu cầu nhân viên {employee_name} hoàn thành phiếu đo đạc công đoạn {doc.operation}",
+			"email_content": "",
+			"type": "Alert",
+			"document_type": "Operation Tracker Inspection",
+			"document_name": doc.name
+		}).insert(ignore_permissions=True)
+	
+		for param in doc.parameters:
+			doc.append("items", {
+				"from_time": now,
+				"specification": param.specification,
+			})
+
+		doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def update_params(inspection, items):
+	doc = frappe.get_doc("Operation Tracker Inspection", inspection)
+	now = now_datetime()
+	feedback_id = frappe.generate_hash(length=8)
+
+	if isinstance(items, str):
+		items = json.loads(items)
+
+	send = False
+	for item in items:
+		from_time = get_datetime(item.get("from_time"))
+		spec = item.get("specification")
+		feedback = item.get("feedback")
+
+		for row in doc.items:
+			if row.from_time == from_time and row.specification == spec:
+				row.value = item.get("value")
+				row.to_time = now
+				row.feedback = feedback
+				row.feedback_id = feedback_id
+				break
+
+		if feedback: send = feedback
+	
+	if send:
+		jc_doc = frappe.get_doc("Job Card", doc.job_card)
+		if not hasattr(jc_doc, "custom_tracker") or jc_doc.custom_tracker is None:
+			jc_doc.custom_tracker = []
+		jc_doc.append("custom_tracker", {
+			"from_time": now,
+			"feedback": send,
+			"feedback_id": feedback_id
+		})
+		jc_doc.save(ignore_permissions=True)
+
+	doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def send_recommendation(inspection, items):
+    """
+    Trả về feedback gợi ý dựa trên Operation Tracker Evaluation.
+    items: list of dicts [{specification, value}]
+    Trả về string, mỗi feedback trên 1 dòng có gạch đầu dòng.
+    """
+    if isinstance(items, str):
+        import json
+        items = json.loads(items)
+
+    # Lấy tất cả evaluation
+    evaluations = frappe.get_all(
+        "Operation Tracker Evaluation",
+        fields=["specification", "evaluation", "value", "feedback"]
+    )
+
+    feedback_lines = []
+
+    for item in items:
+        spec = item.get("specification")
+        val = item.get("value")
+
+        for ev in evaluations:
+            if ev.specification != spec:
+                continue
+
+            try:
+                # ép kiểu float để so sánh số
+                item_val = float(val)
+                eval_val = float(ev.value)
+            except (ValueError, TypeError):
+                continue
+
+            # Kiểm tra điều kiện
+            op = ev.evaluation.strip()
+            if op == ">" and item_val > eval_val:
+                feedback_lines.append(f"{ev.feedback}")
+            elif op == "<" and item_val < eval_val:
+                feedback_lines.append(f"{ev.feedback}")
+            elif op == "=" and item_val == eval_val:
+                feedback_lines.append(f"{ev.feedback}")
+            elif op in ["≥", ">="] and item_val >= eval_val:
+                feedback_lines.append(f"{ev.feedback}")
+            elif op in ["≤", "<="] and item_val <= eval_val:
+                feedback_lines.append(f"{ev.feedback}")
+
+    # loại bỏ các feedback rỗng
+    feedback_lines = [line for line in feedback_lines if line.strip()]
+    return ", ".join(feedback_lines)
