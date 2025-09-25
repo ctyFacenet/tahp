@@ -98,17 +98,23 @@ frappe.query_reports["Downtime Report"] = {
         {
             fieldname: "reason_group",
             label: "Nhóm nguyên nhân",
-            fieldtype: "Data"
+            fieldtype: "Data",
+            hidden: "1"
+
         },
         {
             fieldname: "reason_detail",
             label: "Nguyên nhân",
-            fieldtype: "Data"
+            fieldtype: "Data",
+            hidden: "1"
+
         },
         {
             fieldname: "category",
             label: "Hệ",
             fieldtype: "Select",
+           
+
             options: [],
             on_change: function() {
                 
@@ -119,12 +125,15 @@ frappe.query_reports["Downtime Report"] = {
         {
             fieldname: "machine_group",
             label: "Cụm máy",
-            fieldtype: "Data"
+            fieldtype: "Data",
+            hidden: "1"
+
         },
         {
             fieldname: "equipment_name",
             label: "Máy dừng",
-            fieldtype: "Data"
+            fieldtype: "Data",
+            hidden: "1"
         },
         
        
@@ -140,16 +149,25 @@ frappe.query_reports["Downtime Report"] = {
         
         this.setup_title_observer(report);
         this.load_manufacturing_categories(report);
-       
+        // clear filter khi F5
+        report.filters.forEach(f => {
+            if (f.df.fieldname === "from_date") {
+                f.set_value(frappe.datetime.add_days(frappe.datetime.get_today(), -7));
+            } else if (f.df.fieldname === "to_date") {
+                f.set_value(frappe.datetime.get_today());
+            } else {
+                f.set_value("");
+            }
+        });
 
         // Ẩn 2 nút Action với ...
         report.page.wrapper.find(".standard-actions").css("display", "none");
         report.page.wrapper.find(".custom-actions.hidden-xs.hidden-md").css("display", "none");
 
 
-        $(".page-wrapper").css({
-            "margin-top": "50px"
-        });
+        // $(".page-wrapper").css({
+        //     "margin-top": "50px"
+        // });
 
        
         let title_el = report.page.wrapper.find(".page-head-content .title-text");
@@ -160,31 +178,94 @@ frappe.query_reports["Downtime Report"] = {
                 "text-align": "center",
                 
         });
-
-
-        if (!report.page.wrapper.find(".select-wrapper").length) {
-            title_el.append(`
-                <div class="select-wrapper" style="margin-top:30px; display:flex; justify-content:center; font-size:15px; font-weight:normal; width:100%;">
-                    
-                    <select id="report-view-select" style="padding:5px 10px; border-radius:6px; border:1px solid #ccc;">
-                        <option value="reason" selected>Theo nguyên nhân</option>
-                        <option value="device">Theo thiết bị</option>
-                    </select>
-                </div>
-            `);
-
-            this.setup_select_events(report);
-        }
+        
+        // Sử dụng setTimeout để đảm bảo DOM đã sẵn sàng
+        setTimeout(() => {
+            this.setupPageLayout(report);
+        }, 100);
         
         setTimeout(() => {
             this.show_reason_charts();
             // Đánh dấu là đã khởi tạo xong
             this._initialized = true;
-            // this.setup_select_events(report);
-        }, 100);
+        }, 200);
         
+    },
+
+    setupPageLayout: function(report) {
+       
+           
+        if (!report.page.wrapper.find(".select-wrapper").length) {
+            // Lấy container .page-form
+            const pageForm = report.page.wrapper.find('.page-form');
+
+            if (pageForm.length) {
+                pageForm.prepend(`
+                    <div class="select-wrapper" style="
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        margin: 0;
+                    ">
+                        <select id="report-view-select" style="
+                            padding:5px 10px;
+                            border-radius:6px;
+                            border:1px solid #ccc;
+                            background-color: #f3f3f3 !important;
+                        ">
+                            <option value="reason" selected>Theo nguyên nhân</option>
+                            <option value="device">Theo thiết bị</option>
+                        </select>
+                    </div>
+                `);
+
+                this.setup_select_events(report);
+            }
+        }
+
+        // // Dùng JS để thêm style trực tiếp
+        // const pageForm = document.querySelector('.page-form');  
+        // if (pageForm) {
+        //     pageForm.style.justifyContent = 'space-between';
+        //     pageForm.style.alignItems = 'center';
+        //     pageForm.style.padding = '0 20px';
+
+        //     const fromDate = pageForm.querySelector('.frappe-control[data-fieldname="from_date"]');
+        //     const toDate = pageForm.querySelector('.frappe-control[data-fieldname="to_date"]');
+        //     const extraDiv = pageForm.querySelector('.frappe-control[data-fieldname="category"]');
+
+        //     if (fromDate && toDate) {
+        //         // Tạo div mới bọc 2 filter
+        //         const wrapper = document.createElement('div');
+        //         wrapper.classList.add('date-wrapper');
+        //         wrapper.style.display = 'flex';
+        //         wrapper.style.justifyContent = 'flex-end';
+        //         wrapper.style.gap = '10px';
+        //         wrapper.style.width = 'max-content';
+        //         wrapper.style.flex = '0 0 auto';
+        //         wrapper.style.justifyContent = 'flex-end';
+
+        //         // Chèn extra div nếu có
+        //         if (extraDiv) {
+        //             wrapper.appendChild(extraDiv);
+        //             extraDiv.style.minWidth = '150px';
+        //         }
+
+        //         // Chuyển 2 filter vào div mới
+        //         wrapper.appendChild(fromDate);
+        //         wrapper.appendChild(toDate);
+
+        //         // Thêm div wrapper vào page-form
+        //         pageForm.appendChild(wrapper);
+
+        //         // Mở rộng width cho từng filter nếu cần
+        //         fromDate.style.minWidth = '150px';
+        //         toDate.style.minWidth = '150px';
+        //     }
         
-    },  
+       
+    },
+    
     load_manufacturing_categories: function(report) {
         
         frappe.db.get_list('Manufacturing Category', {
@@ -219,47 +300,21 @@ frappe.query_reports["Downtime Report"] = {
                     .filter(f => !["from_date", "to_date"].includes(f.df.fieldname))
                     .forEach(f => f.set_value(""));
 
-                // Lấy các filter cần ẩn/hiện
-                let reason_group = report.get_filter("reason_group");
-                let reason_detail = report.get_filter("reason_detail");
                 let category = report.get_filter("category");
-                let machine_group = report.get_filter("machine_group");
-                let equipment_name = report.get_filter("equipment_name");
-
-                
 
                 if (selectEl.value === "reason") {
                     this.show_reason_charts();
-                    reason_group.toggle(true);
-                    reason_detail.toggle(true);
-                    category.toggle(false);
-                    machine_group.toggle(false);
-                    equipment_name.toggle(false);
+                    if (category) category.toggle(false);
                 } else if (selectEl.value === "device") {
                     this.show_device_charts();
-                    reason_group.toggle(false);
-                    reason_detail.toggle(false);
-                    category.toggle(true);
-                    machine_group.toggle(true);
-                    equipment_name.toggle(true);
-
+                    if (category) category.toggle(true);
                 }
             });
 
             // Khi load lần đầu, set filter theo default (reason)
             setTimeout(() => {
-                let reason_group = report.get_filter("reason_group");
-                let reason_detail = report.get_filter("reason_detail");
-                let machine_group = report.get_filter("machine_group");
-                let equipment_name = report.get_filter("equipment_name");
                 let category = report.get_filter("category");
-
-
-                reason_group.toggle(true);
-                reason_detail.toggle(true);
-                category.toggle(false);
-                machine_group.toggle(false);
-                equipment_name.toggle(false);
+                if (category) category.toggle(false);
             }, 100);
         }
     },
@@ -271,39 +326,58 @@ frappe.query_reports["Downtime Report"] = {
     },
 
     show_reason_charts: function() {
-
+      
+        if (typeof draw_column_chart1 === 'function') {
             draw_column_chart1();
+        }
+        if (typeof draw_horizontal_chart1 === 'function') {
             draw_horizontal_chart1();
+        }
         
     },
 
     show_device_charts: function() {
-        
+       
+        if (typeof draw_column_chart === 'function') {
             draw_column_chart();
+        }
+        if (typeof draw_horizontal_chart === 'function') {
             draw_horizontal_chart();
+        }
         
     },
+    
     setup_title_observer: function(report) {
+       
         const $reportBody = $(report.page.body);
         
-        this.observer = new MutationObserver(() => {
+        // Khởi tạo observer
+        this.observer = new MutationObserver((mutations, obs) => {
             this.add_custom_title($reportBody);
+
+            // Nếu title đã tồn tại, ngắt observer
+            if ($reportBody.find(".downtime-report-title").length) {
+                obs.disconnect();
+            }
         });
+
+        // Bắt đầu lắng nghe thay đổi DOM
+        this.observer.observe(report.page.body.get(0), { childList: true, subtree: true });
         
-        this.observer.observe(report.page.body.get(0), { childList: true });
     },
     
     add_custom_title: function($reportBody) {
        
-         const $datatable = $reportBody.find(".datatable");
+        const $datatable = $reportBody.find(".datatable");
         
         if ($datatable.length && !$reportBody.find(".downtime-report-title").length) {
             $datatable.before('<h4 class="downtime-report-title" style="margin: 15px 0; font-weight: 600;">Chi tiết theo thiết bị:</h4>');
         }
+        
     }
 };
 
-
+//Theo thiết bị
 async function draw_column_chart() {
     
     await new Promise(resolve => setTimeout(resolve, 200));
@@ -319,7 +393,7 @@ async function draw_column_chart() {
     let wrapper = document.createElement("div");
     wrapper.classList.add("custom-chart-wrapper");
     wrapper.style.width = "100%";
-    wrapper.style.height = "400px";
+    // wrapper.style.height = "400px";
     
     
     reportWrapper.appendChild(wrapper);
@@ -351,7 +425,7 @@ async function draw_column_chart() {
             const ctx = canvas.getContext("2d");
             Chart.register(ChartDataLabels);
 
-            new Chart(ctx, {
+            let chartInstance = new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: labels,
@@ -371,7 +445,8 @@ async function draw_column_chart() {
                             const chart = elements[0];
                             const machine = labels[chart.index]; 
                             const currentFilter_mc = frappe.query_report.get_filter_value("machine_group");
-                            const dataset = event.chart.data.datasets[0];
+                            const dataset = chartInstance.data.datasets[0];
+                            const bgColors = [...colors]; // giữ màu gốc bên ngoài luôn để reset
                             // console.log("Click vào:", reason);
 
                             try {
@@ -379,6 +454,8 @@ async function draw_column_chart() {
                                     // frappe.query_report.set_filter_value("reason_group", "");
                                     frappe.query_report.set_filter_value("machine_group", "");
                                     frappe.query_report.refresh();
+                                    dataset.backgroundColor = bgColors;
+
                                     // selectedReason = null;
                                     
                                    
@@ -390,7 +467,17 @@ async function draw_column_chart() {
                                 else {
                                     frappe.query_report.set_filter_value("machine_group", machine);
                                     frappe.query_report.refresh();
-                                    // selectedReason = reason;
+                                   
+                                    // Highlight cột đang chọn
+                                    dataset.backgroundColor = bgColors.map((c, i) => {
+                                        if (i === chart.index) {
+                                            // làm sáng hơn giống hover
+                                            return Chart.helpers.color(c).darken(0.4).rgbString();
+                                        }
+                                        // mờ các cột khác đi một chút
+                                        return Chart.helpers.color(c).alpha(0.8).rgbString();
+                                    });
+                                    
                                     
 
                                     frappe.show_alert({
@@ -398,11 +485,12 @@ async function draw_column_chart() {
                                         indicator: "green"
                                     })
                                 }
+
+                                chartInstance.update();
+
                                 
-                                
-                                
-                                
-                                
+
+                               
                             } catch (err) {
                                 // console.error("Lỗi khi set filter:", err);
                                 
@@ -462,7 +550,7 @@ async function draw_horizontal_chart() {
     let wrapper = document.createElement("div");
     wrapper.classList.add("custom-chart-wrapper");
     wrapper.style.width = "100%";
-    wrapper.style.height = "400px";
+    // wrapper.style.height = "400px";
 
    
 
@@ -518,12 +606,15 @@ async function draw_horizontal_chart() {
                             const chart = elements[0];
                             const equipmentName = chartInstance.data.labels[chart.index];
                             const currentFilter_name = frappe.query_report.get_filter_value("equipment_name");
-
+                            const dataset = chartInstance.data.datasets[0];
+                            const bgColors = [...chartData.colors]; 
                             try {
                                 if (currentFilter_name === equipmentName) {  
                                     // Xóa filter
                                     frappe.query_report.set_filter_value("equipment_name", "");
                                     frappe.query_report.refresh();
+                                    dataset.backgroundColor = bgColors;
+
                                     
                                     frappe.show_alert({
                                         message: "Đã xóa bộ lọc theo máy",
@@ -533,12 +624,26 @@ async function draw_horizontal_chart() {
                                     // Set filter 
                                     frappe.query_report.set_filter_value("equipment_name", equipmentName);
                                     frappe.query_report.refresh();
+                                    dataset.backgroundColor = bgColors.map((c, i) => {
+                                        if (i === chart.index) {
+                                            // highlight cột đang chọn
+                                            return Chart.helpers.color(c).darken(0.4).rgbString();
+                                        }
+                                        // làm mờ các cột khác
+                                        return Chart.helpers.color(c).alpha(0.8).rgbString();
+                                    });
                                     
                                     frappe.show_alert({
                                         message: "Đã lọc theo: " + equipmentName,
                                         indicator: "green"
                                     });
                                 }
+                               
+                                
+
+                              
+                                chartInstance.update(); 
+
                             } catch (err) {
                                 setTimeout(() => {
                                     frappe.query_report.refresh();
@@ -700,7 +805,7 @@ async function draw_column_chart1() {
     let wrapper = document.createElement("div");
     wrapper.classList.add("custom-chart-wrapper");
     wrapper.style.width = "100%";
-    wrapper.style.height = "400px";
+    // wrapper.style.height = "400px";
     
    
     reportWrapper.appendChild(wrapper);
@@ -734,7 +839,7 @@ async function draw_column_chart1() {
             Chart.register(ChartDataLabels);
             
             // let selectedReason = null;
-            new Chart(ctx, {
+            let chartInstance = new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: labels,
@@ -754,14 +859,16 @@ async function draw_column_chart1() {
                             const chart = elements[0];
                             const reason = labels[chart.index]; 
                             const currentFilter = frappe.query_report.get_filter_value("reason_group");
-                            const dataset = event.chart.data.datasets[0];
-                            console.log("Click vào:", reason);
+                            const dataset = chartInstance.data.datasets[0];
+                            const bgColors = [...colors]; // giữ màu gốc bên ngoài luôn để reset
 
                             try {
                                 if(currentFilter === reason) {  
                                     // frappe.query_report.set_filter_value("reason_group", "");
                                     frappe.query_report.set_filter_value("reason_group", "");
                                     frappe.query_report.refresh();
+                                    dataset.backgroundColor = bgColors;
+
                                     // selectedReason = null;
                                     
                                    
@@ -773,7 +880,16 @@ async function draw_column_chart1() {
                                 else {
                                     frappe.query_report.set_filter_value("reason_group", reason);
                                     frappe.query_report.refresh();
-                                    // selectedReason = reason;
+                                    
+                                    // Highlight cột đang chọn
+                                    dataset.backgroundColor = bgColors.map((c, i) => {
+                                        if (i === chart.index) {
+                                            // làm sáng hơn giống hover
+                                            return Chart.helpers.color(c).darken(0.4).rgbString();
+                                        }
+                                        // mờ các cột khác đi một chút
+                                        return Chart.helpers.color(c).alpha(0.8).rgbString();
+                                    });
                                     
 
                                     frappe.show_alert({
@@ -781,6 +897,8 @@ async function draw_column_chart1() {
                                         indicator: "green"
                                     })
                                 }
+                                chartInstance.update();
+
                                 
                                 
                                 
@@ -846,7 +964,7 @@ async function draw_horizontal_chart1() {
     let wrapper = document.createElement("div");
     wrapper.classList.add("custom-chart-wrapper");
     wrapper.style.width = "100%";
-    wrapper.style.height = "400px";
+    // wrapper.style.height = "400px";
 
   
   
@@ -910,6 +1028,8 @@ async function draw_horizontal_chart1() {
                             const chart = elements[0];
                             const reasonDetail = chartInstance.data.labels[chart.index];
                             const currentFilter_dt = frappe.query_report.get_filter_value("reason_detail");
+                            const dataset = chartInstance.data.datasets[0];
+                            const bgColors = [...chartData.colors]; 
 
                             // console.log("Click vào:", reason);
 
@@ -919,6 +1039,8 @@ async function draw_horizontal_chart1() {
                                     frappe.query_report.set_filter_value("reason_detail", "");
                                     frappe.query_report.refresh();
                                     // selectedReasonDetail = null;
+                                    dataset.backgroundColor = bgColors;
+
                                     
                                     frappe.show_alert({
                                         message: "Đã xóa bộ lọc theo nguyên nhân",
@@ -928,6 +1050,15 @@ async function draw_horizontal_chart1() {
                                     // Set filter reason_detail mới
                                     frappe.query_report.set_filter_value("reason_detail", reasonDetail);
                                     frappe.query_report.refresh();
+
+                                    dataset.backgroundColor = bgColors.map((c, i) => {
+                                        if (i === chart.index) {
+                                            // highlight cột đang chọn
+                                            return Chart.helpers.color(c).darken(0.4).rgbString();
+                                        }
+                                        // làm mờ các cột khác
+                                        return Chart.helpers.color(c).alpha(0.8).rgbString();
+                                    });
                                     // selectedReasonDetail = reasonDetail;
                                      frappe.show_alert({
                                         message: "Đã lọc theo: " + reasonDetail,
@@ -935,6 +1066,7 @@ async function draw_horizontal_chart1() {
                                     });
                                     
                                 }
+                                chartInstance.update(); 
                                 
                                 
                                 
