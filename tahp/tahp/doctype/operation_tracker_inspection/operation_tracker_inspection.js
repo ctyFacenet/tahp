@@ -193,44 +193,94 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
     define_label: function(frm, $row) {
         $row.empty();
-        let alert_class = "alert-danger border border-danger";
 
+        // Phiếu đã hoàn thành
         if (frm.doc.docstatus === 1) {
             $row.append($(`
                 <div class="next_time alert w-100 text-center alert-success border border-success" style="margin:0" role="alert">
                     Hoàn thành đo đạc chỉ số
                 </div>
             `));
-        } else if (frm.doc.docstatus === 0 && frm.doc.next_time) {
-            let next_time = frappe.datetime.str_to_obj(frm.doc.next_time);
-            next_time.setMinutes(next_time.getMinutes() + 0.6); // cộng thêm 1 phút
-
+            return;
+        } else if (frm.doc.docstatus === 2) {
             $row.append($(`
-                <div class="next_time alert w-100 text-center ${alert_class}" style="margin:0" role="alert">
-                    Thời gian còn lại: 00:00:00
+                <div class="next_time alert w-100 text-center alert-danger border border-success" style="margin:0" role="alert">
+                    Phiếu đã bị huỷ
                 </div>
             `));
+            return;            
+        }
 
-            function updateCountdown() {
-                let now = new Date(); // giờ hiện tại
-                let diff = next_time.getTime() - now.getTime(); // tính ms
+        // Xác định reference_time
+        let reference_time = null;
+        let latest_item = null;
 
-                if (diff <= 0) {
-                    $row.find('.next_time').text("Quá hạn thời gian điền phiếu");
-                    clearInterval(interval);
-                    return;
+        if (frm.doc.items && frm.doc.items.length) {
+            // Nếu có dòng, dùng from_time của dòng mới nhất
+            latest_item = frm.doc.items.reduce((latest, item) => {
+                if (!latest) return item;
+                return frappe.datetime.str_to_obj(item.from_time) > frappe.datetime.str_to_obj(latest.from_time) ? item : latest;
+            }, null);
+            reference_time = frappe.datetime.str_to_obj(latest_item.from_time);
+        } else if (frm.doc.next_time) {
+            // Nếu chưa có dòng, dùng next_time - frequency
+            reference_time = new Date(frappe.datetime.str_to_obj(frm.doc.next_time).getTime() - frm.doc.frequency * 60 * 1000);
+        } else {
+            // Không có gì để tính
+            $row.append($(`
+                <div class="next_time alert w-100 text-center alert-warning border border-warning" style="margin:0" role="alert">
+                    Chưa có phiếu nào
+                </div>
+            `));
+            return;
+        }
+
+        // Tạo div hiển thị
+        let $next_time_div = $(`
+            <div class="next_time alert w-100 text-center alert-danger border border-danger" style="margin:0" role="alert">
+                Thời gian còn lại: 00:00:00
+            </div>
+        `);
+        $row.append($next_time_div);
+
+        function updateCountdown() {
+            let now = new Date();
+            let end_time = new Date(reference_time.getTime() + frm.doc.frequency * 60 * 1000);
+            let diff = end_time.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                if ((latest_item && latest_item.to_time) || (!latest_item)) {
+                    // Phiếu mới xuất hiện, đang tạo
+                    $next_time_div.text("Đang tạo phiếu...");
+                    $next_time_div
+                        .removeClass("alert-danger border-danger")
+                        .addClass("alert-info border border-info");
+                } else {
+                    // Quá hạn
+                    $next_time_div.text("Thời gian điền phiếu sắp hết..");
+                    $next_time_div
+                        .removeClass("alert-info border-info")
+                        .addClass("alert-danger border border-danger");
                 }
-
-                let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
-                let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-                let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
-
-                $row.find('.next_time').text(`Thời gian còn lại: ${hours}:${minutes}:${seconds}`);
+                clearInterval(interval);
+                return;
             }
 
-            let interval = setInterval(updateCountdown, 1000);
-            updateCountdown(); // cập nhật ngay
+            let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+            let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+            let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+
+            if ((latest_item && latest_item.to_time) || (!latest_item)) {
+                $next_time_div.text(`Phiếu mới xuất hiện sau: ${hours}:${minutes}:${seconds}`);
+                $next_time_div.removeClass("alert-danger border-danger").addClass("alert-info border border-info");
+            } else {
+                $next_time_div.text(`Thời gian còn lại: ${hours}:${minutes}:${seconds}`);
+                $next_time_div.removeClass("alert-info border-info").addClass("alert-danger border border-danger");
+            }
         }
+
+        let interval = setInterval(updateCountdown, 1000);
+        updateCountdown();
     },
 
     define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null, action_param=null, confirmAction=true) {

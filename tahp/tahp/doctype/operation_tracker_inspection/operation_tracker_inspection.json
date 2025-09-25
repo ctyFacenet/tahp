@@ -45,6 +45,8 @@
    "fetch_from": "job_card.operation",
    "fieldname": "operation",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "C\u00f4ng \u0111o\u1ea1n",
    "options": "Operation"
   },
@@ -65,13 +67,15 @@
   {
    "fieldname": "job_card",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "LSX C\u00f4ng \u0111o\u1ea1n",
    "options": "Job Card"
   },
   {
    "fieldname": "frequency",
    "fieldtype": "Data",
-   "label": "T\u1ea7n su\u1ea5t"
+   "in_list_view": 1,
+   "label": "T\u1ea7n su\u1ea5t (ph\u00fat)"
   },
   {
    "fieldname": "next_time",
@@ -101,6 +105,7 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Nh\u00e2n vi\u00ean",
    "options": "Employee"
   }
@@ -109,7 +114,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-25 16:49:30.123731",
+ "modified": "2025-09-25 22:09:07.409195",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Inspection",

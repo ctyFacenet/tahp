@@ -8,29 +8,50 @@ from frappe.utils import now_datetime, get_datetime
 class OperationTrackerInspection(Document):
 	pass
 
+def ceil_next_time(dt, min_delta_seconds=60):
+    """
+    Làm tròn dt lên phút gần nhất và đảm bảo ít nhất min_delta_seconds so với from_time
+    """
+    # loại bỏ giây/microsecond
+    next_time = dt.replace(second=0, microsecond=0)
+    
+    # nếu còn phần giây, cộng thêm 1 phút
+    if dt.second > 0 or dt.microsecond > 0:
+        next_time += timedelta(minutes=1)
+    
+    return next_time
 
 @frappe.whitelist()
 def generate_inspection(job_card, operation, from_time):
-	tracker = frappe.get_single("Operation Tracker")
-	for row in tracker.items:
-		if row.operation == operation:
-			inspection = frappe.new_doc("Operation Tracker Inspection")
-			inspection.job_card = job_card
-			inspection.operation = operation
-			inspection.start_time = from_time
-			inspection.frequency = row.frequency
-			inspection.next_time = from_time + timedelta(minutes=row.frequency)
-			inspection.employee = row.employee
+    if isinstance(from_time, str):
+        from_time = frappe.utils.get_datetime(from_time)  # đảm bảo from_time là datetime
 
-			if row.qc_template:
-				template_doc = frappe.get_doc("Quality Inspection Template", row.qc_template)
-				for spec in template_doc.item_quality_inspection_parameter:
-					inspection.append("parameters", {
-						"specification": spec.specification,
-						"unit": spec.custom_unit
-					})
+    tracker = frappe.get_single("Operation Tracker")
+    for row in tracker.items:
+        if row.operation == operation:
+            inspection = frappe.new_doc("Operation Tracker Inspection")
+            inspection.job_card = job_card
+            inspection.operation = operation
+            inspection.start_time = from_time
+            inspection.frequency = row.frequency
+            # tính next_time với ceil và buffer tối thiểu 60s
+            next_time = from_time + timedelta(minutes=row.frequency)
+            inspection.next_time = ceil_next_time(next_time)
+            # đảm bảo cách from_time ít nhất 60 giây
+            if (inspection.next_time - from_time).total_seconds() < 60:
+                inspection.next_time += timedelta(minutes=1)
 
-			inspection.insert(ignore_permissions=True)
+            inspection.employee = row.employee
+
+            if row.qc_template:
+                template_doc = frappe.get_doc("Quality Inspection Template", row.qc_template)
+                for spec in template_doc.item_quality_inspection_parameter:
+                    inspection.append("parameters", {
+                        "specification": spec.specification,
+                        "unit": spec.custom_unit
+                    })
+
+            inspection.insert(ignore_permissions=True)
 
 def add_inspection():
 	now = now_datetime()
@@ -49,7 +70,7 @@ def add_inspection():
 		if now < doc.next_time:
 			continue
 
-		doc.next_time = now + timedelta(minutes=int(doc.frequency))
+		doc.next_time = (now + timedelta(minutes=int(doc.frequency))).replace(second=0, microsecond=0)
 		user, employee_name = frappe.db.get_value(
 			"Employee",
 			doc.employee,
