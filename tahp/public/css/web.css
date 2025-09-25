@@ -4,3 +4,16 @@ body {
     background-position: center;   /* căn giữa ảnh */
     background-repeat: no-repeat;  /* không lặp lại */
 }
+
+.chart-container {
+    position: relative;
+    height: 400px; 
+    width: 100%;
+}
+
+/* Áp dụng cho màn hình điện thoại (chiều rộng dưới 768px) */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 500px; 
+    }
+}
