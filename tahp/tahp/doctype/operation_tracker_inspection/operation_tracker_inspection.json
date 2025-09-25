@@ -114,7 +114,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-25 22:09:07.409195",
+ "modified": "2025-09-25 22:39:48.280174",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Inspection",
@@ -122,6 +122,7 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -135,6 +136,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,

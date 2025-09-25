@@ -110,9 +110,13 @@ function control_operation(frm, cdt, cdn) {
         selectedOps = [];
     }
 
-    let btnLabel = selectedOps.length > 0
-        ? `Đã chọn ${selectedOps.length} công đoạn`
-        : "Chọn công đoạn";
+    if (selectedOps.length > 0) {
+        btnLabel = `Đã chọn ${selectedOps.length} công đoạn`;
+    } else if (frm.doc.docstatus === 1) {
+        btnLabel = "Trống";
+    } else {
+        btnLabel = "Chọn công đoạn";
+    }
 
     // Render button
     approvedField.html(`

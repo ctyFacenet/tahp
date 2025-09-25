@@ -34,4 +34,4 @@ def after_insert(doc, method):
                     "document_type": "Job Card",
                     "document_name": doc.name
                 }).insert(ignore_permissions=True)
-                break
+                return

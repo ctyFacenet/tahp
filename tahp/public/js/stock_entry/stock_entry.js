@@ -38,12 +38,30 @@ frappe.ui.form.on('Stock Entry', {
             work_order: frm.doc.work_order
         });
 
+        frm.doc.items.forEach(item => {
+            if (item.is_finished_item) {
+                item.description = "Thành phẩm";
+            } else {
+                item.description = "Nguyên liệu sản xuất";
+            }
+        });
+
         if (inputs && inputs.length) {
             inputs.forEach(input => {
                 let existing = frm.doc.items.find(item => item.item_code === input.item_code);
                 if (existing) {
+                    existing.qty = 0;
+                    existing.transfer_qty = 0;
+                }
+            });
+
+            inputs.forEach(input => {
+                let existing = frm.doc.items.find(item => item.item_code === input.item_code);
+                console.log('helli')
+                if (existing) {
                     existing.qty += input.qty;
                     existing.transfer_qty += input.qty;
+                    existing.description = input.description ? input.description : existing.description
                 }
             });
 

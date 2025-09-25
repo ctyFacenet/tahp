@@ -170,7 +170,6 @@ def add_input(work_order):
         filters={"docstatus": 1, "work_order": work_order},
         fields=["name"]
     )
-    print('hello2\n\n\n\n\n')
     result = []
 
     for jc in job_cards:
@@ -189,13 +188,12 @@ def add_input(work_order):
                     "qty": row.qty,
                     "uom": row.uom,
                     "s_warehouse": warehouse,
-                    "description": "Phụ gia tiêu hao trong SX"
+                    "description": "Nguyên liệu tổng hợp SL từ công đoạn"
                 })
 
     bom_no = frappe.db.get_value("Work Order", work_order, "bom_no")
     bom_doc = frappe.get_doc("BOM", bom_no)
     if bom_doc.custom_sub_items:
-        print('hello\n\n\n\n\n')
         for row in bom_doc.custom_sub_items:
             item_group = frappe.db.get_value("Item", row.item_code, "item_group")
             warehouse = frappe.db.get_value(
@@ -204,7 +202,6 @@ def add_input(work_order):
                 "default_warehouse"
             )
             if not warehouse:
-                print('hello2\n\n\n\n\n')
                 wo_doc = frappe.get_doc("Work Order", work_order)
                 warehouse = wo_doc.fg_warehouse
             result.append({

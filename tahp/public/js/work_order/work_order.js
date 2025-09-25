@@ -2,6 +2,17 @@ frappe.ui.form.on('Work Order', {
     refresh: async function(frm) {
         frm.set_intro("");
         await finish_button(frm);
+        frm.remove_custom_button('Close', 'Status');
+        frm.remove_custom_button('Stop', 'Status');
+        if (frm.doc.status == "In Process") {
+            let job_cards = await frappe.db.get_list("Job Card", {
+                filters: { work_order: frm.doc.name, docstatus: ["!=", 2] },
+                fields: ["name"]
+            });
+            if (job_cards.length == frm.doc.operations.length) {
+                frm.remove_custom_button("Create Job Card");
+            }
+        }
     },
     onload: async function(frm) {
         await autofill_items(frm);
@@ -60,7 +71,7 @@ async function autofill_items(frm) {
 
 // Huy Section
 frappe.ui.form.on("Work Order", {
-    refresh: function(frm) {
+    refresh: async function(frm) {
         frm.set_intro("");
         if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
     }
