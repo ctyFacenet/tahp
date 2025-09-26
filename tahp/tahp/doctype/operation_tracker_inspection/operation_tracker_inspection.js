@@ -642,34 +642,90 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             }
         });
 
-        frappe.prompt(
-            {
-                fieldname: "feedback",
-                fieldtype: "Text",
-                label: "Điền yêu cầu gửi tới công nhân nếu có",
-                default: feedback_map.message,
-                reqd: 0
-            },
-            async (values) => {
-                const feedback = values.feedback?.trim() || "";
+        async function ensureCameraAccess() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                frappe.msgprint(__("Trình duyệt không hỗ trợ camera. Vui lòng dùng Chrome hoặc Safari trên điện thoại."));
+                return false;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream.getTracks().forEach(track => track.stop()); // dừng stream sau khi check
+                return true;
+            } catch (err) {
+                frappe.msgprint(__("Không thể truy cập camera: " + err.message));
+                return false;
+            }
+        }
 
-                const items = data.map(d => ({
-                    specification: d.specification,
-                    value: d.value,
-                    from_time: from_time,
-                    feedback: feedback || null
-                }));
+        const showPrompt = () => {
+            frappe.prompt(
+                {
+                    fieldname: "feedback",
+                    fieldtype: "Text",
+                    label: "Điền yêu cầu gửi tới công nhân nếu có",
+                    default: feedback_map.message,
+                    reqd: 0
+                },
+                async (values) => {
+                    const feedback = values.feedback?.trim() || "";
 
-                await frappe.call({
-                    method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
-                    args: { inspection: frm.doc.name, items: items }
-                });
-            },
-            __("Hoàn tất phiếu đo đạc chỉ số"),
-            __("OK") 
-        );
+                    const items = data.map(d => ({
+                        specification: d.specification,
+                        value: d.value,
+                        from_time: from_time,
+                        feedback: feedback || null
+                    }));
+
+                    // Gọi check is_qr_check trước
+                    const qr_check = await frappe.call({
+                        method: "tahp.tahp.doctype.operation_tracker.operation_tracker.is_qr_check"
+                    });
+
+                    if (qr_check.message) {
+                        // Bật scanner
+                        if (await ensureCameraAccess()) {
+                            new frappe.ui.Scanner({
+                                dialog: true,
+                                multiple: false,
+                                async on_scan(scan_data) {
+                                    const scanned = scan_data.decodedText;
+
+                                    const res = await frappe.call({
+                                        method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.check_qr",
+                                        args: {
+                                            inspection: frm.doc.name,
+                                            scanned: scanned
+                                        }
+                                    });
+
+                                    if (res.message) {
+                                        // Đúng QR → gọi update_params
+                                        await frappe.call({
+                                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                                            args: { inspection: frm.doc.name, items: items }
+                                        });
+                                    } else {
+                                        frappe.msgprint(__("Mã QR không đúng, vui lòng quét lại."));
+                                        showPrompt(); // quay lại dialog
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        // Không yêu cầu QR → gọi thẳng update_params
+                        await frappe.call({
+                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                            args: { inspection: frm.doc.name, items: items }
+                        });
+                    }
+                },
+                __("Hoàn tất phiếu đo đạc chỉ số"),
+                __("OK")
+            );
+        };
+
+        showPrompt();
     }
-
 });
 
 function scrollAndFocus(mobileInputs, index) {
