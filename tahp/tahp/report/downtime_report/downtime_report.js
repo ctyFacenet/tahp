@@ -164,11 +164,6 @@ frappe.query_reports["Downtime Report"] = {
         report.page.wrapper.find(".standard-actions").css("display", "none");
         report.page.wrapper.find(".custom-actions.hidden-xs.hidden-md").css("display", "none");
 
-
-        // $(".page-wrapper").css({
-        //     "margin-top": "50px"
-        // });
-
        
         let title_el = report.page.wrapper.find(".page-head-content .title-text");
 
@@ -179,7 +174,6 @@ frappe.query_reports["Downtime Report"] = {
                 
         });
         
-        // Sử dụng setTimeout để đảm bảo DOM đã sẵn sàng
         setTimeout(() => {
             this.setupPageLayout(report);
         }, 100);
@@ -223,7 +217,6 @@ frappe.query_reports["Downtime Report"] = {
             }
         }
 
-        // // Dùng JS để thêm style trực tiếp
         // const pageForm = document.querySelector('.page-form');  
         // if (pageForm) {
         //     pageForm.style.justifyContent = 'space-between';
@@ -235,7 +228,6 @@ frappe.query_reports["Downtime Report"] = {
         //     const extraDiv = pageForm.querySelector('.frappe-control[data-fieldname="category"]');
 
         //     if (fromDate && toDate) {
-        //         // Tạo div mới bọc 2 filter
         //         const wrapper = document.createElement('div');
         //         wrapper.classList.add('date-wrapper');
         //         wrapper.style.display = 'flex';
@@ -245,20 +237,18 @@ frappe.query_reports["Downtime Report"] = {
         //         wrapper.style.flex = '0 0 auto';
         //         wrapper.style.justifyContent = 'flex-end';
 
-        //         // Chèn extra div nếu có
         //         if (extraDiv) {
         //             wrapper.appendChild(extraDiv);
         //             extraDiv.style.minWidth = '150px';
         //         }
 
-        //         // Chuyển 2 filter vào div mới
+        //     
         //         wrapper.appendChild(fromDate);
         //         wrapper.appendChild(toDate);
 
-        //         // Thêm div wrapper vào page-form
         //         pageForm.appendChild(wrapper);
 
-        //         // Mở rộng width cho từng filter nếu cần
+        //         
         //         fromDate.style.minWidth = '150px';
         //         toDate.style.minWidth = '150px';
         //     }
@@ -282,7 +272,7 @@ frappe.query_reports["Downtime Report"] = {
                     
                     manufacturing_filter.df.options = options;
                     
-                    // Refresh filter để hiển thị options mới
+                    // Refresh filter
                     manufacturing_filter.refresh();
                 }
             }
@@ -311,7 +301,6 @@ frappe.query_reports["Downtime Report"] = {
                 }
             });
 
-            // Khi load lần đầu, set filter theo default (reason)
             setTimeout(() => {
                 let category = report.get_filter("category");
                 if (category) category.toggle(false);
@@ -355,13 +344,11 @@ frappe.query_reports["Downtime Report"] = {
         this.observer = new MutationObserver((mutations, obs) => {
             this.add_custom_title($reportBody);
 
-            // Nếu title đã tồn tại, ngắt observer
             if ($reportBody.find(".downtime-report-title").length) {
                 obs.disconnect();
             }
         });
 
-        // Bắt đầu lắng nghe thay đổi DOM
         this.observer.observe(report.page.body.get(0), { childList: true, subtree: true });
         
     },

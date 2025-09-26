@@ -2,6 +2,17 @@ frappe.ui.form.on('Work Order', {
     refresh: async function(frm) {
         frm.set_intro("");
         await finish_button(frm);
+        frm.remove_custom_button('Close', 'Status');
+        frm.remove_custom_button('Stop', 'Status');
+        if (frm.doc.status == "In Process") {
+            let job_cards = await frappe.db.get_list("Job Card", {
+                filters: { work_order: frm.doc.name, docstatus: ["!=", 2] },
+                fields: ["name"]
+            });
+            if (job_cards.length == frm.doc.operations.length) {
+                frm.remove_custom_button("Create Job Card");
+            }
+        }
     },
     onload: async function(frm) {
         await autofill_items(frm);
@@ -32,13 +43,16 @@ async function finish_button(frm) {
     const response = await frappe.call({method: "tahp.doc_events.work_order.before_submit.check_status", args: {work_order: frm.doc.name}})
     if (response.message) {
         frm.add_custom_button(__('Hoàn thành'), async function () {
-            const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
-                work_order_id: frm.doc.name,
-                purpose: "Manufacture",
-                qty: frm.doc.qty
-            });
-            frappe.model.sync(stock_entry);
-            frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+            if (typeof response.message === "string") frappe.set_route("Form", "Stock Entry", response.message)
+            else {
+                const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
+                    work_order_id: frm.doc.name,
+                    purpose: "Manufacture",
+                    qty: frm.doc.qty
+                });
+                frappe.model.sync(stock_entry);
+                frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+            }
         }).addClass('btn-primary')
     }
 }
@@ -57,7 +71,7 @@ async function autofill_items(frm) {
 
 // Huy Section
 frappe.ui.form.on("Work Order", {
-    refresh: function(frm) {
+    refresh: async function(frm) {
         frm.set_intro("");
         if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
     }

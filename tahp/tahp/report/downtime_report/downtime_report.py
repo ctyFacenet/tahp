@@ -277,5 +277,3 @@ def downtime_reason_detail_data(filters=None):
         "colors": colors4,
       
     }
-    
-    

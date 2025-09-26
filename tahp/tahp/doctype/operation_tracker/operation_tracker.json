@@ -1,99 +1,43 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{operation}-{frequency}",
- "creation": "2025-08-22 13:33:05.373207",
+ "creation": "2025-09-24 16:17:14.507869",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "operation",
-  "frequency",
-  "from_time",
-  "column_break_felp",
-  "qc_template",
-  "condition",
-  "closed_when_operation_end",
-  "amended_from"
+  "is_qr",
+  "items"
  ],
  "fields": [
   {
-   "fieldname": "operation",
-   "fieldtype": "Link",
-   "label": "C\u00f4ng \u0111o\u1ea1n",
-   "options": "Operation"
-  },
-  {
-   "fieldname": "frequency",
-   "fieldtype": "Int",
-   "label": "T\u1ea7n su\u1ea5t (ph\u00fat)"
-  },
-  {
-   "fieldname": "column_break_felp",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "qc_template",
-   "fieldtype": "Link",
-   "label": "M\u1eabu QC \u0111o \u0111\u1ea1c",
-   "options": "Quality Inspection Template"
-  },
-  {
-   "default": "To\u00e0n b\u1ed9 th\u00f4ng s\u1ed1 \u0111\u1ea1t",
-   "fieldname": "condition",
-   "fieldtype": "Select",
-   "label": "\u0110i\u1ec1u ki\u1ec7n ch\u1ea5p nh\u1eadn",
-   "options": "To\u00e0n b\u1ed9 th\u00f4ng s\u1ed1 \u0111\u1ea1t\nCh\u1ec9 c\u1ea7n m\u1ed9t th\u00f4ng s\u1ed1 \u0111\u1ea1t"
-  },
-  {
    "default": "0",
-   "fieldname": "closed_when_operation_end",
+   "fieldname": "is_qr",
    "fieldtype": "Check",
-   "label": "\u0110\u00f3ng l\u1ec7nh khi LSX c\u00f4ng \u0111o\u1ea1n k\u1ebft th\u00fac?"
+   "label": "K\u00edch ho\u1ea1t QR"
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Operation Tracker",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "default": "0",
-   "fieldname": "active",
-   "fieldtype": "Check",
-   "label": "Ho\u1ea1t \u0111\u1ed9ng",
-   "read_only": 1
-  },
-  {
-   "description": "VD: Khi c\u00f4ng \u0111o\u1ea1n A \u0111\u00e3 b\u1eaft \u0111\u1ea7u, h\u1ec7 th\u1ed1ng s\u1ebd \u0111\u1ee3i N ph\u00fat t\u01b0\u01a1ng \u1ee9ng r\u1ed3i m\u1edbi g\u1eedi l\u1ec7nh \u0111o \u0111\u1ea1c l\u1ea7n \u0111\u1ea7u",
-   "fieldname": "from_time",
-   "fieldtype": "Int",
-   "label": "Th\u1eddi gian ch\u1edd l\u1ea7n \u0111\u1ea7u (ph\u00fat)"
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "B\u1ea3ng thi\u1ebft l\u1eadp c\u00f4ng vi\u1ec7c",
+   "options": "Operation Tracker Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
+ "issingle": 1,
  "links": [],
- "modified": "2025-09-09 14:22:36.481372",
+ "modified": "2025-09-24 16:18:48.089439",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker",
- "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
@@ -102,10 +46,8 @@
    "create": 1,
    "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "All",
    "share": 1,
    "write": 1
