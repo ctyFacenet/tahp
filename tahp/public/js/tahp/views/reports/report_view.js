@@ -477,34 +477,49 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
         });
 	}
 
-	editFunction(name, doctype) {
-		// Điều hướng tới form để chỉnh sửa
-		frappe.set_route("Form", doctype, name);
+	editFunction(name) {
+		if (!this.doctype) return
+		frappe.set_route("Form", this.doctype, name);
 	}
 
-	deleteFunction(name, doctype) {
-		// Xác nhận trước khi xoá
-		frappe.confirm(
-			`Bạn có chắc muốn xoá <b>${doctype}</b> ${name}?`,
-			() => {
-				frappe.db.delete_doc(doctype, name)
-					.then(() => {
-						frappe.show_alert({
-							message: __("Đã xoá thành công"),
-							indicator: "green"
-						});
-						// reload lại trang / datatable tuỳ bạn
-						frappe.reload_doc(doctype);
-					})
-					.catch(err => {
-						frappe.msgprint({
-							title: __("Lỗi khi xoá"),
-							message: err.message,
-							indicator: "red"
-						});
-					});
+	async deleteFunction(name) {
+		if (!this.doctype) return;
+
+		const confirmed = await new Promise(resolve => {
+			frappe.confirm(
+				`Bạn có chắc chắn muốn xoá <b>${__(this.doctype)}</b> ${name}?`,
+				() => resolve(true),
+				() => resolve(false)
+			);
+		});
+
+		if (!confirmed) return;
+
+		this.disable_list_update = true;
+
+		try {
+			const r = await frappe.call({
+				method: "tahp.utils.report_action.delete_document",
+				args: { doctype: this.doctype, name }
+			});
+
+			if (r.message) {
+				frappe.show_alert({
+					message: __("Đã xoá thành công"),
+					indicator: "green"
+				});
+
+				this.refresh();
 			}
-		);
+		} catch (err) {
+			frappe.msgprint({
+				title: __("Lỗi khi xoá"),
+				message: err.message,
+				indicator: "red"
+			});
+		} finally {
+			this.disable_list_update = false;
+		}
 	}
 	
 	toggle_charts() {
