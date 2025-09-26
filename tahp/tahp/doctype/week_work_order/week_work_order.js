@@ -578,34 +578,17 @@ async function open_create_shift_dialog(frm) {
                     bom_doc.operations.map(async (op) => {
                         const operation_doc = await frappe.db.get_doc('Operation', op.operation);
                         let custom_employee = null;
-                        let tracker = null;
                         if (operation_doc.custom_team && operation_doc.custom_team.length === 1) custom_employee = operation_doc.custom_team[0].employee
-                        let trackers = await frappe.db.get_list('Operation Tracker', {
-                            filters: { operation: op.operation, docstatus: 1 },
-                            fields: ["name"],
-                            order_by: "creation desc",
-                            limit: 1
-                        });
-                        if (trackers.length > 0) tracker = 1
                         return {
                             operation: op.operation,
                             workstation: op.workstation,
                             time_in_mins: op.time_in_mins,
                             sequence_id: op.sequence_id,
                             custom_employee: custom_employee,
-                            custom_is_qc_tracked: tracker
                         };
                     })
                 );
-
-                for (let row of operations) {
-                    let op_doc = await frappe.db.get_doc("Operation", row.operation);
-                    if (op_doc.custom_team && op_doc.custom_team.length === 1) {
-                        frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
-                    }
-
-                }
-        
+    
                 const wo_doc = {
                     doctype: 'Work Order',
                     production_item: values.item,
@@ -626,8 +609,6 @@ async function open_create_shift_dialog(frm) {
                     method: 'frappe.client.insert',
                     args: { doc: wo_doc }
                 });
-        
-                const wo_name = wo_res.message.name;
                 frm.reload_doc();
             } catch (err) {
                 console.log(err)
