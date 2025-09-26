@@ -10,12 +10,6 @@ frappe.ui.form.on('Stock Entry', {
 
     autofill_input: async function(frm) {
         if (!frm.is_new() || !frm.doc.work_order) return;
-        if (frm.doc.stock_entry_type === "Manufacture") {
-            frm.doc.items.forEach(row => {
-                if (row.is_finished_item) row.description = 'Thành phẩm';
-                else row.description = 'Nguyên liệu trong sản xuất';
-            });            
-        }
         const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', { work_order: frm.doc.work_order });
         if (inputs && inputs.length) {
             inputs.forEach(input => {
@@ -40,6 +34,9 @@ frappe.ui.form.on('Stock Entry', {
     refresh: function(frm) {
         frm.set_intro("")
         frm.events.set_warehouse_readonly(frm);
+        frm.$wrapper.find('.grid-add-multiple-rows').remove();
+        frm.$wrapper.find('.grid-download').remove();
+        frm.$wrapper.find('.grid-upload').remove();
         if (frm.doc.stock_entry_type) {
             let title = "";
 
@@ -78,11 +75,30 @@ frappe.ui.form.on('Stock Entry', {
             frm.fields_dict.items.grid.update_docfield_property('s_warehouse', 'read_only', 1);
         } else if (type === "Material Issue") {
             frm.fields_dict.items.grid.update_docfield_property('t_warehouse', 'read_only', 1);
+        } else if (type === "Manufacture") {
+            set_warehouse_readonly_by_finished(frm)
         }
-        frm.fields_dict.items.grid.refresh();        
+        frm.fields_dict.items.grid.refresh();
     }
 
 });
+
+function set_warehouse_readonly_by_finished(frm) {
+    frm.fields_dict.items.grid.grid_rows.forEach((grid_row) => {
+        const doc = grid_row.doc;
+
+        if (doc.is_finished_item) {
+            grid_row.wrapper.find('[data-fieldname="s_warehouse"]').css('pointer-events', 'none');
+            grid_row.wrapper.find('[data-fieldname="t_warehouse"]').css('pointer-events', '');
+        } else {
+            grid_row.wrapper.find('[data-fieldname="t_warehouse"]').css('pointer-events', 'none');
+            grid_row.wrapper.find('[data-fieldname="s_warehouse"]').css('pointer-events', '');
+        }
+    });
+
+    frm.fields_dict.items.grid.refresh();
+}
+
 
 frappe.ui.form.on('Stock Entry Detail', {
     qty: function(frm, cdt, cdn) {
@@ -90,7 +106,7 @@ frappe.ui.form.on('Stock Entry Detail', {
         if (row.is_finished_item) {
             frm.doc.fg_completed_qty = row.qty;
         }
-    }
+    },
 });
 
 
@@ -119,17 +135,27 @@ async function set_code(frm) {
     const start_date = `${year}-${month}-01`;
     const end_date = `${year}-${month}-${lastDay}`;
 
+    // Lấy bản ghi mới nhất theo custom_code
     const entries = await frappe.db.get_list("Stock Entry", {
         filters: [
-            ["docstatus", "=", 1],
             ["stock_entry_type", "=", frm.doc.stock_entry_type],
             ["posting_date", ">=", start_date],
-            ["posting_date", "<=", end_date]
+            ["posting_date", "<=", end_date],
+            ["custom_code", "like", `${code}.${year}.${month}.%`]
         ],
-        fields: ["name"]
+        fields: ["custom_code"],
+        order_by: "custom_code desc",
+        limit: 1
     });
 
-    const index = entries.length + 1;
-    const custom_code = `${code}.${year}.${month}.${String(index).padStart(4, '0')}`;
+    let next_index = 1;
+    if (entries.length > 0 && entries[0].custom_code) {
+        const last_code = entries[0].custom_code;
+        const parts = last_code.split(".");
+        const last_number = parseInt(parts[3] || "0", 10);
+        next_index = last_number + 1;
+    }
+
+    const custom_code = `${code}.${year}.${month}.${String(next_index).padStart(4, '0')}`;
     frm.set_value('custom_code', custom_code);
 }

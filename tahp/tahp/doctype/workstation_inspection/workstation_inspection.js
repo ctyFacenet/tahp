@@ -6,11 +6,13 @@ frappe.ui.form.on("Workstation Inspection", {
         clean_table(frm)
     },
     refresh(frm) {
+        frm.fields_dict.workstations.df.only_select = 1;
         frm.fields_dict.workstations.get_query = function(doc) {
             return {
                 query: "tahp.tahp.doctype.workstation_inspection.workstation_inspection.workstation_query"
             }
         }
+        frm.trigger("workstations");
         clean_table(frm)
     },
     workstations: async function (frm) {
@@ -48,7 +50,7 @@ frappe.ui.form.on("Workstation Inspection", {
         }
         frm.refresh_field('items')
         clean_table(frm)
-    }
+    },
 });
 
 function clean_table(frm, field) {

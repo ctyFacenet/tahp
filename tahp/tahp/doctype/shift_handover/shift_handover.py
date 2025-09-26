@@ -18,7 +18,7 @@ def reject(name, comment):
     shift_leader = wo_doc.custom_shift_leader
     user = frappe.db.get_value("Employee", shift_leader, "user_id")
 
-    subject = f"Biên bản giao ca đã bị từ chối: {wo_name}"
+    subject = f"Biên bản giao ca đã bị từ chối: <b style='font-weight:bold'>{wo_name}</b>"
     frappe.get_doc({
         "doctype": "Notification Log",
         "for_user": user,

@@ -54,12 +54,12 @@ frappe.query_reports["BOM Custom Search"] = {
         const base = default_formatter(value, row, column, data);
         return `<div class="d-flex justify-content-between align-items-center w-100 px-2">
                     ${base}
-                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 17px;white-space:nowrap;">Chọn</button>
+                    <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 15px;white-space:nowrap;">Chọn</button>
                 </div>`;
     },
 
     get_datatable_options(options) {
-        return { ...options, cellHeight: 50 };
+        return { ...options, freezeIndex: 2};
     }
 };
 
@@ -72,12 +72,6 @@ function injectDatatableCSS(report) {
     const style = document.createElement('style');
     style.id = 'custom-dt-style';
     style.innerHTML = `
-        #${wrapper.attr("id")} .dt-row-header .dt-cell__content { padding-inline: 0 !important;}
-        #${wrapper.attr("id")} .dt-scrollable .dt-cell__content { 
-            display: flex !important; align-items: center; justify-content: center; 
-            word-break: break-word; white-space: normal; text-overflow: ellipsis; 
-            overflow: hidden; padding-block:0px;
-        }
         #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-6 .dt-cell__content { align-items: flex-start; }
         #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-3 .dt-cell__content { align-items: flex-start; }
         #${wrapper.attr("id")} .dt-scrollable .dt-cell--col-4 .dt-cell__content { justify-content: flex-start; }
@@ -87,7 +81,19 @@ function injectDatatableCSS(report) {
             overflow: visible !important;
             text-overflow: unset !important;
         }
-        #${wrapper.attr("id")} .datatable .dt-row { height: auto !important; }
+        #${wrapper.attr("id")} .dt-cell--col-2 .dt-cell__content a {
+            flex: 0 0 75%;
+            max-width: 75%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        #${wrapper.attr("id")} .dt-cell--col-2 .dt-cell__content button {
+            flex: 0 0 25%;
+            max-width: 25%;
+            text-align: center;
+            white-space: nowrap;
+        }
     `;
 
     // append trực tiếp vào wrapper thay vì head
@@ -114,8 +120,6 @@ function merge_columns(report) {
     wrapper.find('.report-footer').hide();
 
     const dtRowHeader = wrapper.find('.dt-row-header');
-    dtRowHeader.find('.dt-cell__content').addClass('text-center font-weight-bold');
-
     const newRow = dtRowHeader.clone().addClass('dt-row-header-clone');
 
     const groups = { in: [], out: [] };

@@ -20,6 +20,7 @@ def execute(filters=None):
         bom_filters["custom_gyps"] = filters["custom_gyps"]
 
     boms = frappe.db.get_all("BOM", filters=bom_filters, fields=["name", "item"])
+    indent = 0
     for bom in boms:
         doc = frappe.get_doc("BOM", bom.name)
 
@@ -83,7 +84,7 @@ def execute(filters=None):
     # ]
     # summary.append({"label": "Tổng BOM", "value": total_boms})
 
-    # # --- Chart: hiển thị số BOM theo custom_category ---
+    # # # --- Chart: hiển thị số BOM theo custom_category ---
     # chart = {
     #     "data": {
     #         "labels": list(category_counter.keys()),
@@ -97,7 +98,7 @@ def execute(filters=None):
     #     "type": "bar"  # có thể đổi sang pie hoặc line
     # }
 
-    message = []
+    # message = []
 
     # return columns, data, message, chart, summary
     return columns, data

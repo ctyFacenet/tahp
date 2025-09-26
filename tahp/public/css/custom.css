@@ -38,3 +38,6 @@ textarea {
   display: none !important;
 }
 
+.notification-item.unread {
+  background: rgb(243, 248, 255);
+}

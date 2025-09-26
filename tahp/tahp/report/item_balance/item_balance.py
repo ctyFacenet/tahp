@@ -13,7 +13,7 @@ def execute(filters=None):
         "Nhóm mặt hàng:Link/Item Group:220"
     ]
 
-    data = frappe.db.sql("""
+    data = frappe.db.sql(f"""
         SELECT
             a.item_code,
             a.item_name,

@@ -10,6 +10,13 @@ frappe.ui.form.on("Item", {
     stock_uom: function(frm) {
         change_label(frm);
     },
+    refresh: function(frm) {
+        frm.set_intro("");
+        frm.clear_custom_buttons();
+        frm.add_custom_button("Thêm mẫu mã cho mặt hàng", () => {
+            erpnext.item.show_multiple_variants_dialog(frm);
+        })
+    },
 });
 
 /**

@@ -458,6 +458,9 @@ class NotificationsView extends BaseNotificationsView {
 					"frappe.desk.doctype.notification_log.notification_log.trigger_indicator_hide"
 				);
 			}
+		});
+
+		this.parent.on("hide.bs.dropdown", () => {
 			let notificationsView = this;
 			this.container.find(".notification-item.unread").each((idx, el) => {
 				const $el = $(el);

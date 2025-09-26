@@ -11,6 +11,7 @@ frappe.custom_utils_dynamic_filters = function(report, filters, callback) {
             hidden: filter.hidden || null,
             change: function() {
                 const value = field.get_value();
+                console.log(value)
                 if (field_values[filter.fieldname] !== value) {
                     field_values[filter.fieldname] = value;
                     report.refresh();
