@@ -1,0 +1,23 @@
+{
+ "content": null,
+ "creation": "2025-09-24 14:26:55.433344",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-09-24 14:26:55.433344",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "hello-vue",
+ "owner": "Administrator",
+ "page_name": "hello-vue",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "title": "Hello Vue",
+ "script": "hello_vue.bundle.js",
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0
+}

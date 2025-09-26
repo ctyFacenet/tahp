@@ -47,9 +47,6 @@ app_include_css = [
     "/assets/tahp/css/workstation_dashboard.css",
     "/assets/tahp/css/custom_nav.css",
 
-    
-
-
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [

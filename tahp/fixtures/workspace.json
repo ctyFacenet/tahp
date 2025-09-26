@@ -508,7 +508,7 @@
   "hide_custom": 0,
   "icon": "crm",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "CRM",
   "links": [
    {
@@ -4998,7 +4998,7 @@
   "hide_custom": 0,
   "icon": "integration",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Integrations",
   "links": [
    {
@@ -8917,7 +8917,7 @@
   "hide_custom": 0,
   "icon": "support",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Support",
   "links": [
    {
@@ -10174,7 +10174,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2024-10-21 14:13:38.777556",
+  "modified": "2025-09-24 15:24:30.432264",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],
@@ -10350,6 +10350,23 @@
     "parentfield": "shortcuts",
     "parenttype": "Workspace",
     "report_ref_doctype": "Work Order",
+    "restrict_to_domain": null,
+    "stats_filter": null,
+    "type": "Report",
+    "url": null
+   },
+   {
+    "color": null,
+    "doc_view": "",
+    "format": null,
+    "icon": null,
+    "kanban_board": null,
+    "label": "Defect Report",
+    "link_to": "Defect Report",
+    "parent": "Manufacturing",
+    "parentfield": "shortcuts",
+    "parenttype": "Workspace",
+    "report_ref_doctype": "Report",
     "restrict_to_domain": null,
     "stats_filter": null,
     "type": "Report",
@@ -10809,7 +10826,7 @@
   "hide_custom": 0,
   "icon": "setting",
   "indicator_color": null,
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "ERPNext Settings",
   "links": [
    {
@@ -11694,7 +11711,7 @@
   "hide_custom": 0,
   "icon": "arrow-left",
   "indicator_color": "",
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Payables",
   "links": [
    {
@@ -12060,7 +12077,7 @@
   "hide_custom": 0,
   "icon": "arrow-right",
   "indicator_color": "",
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Receivables",
   "links": [
    {
@@ -12514,7 +12531,7 @@
   "hide_custom": 0,
   "icon": "file",
   "indicator_color": "",
-  "is_hidden": 1,
+  "is_hidden": 0,
   "label": "Financial Reports",
   "links": [
    {
