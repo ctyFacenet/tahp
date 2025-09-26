@@ -4,25 +4,65 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+from datetime import datetime, timedelta
 
 def execute(filters=None):
     if not filters:
         filters = {}
 
+    # Xử lý filter tuần
+    filters = process_week_filter(filters)
+    
     columns = get_columns(filters)
     data = get_data(filters) 
     
-    total_consumed = sum(row.get('total_actual_qty', 0) for row in data)
-    report_summary = [
-        {
-            "value": total_consumed,
-            "label": _("Tổng tiêu thụ thực tế"),
-            "datatype": "Float",
-            "indicator": "Green" if total_consumed > 0 else "Red"
-        }
-    ]
+    # total_consumed = sum(row.get('total_actual_qty', 0) for row in data)
+    # report_summary = [
+    #     {
+    #         "value": total_consumed,
+    #         "label": _("Tổng tiêu thụ thực tế"),
+    #         "datatype": "Float",
+    #         "indicator": "Green" if total_consumed > 0 else "Red"
+    #     }
+    # ]
     
-    return columns, data, None, None, report_summary
+    return columns, data, None, None, None
+
+def process_week_filter(filters):
+    """
+    Xử lý filter tuần: chuyển đổi ngày được chọn thành khoảng từ thứ 2 đến chủ nhật
+    """
+    if filters.get("week"):
+        try:
+            # Parse ngày được chọn
+            if isinstance(filters["week"], str):
+                selected_date = datetime.strptime(filters["week"], "%Y-%m-%d")
+            else:
+                selected_date = filters["week"]
+            
+            # Tính toán thứ trong tuần (0=Thứ 2, 6=Chủ nhật)
+            weekday = selected_date.weekday()
+            
+            # Tính ngày thứ 2 của tuần
+            monday = selected_date - timedelta(days=weekday)
+            
+            # Tính ngày chủ nhật của tuần
+            sunday = monday + timedelta(days=6)
+            
+            # Cập nhật filters với khoảng thời gian từ thứ 2 đến chủ nhật
+            filters["from_date"] = monday.strftime("%Y-%m-%d")
+            filters["to_date"] = sunday.strftime("%Y-%m-%d")
+            
+            # Log để debug (có thể bỏ sau khi test xong)
+            frappe.log_error(
+                f"Week filter: Selected {filters['week']} -> Monday {filters['from_date']} to Sunday {filters['to_date']}", 
+                "Week Filter Debug"
+            )
+            
+        except Exception as e:
+            frappe.log_error(f"Error processing week filter: {str(e)}", "Week Filter Error")
+    
+    return filters
 
 def get_data(filters):
     """
@@ -200,4 +240,3 @@ def get_work_orders(filters):
     """.format(conditions=conditions), filters, as_dict=1)
 
     return work_orders
-
