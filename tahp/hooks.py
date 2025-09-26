@@ -57,7 +57,7 @@ app_include_js = [
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
     "https://cdn.jsdelivr.net/npm/chart.js",
     "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2",
-    
+
     # "/assets/tahp/js/work_order/work_order.js",
     # "/assets/tahp/js/item/item.js",
     # "/assets/tahp/js/stock_entry/stock_entry.js",
