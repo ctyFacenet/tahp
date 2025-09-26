@@ -87,7 +87,7 @@ frappe.ui.form.on('WWO Plan Item', {
 //         }
 //     }
 // });
-
+    }})
 function setup_ui(frm) {
     $(frm.page.wrapper).find('.btn-open-row, .form-message-container').hide();
     frm.page.btn_primary.hide();
@@ -122,11 +122,12 @@ function setup_css() {
         .prop('id', 'wwo-css')
         .html(`
             .col.grid-static-col.d-flex.justify-content-center {display:none!important;}
-            .form-grid {border:2px solid #101010ff; border-radius:4px; box-shadow:none; margin-bottom:20px;}
-            .grid-row, .grid-heading-row {border-bottom:1px solid #101010ff;}
             .rows .grid-row { padding-bottom: 20px;padding-top: 20px;}
+            .form-grid {border:1px solid #101010ff; border-radius:4px; box-shadow:none; margin-bottom:20px;}
+            
             .rows .btn { pointer-events: auto; }
-        
+            .row-check, div:has(>div[data-original-title="Sửa"]) { display: none !important; }
+
             .btn-custom {
                 padding: 4px 10px;
                 margin-right: 8px;
@@ -161,7 +162,7 @@ function setup_css() {
                 pointer-events: auto;
                 cursor: pointer;
             }
-        
+            [data-fieldname="item_name"], [data-fieldname="bom"], [data-fieldname="item"]{flex: 0 0 23.666% !important; max-width: 21.666% !important;}
             @media (min-width: 768px) {
                 .rows [data-fieldname="bom"],
                 .rows [data-fieldname="item"],
@@ -211,11 +212,14 @@ async function generate_data(frm, week) {
     else {
         frappe.model.clear_table(frm.doc, 'items');
         week.forEach(week => {
-            week.items.forEach((row, index) => {
-                frm.add_child('items', {
+            week.items.forEach(async function(row, index) {
+                console.log(row);    
+                //const item = await frappe.db.get_doc('Item', row.item);
+                return frm.add_child('items', {
                     wwo: index === 0 ? week.name : "",
                     approved: index === 0 ? week.workflow_state : "",
                     item: row.item,
+                    item_name: row.item_name,
                     qty: row.qty,
                     bom: row.bom,
                     planned_start_time: row.planned_start_time,
@@ -240,20 +244,20 @@ async function setup_button(frm) {
         const cellValue = $cell.find('.static-area').text().trim();
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
-        html = cellValue === "Đợi GĐ duyệt" 
+        html = cellValue === "Đợi PT duyệt" 
         ? 
         `<button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
         <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
         <button class="btn btn-primary btn-sm btn-custom" name="duyet2" value="${rowData.wwo}">Duyệt</button>`
         : ` `
         const row = $cell.closest('.grid-row');
-        row.prepend(`<div class = "data-row row d-flex justify-content-between align-items-center p-0"> 
+        row.prepend(`<div class = "data-row row d-flex justify-content-between align-items-center pb-4 font-weight-bold"> 
             <div> ${rowData.wwo} </div>
             <div> 
                 ${html}  
             </div>
             </div>`)
-        row.append(`<div class = "data-row row d-flex justify-content-between align-items-center p-0"> 
+        row.append(`<div class = "data-row row d-flex justify-content-between align-items-center pt-5"> 
             <div> ${rowData.note?rowData.note: "Không có ghi chú"} </div>
             </div>`)
         $cell.find('.static-area').hide();
@@ -689,9 +693,8 @@ function setup_bom_tooltip_events() {
     }
 }
 
-function setup_item_tooltip_events() {
-    const $itemLinks = $('[data-fieldname="item"]');
-
+async function setup_item_tooltip_events() {
+    const $itemLinks = $('.rows [data-fieldname="item"]');
     $itemLinks.off('mouseenter mouseleave mousemove click');
 
     $itemLinks.on('click', function (e) {
@@ -714,7 +717,6 @@ function setup_item_tooltip_events() {
         }
 
         try {
-           
             const item = await frappe.db.get_doc('Item', itemCode);
             let tooltipText = `Mã: ${item.item_code}\nTên: ${item.item_name || ''}\nNhóm: ${item.item_group || ''}`;
             $('#custom-tooltip').text(tooltipText).show();

@@ -154,7 +154,7 @@ def wwo_plan():
 		plan['items'] = frappe.db.get_all(
 			'Week Work Order Item', 
 			filters={'parent': plan['name']}, 
-			fields=['bom','item','name','planned_start_time','planned_end_time','qty','uom']
+			fields=['bom','item','item_name','name','planned_start_time','planned_end_time','qty','uom']
 		)    
 	frappe.response["message"] = plans
 
