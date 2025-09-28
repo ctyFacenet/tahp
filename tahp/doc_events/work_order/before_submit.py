@@ -3,10 +3,56 @@ from tahp.doc_events.work_order.work_order_api import execute_shift_handover
 
 def before_submit(doc, method):
     check_shift_leader(doc)
+    check_stock_qty(doc)
     check_workstation(doc)
     warn_workstation(doc)
     execute_shift_handover(doc)
     doc.status = "In Process"
+
+def check_stock_qty(doc):
+    if not doc.required_items:
+        return
+
+    issues = []
+    for item in doc.required_items:
+        if item.required_qty > item.available_qty_at_source_warehouse:
+            issues.append({
+                "item_code": item.item_code,
+                "item_name": item.item_name or doc.item_name or "",
+                "required": item.required_qty,
+                "available": item.available_qty_at_source_warehouse,
+            })
+
+    if issues:
+        # tạo bảng HTML
+        table_rows = "".join(
+            f"<tr>"
+            f"<td>{i['item_code']}</td>"
+            f"<td>{i['item_name']}</td>"
+            f"<td>{i['required']}</td>"
+            f"<td>{i['available']}</td>"
+            f"</tr>"
+            for i in issues
+        )
+        msg = f"""
+        <div>
+            <table class="table table-bordered table-sm" style="margin:0px">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Mã hàng</th>
+                        <th>Tên mặt hàng</th>
+                        <th>SL yêu cầu</th>
+                        <th>SL có sẵn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows}
+                </tbody>
+            </table>
+        </div>
+        """
+        frappe.throw(msg=msg, title="Kho đang thiếu số lượng nguyên vật liệu")
+            
 
 def check_shift_leader(doc):
     if doc.custom_shift_leader:

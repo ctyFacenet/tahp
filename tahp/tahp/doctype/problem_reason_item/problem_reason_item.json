@@ -1,0 +1,49 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-28 22:52:28.579113",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "group_name",
+  "m\u1ee9c_nghi\u00eam_tr\u1ecdng",
+  "workstation"
+ ],
+ "fields": [
+  {
+   "fieldname": "group_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean nh\u00f3m"
+  },
+  {
+   "fieldname": "m\u1ee9c_nghi\u00eam_tr\u1ecdng",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "M\u1ee9c nghi\u00eam tr\u1ecdng",
+   "options": "Nh\u1eb9\nTrung b\u00ecnh\nNghi\u00eam tr\u1ecdng"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "C\u1ee5m thi\u1ebft b\u1ecb/Thi\u1ebft b\u1ecb",
+   "options": "Workstation"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-28 22:58:03.064581",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Problem Reason Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
