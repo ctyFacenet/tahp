@@ -42,13 +42,13 @@ frappe.ui.form.on('BOM', {
             title: `Cập nhật Hệ sản xuất: ${frm.doc.custom_category}`,
             fields: [
                 {
-                    label: "Mẫu QC đầu vào",
+                    label: "Mẫu chỉ só đầu vào",
                     fieldname: "qc_template",
                     fieldtype: "Link",
                     options: "Quality Inspection Template"
                 },
                 {
-                    label: "Mẫu QC đầu ra",
+                    label: "Mẫu chỉ số đầu ra",
                     fieldname: "qc_template_out",
                     fieldtype: "Link",
                     options: "Quality Inspection Template"

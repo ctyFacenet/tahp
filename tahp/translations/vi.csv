@@ -376,7 +376,7 @@ Purpose,Lý do
 "If your data is in HTML, please copy paste the exact HTML code with the tags.","Nếu dữ liệu của bạn được viết bằng HTML, chỉnh sửa và đính kèm toàn bộ thẻ HTML trong văn bản"
 Rate,Đơn giá
 Add field,Thêm trường
-Quality Inspection,Phiếu QC
+Quality Inspection,Phiếu kiểm tra
 Is Scrap Item,Là phụ phẩm
 Is Finished Item,Là thành phẩm
 Target Warehouse,Kho nhập
@@ -705,12 +705,12 @@ Cache Cleared,Đã dọn dẹp bộ đệm
 Maximum Value,Giá trị tối đa
 Minimum Value,Giá trị tối thiểu
 No.,STT
-Item Quality Inspection Parameter,Danh sách thông số QC
+Item Quality Inspection Parameter,Danh sách thông số kiểm tra
 Filters applied for {0},Lọc tìm kiếm theo: {0}
 {0} List,Danh sách {0}
 Advanced Search,Tìm kiếm nâng cao
 Create a new {0},Tạo mới {0}
-Quality,Phiếu QC
+Quality,Phiếu kiểm tra
 Details,Chi tiết
 Disabled,Vô hiệu hóa
 Default Unit of Measure,Đơn vị đo chính
@@ -772,7 +772,7 @@ Workstation Name,Tên thiết bị/cụm thiết bị
 Description,Mô tả
 Parameter Group,Nhóm thông số
 Parameter,Thông số
-Quality Inspection Template Name,Tên mẫu QC
+Quality Inspection Template Name,Tên mẫu kiểm tra
 You haven't created a {0} yet,Bạn chưa tạo bản ghi {0} nào
 Is Group,Nhóm
 Parent Item Group,Theo nhóm cha
@@ -795,13 +795,13 @@ New,Mới
 Add,Thêm
 ERPNext,FaceNet
 Home,Trang chủ
-Quality Inspection Parameter,Thông số QC
+Quality Inspection Parameter,Thông số kiểm tra
 BOM,Công thức sản xuất (BOM)
 Routing,Quy trình sản xuất
 Operation,Công đoạn
 Workstation Type,Loại thiết bị
 Workstation,Thiết bị/Cụm thiết bị
-Quality Inspection Template,Mẫu QC
+Quality Inspection Template,Mẫu kiểm tra
 Item,Mặt hàng
 Item Group,Nhóm mặt hàng
 Warehouse,Nhà kho
@@ -14044,3 +14044,5 @@ Production Closing Report, Báo cáo chốt sản lượng
 Operation Tracker, Quản lí đo đạc
 Operation Tracker Inspection, Phiếu đo đạc
 Operation Tracker Evaluation, Tiêu chí đánh giá
+BOM Custom Search, Tìm kiếm BOM
+Downtime Report, Báo cáo dừng máy

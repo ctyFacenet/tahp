@@ -21,12 +21,14 @@
    "unique": 1
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "qc_template",
    "fieldtype": "Link",
    "label": "M\u1eabu ch\u1ec9 s\u1ed1 \u0111\u1ea7u v\u00e0o",
    "options": "Quality Inspection Template"
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "qc_template_out",
    "fieldtype": "Link",
    "label": "M\u1eabu ch\u1ec9 s\u1ed1 \u0111\u1ea7u ra",
@@ -36,7 +38,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-06 11:25:37.170731",
+ "modified": "2025-09-28 19:40:06.170872",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Manufacturing Category",

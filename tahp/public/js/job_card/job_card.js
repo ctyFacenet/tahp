@@ -847,6 +847,11 @@ frappe.ui.form.on('Job Card', {
         let desktopInputs = [];
         data.forEach((row, rowIndex) => {
             let $tr = $('<tr></tr>')
+            if (rowIndex % 2 === 0) {
+                $tr.css("background-color", "#f5f5f5ff");
+            } else {
+                $tr.css("background-color", "#ffffff");
+            }
             columns.forEach(col => {
                 let $td
                 if (col.action && frm.doc.docstatus === 0) {
@@ -867,6 +872,7 @@ frappe.ui.form.on('Job Card', {
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $input.css('pointer-events', 'none')
+                        $input.css('background', 'transparent')
                         $td = $('<td></td>');
                         desktopInputs.push($input);
                         $td.append($input);
