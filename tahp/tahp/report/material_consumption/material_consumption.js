@@ -80,6 +80,10 @@ frappe.query_reports["Material Consumption"] = {
             // Core Logic: Trigger refresh only if the field was cleared.
             if (old_value && !new_value) {
                 report.refresh();
+                // Re-render chart after refresh
+                setTimeout(() => {
+                    this.draw_chart();
+                }, 500);
             }
 
             // Update the stored value to the new value for the next event.
