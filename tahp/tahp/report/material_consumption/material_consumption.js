@@ -14,7 +14,7 @@ frappe.query_reports["Material Consumption"] = {
             "label": __("Từ ngày"),
             "fieldtype": "Date",
             "on_change": function() {
-                frappe.query_reports["Material Consumption"].handle_filter_change();
+                frappe.query_reports["Material Consumption"].handle_date_range_change();
             }
         },
         {
@@ -22,18 +22,40 @@ frappe.query_reports["Material Consumption"] = {
             "label": __("Đến ngày"),
             "fieldtype": "Date",
             "on_change": function() {
-                frappe.query_reports["Material Consumption"].handle_filter_change();
+                frappe.query_reports["Material Consumption"].handle_date_range_change();
             }
         },
         {
             "fieldname": "week",
-            "label": __("Chọn tuần sản xuất"),
+            "label": __("Tuần"),
             "fieldtype": "Date",
             "on_change": function() {
                 frappe.query_reports["Material Consumption"].handle_week_change();
             }
         },
+        {
+            "fieldname": "month",
+            "label": __("Tháng"),
+            "fieldtype": "Select",
+            "options": ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            "on_change": function() {
+                frappe.query_reports["Material Consumption"].handle_month_year_change();
+            }
+        },
+        {
+            "fieldname": "year",
+            "label": __("Năm"),
+            "fieldtype": "Int",
+            "default": new Date().getFullYear(),
+            "on_change": function() {
+                frappe.query_reports["Material Consumption"].handle_month_year_change();
+            }
+        },
     ],
+
+    get_datatable_options(options) {
+        return { ...options, freezeIndex: 4};
+    },
     
     "onload": function(report) {
         frappe.require("https://cdn.jsdelivr.net/npm/chart.js").then(() => {
@@ -45,34 +67,50 @@ frappe.query_reports["Material Consumption"] = {
         let previous_values = {
             from_date: report.get_filter_value("from_date"),
             to_date: report.get_filter_value("to_date"),
-            week: report.get_filter_value("week")
+            week: report.get_filter_value("week"),
+            month: report.get_filter_value("month"),
+            year: report.get_filter_value("year")
         };
 
-        // 2. Create a single, reusable handler for date changes.
+        // Create a single, reusable handler for date changes.
         const on_date_cleared_handler = (fieldname) => {
             const new_value = report.page.fields_dict[fieldname].get_value();
             const old_value = previous_values[fieldname];
 
-            // 3. Core Logic: Trigger refresh only if the field was cleared.
+            // Core Logic: Trigger refresh only if the field was cleared.
             if (old_value && !new_value) {
                 report.refresh();
             }
 
-            // 4. Update the stored value to the new value for the next event.
+            // Update the stored value to the new value for the next event.
             previous_values[fieldname] = new_value;
         };
 
-        // 5. Attach the custom handler to both date filter inputs and week filter.
+        // Attach the custom handler to all filter inputs.
         report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
         report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
         report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
+        report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
+        report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
     },
 
     "handle_filter_change": function() {
-        // Clear week filter when from_date or to_date changes
-        const current_week = frappe.query_report.get_filter_value("week");
-        if (current_week) {
-            frappe.query_report.set_filter_value("week", "");
+        // Generic filter change handler - just refresh
+        frappe.query_report.refresh();
+        setTimeout(() => {
+            this.draw_chart();
+        }, 500);
+    },
+
+    "handle_date_range_change": function() {
+        // When from_date or to_date changes, clear week and month filters
+        const from_date = frappe.query_report.get_filter_value("from_date");
+        const to_date = frappe.query_report.get_filter_value("to_date");
+        
+        if (from_date || to_date) {
+            // Clear other filters silently (without triggering their on_change)
+            frappe.query_report.set_filter_value("week", "", false);
+            frappe.query_report.set_filter_value("month", "", false);
         }
         
         frappe.query_report.refresh();
@@ -85,9 +123,10 @@ frappe.query_reports["Material Consumption"] = {
         const week_value = frappe.query_report.get_filter_value("week");
         
         if (week_value) {
-            // Clear from_date and to_date when week is selected
-            frappe.query_report.set_filter_value("from_date", "");
-            frappe.query_report.set_filter_value("to_date", "");
+            // Clear other date filters silently
+            frappe.query_report.set_filter_value("from_date", "", false);
+            frappe.query_report.set_filter_value("to_date", "", false);
+            frappe.query_report.set_filter_value("month", "", false);
             
             // Calculate and display the week range for user reference
             const selected_date = frappe.datetime.str_to_obj(week_value);
@@ -99,12 +138,38 @@ frappe.query_reports["Material Consumption"] = {
                 message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
                 indicator: 'blue'
             }, 5);
+            
+            // Refresh immediately after setting week
+            frappe.query_report.refresh();
+            setTimeout(() => {
+                this.draw_chart();
+            }, 500);
         }
+    },
+
+    "handle_month_year_change": function() {
+        const month_value = frappe.query_report.get_filter_value("month");
+        const year_value = frappe.query_report.get_filter_value("year");
         
-        frappe.query_report.refresh();
-        setTimeout(() => {
-            this.draw_chart();
-        }, 500);
+        // Only process if month is selected (year always has a default value)
+        if (month_value) {
+            // Clear other date filters silently (without triggering their on_change)
+            frappe.query_report.set_filter_value("from_date", "", false);
+            frappe.query_report.set_filter_value("to_date", "", false);
+            frappe.query_report.set_filter_value("week", "", false);
+            
+            // Show a message to user about the selected month/year
+            frappe.show_alert({
+                message: __(`Đã chọn tháng ${month_value}/${year_value}`),
+                indicator: 'green'
+            }, 5);
+            
+            // Refresh immediately after setting month
+            frappe.query_report.refresh();
+            setTimeout(() => {
+                this.draw_chart();
+            }, 500);
+        }
     },
 
     // Helper function to get Monday of the week containing the given date
@@ -132,17 +197,60 @@ frappe.query_reports["Material Consumption"] = {
         const data_rows = frappe.query_report.data;
         if (!data_rows || data_rows.length === 0) return;
 
-        this.draw_first_chart(data_rows);
+        // data summary by ingredients to draw chart
+        const material_summary = this.aggregate_data_for_charts(data_rows);
+
+        this.draw_first_chart(material_summary);
         this.draw_second_chart(data_rows);
     },
 
-    "draw_first_chart": function(data_rows) {
-        const bar_thickness = 30;
-        const chart_padding = 100;
-        const num_bars = data_rows.length;
+    "aggregate_data_for_charts": function(data_rows) {
+        const material_map = {};
+        
+        data_rows.forEach(row => {
+            const material_name = row.material_name;
+            const uom = row.uom;
+            const key = material_name;
+            
+            if (!material_map[key]) {
+                material_map[key] = {
+                    material_name: material_name,
+                    uom: uom,
+                    total_actual_qty: 0,
+                    total_planned_qty: 0
+                };
+            }
+            
+            material_map[key].total_actual_qty += (row.total_actual_qty || 0);
+            material_map[key].total_planned_qty += (row.total_planned_qty || 0);
+        });
+        
+        const result = Object.values(material_map).map(item => {
+            const total_actual = item.total_actual_qty;
+            const total_planned = item.total_planned_qty;
+            
+            const over_limit = Math.max(0, total_actual - total_planned);
+            
+            const within_limit = total_actual - over_limit;
+            
+            return {
+                material_name: item.material_name,
+                uom: item.uom,
+                within_limit_qty: within_limit,
+                over_limit_qty: over_limit
+            };
+        });
+        
+        return result;
+    },
+
+    "draw_first_chart": function(material_summary) {
+        const bar_thickness = 40;
+        const chart_padding = 120;
+        const num_bars = material_summary.length;
         let calculated_height = (num_bars * bar_thickness) + chart_padding;
-        if (calculated_height < 300) {
-            calculated_height = 300;
+        if (calculated_height < 400) {
+            calculated_height = 400;
         }
 
         const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 40px;">
@@ -150,17 +258,17 @@ frappe.query_reports["Material Consumption"] = {
         </div>`);
         $('.report-wrapper').prepend(chartContainer);
 
-        const labels = data_rows.map(row => `${row.material_name} (${row.uom})`);
+        const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
 
         const datasets = [
             {
                 label: 'Thực tế',
-                data: data_rows.map(row => row.within_limit_qty),
+                data: material_summary.map(row => row.within_limit_qty),
                 backgroundColor: 'rgba(128, 128, 224, 0.8)'
             },
             {
                 label: 'Vượt định mức',
-                data: data_rows.map(row => row.over_limit_qty),
+                data: material_summary.map(row => row.over_limit_qty),
                 backgroundColor: 'rgba(255, 0, 0, 1)'
             }
         ];
@@ -173,7 +281,7 @@ frappe.query_reports["Material Consumption"] = {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: { x: { stacked: true }, y: { stacked: true } },
+                scales: { x: { stacked: true,  }, y: { stacked: true } },
                 plugins: {
                     title: {
                         display: true,
@@ -215,19 +323,56 @@ frappe.query_reports["Material Consumption"] = {
             'rgba(54, 162, 235, 0.9)', 'rgba(255, 206, 86, 0.9)', 'rgba(255, 159, 64, 0.9)'
         ];
 
+        const unique_materials = [...new Set(data_rows.map(row => row.material_name))];
+        const material_color_map = {};
+        unique_materials.forEach((material, index) => {
+            material_color_map[material] = material_colors[index % material_colors.length];
+        });
+
         let main_datasets = [];
         let over_limit_datasets = [];
         const transform_zero_to_null = (value) => (value === 0 || !value ? null : value);
 
-        data_rows.forEach((material_row, material_index) => {
-            const material_name_with_unit = `${material_row.material_name} (${material_row.uom})`;
-            const base_color = material_colors[material_index % material_colors.length];
+        const material_summary = {};
+        data_rows.forEach(row => {
+            const material_name = row.material_name;
+            if (!material_summary[material_name]) {
+                material_summary[material_name] = {
+                    material_name: material_name,
+                    uom: row.uom,
+                    data: {}
+                };
+                production_items.forEach(item => {
+                    material_summary[material_name].data[item.actual_field] = 0;
+                    material_summary[material_name].data[item.planned_field] = 0;
+                });
+            }
             
-            const within_limit_data = production_items.map(item => transform_zero_to_null(Math.min(material_row[item.actual_field] || 0, material_row[item.planned_field] || 0)));
-            const over_limit_data = production_items.map(item => transform_zero_to_null(Math.max(0, (material_row[item.actual_field] || 0) - (material_row[item.planned_field] || 0))));
+            production_items.forEach(item => {
+                material_summary[material_name].data[item.actual_field] += (row[item.actual_field] || 0);
+                material_summary[material_name].data[item.planned_field] += (row[item.planned_field] || 0);
+            });
+        });
+
+        Object.values(material_summary).forEach(material_data => {
+            const material_name = material_data.material_name;
+            const material_name_with_unit = `${material_name} (${material_data.uom})`;
+            const base_color = material_color_map[material_name];
             
-            // --- THAY ĐỔI: Đặt độ rộng cố định cho cột để đảm bảo đồng nhất ---
-            const bar_thickness = 25; // Tăng độ dày lên, bạn có thể chỉnh số này
+            const within_limit_data = production_items.map(item => 
+                transform_zero_to_null(Math.min(
+                    material_data.data[item.actual_field] || 0, 
+                    material_data.data[item.planned_field] || 0
+                ))
+            );
+            
+            const over_limit_data = production_items.map(item => 
+                transform_zero_to_null(Math.max(0, 
+                    (material_data.data[item.actual_field] || 0) - (material_data.data[item.planned_field] || 0)
+                ))
+            );
+            
+            const bar_thickness = 35;
 
             main_datasets.push({
                 label: material_name_with_unit,
@@ -236,7 +381,9 @@ frappe.query_reports["Material Consumption"] = {
                 stack: material_name_with_unit,
                 skipNull: true,
                 barThickness: bar_thickness,
-                maxBarThickness: bar_thickness + 5
+                maxBarThickness: bar_thickness + 10,
+                categoryPercentage: 0.9, 
+                barPercentage: 0.9
             });
 
             if (over_limit_data.some(d => d !== null)) {
@@ -247,7 +394,9 @@ frappe.query_reports["Material Consumption"] = {
                     stack: material_name_with_unit,
                     skipNull: true,
                     barThickness: bar_thickness,
-                    maxBarThickness: bar_thickness + 5
+                    maxBarThickness: bar_thickness + 10,
+                    categoryPercentage: 0.9,
+                    barPercentage: 0.9
                 });
             }
         });
@@ -260,17 +409,19 @@ frappe.query_reports["Material Consumption"] = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                // --- THAY ĐỔI: Bỏ tỷ lệ phần trăm để dùng độ rộng cố định ---
-                // categoryPercentage: 0.85,
-                // barPercentage: 0.9,
                 scales: {
                     x: {
                         stacked: false,
                         grid: { drawOnChartArea: false, offset: true },
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
                     },
                     y: {
                         stacked: true,
-                        beginAtZero: true
+                        beginAtZero: true,
                     }
                 },
                 plugins: {
