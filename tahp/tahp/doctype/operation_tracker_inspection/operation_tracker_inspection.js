@@ -213,7 +213,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             return;
         } else if (frm.doc.docstatus === 2) {
             $row.append($(`
-                <div class="next_time alert w-100 text-center alert-danger border border-success" style="margin:0" role="alert">
+                <div class="next_time alert w-100 text-center alert-danger border border-danger" style="margin:0" role="alert">
                     Phiếu đã bị huỷ
                 </div>
             `));
@@ -447,7 +447,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
         let mobileInputs = [];
         data.forEach((row, rowIndex) => {
-            let $row = $(`<div class="d-flex jc-tb-mobile-row"></div>`)
+            let $row = $(`<div class="d-flex jc-tb-mobile-row" style="height: 40px; line-height: 40px; align-items:center;"></div>`)
             let bgColor = rowIndex % 2 === 0 ? "#f5f5f5ff" : "#ffffff";
             $row.css({
                 "background-color": bgColor,
@@ -464,6 +464,8 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $right = $(`<div style="${getFlexStyle()}" class="text-right"></div>`);
                     $realRight = $('<div class="jc-tb-right"></div>');
                     $right.append($realRight);
+                } else {
+                    $row.css({'width':'fit-content'})
                 }
             } else {
                 $left = $(`<div style="${getFlexStyle(2)}" class="text-left"></div>`);
@@ -501,7 +503,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $left.append($primaryDiv);
                 }
                 else if (col.is_secondary && row[col.fieldname]) {
-                    $secondary.push(`<div class="jc-tb-secondary">${row[col.fieldname]}</div>`)
+                    $secondary.push(`<div class="">${row[col.fieldname]}</div>`)
                 }
                 else if (col.is_value) {
                     if (col.type !== 'string') {
@@ -511,6 +513,9 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $input.css('pointer-events', 'none');
+                        $row.css('height', '60px');
+                        $row.css('line-height', '60px');
+                        $input.css('height', '50px');
                         if (col.nowrap) $input.css({'max-width': '5ch'})
                         else $input.css({'width':'100%'})
                         if (frm.doc.docstatus == 0) $input.addClass('jc-tb-mobile-value-new')
@@ -522,7 +527,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     }
                 }
                 else if (col.is_unit && row[col.fieldname]) {
-                    $right.append(`<div class="ml-2 jc-tb-secondary">${row[col.fieldname]}</div>`)
+                    $right.append(`<div class="jc-tb-secondary">${row[col.fieldname]}</div>`)
                 }
                 else if (col.action && frm.doc.docstatus === 0) {
                     col.action.forEach(btn => {
@@ -550,7 +555,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 $row.append($left, $right)
             }
 
-            let $wrapper = $('<div ></div>');
+            let $wrapper = $('<div></div>');
             $wrapper.append($row);
 
             if (!$buttons.is(':empty')) {
@@ -558,14 +563,16 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             }
 
             if ($secondary.length) {
-                let $secondaryRow = $('<div class="jc-tb-secondary-row d-flex"></div>');
+                let $secondaryRow = $('<div></div>');
                 $secondary.forEach(sec => $secondaryRow.append(sec));
 
                 // cùng màu với row
                 $secondaryRow.css({
                     "background-color": bgColor,
-                    "min-width": "100%",   // chiếm hết bề ngang table
-                    "padding": "0 8px"     // tuỳ chỉnh, để text không sát lề
+                    "line-height": "0.75rem",
+                    "font-size": "0.75rem",
+                    "padding-bottom": "10px",
+                    "width": "100%"
                 });
 
                 $wrapper.append($secondaryRow);

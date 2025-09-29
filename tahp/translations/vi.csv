@@ -5265,9 +5265,9 @@ Update from Frappe Cloud,Update from Frappe Cloud
 Updated,Updated
 Updated Successfully,Updated Successfully
 Updated To A New Version 🎉,Updated To A New Version 🎉
-Updated successfully,Updated successfully
+Updated successfully,Cập nhật thành công
 Updates,Updates
-Updating,Updating
+Updating,Đang cập nhật
 Updating Email Queue Statuses. The emails will be picked up in the next scheduled run.,Updating Email Queue Statuses. The emails will be picked up in the next scheduled run.
 Updating counter may lead to document name conflicts if not done properly,Updating counter may lead to document name conflicts if not done properly
 Updating global settings,Updating global settings
@@ -12611,7 +12611,7 @@ Stock Closing,Stock Closing
 Stock Consumed During Repair,Stock Consumed During Repair
 Stock Consumption Details,Stock Consumption Details
 Stock Details,Stock Details
-Stock Entries already created for Work Order {0}: {1},Phiếu nhập thành phẩm cho LSX ca {0} đã tồn tại: {1}
+Stock Entries already created for Work Order {0}: {1},Phiếu nhập xuất cho LSX ca {0} đã tồn tại: {1}
 Stock Entry (Outward GIT),Stock Entry (Outward GIT)
 Stock Entry Child,Stock Entry Child
 Stock Entry Detail,Stock Entry Detail

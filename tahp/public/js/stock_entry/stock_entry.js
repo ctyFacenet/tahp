@@ -10,7 +10,7 @@ frappe.ui.form.on('Stock Entry', {
 
     autofill_input: async function(frm) {
         if (!frm.is_new() || !frm.doc.work_order) return;
-
+        console.log(frm.doc.items)
         const inputs = await frappe.xcall('tahp.doc_events.work_order.before_submit.add_input', {
             work_order: frm.doc.work_order
         });
@@ -34,11 +34,12 @@ frappe.ui.form.on('Stock Entry', {
 
             inputs.forEach(input => {
                 let existing = frm.doc.items.find(item => item.item_code === input.item_code);
-                console.log('helli')
                 if (existing) {
                     existing.qty += input.qty;
                     existing.transfer_qty += input.qty;
-                    existing.description = input.description ? input.description : existing.description
+                    existing.description = input.description ? input.description : existing.description;
+                    existing.s_warehouse = input.s_warehouse ? input.s_warehouse : existing.s_warehouse;
+                    existing.t_warehouse = input.t_warehouse ? input.t_warehouse : existing.t_warehouse;
                 }
             });
 
@@ -57,7 +58,7 @@ frappe.ui.form.on('Stock Entry', {
 
             switch (frm.doc.stock_entry_type) {
                 case "Manufacture":
-                    title = "Nhập kho thành phẩm";
+                    title = "Nhập xuất sau SX";
                     break;
                 case "Material Receipt":
                     title = "Nhập kho";
@@ -80,7 +81,9 @@ frappe.ui.form.on('Stock Entry', {
             if (frm.doc.docstatus !== 0) return;
             let html = `
                 <div class="alert alert-info w-100" role="alert" style="margin-bottom:0px;">
-                    Bạn có thể chỉnh sửa lại số lượng theo thực tế
+                    Bạn có thể chỉnh sửa lại số lượng theo thực tế.<br>
+                    <span class="text-danger fw-bold mt-3"">Mặt hàng có số lượng bôi đỏ</span>: Nguyên vật liệu, nhiên liệu, phụ gia tiêu hao cho sản xuất.<br>
+                    <span class="text-success fw-bold mt-3"">Mặt hàng có số lượng bôi xanh</span>: Thành phẩm tạo ra sau sản xuất.                    
                 </div>
             `;
             frm.fields_dict.custom_warn.$wrapper.html(html);

@@ -342,7 +342,7 @@ frappe.ui.form.on('Job Card', {
 
     update_feedback: async function(frm, $col0) {
         const tracker = frm.doc.custom_tracker;
-        if (!tracker || !tracker.length) {
+        if (!tracker || !tracker.length || frm.doc.docstatus != 0) {
             $col0.hide();
             return;
         }

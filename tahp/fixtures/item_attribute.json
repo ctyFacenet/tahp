@@ -1,0 +1,142 @@
+[
+ {
+  "attribute_name": "Phân loại",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Item Attribute",
+  "from_range": 0.0,
+  "increment": 0.0,
+  "item_attribute_values": [
+   {
+    "abbr": "A",
+    "attribute_value": "A",
+    "parent": "Phân loại",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "B",
+    "attribute_value": "B",
+    "parent": "Phân loại",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "C",
+    "attribute_value": "C",
+    "parent": "Phân loại",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   }
+  ],
+  "modified": "2025-09-12 16:16:33.656346",
+  "name": "Phân loại",
+  "numeric_values": 0,
+  "to_range": 0.0
+ },
+ {
+  "attribute_name": "Độ ẩm",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Item Attribute",
+  "from_range": 0.0,
+  "increment": 0.0,
+  "item_attribute_values": [
+   {
+    "abbr": "6",
+    "attribute_value": "0-6",
+    "parent": "Độ ẩm",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "8",
+    "attribute_value": "6-8",
+    "parent": "Độ ẩm",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "12",
+    "attribute_value": "10-12",
+    "parent": "Độ ẩm",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "20",
+    "attribute_value": "18-20",
+    "parent": "Độ ẩm",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   }
+  ],
+  "modified": "2025-09-29 14:29:20.223808",
+  "name": "Độ ẩm",
+  "numeric_values": 0,
+  "to_range": 0.0
+ },
+ {
+  "attribute_name": "Cơ lý",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Item Attribute",
+  "from_range": 0.0,
+  "increment": 0.0,
+  "item_attribute_values": [
+   {
+    "abbr": "+",
+    "attribute_value": "Có cơ lý",
+    "parent": "Cơ lý",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": ".",
+    "attribute_value": "Không cơ lý",
+    "parent": "Cơ lý",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   }
+  ],
+  "modified": "2025-09-29 14:29:48.772717",
+  "name": "Cơ lý",
+  "numeric_values": 0,
+  "to_range": 0.0
+ },
+ {
+  "attribute_name": "Đặc tính",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Item Attribute",
+  "from_range": 0.0,
+  "increment": 0.0,
+  "item_attribute_values": [
+   {
+    "abbr": "SAY",
+    "attribute_value": "Sấy",
+    "parent": "Đặc tính",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "UOT",
+    "attribute_value": "Ướt",
+    "parent": "Đặc tính",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   },
+   {
+    "abbr": "TRON",
+    "attribute_value": "Trộn",
+    "parent": "Đặc tính",
+    "parentfield": "item_attribute_values",
+    "parenttype": "Item Attribute"
+   }
+  ],
+  "modified": "2025-09-29 14:28:21.893806",
+  "name": "Đặc tính",
+  "numeric_values": 0,
+  "to_range": 0.0
+ }
+]

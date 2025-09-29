@@ -7,7 +7,7 @@ frappe.listview_settings["Stock Entry"] = {
             let title = "";
             switch (type) {
                 case "Manufacture":
-                    title = "Nhập kho thành phẩm";
+                    title = "Nhập xuất sau SX";
                     break;
                 case "Material Receipt":
                     title = "Nhập kho";
