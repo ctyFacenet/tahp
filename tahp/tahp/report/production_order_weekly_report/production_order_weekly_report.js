@@ -101,6 +101,12 @@ frappe.query_reports["Production Order Weekly Report"] = {
             refresh_charts(report);
         }, 100);
        
+    },
+    get_datatable_options(options) {
+        return { 
+            ...options, 
+             title: '<div style="text-align: left; font-size: clamp(18px, 1.5vw, 22px); margin-left: 10px ; font-weight: 500;">Thống kê sản lượng:</div>' 
+        }
     }
 };
 
