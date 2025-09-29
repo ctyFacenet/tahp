@@ -447,7 +447,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
         let mobileInputs = [];
         data.forEach((row, rowIndex) => {
-            let $row = $(`<div class="d-flex jc-tb-mobile-row" style="height: 40px; line-height: 40px; align-items:center;width:fit-content;"></div>`)
+            let $row = $(`<div class="d-flex jc-tb-mobile-row"></div>`)
             let bgColor = rowIndex % 2 === 0 ? "#f5f5f5ff" : "#ffffff";
             $row.css({
                 "background-color": bgColor,
@@ -550,7 +550,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 $row.append($left, $right)
             }
 
-            let $wrapper = $('<div style="width:fit-content;"></div>');
+            let $wrapper = $('<div ></div>');
             $wrapper.append($row);
 
             if (!$buttons.is(':empty')) {
