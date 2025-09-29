@@ -17,7 +17,6 @@ fixtures = [
     {"doctype": "Website Settings"},
     {"doctype": "System Settings"},
     {"doctype": "Custom HTML Block"},
-    {"doctype": "Downtime Reason"},
     {"doctype": "Role Profile"},
 ]
 
