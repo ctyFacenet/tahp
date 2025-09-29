@@ -1086,7 +1086,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		}
 		this.chart = [];
 		this.$chart.empty();
-		this.$chart.hide().show(); // trick refresh DOM
+		this.$chart.hide().show(); // trick refresh DOM 
 
 		const numberPerRow = (this.chartjsOptions?.number_per_row) || 2;
 		const chartHeight = (this.chartjsOptions?.chart_height) || 400;
@@ -1103,6 +1103,18 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 				position: 'relative'
 			}).addClass('chart-js-col').appendTo(this.$chart);
 
+			// Nếu có cờ html thì render HTML thay vì chart
+			if (chartInfo.html === true && chartInfo.content) {
+				// content có thể là string HTML hoặc 1 element
+				if (typeof chartInfo.content === "string") {
+					$col.append(chartInfo.content);
+				} else {
+					$col.append(chartInfo.content); // nếu là jQuery object / DOM element
+				}
+				return; // bỏ qua chart.js
+			}
+
+			// Render chart như bình thường
 			const canvas = $('<canvas></canvas>').css({
 				width: '100%',
 				maxHeight: chartHeight + 'px'
@@ -1119,7 +1131,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 			this.chart.forEach(c => c.resize());
 		});
 	}
-
 
 	open_create_chart_dialog() {
 		const me = this;
