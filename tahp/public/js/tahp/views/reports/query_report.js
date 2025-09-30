@@ -1079,6 +1079,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 	}
 
 	render_chart_js() {
+		console.log('refresh')
 		if (this.chart && Array.isArray(this.chart)) {
 			this.chart.forEach(c => {
 				if (c && typeof c.destroy === "function") c.destroy();
@@ -1103,13 +1104,17 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 				position: 'relative'
 			}).addClass('chart-js-col').appendTo(this.$chart);
 
-			// Nếu có cờ html thì render HTML thay vì chart
-			if (chartInfo.html === true && chartInfo.content) {
-				// content có thể là string HTML hoặc 1 element
-				if (typeof chartInfo.content === "string") {
-					$col.append(chartInfo.content);
-				} else {
-					$col.append(chartInfo.content); // nếu là jQuery object / DOM element
+			if (chartInfo.html === true) {
+				if (typeof chartInfo.options?.render === "function") {
+					// gọi hàm render do người dùng cung cấp
+					const content = chartInfo.options.render();
+					$col.append(content);
+				} else if (chartInfo.content) {
+					if (typeof chartInfo.content === "string") {
+						$col.append(chartInfo.content);
+					} else {
+						$col.append(chartInfo.content);
+					}
 				}
 				return; // bỏ qua chart.js
 			}
