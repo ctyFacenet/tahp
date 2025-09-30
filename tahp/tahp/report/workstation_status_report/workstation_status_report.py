@@ -276,7 +276,8 @@ def execute_summary(filters=None):
 					counts[c["status"]] += 1
 
 			if row_label == "% Máy khả dụng":
-				value = f"{round(counts['Đang chạy'] / total * 100, 2)}%" if total > 0 else "0%"
+				available = counts["Đang chạy"] + counts["Đang tắt"]
+				value = f"{int(available / total * 100)}%" if total > 0 else "0%"
 			elif row_label == "Tổng số máy":
 				value = total
 			else:

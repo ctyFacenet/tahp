@@ -1078,8 +1078,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		this.chart = new frappe.Chart(this.$chart[0], options);
 	}
 
-	render_chart_js() {
-		console.log('refresh')
+	async render_chart_js() {
 		if (this.chart && Array.isArray(this.chart)) {
 			this.chart.forEach(c => {
 				if (c && typeof c.destroy === "function") c.destroy();
@@ -1095,19 +1094,18 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 
 		if (!this.charts) return;
 
-		this.charts.forEach((chartInfo) => {
+		this.charts.forEach(async (chartInfo) => {
 			const $col = $('<div></div>').css({
 				boxSizing: 'border-box',
 				flex: `1 1 calc(${100 / numberPerRow}% - ${(gap * (numberPerRow - 1)) / numberPerRow}px)`,
 				minWidth: '300px',
-				padding: '8px',
+				paddingBlock: '8px',
 				position: 'relative'
 			}).addClass('chart-js-col').appendTo(this.$chart);
 
 			if (chartInfo.html === true) {
-				if (typeof chartInfo.options?.render === "function") {
-					// gọi hàm render do người dùng cung cấp
-					const content = chartInfo.options.render();
+				if (typeof chartInfo.htmlRender === "function") {
+					const content = await chartInfo.htmlRender();
 					$col.append(content);
 				} else if (chartInfo.content) {
 					if (typeof chartInfo.content === "string") {

@@ -1190,6 +1190,11 @@ frappe.ui.form.on('Job Card', {
                     args: { job_card: frm.doc.name }
                 })).message;
 
+                if (!workstations || workstations.length === 0) {
+                    frappe.msgprint("Không có thiết bị nào để chọn.");
+                    return reject();
+                }
+
                 const d = new frappe.ui.Dialog({
                     title: 'Chọn thiết bị',
                     fields: [{ fieldname: "html_table", fieldtype: "HTML" }],
