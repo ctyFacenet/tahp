@@ -15,7 +15,7 @@ def check_stock_qty(doc):
 
     issues = []
     for item in doc.required_items:
-        if item.required_qty > item.available_qty_at_source_warehouse:
+        if item.required_qty > (item.available_qty_at_source_warehouse or 0):
             issues.append({
                 "item_code": item.item_code,
                 "item_name": item.item_name or doc.item_name or "",
