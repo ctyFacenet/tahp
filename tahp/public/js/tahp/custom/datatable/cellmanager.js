@@ -831,7 +831,6 @@ export default class CellManager {
         if (cell.freezeRight) {
             style += `position: sticky; right: 0; z-index: 2;`;
         }
-
         return `
             <div class="${className}" ${dataAttr} style="${style}" tabindex="0">
                 ${this.getCellContent(cell)}
@@ -905,8 +904,13 @@ export default class CellManager {
             isHeader ? `dt-cell__content--header-${colIndex}` : `dt-cell__content--col-${colIndex}`
         ].join(' ');
 
+        let styleHeader = '';
+        if (isHeader && this.options.headerBackground) {
+            styleHeader = `background-color: ${this.options.headerBackground};`; 
+        }
+
         let cellContentHTML = `
-            <div class="${className}">
+            <div class="${className}" style="${styleHeader}">
                 ${contentHTML}
                 ${sortIndicator}
                 ${resizeColumn}

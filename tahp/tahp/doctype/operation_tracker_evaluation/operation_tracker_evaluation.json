@@ -1,0 +1,101 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:OTE-{specification}-{###}",
+ "creation": "2025-09-25 15:29:40.988539",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "specification",
+  "column_break_vcgl",
+  "evaluation",
+  "column_break_yrfw",
+  "value",
+  "column_break_mvkw",
+  "feedback"
+ ],
+ "fields": [
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "specification",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Th\u00f4ng s\u1ed1",
+   "options": "Quality Inspection Parameter"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "evaluation",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Ph\u00e9p so s\u00e1nh",
+   "options": ">\n<\n=\n\u2265\n\u2264"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "feedback",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u0110\u00e1nh gi\u00e1 & Khuy\u1ebfn ngh\u1ecb"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Gi\u00e1 tr\u1ecb"
+  },
+  {
+   "fieldname": "column_break_vcgl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yrfw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_mvkw",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-25 16:37:36.424311",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Operation Tracker Evaluation",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

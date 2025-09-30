@@ -4,6 +4,7 @@
 import frappe
 
 
+@frappe.whitelist()
 def execute(filters=None):
     columns = [
         "Mã mặt hàng:Link/Item:150",

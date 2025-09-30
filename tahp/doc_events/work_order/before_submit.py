@@ -3,10 +3,56 @@ from tahp.doc_events.work_order.work_order_api import execute_shift_handover
 
 def before_submit(doc, method):
     check_shift_leader(doc)
+    check_stock_qty(doc)
     check_workstation(doc)
     warn_workstation(doc)
     execute_shift_handover(doc)
     doc.status = "In Process"
+
+def check_stock_qty(doc):
+    if not doc.required_items:
+        return
+
+    issues = []
+    for item in doc.required_items:
+        if item.required_qty > (item.available_qty_at_source_warehouse or 0):
+            issues.append({
+                "item_code": item.item_code,
+                "item_name": item.item_name or doc.item_name or "",
+                "required": item.required_qty,
+                "available": item.available_qty_at_source_warehouse,
+            })
+
+    if issues:
+        # tạo bảng HTML
+        table_rows = "".join(
+            f"<tr>"
+            f"<td>{i['item_code']}</td>"
+            f"<td>{i['item_name']}</td>"
+            f"<td>{i['required']}</td>"
+            f"<td>{i['available']}</td>"
+            f"</tr>"
+            for i in issues
+        )
+        msg = f"""
+        <div>
+            <table class="table table-bordered table-sm" style="margin:0px">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Mã hàng</th>
+                        <th>Tên mặt hàng</th>
+                        <th>SL yêu cầu</th>
+                        <th>SL có sẵn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows}
+                </tbody>
+            </table>
+        </div>
+        """
+        frappe.throw(msg=msg, title="Kho đang thiếu số lượng nguyên vật liệu")
+            
 
 def check_shift_leader(doc):
     if doc.custom_shift_leader:
@@ -134,12 +180,27 @@ def warn_workstation(doc):
 @frappe.whitelist()
 def check_status(work_order):
     work_order_doc = frappe.get_doc("Work Order", work_order)
-    if work_order_doc.docstatus != 1: return False
+    if work_order_doc.docstatus != 1:
+        return False
 
+    # Kiểm tra Job Cards
     job_cards = frappe.db.get_all("Job Card", filters={"work_order": work_order_doc.name, "docstatus":1})
-    if len(job_cards) == len(work_order_doc.operations):
-        return True
-    return False
+    if len(job_cards) != len(work_order_doc.operations):
+        return False
+
+    # Kiểm tra Stock Entry dạng Manufacture đã tồn tại chưa
+    stock_entry = frappe.db.get_value("Stock Entry", 
+        filters={
+            "work_order": work_order_doc.name,
+            "stock_entry_type": "Manufacture",
+            "docstatus": 0
+        }, 
+        fieldname="name"
+    )
+
+    if stock_entry:
+        return stock_entry  # trả về name của Stock Entry nếu đã tồn tại
+    return True  # chưa có Stock Entry
 
 @frappe.whitelist()
 def add_input(work_order):
@@ -155,7 +216,6 @@ def add_input(work_order):
         filters={"docstatus": 1, "work_order": work_order},
         fields=["name"]
     )
-    print('hello2\n\n\n\n\n')
     result = []
 
     for jc in job_cards:
@@ -174,13 +234,12 @@ def add_input(work_order):
                     "qty": row.qty,
                     "uom": row.uom,
                     "s_warehouse": warehouse,
-                    "description": "Phụ gia tiêu hao trong SX"
+                    "description": "Nguyên liệu tổng hợp SL từ công đoạn"
                 })
 
     bom_no = frappe.db.get_value("Work Order", work_order, "bom_no")
     bom_doc = frappe.get_doc("BOM", bom_no)
     if bom_doc.custom_sub_items:
-        print('hello\n\n\n\n\n')
         for row in bom_doc.custom_sub_items:
             item_group = frappe.db.get_value("Item", row.item_code, "item_group")
             warehouse = frappe.db.get_value(
@@ -189,7 +248,6 @@ def add_input(work_order):
                 "default_warehouse"
             )
             if not warehouse:
-                print('hello2\n\n\n\n\n')
                 wo_doc = frappe.get_doc("Work Order", work_order)
                 warehouse = wo_doc.fg_warehouse
             result.append({

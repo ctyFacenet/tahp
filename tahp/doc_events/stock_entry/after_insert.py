@@ -4,6 +4,7 @@ import calendar
 def after_insert(doc, method):
     generate_qc(doc)
     send_noti(doc)
+    autofill_shift_handover(doc)
 
 def generate_qc(doc):
     """
@@ -91,3 +92,31 @@ def send_noti(doc):
             "document_type": "Stock Entry",
             "document_name": doc.name
         }).insert(ignore_permissions=True)
+
+def autofill_shift_handover(doc):
+    if doc.stock_entry_type == 'Manufacture' and doc.work_order:
+        shift_handovers = frappe.db.get_all(
+            'Shift Handover',
+            filters={'work_order': doc.work_order},
+            fields=['name']
+        )
+        
+        for handover in shift_handovers:
+            handover_doc = frappe.get_doc('Shift Handover', handover.name)
+            if not handover_doc.stock_entry:
+                handover_doc.stock_entry = doc.name
+                handover_doc.save(ignore_permissions=True)
+                wo_doc = frappe.get_doc("Work Order", doc.work_order)
+                shift_leader = wo_doc.custom_shift_leader
+                if not shift_leader: continue
+                user = frappe.db.get_value("Employee", shift_leader, "user_id")
+                if not user: continue
+                frappe.get_doc({
+                    "doctype": "Notification Log",
+                    "for_user": user,
+                    "subject": f"Vui lòng kiểm tra nội dung BBGC ca {handover.name} và gửi bàn giao",
+                    "email_content": "Vui lòng kiểm tra nội dung BBGC và gửi bàn giao",
+                    "type": "Alert",
+                    "document_type": "Shift Handover",
+                    "document_name": handover.name
+                }).insert(ignore_permissions=True)

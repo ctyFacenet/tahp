@@ -16,7 +16,8 @@
    "fieldname": "group_name",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Thu\u1ed9c ph\u00e2n lo\u1ea1i"
+   "label": "Thu\u1ed9c ph\u00e2n lo\u1ea1i",
+   "reqd": 1
   },
   {
    "fieldname": "operation",
@@ -29,7 +30,8 @@
    "fieldname": "reason",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "L\u00fd do d\u1eebng"
+   "label": "L\u00fd do d\u1eebng",
+   "reqd": 1
   },
   {
    "fieldname": "group_instance",
@@ -41,7 +43,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-10 10:18:15.917135",
+ "modified": "2025-09-28 22:37:01.710490",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Downtime Reason Item",
