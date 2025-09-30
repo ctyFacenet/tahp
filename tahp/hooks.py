@@ -54,14 +54,11 @@ app_include_js = [
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
-<<<<<<< HEAD
     "/assets/tahp/node_modules/chart.js/dist/chart.umd.js"
 
-=======
     "https://cdn.jsdelivr.net/npm/chart.js",
     "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2",
     
->>>>>>> origin/dev
     # "/assets/tahp/js/work_order/work_order.js",
     # "/assets/tahp/js/item/item.js",
     # "/assets/tahp/js/stock_entry/stock_entry.js",
