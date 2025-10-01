@@ -1,6 +1,6 @@
 frappe.router.render = function () {
   if (this.current_route[0]) {
-    console.log("Rendering route:", this.current_route[0]);
+    // console.log("Rendering route:", this.current_route[0]);
 
     if (this.current_route[0] === "modern-menu") {
       if (!sessionStorage.getItem("modern_menu_reloaded")) {

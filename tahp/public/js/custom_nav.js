@@ -109,7 +109,7 @@ async function preloadWorkspaces() {
 
         workspaceCache[slugify(page.name)] = page;
       });
-      console.log("⚡ Workspaces preloaded:", Object.keys(workspaceCache));
+      // console.log("⚡ Workspaces preloaded:", Object.keys(workspaceCache));
     }
   } catch (e) {
     console.error("❌ Preload error:", e);
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (document.querySelectorAll(".workspace-block").length) {
       initDropdowns();
       obs.disconnect();
-      console.log("🛑 Observer stopped - Dropdowns initialized");
+      // console.log("🛑 Observer stopped - Dropdowns initialized");
     }
   });
 

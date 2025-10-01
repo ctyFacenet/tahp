@@ -46,11 +46,13 @@ app_include_css = [
     "/assets/tahp/css/custom_confirm.css",
     "/assets/tahp/css/workstation_dashboard.css",
     "/assets/tahp/css/custom_nav.css",
+    "/assets/tahp/css/build.css"
 
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
     "my_desk.bundle.js",
+    "tahp.bundle.js",
     "/assets/tahp/js/menu/router.js",
     "/assets/tahp/js/menu/page.js",
     # "/assets/tahp/js/menu/workspace.js",

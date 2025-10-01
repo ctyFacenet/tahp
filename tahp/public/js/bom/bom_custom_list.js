@@ -1,6 +1,7 @@
 frappe.listview_settings["BOM"] = {
   hide_name_column: true,
   onload: function (listview) {
+
     // Xóa giao diện mặc định
     $(listview.page.body)
       .find(
