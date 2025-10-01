@@ -244,7 +244,7 @@ async function setup_button(frm) {
         const cellValue = $cell.find('.static-area').text().trim();
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
-        html = cellValue === "Đợi PT duyệt" 
+        html = cellValue === "Đợi GĐ duyệt" 
         ? 
         `<button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
         <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
@@ -274,7 +274,7 @@ async function setup_button(frm) {
             'tu-choi-khsx2': handle_ignore_plan,
             'tu-choi-ptcn2': handle_ignore_tech,
             'duyet2': handle_approve
-        };
+        }; 
 
         if (actionHandlerMap[action]) actionHandlerMap[action](frm, wwo);
     });

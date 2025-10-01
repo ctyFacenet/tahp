@@ -6,5 +6,6 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-
+  const LucidePlus: typeof import('~icons/lucide/plus')['default']
+  const LucideSearch: typeof import('~icons/lucide/search')['default']
 }

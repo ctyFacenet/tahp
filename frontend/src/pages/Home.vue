@@ -1,6 +1,6 @@
 <template>
   <div class=" w-4/5 py-12 mx-auto">
-    <h1 class="text-3xl font-bold mb-6">WWO Plans</h1>
+    <h1 class="text-3xl font-bold mb-6">Phương án KHSX</h1>
     <div class="p-3 justify-self-end">
     <Button
       :variant="'solid'"
@@ -56,7 +56,7 @@
         <div>
         {{ group.group }}  <span class = {{group.status}}>({{ group.status }})</span></div>
         
-        <div v-if="group.status !== 'Đợi GĐ duyệt'" class = "flex">
+        <div v-if="group.status == 'Đợi GĐ duyệt'" class = "flex">
         <div class="p-1">
           <Button
             :variant="'subtle'"
@@ -189,7 +189,7 @@
                   </template>
                   <template #body-content>
                     <div>
-                      <h2>Dynamic Form with Rows</h2>
+                      <h2>Khai báo mặt hàng</h2>
                       <form @submit.prevent="submitForm">
                         <table>
                           <thead>
@@ -204,36 +204,50 @@
                           <tbody>
                             <tr v-for="(row, index) in rows" :key="index">
                               <td>
-                                <input
-                                  type="text"
-                                  v-model="row.itemName"
-                                  placeholder="Enter name"
-                                  required
-                                />
+                                    <Combobox
+                                      :options="listProduct.data"
+                                      v-model="row.item_code"
+                                      :placeholder="dstate.placeholder"
+                                      :disabled="dstate.disabled"
+                                      :show-cancel="dstate.showCancel"
+                                    />
+                                    <div class="mt-2 text-sm text-gray-600">
+                                      Selected: {{ row.item_code || 'None' }}
+                                    </div>                                  
                               </td>
                               <td>
-                                <input
-                                  type="email"
+                                <FormControl
+                                  :type="'number'"
+                                  :ref_for="true"
+                                  size="sm"
+                                  variant="subtle"
+                                  placeholder="Số lượng kế hoạch"
+                                  :disabled="false"
                                   v-model="row.qty"
-                                  placeholder="Enter email"
-                                  required
                                 />
                               </td>
                               <td>
-                                <input
-                                  type="email"
-                                  v-model="row.dateStart"
-                                  placeholder="Enter email"
-                                  required
-                                />
+                                
+                                <FormControl
+                                :type="'date'"
+                                :ref_for="true"
+                                size="sm"
+                                variant="subtle"
+                                placeholder="Placeholder"
+                                :disabled="false"
+                                v-model="row.dateStart"
+                              />
                               </td>
                               <td>
-                                <input
-                                  type="email"
-                                  v-model="row.dateEnd"
-                                  placeholder="Enter email"
-                                  required
-                                />
+                                <FormControl
+                                :type="'date'"
+                                :ref_for="true"
+                                size="sm"
+                                variant="subtle"
+                                placeholder="Placeholder"
+                                :disabled="false"
+                                v-model="row.dateEnd"
+                              />
                               </td>
                               <td>
                                 <button type="button" @click="removeRow(index)">Remove</button>
@@ -241,8 +255,8 @@
                             </tr>
                           </tbody>
                         </table>
-                        <button type="button" @click="addRow">Add Row</button>
-                        <button type="submit">Submit</button>
+                        <button type="button" @click="addRow">Thêm dòng</button>
+                        <button type="submit">Lưu</button>
                       </form>
                     </div>
                   </template>
@@ -250,7 +264,7 @@
                     <div class="flex justify-start flex-row-reverse gap-2">
                       <Button
                         variant="solid"
-                        @click="handleSave(close, group.group)"
+                        @click="createNewLSX(close, rows)"
                       >
                         Xác nhận
                       </Button>
@@ -277,7 +291,7 @@
 <script setup>
 import {createListResource, createResource, call} from "frappe-ui"
 import { ref , computed, reactive} from "vue"
-import { ListView, Dialog, FormControl } from "frappe-ui"
+import { ListView, Dialog, FormControl, Combobox } from "frappe-ui"
 import { useRoute } from 'vue-router'
 import { session } from "../data/session"
 
@@ -289,12 +303,58 @@ const text = ref('')
 const dialog1 = ref(false)
 const dialog3 = ref(false)
 const createDialog = ref(false)
-const newLSX = reactive({
-  item: '',
-  BOM: '',
-  qty: '',
-  uom: '',
+const dstate = reactive({
+  disabled: false,
+  placeholder: 'Select an option...',
+  showCancel: true,
 })
+let listProduct = createListResource({
+  doctype: 'Item',
+  fields: ['name', 'item_code', 'item_name'],
+  orderBy: 'creation desc',
+  start: 0,
+  pageLength: 5,
+  transform(datas) {
+    const newData = datas.map(data => {
+      return {
+        label: data.item_name,
+        value: data.item_code
+      } 
+    })
+    return [
+      ...newData,
+      {
+        type: 'custom',
+        key: 'create-new',
+        label: 'Create New Item',
+        icon: LucidePlus,
+        onClick: (context) => {
+          alert(`Creating new item: "${context.searchTerm}"`)
+        },
+      },
+      {
+        type: 'custom',
+        key: 'advanced-search',
+        label: 'Advanced Search',
+        icon: LucideSearch,
+        condition: (context) =>
+          context.searchTerm.length > 3,
+        onClick: (context) => {
+          alert(`Opening advanced search for: "${context.searchTerm}"`)
+        },
+        keepOpen: true,
+      }
+  ]
+    },
+} )
+
+listProduct.fetch()
+
+function createNewLSX(close, rows) {
+  console.log("Creating new LSX with rows:", rows);
+  // Here you would typically send the data to your backend or perform other actions
+  close(); // Close the dialog after creation
+}
 const rows = reactive([
     { name: "", email: "" },
   ]);
