@@ -52,14 +52,28 @@ frappe.ui.form.on('BOM', {
       wrapper: frm.vue_wrapper
     });
 
-    // Mount riêng từng component vào từng wrapper
-    // if (!frm.report_wrapper) {
-    //   frm.report_wrapper = $(`<div id="report-dashboard"></div>`).appendTo(frm.page.wrapper);
-    // }
-    // frm.report_wrapper.empty();
-    // new tahp.ui.ReportDashboardComponent({
-    //   wrapper: frm.report_wrapper,
-    // });
+    frm.add_custom_button("Open Wizard", () => {
+      const d = new frappe.ui.Dialog({
+        title: "Multi-step Wizard với Vue",
+        size: "extra-large"
+      });
+
+      const wrapper = $('<div></div>').appendTo(d.body);
+
+      new tahp.ui.WizardDialogComponent({
+        wrapper,
+        rows: [
+          { item_code: "SP001", item_name: "Sản phẩm A", qty: 15 },
+          { item_code: "SP002", item_name: "Sản phẩm B", qty: 3 },
+          { item_code: "SP003", item_name: "Sản phẩm C", qty: 8 },
+          { item_code: "SP004", item_name: "Sản phẩm D", qty: 18 },
+          { item_code: "SP005", item_name: "Sản phẩm K", qty: 2 }
+        ]
+      });
+
+      d.show();
+    });
+
   },
 
   with_operations: function (frm) {

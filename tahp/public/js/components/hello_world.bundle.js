@@ -1,9 +1,9 @@
-import DetailOrderReport from "../../hello_vue/pages/DetailOrderReport.vue";
+import ProductionReport from "../../hello_vue/pages/ProductionReport.vue";
 
 class HelloWorldComponent {
   constructor({ wrapper }) {
     this.wrapper = wrapper;
-    this.mounted = tahp.vue.mountVue(DetailOrderReport, {}, this.wrapper);
+    this.mounted = tahp.vue.mountVue(ProductionReport, {}, this.wrapper);
   }
 
   destroy() {
