@@ -351,7 +351,7 @@ export default class RowManager {
         
         const lastColIndex = this.datamanager.getColumnCount() - 1;
         const rowHTML = row.map(cell => {
-            if (this.options.freezeIndex !== undefined && cell.colIndex <= this.options.freezeIndex) {
+            if (this.options.freezeIndex !== null && cell.colIndex <= this.options.freezeIndex) {
                 cell.freezeLeft = "sticky-left";
             }
 

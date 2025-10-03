@@ -13,6 +13,7 @@ export default class ColumnManager {
             'options',
             'fireEvent',
             'header',
+            'spanHeader',
             'datamanager',
             'cellmanager',
             'style',
@@ -27,6 +28,7 @@ export default class ColumnManager {
 
     renderHeader() {
         this.header.innerHTML = '<div></div>';
+        this.spanHeader.innerHTML = this.getSpanHeaderHTML(this.datamanager.getColumns());
         this.refreshHeader();
     }
 
@@ -44,6 +46,67 @@ export default class ColumnManager {
         this.$columnMap = [];
         this.bindMoveColumn();
     }
+
+    getSpanHeaderHTML(columns) {
+        const hasParent = columns.some(col => col.parent);
+        if (!hasParent) return '';
+        const cells = [];
+        let i = 0;
+        let styleHeader = '';
+        if (this.options.headerBackground) {
+            styleHeader = `background-color: ${this.options.headerBackground};`; 
+        }
+        while (i < columns.length) {
+            const col = columns[i];
+            let freezeLeft = '';
+            if (this.options.freezeIndex !== null && i <= this.options.freezeIndex) {
+                freezeLeft = "sticky-left";
+            }
+            if (col.parent) {
+                // Tìm hết các column liên tiếp có cùng parent
+                let spanCount = 1;
+                while (i + spanCount < columns.length && columns[i + spanCount].parent === col.parent) {
+                    spanCount++;
+                }
+                const totalWidth = columns.slice(i, i + spanCount).reduce((w, c) => w + c.width, 0) + (spanCount - 1);
+                cells.push(`<div 
+                    class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft}"
+                    data-parent="${col.parent}"
+                    style="width:${totalWidth}px;${styleHeader};border-bottom: 1px solid var(--dt-border-color);">
+                    ${col.parent}</div>`);
+                i += spanCount;
+            } else {
+                cells.push(`<div class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft}" 
+                    data-col-index="${i}"
+                    style="width:${col.width || 40}px;${styleHeader}"></div>`);
+                i++;
+            }
+        }
+        return `<div class="dt-row dt-row-spanheader">${cells.join('')}</div>`;
+    }
+
+    updateParentSpanWidth(parentName, colIndex) {
+        if (parentName) {
+            const columns = this.datamanager.getColumns().filter(c => c.parent === parentName);
+            if (!columns.length) return;
+
+            const totalWidth = columns.reduce((sum, c) => sum + c.width, 0) + (columns.length - 1);
+            const spanDiv = this.spanHeader.querySelector(`.dt-cell-span[data-parent="${parentName}"]`);
+            if (spanDiv) {
+                spanDiv.style.width = totalWidth + 'px';
+            }
+        } 
+        else if (colIndex !== undefined) {
+            const col = this.getColumn(colIndex);
+            if (!col) return;
+            
+            const spanDiv = this.spanHeader.querySelector(`.dt-cell-span[data-col-index="${colIndex}"]`);
+            if (spanDiv) {
+                spanDiv.style.width = col.width + 'px';
+            }
+        }
+    }
+
 
     getHeaderHTML(columns) {
         let html = this.rowmanager.getRowHTML(columns, {
@@ -192,6 +255,12 @@ export default class ColumnManager {
                 width: finalWidth
             });
             this.setColumnHeaderWidth(colIndex);
+            const col = this.getColumn(colIndex);
+            if (col && col.parent) {
+                this.updateParentSpanWidth(col.parent);
+            } else {
+                this.updateParentSpanWidth(null, colIndex);
+            }
         };
         $.on(document.body, 'mousemove', onMouseMove);
         this.instance.on('onDestroy', () => {

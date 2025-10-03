@@ -11,7 +11,7 @@
   --dt-spacer-3: 1rem;
   --dt-border-radius: var(--border-radius);
   --dt-cell-bg: var(--fg-color);
-  --dt-border-color: var(--table-border-color);
+  --dt-border-color: #b6b6b6;
   --dt-border-radius: var(--border-radius);
   --dt-header-cell-bg: var(--subtle-fg);
   --dt-selection-highlight-color: #d8e2ff;;

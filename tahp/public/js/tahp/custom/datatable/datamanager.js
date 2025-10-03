@@ -138,13 +138,16 @@ init(data, columns) {
                 return value + '';
             }
         };
-
+        
         this.columns = columns
             .map((cell, i) => this.prepareCell(cell, i))
             .map(col => Object.assign({}, baseCell, col))
             .map(col => {
                 col.content = col.content || col.name || '';
                 col.id = col.id || col.content;
+                if (col.parent) {
+                    col.parent = col.parent;
+                }
                 return col;
             });
     }
@@ -154,7 +157,8 @@ init(data, columns) {
             content: '',
             sortOrder: 'none',
             colIndex: i,
-            column: this.columns[i]
+            column: this.columns[i],
+            parent: null
         };
 
         if (content !== null && typeof content === 'object') {
