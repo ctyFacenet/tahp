@@ -1103,19 +1103,34 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 				position: 'relative'
 			}).addClass('chart-js-col').appendTo(this.$chart);
 
+			// TH1: chỉ render html
 			if (chartInfo.html === true) {
 				if (typeof chartInfo.htmlRender === "function") {
 					const content = await chartInfo.htmlRender();
 					$col.append(content);
 				} else if (chartInfo.content) {
-					if (typeof chartInfo.content === "string") {
-						$col.append(chartInfo.content);
-					} else {
-						$col.append(chartInfo.content);
-					}
+					$col.append(typeof chartInfo.content === "string" ? chartInfo.content : chartInfo.content);
 				}
 				return; // bỏ qua chart.js
 			}
+
+			// TH2: hybrid = vừa chart vừa html
+			let hybridTop = null, hybridBottom = null;
+			if (chartInfo.html === "hybrid" && chartInfo.hybrid) {
+				if (chartInfo.hybrid.top) {
+					hybridTop = typeof chartInfo.hybrid.top === "function" 
+						? await chartInfo.hybrid.top() 
+						: chartInfo.hybrid.top;
+				}
+				if (chartInfo.hybrid.bottom) {
+					hybridBottom = typeof chartInfo.hybrid.bottom === "function" 
+						? await chartInfo.hybrid.bottom() 
+						: chartInfo.hybrid.bottom;
+				}
+			}
+
+			// Thêm top content
+			if (hybridTop) $col.append(hybridTop);
 
 			// Render chart như bình thường
 			const canvas = $('<canvas></canvas>').css({
@@ -1127,6 +1142,9 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 			chartInfo.options = { ...chartInfo.options, maintainAspectRatio: false, responsive: true };
 			const chartObj = new Chart(ctx, chartInfo.options);
 			this.chart.push(chartObj);
+
+			// Thêm bottom content
+			if (hybridBottom) $col.append(hybridBottom);
 		});
 
 		// Resize all charts khi window thay đổi kích thước
