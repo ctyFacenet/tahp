@@ -50,6 +50,7 @@ async function finish_button(frm) {
                     purpose: "Manufacture",
                     qty: frm.doc.qty
                 });
+                console.log(stock_entry)
                 frappe.model.sync(stock_entry);
                 frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
             }

@@ -7,7 +7,7 @@ def before_save(doc, method):
     - Nếu `total_operation_time` chưa có, gán mặc định = 1.
     """
     empty_tables = []
-    tables = ["custom_configs", "custom_inputs", "custom_subtasks", "custom_team"]
+    tables = ["custom_configs", "custom_subtasks", "custom_team"]
 
     for t in tables:
         table_field = doc.meta.get_field(t)

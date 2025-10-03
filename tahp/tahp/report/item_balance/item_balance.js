@@ -2,7 +2,7 @@ frappe.query_reports["Item Balance"] = {
     onload: function(report) {
         // report.charts = [
         //     {
-        //         title: "Tồn kho theo nhóm mặt hàng",
+        //         html: "hybrid",   // bật chế độ hybrid
         //         options: {
         //             type: 'bar',
         //             data: {
@@ -27,10 +27,21 @@ frappe.query_reports["Item Balance"] = {
         //                     }
         //                 ]
         //             },
+        //             options: {
+        //                 plugins: {
+        //                     legend: { position: 'top' }
+        //                 }
+        //             }
         //         },
-        //     },
-
+        //         hybrid: {
+        //             top: "<div class='hybrid-top text-muted mb-2'><strong>Báo cáo tồn kho</strong></div>",
+        //             bottom: () => {
+        //                 return $("<div class='hybrid-bottom small mt-2 text-muted'>Nguồn dữ liệu: ERPNext</div>");
+        //             }
+        //         }
+        //     }
         // ];
+
         report.chartjsOptions.number_per_row = 2
     },
 };
