@@ -487,12 +487,21 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
             let producedColor = modernColors[1];
             
             items.forEach((item, i) => {
-                // Chọn màu cho Qty: bỏ 2 màu đầu, lấy các màu tiếp theo
+                // Tìm label từ ngày đầu tiên có dữ liệu
+                let itemLabel = item;
+                for (let d of bomDates) {
+                    if (bom[d][item]?.label) {
+                        itemLabel = bom[d][item].label;
+                        break;
+                    }
+                }
+
+                // Chọn màu cho Qty (bỏ 2 màu đầu)
                 let qtyColor = modernColors[(i + 2) % modernColors.length];
 
                 // Qty
                 bomDatasets.push({
-                    label: bom[bomDates[0]][item]?.label || item,
+                    label: itemLabel,
                     data: bomDates.map(d => bom[d][item]?.qty || 0),
                     backgroundColor: qtyColor.bg,
                     borderColor: qtyColor.border,
