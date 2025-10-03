@@ -17,7 +17,6 @@ fixtures = [
     {"doctype": "Website Settings"},
     {"doctype": "System Settings"},
     {"doctype": "Custom HTML Block"},
-    {"doctype": "Downtime Reason"},
     {"doctype": "Role Profile"},
 ]
 
@@ -212,6 +211,7 @@ override_doctype_class = {
 	"Employee": "tahp.overrides.employee.Employee",
     "Stock Entry": "tahp.overrides.stock_entry.StockEntry",
     "Job Card": "tahp.overrides.job_card.JobCard",
+    "Work Order": "tahp.overrides.work_order.WorkOrder",
 }
 
 # Document Events

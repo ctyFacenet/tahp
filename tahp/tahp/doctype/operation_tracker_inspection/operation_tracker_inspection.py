@@ -182,3 +182,13 @@ def send_recommendation(inspection, items):
     # loại bỏ các feedback rỗng
     feedback_lines = [line for line in feedback_lines if line.strip()]
     return ", ".join(feedback_lines)
+
+@frappe.whitelist()
+def check_qr(inspection, scanned):
+    doc = frappe.get_doc("Operation Tracker Inspection", inspection)
+    workstation = frappe.get_value("Operation", doc.operation, "workstation")
+    if workstation:
+        custom_qr = frappe.get_value("Workstation", workstation, "custom_qr")
+        if custom_qr == scanned:
+            return True
+    return False

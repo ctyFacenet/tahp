@@ -337,7 +337,7 @@ def update_workstations(job_card, workstations):
                             "from_time": from_time,
                             "reason": reason,
                             "is_danger": 1 if status == "Hỏng" else 0,
-                            "group_name": "Dừng do hỏng" if status == "Hỏng" else group_name
+                            "group_name": group_name
                         })
 
                 row.status = status

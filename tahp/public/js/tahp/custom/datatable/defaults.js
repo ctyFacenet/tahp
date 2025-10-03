@@ -60,7 +60,7 @@ export default function getDefaultOptions(instance) {
         layout: 'fixed', // fixed, fluid, ratio
         noDataMessage: instance.translate('No Data'),
         cellHeight: 40,
-        minimumColumnWidth: 30,
+        minimumColumnWidth: 40,
         inlineFilters: false,
         treeView: false,
         checkedRowStatus: true,
@@ -72,6 +72,7 @@ export default function getDefaultOptions(instance) {
         freezeIndex: null,
         hasAction: null,
         title: null,
-        styleTitle: null
+        styleTitle: null,
+        headerBackground: null
     };
 };

@@ -466,10 +466,13 @@ export default class ColumnManager {
 
     getDropdownHTML() {
         const { dropdownButton } = this.options;
-
+        let styleHeader = '';
+        if (this.options.headerBackground) {
+            styleHeader = `background-color: ${this.options.headerBackground};`; 
+        }
         return `
             <div class="dt-dropdown">
-                <div class="dt-dropdown__toggle">${dropdownButton}</div>
+                <div class="dt-dropdown__toggle" style="${styleHeader}">${dropdownButton}</div>
             </div>
       `;
     }

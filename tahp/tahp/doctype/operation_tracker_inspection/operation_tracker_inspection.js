@@ -48,15 +48,15 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             <div class="font-weight-bold">Chú thích</div>
             <div>
                 <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#ef4444;vertical-align:middle;margin-right:5px;"></span>
-                Nhân viên QC chưa điền phiếu
-            </div>
-            <div>
-                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#22c55e;vertical-align:middle;margin-right:5px;"></span>
-                Nhân viên QC đã điền phiếu
+                Phiếu chưa được nhân viên đo đạc điền
             </div>
             <div>
                 <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#3b82f6;vertical-align:middle;margin-right:5px;"></span>
-                Công nhân đã xác nhận phiếu
+                Phiếu đã điều xong, đang đợi công nhận xác nhận
+            </div>
+            <div>
+                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#22c55e;vertical-align:middle;margin-right:5px;"></span>
+                Phiếu đã được điền và xác nhận
             </div>
         </div>`)
         if (frm.doc.docstatus == 0) $row2.append($col21)
@@ -173,16 +173,25 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 let fname = frappe.scrub(r.specification);
                 let unit = spec_units[r.specification] || "";
                 d[fname] = r.value ? (unit ? `${r.value} ${unit}` : r.value) : "";
+                d.feedback = r.feedback
             });
 
 
             if (!to_obj) {
                 d.background = "danger"; 
             } else {
-                d.background = rows[0].sent ? "info" : "success";
+                if (d.feedback) {
+                    d.background = rows[0].sent ? "success" : "info";
+                } else {
+                    d.background = "success";
+                }
             }
+
+            d._from_obj = from_obj;
             return d;
         });
+
+        history.sort((a, b) => b._from_obj - a._from_obj);
         // render bảng
         frm.events.define_table(
             frm, $col31, "Lịch sử đo đạc",
@@ -204,7 +213,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             return;
         } else if (frm.doc.docstatus === 2) {
             $row.append($(`
-                <div class="next_time alert w-100 text-center alert-danger border border-success" style="margin:0" role="alert">
+                <div class="next_time alert w-100 text-center alert-danger border border-danger" style="margin:0" role="alert">
                     Phiếu đã bị huỷ
                 </div>
             `));
@@ -312,7 +321,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
         // Desktop
         let $desktopWrapper = $('<div class="d-none d-md-block overflow-auto"></div>');
-        let $desktopTable = $('<table class="table table-sm"></table>')
+        let $desktopTable = $('<table class="table table-sm table-bordered"></table>')
         let $thead = $('<thead><tr></tr></thead>')
         columns.forEach(col => {
             let th = `<th>${col.label || ""}</th>`
@@ -326,6 +335,11 @@ frappe.ui.form.on("Operation Tracker Inspection", {
         let desktopInputs = [];
         data.forEach((row, rowIndex) => {
             let $tr = $('<tr></tr>')
+            if (rowIndex % 2 === 0) {
+                $tr.css("background-color", "#f5f5f5ff");
+            } else {
+                $tr.css("background-color", "#ffffff");
+            }
             columns.forEach(col => {
                 let $td
                 if (col.action && frm.doc.docstatus === 0) {
@@ -373,6 +387,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $input.css('pointer-events', 'none')
+                        $input.css('background-color', 'transparent')
                         $td = $('<td></td>');
                         desktopInputs.push($input);
                         $td.append($input);
@@ -411,9 +426,9 @@ frappe.ui.form.on("Operation Tracker Inspection", {
         }
         function getFlexStyle() {
             if (totalColumns > 5) {
-                return 'min-width:70px;border-bottom:1px solid #ebebebff;padding-block:5px;'; // tuỳ chỉnh độ rộng tối thiểu mỗi cột
+                return 'min-width:70px;'; // tuỳ chỉnh độ rộng tối thiểu mỗi cột
             }
-            return 'flex:1;border-bottom:1px solid #ebebebff;padding-block:5px;';
+            return 'flex:1;';
         }
 
         if (middles.length) {
@@ -429,9 +444,14 @@ frappe.ui.form.on("Operation Tracker Inspection", {
         $mobileTable.append($theadMobile);
         $wrapper.append($mobileTable);
 
+
         let mobileInputs = [];
         data.forEach((row, rowIndex) => {
-            let $row = $(`<div class="d-flex jc-tb-mobile-row"></div>`)
+            let $row = $(`<div class="d-flex jc-tb-mobile-row" style="height: 40px; line-height: 40px; align-items:center;"></div>`)
+            let bgColor = rowIndex % 2 === 0 ? "#f5f5f5ff" : "#ffffff";
+            $row.css({
+                "background-color": bgColor,
+            });
             let $left, $right, $realRight, $middlesDivs = [];
             let $secondary = []
 
@@ -444,6 +464,8 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $right = $(`<div style="${getFlexStyle()}" class="text-right"></div>`);
                     $realRight = $('<div class="jc-tb-right"></div>');
                     $right.append($realRight);
+                } else {
+                    $row.css({'width':'fit-content'})
                 }
             } else {
                 $left = $(`<div style="${getFlexStyle(2)}" class="text-left"></div>`);
@@ -481,7 +503,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $left.append($primaryDiv);
                 }
                 else if (col.is_secondary && row[col.fieldname]) {
-                    $secondary.push(`<div class="jc-tb-secondary">${row[col.fieldname]}</div>`)
+                    $secondary.push(`<div class="">${row[col.fieldname]}</div>`)
                 }
                 else if (col.is_value) {
                     if (col.type !== 'string') {
@@ -491,6 +513,9 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $input.css('pointer-events', 'none');
+                        $row.css('height', '60px');
+                        $row.css('line-height', '60px');
+                        $input.css('height', '50px');
                         if (col.nowrap) $input.css({'max-width': '5ch'})
                         else $input.css({'width':'100%'})
                         if (frm.doc.docstatus == 0) $input.addClass('jc-tb-mobile-value-new')
@@ -502,7 +527,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     }
                 }
                 else if (col.is_unit && row[col.fieldname]) {
-                    $right.append(`<div class="ml-2 jc-tb-secondary">${row[col.fieldname]}</div>`)
+                    $right.append(`<div class="jc-tb-secondary">${row[col.fieldname]}</div>`)
                 }
                 else if (col.action && frm.doc.docstatus === 0) {
                     col.action.forEach(btn => {
@@ -530,8 +555,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 $row.append($left, $right)
             }
 
-            let $wrapper = $('<div class="mb-2 pb-2"></div>');
-
+            let $wrapper = $('<div></div>');
             $wrapper.append($row);
 
             if (!$buttons.is(':empty')) {
@@ -539,10 +563,21 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             }
 
             if ($secondary.length) {
-                let $secondaryRow = $('<div class="jc-tb-secondary-row d-flex"></div>');
+                let $secondaryRow = $('<div></div>');
                 $secondary.forEach(sec => $secondaryRow.append(sec));
+
+                // cùng màu với row
+                $secondaryRow.css({
+                    "background-color": bgColor,
+                    "line-height": "0.75rem",
+                    "font-size": "0.75rem",
+                    "padding-bottom": "10px",
+                    "width": "100%"
+                });
+
                 $wrapper.append($secondaryRow);
             }
+
 
             $mobileTable.append($wrapper);
 
@@ -642,34 +677,90 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             }
         });
 
-        frappe.prompt(
-            {
-                fieldname: "feedback",
-                fieldtype: "Text",
-                label: "Điền yêu cầu gửi tới công nhân nếu có",
-                default: feedback_map.message,
-                reqd: 0
-            },
-            async (values) => {
-                const feedback = values.feedback?.trim() || "";
+        async function ensureCameraAccess() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                frappe.msgprint(__("Trình duyệt không hỗ trợ camera. Vui lòng dùng Chrome hoặc Safari trên điện thoại."));
+                return false;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream.getTracks().forEach(track => track.stop()); // dừng stream sau khi check
+                return true;
+            } catch (err) {
+                frappe.msgprint(__("Không thể truy cập camera: " + err.message));
+                return false;
+            }
+        }
 
-                const items = data.map(d => ({
-                    specification: d.specification,
-                    value: d.value,
-                    from_time: from_time,
-                    feedback: feedback || null
-                }));
+        const showPrompt = () => {
+            frappe.prompt(
+                {
+                    fieldname: "feedback",
+                    fieldtype: "Text",
+                    label: "Điền yêu cầu gửi tới công nhân nếu có",
+                    default: feedback_map.message,
+                    reqd: 0
+                },
+                async (values) => {
+                    const feedback = values.feedback?.trim() || "";
 
-                await frappe.call({
-                    method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
-                    args: { inspection: frm.doc.name, items: items }
-                });
-            },
-            __("Hoàn tất phiếu đo đạc chỉ số"),
-            __("OK") 
-        );
+                    const items = data.map(d => ({
+                        specification: d.specification,
+                        value: d.value,
+                        from_time: from_time,
+                        feedback: feedback || null
+                    }));
+
+                    // Gọi check is_qr_check trước
+                    const qr_check = await frappe.call({
+                        method: "tahp.tahp.doctype.operation_tracker.operation_tracker.is_qr_check"
+                    });
+
+                    if (qr_check.message) {
+                        // Bật scanner
+                        if (await ensureCameraAccess()) {
+                            new frappe.ui.Scanner({
+                                dialog: true,
+                                multiple: false,
+                                async on_scan(scan_data) {
+                                    const scanned = scan_data.decodedText;
+
+                                    const res = await frappe.call({
+                                        method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.check_qr",
+                                        args: {
+                                            inspection: frm.doc.name,
+                                            scanned: scanned
+                                        }
+                                    });
+
+                                    if (res.message) {
+                                        // Đúng QR → gọi update_params
+                                        await frappe.call({
+                                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                                            args: { inspection: frm.doc.name, items: items }
+                                        });
+                                    } else {
+                                        frappe.msgprint(__("Mã QR không đúng, vui lòng quét lại."));
+                                        showPrompt(); // quay lại dialog
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        // Không yêu cầu QR → gọi thẳng update_params
+                        await frappe.call({
+                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                            args: { inspection: frm.doc.name, items: items }
+                        });
+                    }
+                },
+                __("Hoàn tất phiếu đo đạc chỉ số"),
+                __("OK")
+            );
+        };
+
+        showPrompt();
     }
-
 });
 
 function scrollAndFocus(mobileInputs, index) {
