@@ -138,7 +138,7 @@ init(data, columns) {
                 return value + '';
             }
         };
-        
+        const hasAnyParent = columns.some(col => col && typeof col === 'object' && col.parent);
         this.columns = columns
             .map((cell, i) => this.prepareCell(cell, i))
             .map(col => Object.assign({}, baseCell, col))
@@ -148,6 +148,7 @@ init(data, columns) {
                 if (col.parent) {
                     col.parent = col.parent;
                 }
+                col.hasParent = !!hasAnyParent;
                 return col;
             });
     }
