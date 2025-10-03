@@ -393,7 +393,6 @@ def bom_overall(main, from_date, to_date):
 
         for ri in wo_doc.required_items:
             if ri.item_code in item_list or ri.item_code == main.item_code: continue
-            print(ri.required_qty, wo.qty, ri.consumed_qty, wo.produced_qty)
             # Tính tỉ lệ qty/prod
             try:
                 qty = (ri.required_qty / wo.qty) if wo.qty else 0

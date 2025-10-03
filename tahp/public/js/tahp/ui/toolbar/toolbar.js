@@ -137,7 +137,6 @@ frappe.ui.toolbar.Toolbar = class {
 			$(".dropdown-help .dropdown-menu").on("click", "a", show_results);
 			// $(".navbar-title").text(__(frappe.get_route_str().split('/')[1]));
 			let route_str = frappe.get_route_str() || "";
-
 			if (route_str.includes("/")) {
 				let parts = route_str.split("/");
 				let doctype_text = parts[1];
@@ -153,7 +152,9 @@ frappe.ui.toolbar.Toolbar = class {
 						.attr("href", "/app/" + doctype_slug);
 				}
 			} else {
-				let doctype_text = route_str;
+				let page_title = $(".title-text:visible").first().text().trim();
+				let doctype_text = __(page_title);
+				console.log(doctype_text)
 				doctype_text = doctype_text
 					.toLowerCase()
 					.split('-')

@@ -230,7 +230,6 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         updateCard("main", response.overall && response.overall.main);
         updateCard("sub", response.overall && response.overall.sub);
 
-
         if (response.category_overall) {
             let cat = response.category_overall;
             let catLabels = Object.keys(cat);
