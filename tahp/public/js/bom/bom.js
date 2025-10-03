@@ -18,6 +18,14 @@ frappe.ui.form.on('BOM', {
                 control_operation(frm, d.doctype, d.name);
             });
         }
+        frm.set_query('item', function(doc) {
+            return {
+                filters: {
+                    "disabled": 0,
+                    "has_variants": 0 
+                }
+            };
+        });
     },
 
     with_operations: function(frm) {
