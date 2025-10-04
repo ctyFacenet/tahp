@@ -64,7 +64,12 @@ def process_month_year_filter(filters):
     """
     if filters.get("month") and filters.get("year"):
         try:
-            month = int(filters["month"])
+            # Extract month number from "Tháng X" format
+            month_str = filters["month"]
+            if month_str.startswith("Tháng "):
+                month = int(month_str.replace("Tháng ", ""))
+            else:
+                month = int(month_str)
             year = int(filters["year"])
             
             # First date of month
