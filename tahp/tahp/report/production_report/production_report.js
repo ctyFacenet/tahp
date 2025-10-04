@@ -414,11 +414,11 @@ frappe.query_reports["Production Report"] = {
         // Create datasets for mixed chart
         const datasets = [
             // Bars for Thạch cao
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(52, 152, 219, 0.85)', borderColor: 'rgba(52, 152, 219, 1)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(52, 152, 219, 0.25)', borderColor: 'rgba(52, 152, 219, 0.5)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             // Lines for P2O5
-            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(231, 76, 60, 0.9)', backgroundColor: 'rgba(231, 76, 60, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
-            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(231, 76, 60, 0.5)', backgroundColor: 'rgba(231, 76, 60, 0.0)', borderDash: [6,4], borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(244, 63, 94, 1)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
+            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(244, 63, 94, 0.6)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderDash: [6,4], borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
 
         const ctx = document.getElementById('daily-production-chart').getContext('2d');

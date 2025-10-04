@@ -248,10 +248,10 @@ frappe.query_reports["Material Consumption"] = {
         const num_bars = material_summary.length;
         let calculated_height = (num_bars * bar_thickness) + chart_padding;
         if (calculated_height < 300) {
-            calculated_height = 300;
+            calculated_height = 200;
         }
 
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 40px;">
+        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 40px;">
             <canvas id="myCustomChart"></canvas>
         </div>`);
         $('.report-wrapper').prepend(chartContainer);
@@ -262,12 +262,16 @@ frappe.query_reports["Material Consumption"] = {
             {
                 label: 'Thực tế',
                 data: material_summary.map(row => row.within_limit_qty),
-                backgroundColor: 'rgba(128, 128, 224, 0.8)'
+                backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 2
             },
             {
                 label: 'Vượt định mức',
                 data: material_summary.map(row => row.over_limit_qty),
-                backgroundColor: 'rgba(255, 0, 0, 1)'
+                backgroundColor: 'rgba(244, 63, 94, 0.5)',
+                borderColor: 'rgba(244, 63, 94, 1)',
+                borderWidth: 2
             }
         ];
 
@@ -310,15 +314,25 @@ frappe.query_reports["Material Consumption"] = {
 
         if (production_items.length === 0) return;
 
-        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 60vh; width: 100%; margin-top: 40px; margin-bottom: 40px;">
+        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px;">
             <canvas id="mySecondChart"></canvas>
         </div>`);
         $('.report-wrapper .chart-1').after(chartContainer2);
 
         const labels2 = production_items.map(item => item.name);
         const material_colors = [
-            'rgba(142, 124, 255, 0.9)', 'rgba(255, 82, 82, 0.9)', 'rgba(102, 217, 232, 0.9)',
-            'rgba(54, 162, 235, 0.9)', 'rgba(255, 206, 86, 0.9)', 'rgba(255, 159, 64, 0.9)'
+            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' },      // Indigo
+            { bg: 'rgba(244, 63, 94, 0.5)', border: 'rgba(244, 63, 94, 1)' },        // Rose
+            { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' },      // Sky
+            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple
+            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },       // Amber
+            { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' },        // Green
+            { bg: 'rgba(248, 113, 113, 0.5)', border: 'rgba(248, 113, 113, 1)' },    // Red-400
+            { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' },    // Pink-200
+            { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' },      // Cyan-400
+            { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' },      // Lime-400
+            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },      // Amber-400 (copy để phối)
+            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple-400 (copy để phối)
         ];
 
         const unique_materials = [...new Set(data_rows.map(row => row.material_name))];
@@ -355,7 +369,7 @@ frappe.query_reports["Material Consumption"] = {
         Object.values(material_summary).forEach(material_data => {
             const material_name = material_data.material_name;
             const material_name_with_unit = `${material_name} (${material_data.uom})`;
-            const base_color = material_color_map[material_name];
+            const color_info = material_color_map[material_name];
             
             const within_limit_data = production_items.map(item => 
                 transform_zero_to_null(Math.min(
@@ -375,7 +389,9 @@ frappe.query_reports["Material Consumption"] = {
             main_datasets.push({
                 label: material_name_with_unit,
                 data: within_limit_data,
-                backgroundColor: base_color,
+                backgroundColor: color_info.bg,
+                borderColor: color_info.border,
+                borderWidth: 2,
                 stack: material_name_with_unit,
                 skipNull: true,
                 barThickness: bar_thickness,
@@ -388,7 +404,9 @@ frappe.query_reports["Material Consumption"] = {
                 over_limit_datasets.push({
                     label: 'Vượt định mức',
                     data: over_limit_data,
-                    backgroundColor: 'rgba(217, 30, 24, 0.9)',
+                    backgroundColor: 'rgba(244, 63, 94, 0.5)',
+                    borderColor: 'rgba(244, 63, 94, 1)',
+                    borderWidth: 2,
                     stack: material_name_with_unit,
                     skipNull: true,
                     barThickness: bar_thickness,
