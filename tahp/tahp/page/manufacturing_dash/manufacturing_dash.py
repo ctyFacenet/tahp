@@ -335,28 +335,30 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
     })
 
     for wo in wo_list:
-        # Chuyển sang date để so sánh
         planned_date = wo.planned_start_date.date() if wo.planned_start_date else None
         actual_date = wo.actual_end_date.date() if wo.actual_end_date else None
 
-        # Xác định target main/sub
         if wo.production_item in main_items:
             target = "main"
         elif wo.production_item in sub_items:
             target = "sub"
         else:
-            continue  # Nếu không thuộc main hoặc sub, bỏ qua
-            
-        # Cộng qty theo planned_date
+            continue
+
+        # Ghi nhận kế hoạch theo ngày planned
         if planned_date and from_date <= planned_date <= to_date:
-            if wo.get("produced_qty", 0) < wo.get("qty", 0):
-                result[str(planned_date)][target]["qty"] += (wo.get("qty", 0) - wo.get("produced_qty", 0))
+            planned_remaining = wo.get("qty", 0) - wo.get("produced_qty", 0)
+            if planned_remaining > 0:
+                result[str(planned_date)][target]["qty"] += planned_remaining
                 result[str(planned_date)][target]["qty_wo"].append(wo.name)
 
-        # Cộng produced_qty theo actual_date
+        # Ghi nhận thực tế theo ngày actual
         if actual_date and from_date <= actual_date <= to_date:
-            result[str(actual_date)][target]["produced_qty"] += wo.get("produced_qty", 0)
-            result[str(actual_date)][target]["produced_qty_wo"].append(wo.name)
+            produced = wo.get("produced_qty", 0)
+            if produced > 0:
+                result[str(actual_date)][target]["produced_qty"] += produced
+                result[str(actual_date)][target]["produced_qty_wo"].append(wo.name)
+
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
