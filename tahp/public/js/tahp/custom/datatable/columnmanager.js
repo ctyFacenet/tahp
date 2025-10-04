@@ -55,6 +55,8 @@ export default class ColumnManager {
         let styleHeader = '';
         if (this.options.headerBackground) {
             styleHeader = `background-color: ${this.options.headerBackground};`; 
+        } else {
+            styleHeader = `background-color: var(--subtle-fg);`; 
         }
         while (i < columns.length) {
             const col = columns[i];
