@@ -138,13 +138,17 @@ init(data, columns) {
                 return value + '';
             }
         };
-
+        const hasAnyParent = columns.some(col => col && typeof col === 'object' && col.parent);
         this.columns = columns
             .map((cell, i) => this.prepareCell(cell, i))
             .map(col => Object.assign({}, baseCell, col))
             .map(col => {
                 col.content = col.content || col.name || '';
                 col.id = col.id || col.content;
+                if (col.parent) {
+                    col.parent = col.parent;
+                }
+                col.hasParent = !!hasAnyParent;
                 return col;
             });
     }
@@ -154,7 +158,8 @@ init(data, columns) {
             content: '',
             sortOrder: 'none',
             colIndex: i,
-            column: this.columns[i]
+            column: this.columns[i],
+            parent: null
         };
 
         if (content !== null && typeof content === 'object') {

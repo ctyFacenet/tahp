@@ -99,7 +99,7 @@
 }
 
 .dt-cell {
-    border: 1px solid var(--dt-border-color);
+    /* border: 1px solid var(--dt-border-color); */
     border-bottom: none;
     border-right: none;
     position: relative;
@@ -352,4 +352,34 @@ body.dt-resize {
 .dt-title {
     text-align: center;
     font-size: 2rem;
+}
+
+.dt-span-header {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* mượt trên mobile */
+    
+    /* Ẩn scrollbar cho Chrome, Edge, Safari */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+.dt-spanheader-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+.dt-span-header {
+    border: none !important;
+}
+
+.dt-row-spanheader {
+    display: flex;
+    font-weight: bold;
+    background: #f5f5f5;
+    flex-wrap: nowrap;
+    border: none !important;
+}
+.dt-cell-span {
+    text-align: center;
+    box-sizing: content-box;
+    flex: 0 0 auto;
 }

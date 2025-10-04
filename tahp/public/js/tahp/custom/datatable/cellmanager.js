@@ -831,6 +831,9 @@ export default class CellManager {
         if (cell.freezeRight) {
             style += `position: sticky; right: 0; z-index: 2;`;
         }
+        if (isHeader && cell.hasParent) {
+            style += `border-top: none !important`;
+        }
         return `
             <div class="${className}" ${dataAttr} style="${style}" tabindex="0">
                 ${this.getCellContent(cell)}

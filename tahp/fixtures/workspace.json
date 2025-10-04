@@ -2495,7 +2495,7 @@
   "hide_custom": 0,
   "icon": "buying",
   "indicator_color": null,
-  "is_hidden": 0,
+  "is_hidden": 1,
   "label": "Buying",
   "links": [
    {
@@ -9451,7 +9451,7 @@
     "icon": null,
     "is_query_report": 0,
     "label": "Báo cáo sản xuất",
-    "link_count": 6,
+    "link_count": 7,
     "link_to": null,
     "link_type": "DocType",
     "onboard": 0,
@@ -9472,6 +9472,24 @@
     "link_count": 0,
     "link_to": "Production Report",
     "link_type": "Report",
+    "onboard": 0,
+    "only_for": null,
+    "parent": "Manufacturing",
+    "parentfield": "links",
+    "parenttype": "Workspace",
+    "report_ref_doctype": null,
+    "type": "Link"
+   },
+   {
+    "dependencies": null,
+    "description": null,
+    "hidden": 0,
+    "icon": null,
+    "is_query_report": 0,
+    "label": "Dashboard sản xuất tổng hợp",
+    "link_count": 0,
+    "link_to": "manufacturing_dash",
+    "link_type": "Page",
     "onboard": 0,
     "only_for": null,
     "parent": "Manufacturing",
@@ -9571,7 +9589,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-09-30 15:52:31.281977",
+  "modified": "2025-10-03 10:00:23.432232",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],
