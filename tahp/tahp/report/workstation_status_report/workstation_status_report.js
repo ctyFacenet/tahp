@@ -249,7 +249,7 @@ async function execute_summary(report) {
 
             columns.forEach((col, idx) => {
                 let cellValue = row[col.fieldname] || "";
-                let cellStyle = "padding:5px; border:1px solid #95a5a6; text-align:center; font-weight:bold;";
+                let cellStyle = "padding:5px; border:1px solid #b6b6b6; text-align:center; font-weight:bold;";
 
                 // cột đầu tiên luôn có nền
                 if (idx === 0) {
