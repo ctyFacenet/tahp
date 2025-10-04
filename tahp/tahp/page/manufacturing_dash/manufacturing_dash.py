@@ -86,7 +86,8 @@ def overall(doc_item, start_date, end_date):
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", start_date],
-            "planned_start_date": ["<", end_date + timedelta(days=1)]
+            "planned_start_date": ["<", end_date + timedelta(days=1)],
+            "docstatus": ["!=", 2]
         },
         fields=["qty", "produced_qty"]
     )
@@ -141,7 +142,8 @@ def category_overall(doc_item, start_date, end_date, attribute_name="Phân loạ
         filters={
             "planned_start_date": [">=", start_date],
             "planned_start_date": ["<", end_date + timedelta(days=1)],
-            "production_item": ["in", item_list]
+            "production_item": ["in", item_list],
+            "docstatus": ["!=", 2]
         },
         fields=["name", "produced_qty", "production_item", "custom_category"]
     )
@@ -241,7 +243,8 @@ def attribute_overall(main, from_date, to_date, attribute="Phân loại", catego
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", from_date],
-            "planned_start_date": ["<", to_date + timedelta(days=1)]
+            "planned_start_date": ["<", to_date + timedelta(days=1)],
+            "docstatus": ["!=", 2]
         },
         fields=["name", "qty", "produced_qty", "production_item", "custom_category"]
     )
@@ -286,8 +289,13 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
     Trả về dict dạng:
     {
         "YYYY-MM-DD": {
-            "main": {"qty":..., "produced_qty":..., "label":"Ca 1"},
-            "sub": {"qty":..., "produced_qty":..., "label":"Ca 2"}
+            "main": {
+                "qty": ...,
+                "produced_qty": ...,
+                "qty_wo": [...],
+                "produced_qty_wo": [...]
+            },
+            "sub": {...}
         }
     }
     """
@@ -314,15 +322,16 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
         filters={
             "planned_start_date": [">=", from_date],
             "planned_start_date": ["<", to_date + timedelta(days=1)],
-            "production_item": ["in", main_items + sub_items]
+            "production_item": ["in", main_items + sub_items],
+            "docstatus": ["!=", 2]
         },
-        fields=["qty", "produced_qty", "planned_start_date", "actual_end_date", "production_item"]
+        fields=["name", "qty", "produced_qty", "planned_start_date", "actual_end_date", "production_item"]
     )
 
     # Khởi tạo dict kết quả
     result = defaultdict(lambda: {
-        "main": {"qty": 0, "produced_qty": 0},
-        "sub": {"qty": 0, "produced_qty": 0}
+        "main": {"qty": 0, "produced_qty": 0, "qty_wo": [], "produced_qty_wo": []},
+        "sub": {"qty": 0, "produced_qty": 0, "qty_wo": [], "produced_qty_wo": []}
     })
 
     for wo in wo_list:
@@ -342,13 +351,16 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
         if planned_date and from_date <= planned_date <= to_date:
             if wo.get("produced_qty", 0) < wo.get("qty", 0):
                 result[str(planned_date)][target]["qty"] += (wo.get("qty", 0) - wo.get("produced_qty", 0))
+                result[str(planned_date)][target]["qty_wo"].append(wo.name)
 
         # Cộng produced_qty theo actual_date
         if actual_date and from_date <= actual_date <= to_date:
             result[str(actual_date)][target]["produced_qty"] += wo.get("produced_qty", 0)
+            result[str(actual_date)][target]["produced_qty_wo"].append(wo.name)
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
+    print(sorted_result)
     return sorted_result
 
 def bom_overall(main, from_date, to_date):
@@ -378,7 +390,8 @@ def bom_overall(main, from_date, to_date):
         filters={
             "production_item": ["in", item_list],
             "actual_end_date": [">=", from_date],
-            "actual_end_date": ["<", to_date + timedelta(days=1)]
+            "actual_end_date": ["<", to_date + timedelta(days=1)],
+            "docstatus": 1
         },
         fields=["name", "qty", "produced_qty", "actual_end_date"]
     )
