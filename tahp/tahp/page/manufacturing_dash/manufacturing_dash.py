@@ -362,7 +362,6 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
-    print(sorted_result)
     return sorted_result
 
 def bom_overall(main, from_date, to_date):
@@ -407,33 +406,38 @@ def bom_overall(main, from_date, to_date):
             continue
 
         for ri in wo_doc.required_items:
-            if ri.item_code in item_list or ri.item_code == main.item_code: continue
-            # Tính tỉ lệ qty/prod
-            try:
-                qty = (ri.required_qty / wo.qty) if wo.qty else 0
-            except:
-                qty = 0
-            try:
-                if (ri.consumed_qty / wo.produced_qty) - qty > 0:
-                    produced_qty = (ri.consumed_qty / wo.produced_qty) - qty if wo.produced_qty else 0
-                else:
-                    produced_qty = 0
-            except:
-                produced_qty = 0
+            if ri.item_code in item_list or ri.item_code == main.item_code:
+                continue
 
-            # Gộp vào result
-            if ri.item_code not in result[str(actual_date)]:
-                result[str(actual_date)][ri.item_code] = {
-                    "qty": 0,
-                    "produced_qty": 0,
+            # Định mức kế hoạch trên 1 tấn thành phẩm
+            planned_per_unit = (ri.required_qty / wo.qty) if wo.qty else 0
+
+            # Tiêu hao thực tế trên 1 tấn thành phẩm
+            actual_per_unit = (ri.consumed_qty / wo.produced_qty) if wo.produced_qty else 0
+
+            # Phần vượt định mức trên 1 tấn
+            over_per_unit = actual_per_unit - planned_per_unit if actual_per_unit > planned_per_unit else 0
+
+            date_key = str(actual_date)
+            if ri.item_code not in result[date_key]:
+                result[date_key][ri.item_code] = {
+                    "qty": 0,                # Tổng định mức (1 tấn)
+                    "produced_qty": 0,       # Tổng vượt định mức (1 tấn)
                     "label": ri.item_name,
-                    "work_order": []
+                    "work_order": [],
+                    "work_order_norm": [],
                 }
 
-            result[str(actual_date)][ri.item_code]["qty"] += qty
-            result[str(actual_date)][ri.item_code]["produced_qty"] += produced_qty
-            result[str(actual_date)][ri.item_code]["work_order"].append(wo.name)
+            # Cộng dồn theo ngày
+            result[date_key][ri.item_code]["qty"] += planned_per_unit
+            result[date_key][ri.item_code]["produced_qty"] += over_per_unit
+            if over_per_unit:
+                result[date_key][ri.item_code]["work_order"].append(wo.name)
+            if planned_per_unit:
+                result[date_key][ri.item_code]["work_order_norm"].append(wo.name)
+
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
+    print(sorted_result)
     return sorted_result

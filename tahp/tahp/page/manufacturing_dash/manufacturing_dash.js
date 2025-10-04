@@ -574,23 +574,38 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                         y: { stacked: true }
                     },
                     onClick: (evt, elements) => {
-                        if (elements.length > 0) {
-                            let elem = elements[0];
-                            let chart = this.charts.bom;
-                            let day = chart.data.labels[elem.index];   // YYYY-MM-DD
-                            let dataset = chart.data.datasets[elem.datasetIndex];
-                            
-                            // dataset.stack chính là item (RM000000, RM001001,...)
-                            let itemCode = dataset.stack;
-                            let woList = bom[day]?.[itemCode]?.work_order || [];
+                        if (elements.length === 0) return;
 
-                            if (woList.length > 0) {
-                                frappe.set_route("List", "Work Order", {
-                                    name: ["in", woList]
-                                });
-                            }
+                        let elem = elements[0];
+                        let chart = this.charts.bom;
+                        let day = chart.data.labels[elem.index];   // YYYY-MM-DD
+                        let dataset = chart.data.datasets[elem.datasetIndex];
+                        let itemCode = dataset.stack;               // ví dụ: RM000000
+
+                        // Lấy object của item trong ngày, nếu có
+                        let dayData = bom?.[day]?.[itemCode];
+                        if (!dayData) {
+                            frappe.msgprint("Không tìm thấy dữ liệu cho nguyên liệu này.");
+                            return;
+                        }
+
+                        // Xác định danh sách work order tương ứng
+                        let woList = [];
+                        if (dataset.label === "Vượt định mức") {
+                            woList = dayData.work_order || [];
+                        } else {
+                            woList = dayData.work_order_norm || [];
+                        }
+
+                        if (woList && woList.length > 0) {
+                            frappe.set_route("List", "Work Order", {
+                                name: ["in", woList]
+                            });
+                        } else {
+                            frappe.msgprint("Không có Work Order nào trong danh sách này.");
                         }
                     }
+
                 }
             });
         }
