@@ -26,6 +26,10 @@ frappe.query_reports["Production Report"] = {
         }
     ],
 
+    get_datatable_options(options) {
+        return { ...options, freezeIndex: 2, headerBackground: "rgb(205, 222, 238)"};
+    },
+
     "onload": function(report) {
         setTimeout(() => { this.render_components(); }, 500);
         
@@ -206,7 +210,7 @@ frappe.query_reports["Production Report"] = {
         // Get product columns and their system categories
         const product_columns = columns.filter(c => c.fieldname !== 'production_date');
         const system_by_field = {};
-        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.group_label || '').toString().trim(); });
+        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
         let p2o5 = { planned: 0, actual: 0 };
         let others = { planned: 0, actual: 0 };
@@ -332,7 +336,7 @@ frappe.query_reports["Production Report"] = {
         let daily_summary = {};
         const product_columns = columns.filter(c => c.fieldname !== 'production_date');
         const system_by_field = {};
-        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.group_label || '').toString().trim(); });
+        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
         data_rows.forEach(row => {
             const date = row.production_date;

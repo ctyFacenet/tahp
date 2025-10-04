@@ -366,20 +366,22 @@ def get_columns(filters):
             scrubbed_name = frappe.scrub(item_code)
             
             # Adjust width
-            width = 250 if is_month_filter else 250
+            width = 150 if is_month_filter else 200
             
             columns.append({
-                "label": f"{item_name}  <br><b>{_('Thực tế')}</b>", 
+                "label": f"<br><b>{_('Thực tế')}</b>", 
                 "fieldname": scrubbed_name + "_actual",
                 "fieldtype": "Float",
-                "width": width
+                "width": width,
+                "parent": item_name,
             })
             
             columns.append({
-                "label": f"{item_name}  <br><b>{_('Định mức')}</b>",
+                "label": f"<br><b>{_('Định mức')}</b>",
                 "fieldname": scrubbed_name + "_planned",
                 "fieldtype": "Float",
-                "width": width
+                "width": width,
+                "parent": item_name
             })
 
     return columns

@@ -53,7 +53,7 @@ def process_week_filter(filters):
     return filters
 
 def get_columns(work_orders):
-    """Generate dynamic columns for production report"""
+    """Generate dynamic columns for production report with multi-level headers"""
     columns = [
         {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 120},
     ]
@@ -80,16 +80,16 @@ def get_columns(work_orders):
     # Sort by system category, then by item name
     product_details_list.sort(key=lambda x: (x.get("system_category"), x.get("item_name")))
 
-    # Create columns from sorted list
+    # Create columns from sorted list with multi-level header
     for item in product_details_list:
         scrubbed_name = frappe.scrub(item["item_code"])
         group_label = item.get("system_category") or "Khác"
         columns.append({
-            "label": item["item_name"],
+            "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 150,
-            "group_label": group_label  # For multi-level header
+            "width": 250,
+            "parent": group_label  # For multi-level header - parent shows the system category
         })
         
     return columns

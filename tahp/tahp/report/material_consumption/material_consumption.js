@@ -37,7 +37,7 @@ frappe.query_reports["Material Consumption"] = {
             "fieldname": "month",
             "label": __("Tháng"),
             "fieldtype": "Select",
-            "options": ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            "options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
             "on_change": function() {
                 frappe.query_reports["Material Consumption"].handle_month_year_change();
             }
@@ -54,7 +54,7 @@ frappe.query_reports["Material Consumption"] = {
     ],
 
     get_datatable_options(options) {
-        return { ...options, freezeIndex: 4};
+        return { ...options, freezeIndex: 4, headerBackground: "rgb(205, 222, 238)"};
     },
     
     "onload": function(report) {
@@ -303,7 +303,7 @@ frappe.query_reports["Material Consumption"] = {
 
         columns.forEach(col => {
             if (col.fieldname && col.fieldname.endsWith('_actual')) {
-                const item_name = col.label.split('<br>')[0];
+                const item_name = col.parent || col.label.split('<br>')[0];
                 production_items.push({
                     name: item_name,
                     actual_field: col.fieldname,
