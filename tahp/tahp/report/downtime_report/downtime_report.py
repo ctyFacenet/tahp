@@ -51,7 +51,7 @@ def color_from_text(text):
 
     # Rực rỡ hơn: tăng saturation, giảm lightness nhẹ
     saturation = 0.85         # rất đậm, gần full màu
-    lightness = 0.5           # trung bình sáng, cân đối
+    lightness = 0.65           # trung bình sáng, cân đối
 
     # Chuyển sang RGB
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
