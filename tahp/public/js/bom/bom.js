@@ -64,8 +64,8 @@ frappe.ui.form.on('BOM', {
             ],
             primary_action_label: "Xác nhận",
             primary_action(values) {
-                if (!frm.doc.custom_qc_template) frm.set_value("custom_qc_template", values.qc_template)
-                if (!frm.doc.custom_qc_template_out) frm.set_value("custom_qc_template_out", values.qc_template_out);
+                if (!frm.doc.custom_qc_template || frm.doc.custom_qc_template !== values.qc_template) frm.set_value("custom_qc_template", values.qc_template)
+                if (!frm.doc.custom_qc_template_out || frm.doc.custom_qc_template_out !== values.qc_template_out) frm.set_value("custom_qc_template_out", values.qc_template_out);
                 frappe.db.set_value("Manufacturing Category",frm.doc.custom_category,{qc_template: values.qc_template, qc_template_out: values.qc_template_out})
                 d.hide();
             }

@@ -102,28 +102,10 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:25.464673",
-  "name": "Nháp",
-  "style": "",
-  "workflow_state_name": "Nháp"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-09-07 19:30:37.079586",
   "name": "Đã được PTCN duyệt",
   "style": "Info",
   "workflow_state_name": "Đã được PTCN duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
  },
  {
   "docstatus": 0,
@@ -232,5 +214,23 @@
   "name": "Đợi thủ kho duyệt",
   "style": "",
   "workflow_state_name": "Đợi thủ kho duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
+  "style": "",
+  "workflow_state_name": "Nháp"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
  }
 ]

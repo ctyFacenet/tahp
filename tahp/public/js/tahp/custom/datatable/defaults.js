@@ -25,12 +25,12 @@ export default function getDefaultOptions(instance) {
                     this.sortColumn(column.colIndex, 'none');
                 }
             },
-            {
-                label: instance.translate('Remove column'),
-                action: function (column) {
-                    this.removeColumn(column.colIndex);
-                }
-            }
+            // {
+            //     label: instance.translate('Remove column'),
+            //     action: function (column) {
+            //         this.removeColumn(column.colIndex);
+            //     }
+            // }
         ],
         events: {
             onRemoveColumn(column) {},

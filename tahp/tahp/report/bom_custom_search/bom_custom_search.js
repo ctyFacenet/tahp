@@ -116,35 +116,35 @@ function merge_columns(report) {
     const wrapper = report.page.wrapper;
     const dtHeader = wrapper.find('.dt-header');
     dtHeader.css('width', 'fit-content');
-    dtHeader.find('.dt-row-header-clone, .dt-row-filter').remove();
-    wrapper.find('.report-footer').hide();
+    // dtHeader.find('.dt-row-header-clone, .dt-row-filter').remove();
+    // wrapper.find('.report-footer').hide();
 
     const dtRowHeader = wrapper.find('.dt-row-header');
-    const newRow = dtRowHeader.clone().addClass('dt-row-header-clone');
+    // const newRow = dtRowHeader.clone().addClass('dt-row-header-clone');
 
-    const groups = { in: [], out: [] };
-    newRow.find('.dt-cell__content').each(function() {
-        const $cell = $(this);
-        const title = ($cell.attr('title') || '').trim();
-        if (title.endsWith('(in)')) groups.in.push($cell);
-        else if (title.endsWith('(out)')) groups.out.push($cell);
-        else { $cell.empty(); $cell.removeAttr('title'); }
-    });
+    // const groups = { in: [], out: [] };
+    // newRow.find('.dt-cell__content').each(function() {
+    //     const $cell = $(this);
+    //     const title = ($cell.attr('title') || '').trim();
+    //     if (title.endsWith('(in)')) groups.in.push($cell);
+    //     else if (title.endsWith('(out)')) groups.out.push($cell);
+    //     else { $cell.empty(); $cell.removeAttr('title'); }
+    // });
 
-    mergeGroup(groups.in, '#d0f0c0', 'Chỉ số đầu vào');
-    mergeGroup(groups.out, '#bde6db', 'Chỉ số đầu ra');
+    // mergeGroup(groups.in, '#d0f0c0', 'Chỉ số đầu vào');
+    // mergeGroup(groups.out, '#bde6db', 'Chỉ số đầu ra');
 
-    // Clean up original titles
-    dtRowHeader.find('.dt-cell__content').each(function() {
-        const $cell = $(this);
-        const title = ($cell.attr('title') || '').trim();
-        if (title.endsWith('(in)') || title.endsWith('(out)')) {
-            const text = title.replace(/\s*\((in|out)\)$/, '');
-            $cell.text(text).attr('title', text);
-        }
-    });
+    // // Clean up original titles
+    // dtRowHeader.find('.dt-cell__content').each(function() {
+    //     const $cell = $(this);
+    //     const title = ($cell.attr('title') || '').trim();
+    //     if (title.endsWith('(in)') || title.endsWith('(out)')) {
+    //         const text = title.replace(/\s*\((in|out)\)$/, '');
+    //         $cell.text(text).attr('title', text);
+    //     }
+    // });
 
-    dtRowHeader.before(newRow);
+    // dtRowHeader.before(newRow);
     dtRowHeader.find('.dt-dropdown, .dt-cell__resize-handle').remove();
 }
 

@@ -444,7 +444,7 @@ Open Item {0},Mở mặt hàng {0}
 Open BOM {0},Mở CTSX {0}
 Browse BOM,Duyệt cây CTSX
 Update Cost,Cập nhật giá
-Permanently Submit {0}?,Xác nhận hoàn thành {0}?
+Permanently Submit {0}?,Xác nhận duyệt {0}?
 Include Item In Manufacturing,Bao gồm mặt hàng trong sản xuất
 Is Fixed Asset,Là tài sản cố định
 Item UOM,Đơn vị mặt hàng
