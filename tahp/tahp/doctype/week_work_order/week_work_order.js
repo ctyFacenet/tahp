@@ -94,7 +94,7 @@ frappe.ui.form.on('Week Work Order', {
         }
 
         if (frm.doc.workflow_state === "Đợi PTCN Duyệt" && frm.selected_workflow_action !== "Trả về KHSX") {
-            let missing_bom = frm.doc.items.some(row => row.scrap != 1 && !row.bom);
+            let missing_bom = frm.doc.items.some(row => !row.bom);
             if (missing_bom) {
                 frappe.dom.unfreeze();
                 frappe.throw(__("Vui lòng điền đầy đủ BOM cho tất cả dòng trong bảng"));
@@ -181,19 +181,19 @@ frappe.ui.form.on('Week Work Order Item', {
         let row = locals[cdt][cdn];
         row.bom = null;
 
-        if (row.item) {
-            try {
-                let res = await frappe.db.get_value("Item", row.item, "custom_scrap");
-                if (res && res.message && res.message.custom_scrap == 1) {
-                    row.scrap = 1;
-                } else {
-                    row.scrap = 0;
-                }
-                frm.refresh_field('items');
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        // if (row.item) {
+        //     try {
+        //         let res = await frappe.db.get_value("Item", row.item, "custom_scrap");
+        //         if (res && res.message && res.message.custom_scrap == 1) {
+        //             row.scrap = 1;
+        //         } else {
+        //             row.scrap = 0;
+        //         }
+        //         frm.refresh_field('items');
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        // }
         frm.refresh_field('item');
         validate_roles(frm);
     },
@@ -209,7 +209,7 @@ frappe.ui.form.on('Week Work Order Item', {
     bom: async function(frm, cdt, cdn) {
         let row = locals[cdt][cdn];
         if (
-            row.scrap != 1 &&
+            // row.scrap != 1 &&
             frm.doc.workflow_state === "Đợi PTCN Duyệt" &&
             frm.selected_workflow_action !== "Trả về KHSX" &&
             row.bom
@@ -393,9 +393,9 @@ function validate_roles(frm) {
 
 function validate_dates(cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (row.scrap == 1) {
-        return;
-    }
+    // if (row.scrap == 1) {
+    //     return;
+    // }
     let today = frappe.datetime.get_today();
 
     let start = row.planned_start_time;
@@ -474,7 +474,6 @@ async function open_create_shift_dialog(frm) {
     }
 
     const options = detail_rows
-        .filter(row => row.scrap != 1) // bỏ qua scrap = 1
         .map((row, idx) => ({
             label: `Mặt hàng: ${idx + 1}: ${row.item || row.bom}`,
             value: row.name

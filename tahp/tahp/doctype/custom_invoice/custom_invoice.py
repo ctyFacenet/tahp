@@ -44,32 +44,36 @@ class CustomInvoice(Document):
 
 				for t_item in t_group:
 					if in_qty > 0:
+						available_qty = t_item.qty - t_item.custom_approved_qty
+						used_qty = min(available_qty, in_qty)
 						result.append({
 							"stock_entry": t_item.parent,
 							"item_code": t_item.item_code,
-							"in_qty": t_item.qty,
+							"in_qty": used_qty,
 							"note": self.supplier,
 							"posting_date": date_key
 						})
 						sed_doc = frappe.get_doc("Stock Entry Detail", t_item.name)
-						sed_doc.custom_approved_qty += t_item.qty
+						sed_doc.custom_approved_qty += used_qty
 						sed_doc.save()
-						in_qty -= t_item.qty
+						in_qty -= used_qty
 						if in_qty <= 0: break
 
 				for s_item in s_group:
 					if out_qty > 0:
+						available_qty = s_item.qty - s_item.custom_approved_qty
+						used_qty = min(available_qty, out_qty)
 						result.append({
 							"stock_entry": s_item.parent,
 							"item_code": s_item.item_code,
-							"out_qty": s_item.qty,
+							"out_qty": used_qty,
 							"note": "",
 							"posting_date": date_key
 						})
 						sed_doc = frappe.get_doc("Stock Entry Detail", s_item.name)
-						sed_doc.custom_approved_qty += s_item.qty
+						sed_doc.custom_approved_qty += used_qty
 						sed_doc.save()
-						out_qty -= s_item.qty
+						out_qty -= used_qty
 						if out_qty <= 0: break
 		
 		for res in result:
