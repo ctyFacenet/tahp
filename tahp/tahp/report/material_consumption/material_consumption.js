@@ -250,20 +250,18 @@ frappe.query_reports["Material Consumption"] = {
     "draw_first_chart": function(material_summary) {
         const bar_thickness = 40;
         const chart_padding = 120;
+        const legend_height = 80; // Chiều cao dự kiến cho legend
         const num_bars = material_summary.length;
-        let calculated_height = (num_bars * bar_thickness) + chart_padding;
-        if (calculated_height < 300) {
-            calculated_height = 200;
-        }
+        let calculated_height = (num_bars * bar_thickness) + chart_padding + legend_height;
+        
+        // Giới hạn chiều cao tối thiểu và tối đa
+        calculated_height = Math.max(300, calculated_height); // Tối thiểu 300px
+        calculated_height = Math.min(600, calculated_height); // Tối đa 600px
 
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 20px;">
+        const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 20px;">
             <canvas id="myCustomChart"></canvas>
         </div>`);
         $('.report-wrapper').prepend(chartContainer);
-        
-        // Tạo custom legend container
-        const legendContainer = $(`<div class="custom-legend" style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; max-height: 150px; overflow-y: auto;"></div>`);
-        $('.chart-container.chart-1').after(legendContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
 
@@ -323,8 +321,6 @@ frappe.query_reports["Material Consumption"] = {
             });
         }
 
-        // Tạo custom legend
-        this.createCustomLegend(material_summary, material_color_map, has_over_limit);
         
         const ctx = document.getElementById('myCustomChart').getContext('2d');
         new Chart(ctx, {
@@ -344,50 +340,14 @@ frappe.query_reports["Material Consumption"] = {
                         }
                     },
                     legend: {
-                        display: false  // Ẩn legend mặc định của Chart.js
+                        display: true,
+                        position: 'bottom'
                     }
                 }
             }
         });
     },
 
-    "createCustomLegend": function(material_summary, material_color_map, has_over_limit) {
-        const legendContainer = $('.custom-legend');
-        legendContainer.empty();
-        
-        // Tạo legend cho các nguyên vật liệu
-        material_summary.forEach((material, index) => {
-            const color_info = material_color_map[material.material_name];
-            const material_name_with_unit = `${material.material_name} (${material.uom})`;
-            
-            const legendItem = $(`
-                <div class="legend-item" style="display: inline-block; margin: 5px 10px 5px 0; padding: 5px 10px; background: white; border-radius: 3px; border: 1px solid #ddd;">
-                    <span class="legend-color" style="display: inline-block; width: 12px; height: 12px; background: ${color_info.bg}; border: 1px solid ${color_info.border}; margin-right: 8px; vertical-align: middle;"></span>
-                    <span class="legend-text" style="font-size: 12px; vertical-align: middle;">${material_name_with_unit}</span>
-                </div>
-            `);
-            legendContainer.append(legendItem);
-        });
-        
-        // Thêm legend cho "Vượt định mức" nếu có
-        if (has_over_limit) {
-            const overLimitItem = $(`
-                <div class="legend-item" style="display: inline-block; margin: 5px 10px 5px 0; padding: 5px 10px; background: white; border-radius: 3px; border: 1px solid #ddd;">
-                    <span class="legend-color" style="display: inline-block; width: 12px; height: 12px; background: rgba(244, 63, 94, 0.5); border: 1px solid rgba(244, 63, 94, 1); margin-right: 8px; vertical-align: middle;"></span>
-                    <span class="legend-text" style="font-size: 12px; vertical-align: middle;">Vượt định mức</span>
-                </div>
-            `);
-            legendContainer.append(overLimitItem);
-        }
-        
-        // Thêm tiêu đề cho legend
-        const legendTitle = $(`
-            <div style="font-weight: bold; margin-bottom: 10px; color: #333; font-size: 14px;">
-                Chú thích màu sắc:
-            </div>
-        `);
-        legendContainer.prepend(legendTitle);
-    },
 
     "draw_second_chart": function(data_rows) {
         const columns = frappe.query_report.columns;
