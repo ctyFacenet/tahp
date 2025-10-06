@@ -37,7 +37,7 @@ frappe.query_reports["Material Consumption"] = {
             "fieldname": "month",
             "label": __("Tháng"),
             "fieldtype": "Select",
-            "options": ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            "options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
             "on_change": function() {
                 frappe.query_reports["Material Consumption"].handle_month_year_change();
             }
@@ -54,7 +54,7 @@ frappe.query_reports["Material Consumption"] = {
     ],
 
     get_datatable_options(options) {
-        return { ...options, freezeIndex: 4};
+        return { ...options, freezeIndex: 4, headerBackground: "rgb(205, 222, 238)"};
     },
     
     "onload": function(report) {
@@ -198,8 +198,13 @@ frappe.query_reports["Material Consumption"] = {
         // data summary by ingredients to draw chart
         const material_summary = this.aggregate_data_for_charts(data_rows);
 
+        // Vẽ biểu đồ thứ nhất trước để tạo material_color_map
         this.draw_first_chart(material_summary);
-        this.draw_second_chart(data_rows);
+        
+        // Vẽ biểu đồ thứ hai sau khi đã có material_color_map
+        setTimeout(() => {
+            this.draw_second_chart(data_rows);
+        }, 100);
     },
 
     "aggregate_data_for_charts": function(data_rows) {
@@ -248,26 +253,55 @@ frappe.query_reports["Material Consumption"] = {
         const num_bars = material_summary.length;
         let calculated_height = (num_bars * bar_thickness) + chart_padding;
         if (calculated_height < 300) {
-            calculated_height = 300;
+            calculated_height = 200;
         }
 
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 40px;">
+        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 40px;">
             <canvas id="myCustomChart"></canvas>
         </div>`);
         $('.report-wrapper').prepend(chartContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
 
+        // Tạo bảng màu chung cho tất cả nguyên vật liệu (loại bỏ màu đỏ để tránh trùng với "Vượt định mức")
+        const material_colors = [
+            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' },      // Indigo
+            { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' },      // Sky
+            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple
+            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },       // Amber
+            { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' },        // Green
+            { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' },    // Pink-200
+            { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' },      // Cyan-400
+            { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' },      // Lime-400
+            { bg: 'rgba(59, 130, 246, 0.5)', border: 'rgba(59, 130, 246, 1)' },      // Blue-500
+            { bg: 'rgba(139, 69, 19, 0.5)', border: 'rgba(139, 69, 19, 1)' },        // Brown
+            { bg: 'rgba(75, 85, 99, 0.5)', border: 'rgba(75, 85, 99, 1)' },          // Gray-600
+            { bg: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 1)' },      // Pink-500
+        ];
+
+        // Tạo map màu cho từng nguyên vật liệu
+        const material_color_map = {};
+        material_summary.forEach((material, index) => {
+            material_color_map[material.material_name] = material_colors[index % material_colors.length];
+        });
+
+        // Lưu map màu vào object để sử dụng ở biểu đồ thứ hai
+        this.material_color_map = material_color_map;
+
         const datasets = [
             {
                 label: 'Thực tế',
                 data: material_summary.map(row => row.within_limit_qty),
-                backgroundColor: 'rgba(128, 128, 224, 0.8)'
+                backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 2
             },
             {
                 label: 'Vượt định mức',
                 data: material_summary.map(row => row.over_limit_qty),
-                backgroundColor: 'rgba(255, 0, 0, 1)'
+                backgroundColor: 'rgba(244, 63, 94, 0.5)',
+                borderColor: 'rgba(244, 63, 94, 1)',
+                borderWidth: 2
             }
         ];
 
@@ -299,7 +333,7 @@ frappe.query_reports["Material Consumption"] = {
 
         columns.forEach(col => {
             if (col.fieldname && col.fieldname.endsWith('_actual')) {
-                const item_name = col.label.split('<br>')[0];
+                const item_name = col.parent || col.label.split('<br>')[0];
                 production_items.push({
                     name: item_name,
                     actual_field: col.fieldname,
@@ -310,22 +344,15 @@ frappe.query_reports["Material Consumption"] = {
 
         if (production_items.length === 0) return;
 
-        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 60vh; width: 100%; margin-top: 40px; margin-bottom: 40px;">
+        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px;">
             <canvas id="mySecondChart"></canvas>
         </div>`);
         $('.report-wrapper .chart-1').after(chartContainer2);
 
         const labels2 = production_items.map(item => item.name);
-        const material_colors = [
-            'rgba(142, 124, 255, 0.9)', 'rgba(255, 82, 82, 0.9)', 'rgba(102, 217, 232, 0.9)',
-            'rgba(54, 162, 235, 0.9)', 'rgba(255, 206, 86, 0.9)', 'rgba(255, 159, 64, 0.9)'
-        ];
-
-        const unique_materials = [...new Set(data_rows.map(row => row.material_name))];
-        const material_color_map = {};
-        unique_materials.forEach((material, index) => {
-            material_color_map[material] = material_colors[index % material_colors.length];
-        });
+        
+        // Sử dụng bảng màu đã được tạo từ biểu đồ thứ nhất
+        const material_color_map = this.material_color_map || {};
 
         let main_datasets = [];
         let over_limit_datasets = [];
@@ -355,7 +382,7 @@ frappe.query_reports["Material Consumption"] = {
         Object.values(material_summary).forEach(material_data => {
             const material_name = material_data.material_name;
             const material_name_with_unit = `${material_name} (${material_data.uom})`;
-            const base_color = material_color_map[material_name];
+            const color_info = material_color_map[material_name];
             
             const within_limit_data = production_items.map(item => 
                 transform_zero_to_null(Math.min(
@@ -375,7 +402,9 @@ frappe.query_reports["Material Consumption"] = {
             main_datasets.push({
                 label: material_name_with_unit,
                 data: within_limit_data,
-                backgroundColor: base_color,
+                backgroundColor: color_info.bg,
+                borderColor: color_info.border,
+                borderWidth: 2,
                 stack: material_name_with_unit,
                 skipNull: true,
                 barThickness: bar_thickness,
@@ -388,7 +417,9 @@ frappe.query_reports["Material Consumption"] = {
                 over_limit_datasets.push({
                     label: 'Vượt định mức',
                     data: over_limit_data,
-                    backgroundColor: 'rgba(217, 30, 24, 0.9)',
+                    backgroundColor: 'rgba(220, 38, 38, 0.5)',  // Màu đỏ đậm khác biệt
+                    borderColor: 'rgba(220, 38, 38, 1)',
+                    borderWidth: 2,
                     stack: material_name_with_unit,
                     skipNull: true,
                     barThickness: bar_thickness,

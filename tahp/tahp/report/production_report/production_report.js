@@ -26,6 +26,10 @@ frappe.query_reports["Production Report"] = {
         }
     ],
 
+    get_datatable_options(options) {
+        return { ...options, freezeIndex: 2, headerBackground: "rgb(205, 222, 238)"};
+    },
+
     "onload": function(report) {
         setTimeout(() => { this.render_components(); }, 500);
         
@@ -68,8 +72,9 @@ frappe.query_reports["Production Report"] = {
                 @media (max-width: 768px) {
                     .main-layout-container {
                         flex-direction: column !important;
-                        gap: 15px !important;
-                        padding: 10px !important;
+                        gap: 12px !important;
+                        padding: 8px !important;
+                        margin-bottom: 20px !important;
                     }
                     
                     .progress-section {
@@ -85,51 +90,54 @@ frappe.query_reports["Production Report"] = {
                     
                     .progress-grid {
                         grid-template-columns: 1fr !important;
-                        gap: 10px !important;
+                        gap: 8px !important;
                     }
                     
                     .progress-card {
-                        padding: 15px !important;
-                        min-height: 120px !important;
+                        padding: 12px !important;
+                        min-height: 100px !important;
                     }
                     
                     .progress-card h4 {
-                        font-size: 14px !important;
+                        font-size: 13px !important;
+                        margin-bottom: 6px !important;
                     }
                     
                     .progress-values span:first-child {
-                        font-size: 22px !important;
+                        font-size: 20px !important;
                     }
                     
                     .chart-wrapper {
-                        padding: 15px !important;
-                        margin-top: 15px !important;
+                        padding: 12px !important;
+                        margin-top: 12px !important;
                     }
                 }
                 
                 @media (min-width: 769px) and (max-width: 1024px) {
                     .main-layout-container {
-                        gap: 25px !important;
-                        padding: 15px !important;
+                        gap: 18px !important;
+                        padding: 12px !important;
+                        margin-bottom: 20px !important;
                     }
                     
                     .progress-section {
-                        max-width: 320px !important;
+                        max-width: 300px !important;
                     }
                     
                     .progress-grid {
-                        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+                        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
                     }
                 }
                 
                 @media (min-width: 1025px) {
                     .main-layout-container {
-                        gap: 30px !important;
-                        padding: 20px !important;
+                        gap: 20px !important;
+                        padding: 15px !important;
+                        margin-bottom: 25px !important;
                     }
                     
                     .progress-section {
-                        max-width: 380px !important;
+                        max-width: 320px !important;
                     }
                     
                     .progress-grid {
@@ -173,22 +181,22 @@ frappe.query_reports["Production Report"] = {
         // Create main layout container
         const mainContainer = $(`<div class="main-layout-container" style="
             display: flex; 
-            gap: 20px; 
-            padding: 15px; 
+            gap: 15px; 
+            padding: 10px; 
             align-items: flex-start; 
             justify-content: space-between; 
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         ">
             <div class="progress-section" style="
                 width: 100%; 
-                max-width: 350px; 
+                max-width: 320px; 
                 flex-shrink: 0;
-                min-width: 280px;
+                min-width: 260px;
             "></div>
             <div class="chart-section" style="
                 flex: 1; 
-                min-width: 300px;
+                min-width: 280px;
                 width: 100%;
             "></div>
         </div>`);
@@ -206,7 +214,7 @@ frappe.query_reports["Production Report"] = {
         // Get product columns and their system categories
         const product_columns = columns.filter(c => c.fieldname !== 'production_date');
         const system_by_field = {};
-        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.group_label || '').toString().trim(); });
+        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
         let p2o5 = { planned: 0, actual: 0 };
         let others = { planned: 0, actual: 0 };
@@ -241,8 +249,8 @@ frappe.query_reports["Production Report"] = {
         // Create grid container for progress cards
         const gridContainer = $(`<div class="progress-grid" style="
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
             width: 100%;
         "></div>`);
         container.append(gridContainer);
@@ -254,11 +262,11 @@ frappe.query_reports["Production Report"] = {
                 <div class="progress-card" style="
                     background-color: #fff; 
                     border: 1px solid #e0e0e0; 
-                    border-radius: 12px; 
-                    padding: 20px; 
-                    box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+                    border-radius: 10px; 
+                    padding: 15px; 
+                    box-shadow: 0 3px 5px rgba(0,0,0,0.06);
                     transition: transform 0.2s ease, box-shadow 0.2s ease;
-                    min-height: 140px;
+                    min-height: 110px;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
@@ -266,34 +274,34 @@ frappe.query_reports["Production Report"] = {
                     <div>
                         <h4 style="
                             margin-top: 0; 
-                            margin-bottom: 12px; 
-                            font-size: 16px; 
+                            margin-bottom: 8px; 
+                            font-size: 15px; 
                             font-weight: 600;
                             color: #2c3e50;
-                            line-height: 1.3;
+                            line-height: 1.2;
                         ">${item.name}</h4>
-                        <div class="progress-values" style="margin-bottom: 8px;">
+                        <div class="progress-values" style="margin-bottom: 6px;">
                             <span style="
-                                font-size: 28px; 
+                                font-size: 24px; 
                                 font-weight: 700;
                                 color: #27ae60;
                             ">${item.actual.toLocaleString('en-US')}</span>
                             <span style="
-                                font-size: 14px; 
+                                font-size: 13px; 
                                 color: #6c757d;
                                 margin-left: 4px;
                             "> tấn</span>
                         </div>
                         <div style="
-                            font-size: 13px; 
+                            font-size: 12px; 
                             color: #6c757d; 
-                            margin-bottom: 15px;
+                            margin-bottom: 10px;
                         ">/ ${item.planned.toLocaleString('en-US')} tấn kế hoạch</div>
                     </div>
                     <div class="progress-bar-wrapper" style="
                         background-color: #e9ecef; 
-                        border-radius: 12px; 
-                        height: 12px; 
+                        border-radius: 8px; 
+                        height: 10px; 
                         overflow: hidden;
                         position: relative;
                     ">
@@ -301,7 +309,7 @@ frappe.query_reports["Production Report"] = {
                             width: ${Math.min(percentage, 100)}%; 
                             height: 100%; 
                             background: linear-gradient(90deg, #27ae60, #2ecc71);
-                            border-radius: 12px;
+                            border-radius: 8px;
                             transition: width 0.3s ease;
                         "></div>
                         <div style="
@@ -309,7 +317,7 @@ frappe.query_reports["Production Report"] = {
                             top: 50%;
                             left: 50%;
                             transform: translate(-50%, -50%);
-                            font-size: 10px;
+                            font-size: 9px;
                             font-weight: 600;
                             color: #2c3e50;
                         ">${percentage.toFixed(1)}%</div>
@@ -332,7 +340,7 @@ frappe.query_reports["Production Report"] = {
         let daily_summary = {};
         const product_columns = columns.filter(c => c.fieldname !== 'production_date');
         const system_by_field = {};
-        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.group_label || '').toString().trim(); });
+        product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
         data_rows.forEach(row => {
             const date = row.production_date;
@@ -364,14 +372,14 @@ frappe.query_reports["Production Report"] = {
         const dates = Object.keys(daily_data).sort();
         if (dates.length === 0) return;
 
-        // Calculate canvas size based on device
+        // Calculate canvas size based on device - reduced heights
         const num_days = dates.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
         
-        let bar_width_per_day = is_mobile ? 60 : is_tablet ? 80 : 100;
+        let bar_width_per_day = is_mobile ? 50 : is_tablet ? 70 : 90;
         let canvas_width = num_days * bar_width_per_day;
-        let canvas_height = is_mobile ? 300 : is_tablet ? 350 : 450;
+        let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320; // Reduced heights
         
         if (canvas_width < 300) canvas_width = 300;
         if (canvas_width > 1200) canvas_width = 1200;
@@ -383,8 +391,8 @@ frappe.query_reports["Production Report"] = {
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            padding: 20px;
-            margin-top: 20px;
+            padding: 15px;
+            margin-top: 15px;
         ">
             <div class="chart-container" style="
                 position: relative; 
@@ -414,11 +422,11 @@ frappe.query_reports["Production Report"] = {
         // Create datasets for mixed chart
         const datasets = [
             // Bars for Thạch cao
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(52, 152, 219, 0.85)', borderColor: 'rgba(52, 152, 219, 1)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(52, 152, 219, 0.25)', borderColor: 'rgba(52, 152, 219, 0.5)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             // Lines for P2O5
-            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(231, 76, 60, 0.9)', backgroundColor: 'rgba(231, 76, 60, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
-            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(231, 76, 60, 0.5)', backgroundColor: 'rgba(231, 76, 60, 0.0)', borderDash: [6,4], borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(244, 63, 94, 1)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
+            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(244, 63, 94, 0.6)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderDash: [6,4], borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
 
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
@@ -430,7 +438,15 @@ frappe.query_reports["Production Report"] = {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'top' },
-                    title: { display: true, text: 'Sản lượng sản xuất theo ngày' }
+                    title: { 
+                        display: true, 
+                        text: 'Sản lượng sản xuất theo ngày' ,
+                        font: {
+                            size: 22,
+                            weight: 'bold'
+                        }
+                    },
+
                 },
                 scales: {
                     x: {

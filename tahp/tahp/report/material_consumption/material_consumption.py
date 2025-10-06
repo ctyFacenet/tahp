@@ -64,7 +64,12 @@ def process_month_year_filter(filters):
     """
     if filters.get("month") and filters.get("year"):
         try:
-            month = int(filters["month"])
+            # Extract month number from "Tháng X" format
+            month_str = filters["month"]
+            if month_str.startswith("Tháng "):
+                month = int(month_str.replace("Tháng ", ""))
+            else:
+                month = int(month_str)
             year = int(filters["year"])
             
             # First date of month
@@ -366,20 +371,22 @@ def get_columns(filters):
             scrubbed_name = frappe.scrub(item_code)
             
             # Adjust width
-            width = 250 if is_month_filter else 250
+            width = 150 if is_month_filter else 200
             
             columns.append({
-                "label": f"{item_name}  <br><b>{_('Thực tế')}</b>", 
+                "label": f"<br><b>{_('Thực tế')}</b>", 
                 "fieldname": scrubbed_name + "_actual",
                 "fieldtype": "Float",
-                "width": width
+                "width": width,
+                "parent": item_name,
             })
             
             columns.append({
-                "label": f"{item_name}  <br><b>{_('Định mức')}</b>",
+                "label": f"<br><b>{_('Định mức')}</b>",
                 "fieldname": scrubbed_name + "_planned",
                 "fieldtype": "Float",
-                "width": width
+                "width": width,
+                "parent": item_name
             })
 
     return columns
