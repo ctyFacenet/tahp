@@ -183,13 +183,13 @@ def get_columns(return_specs=False):
     for spec in sorted(specs_in):
         key = spec.replace(" ", "_").lower()
         columns.append({
-            "label": f"{spec} Tối thiểu (in)", "fieldname": f"{key}_min_in",
+            "label": f"{spec} Tối thiểu", "fieldname": f"{key}_min_in",
             "fieldtype": "Float", "width": 100,
             "parent": "Đầu vào",
             "align": "center"
         })
         columns.append({
-            "label": f"{spec} Tối đa (in)", "fieldname": f"{key}_max_in",
+            "label": f"{spec} Tối đa", "fieldname": f"{key}_max_in",
             "fieldtype": "Float", "width": 100,
             "parent": "Đầu vào",
             "align": "center"
@@ -199,13 +199,13 @@ def get_columns(return_specs=False):
     for spec in sorted(specs_out):
         key = spec.replace(" ", "_").lower()
         columns.append({
-            "label": f"{spec} Tối thiểu (out)", "fieldname": f"{key}_min_out",
+            "label": f"{spec} Tối thiểu", "fieldname": f"{key}_min_out",
             "fieldtype": "Float", "width": 100,
             "parent": "Đầu ra",
             "align": "center"
         })
         columns.append({
-            "label": f"{spec} Tối đa (out)", "fieldname": f"{key}_max_out",
+            "label": f"{spec} Tối đa", "fieldname": f"{key}_max_out",
             "fieldtype": "Float", "width": 100,
             "parent": "Đầu ra",
             "align": "center"
