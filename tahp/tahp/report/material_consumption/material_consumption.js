@@ -256,10 +256,14 @@ frappe.query_reports["Material Consumption"] = {
             calculated_height = 200;
         }
 
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 40px;">
+        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 20px;">
             <canvas id="myCustomChart"></canvas>
         </div>`);
         $('.report-wrapper').prepend(chartContainer);
+        
+        // Tạo custom legend container
+        const legendContainer = $(`<div class="custom-legend" style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; max-height: 150px; overflow-y: auto;"></div>`);
+        $('.chart-container.chart-1').after(legendContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
 
@@ -288,23 +292,40 @@ frappe.query_reports["Material Consumption"] = {
         // Lưu map màu vào object để sử dụng ở biểu đồ thứ hai
         this.material_color_map = material_color_map;
 
-        const datasets = [
-            {
-                label: 'Thực tế',
-                data: material_summary.map(row => row.within_limit_qty),
-                backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                borderColor: 'rgba(99, 102, 241, 1)',
-                borderWidth: 2
-            },
-            {
+        // Tạo datasets cho từng nguyên vật liệu với màu riêng biệt
+        const datasets = [];
+        
+        material_summary.forEach((material, index) => {
+            const color_info = material_color_map[material.material_name];
+            const material_name_with_unit = `${material.material_name} (${material.uom})`;
+            
+            // Dataset cho từng nguyên vật liệu với dữ liệu đầy đủ
+            datasets.push({
+                label: material_name_with_unit,
+                data: Array(material_summary.length).fill(null).map((_, i) => i === index ? material.within_limit_qty : null),
+                backgroundColor: color_info.bg,
+                borderColor: color_info.border,
+                borderWidth: 2,
+                stack: 'main'
+            });
+        });
+
+        // Thêm dataset cho phần vượt giới hạn (nếu có)
+        const has_over_limit = material_summary.some(material => material.over_limit_qty > 0);
+        if (has_over_limit) {
+            datasets.push({
                 label: 'Vượt định mức',
-                data: material_summary.map(row => row.over_limit_qty),
+                data: material_summary.map(material => material.over_limit_qty),
                 backgroundColor: 'rgba(244, 63, 94, 0.5)',
                 borderColor: 'rgba(244, 63, 94, 1)',
-                borderWidth: 2
-            }
-        ];
+                borderWidth: 2,
+                stack: 'main'
+            });
+        }
 
+        // Tạo custom legend
+        this.createCustomLegend(material_summary, material_color_map, has_over_limit);
+        
         const ctx = document.getElementById('myCustomChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
@@ -321,10 +342,51 @@ frappe.query_reports["Material Consumption"] = {
                         font: {
                             size: 18
                         }
+                    },
+                    legend: {
+                        display: false  // Ẩn legend mặc định của Chart.js
                     }
                 }
             }
         });
+    },
+
+    "createCustomLegend": function(material_summary, material_color_map, has_over_limit) {
+        const legendContainer = $('.custom-legend');
+        legendContainer.empty();
+        
+        // Tạo legend cho các nguyên vật liệu
+        material_summary.forEach((material, index) => {
+            const color_info = material_color_map[material.material_name];
+            const material_name_with_unit = `${material.material_name} (${material.uom})`;
+            
+            const legendItem = $(`
+                <div class="legend-item" style="display: inline-block; margin: 5px 10px 5px 0; padding: 5px 10px; background: white; border-radius: 3px; border: 1px solid #ddd;">
+                    <span class="legend-color" style="display: inline-block; width: 12px; height: 12px; background: ${color_info.bg}; border: 1px solid ${color_info.border}; margin-right: 8px; vertical-align: middle;"></span>
+                    <span class="legend-text" style="font-size: 12px; vertical-align: middle;">${material_name_with_unit}</span>
+                </div>
+            `);
+            legendContainer.append(legendItem);
+        });
+        
+        // Thêm legend cho "Vượt định mức" nếu có
+        if (has_over_limit) {
+            const overLimitItem = $(`
+                <div class="legend-item" style="display: inline-block; margin: 5px 10px 5px 0; padding: 5px 10px; background: white; border-radius: 3px; border: 1px solid #ddd;">
+                    <span class="legend-color" style="display: inline-block; width: 12px; height: 12px; background: rgba(244, 63, 94, 0.5); border: 1px solid rgba(244, 63, 94, 1); margin-right: 8px; vertical-align: middle;"></span>
+                    <span class="legend-text" style="font-size: 12px; vertical-align: middle;">Vượt định mức</span>
+                </div>
+            `);
+            legendContainer.append(overLimitItem);
+        }
+        
+        // Thêm tiêu đề cho legend
+        const legendTitle = $(`
+            <div style="font-weight: bold; margin-bottom: 10px; color: #333; font-size: 14px;">
+                Chú thích màu sắc:
+            </div>
+        `);
+        legendContainer.prepend(legendTitle);
     },
 
     "draw_second_chart": function(data_rows) {
