@@ -198,8 +198,13 @@ frappe.query_reports["Material Consumption"] = {
         // data summary by ingredients to draw chart
         const material_summary = this.aggregate_data_for_charts(data_rows);
 
+        // Vẽ biểu đồ thứ nhất trước để tạo material_color_map
         this.draw_first_chart(material_summary);
-        this.draw_second_chart(data_rows);
+        
+        // Vẽ biểu đồ thứ hai sau khi đã có material_color_map
+        setTimeout(() => {
+            this.draw_second_chart(data_rows);
+        }, 100);
     },
 
     "aggregate_data_for_charts": function(data_rows) {
@@ -257,6 +262,31 @@ frappe.query_reports["Material Consumption"] = {
         $('.report-wrapper').prepend(chartContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
+
+        // Tạo bảng màu chung cho tất cả nguyên vật liệu (loại bỏ màu đỏ để tránh trùng với "Vượt định mức")
+        const material_colors = [
+            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' },      // Indigo
+            { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' },      // Sky
+            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple
+            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },       // Amber
+            { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' },        // Green
+            { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' },    // Pink-200
+            { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' },      // Cyan-400
+            { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' },      // Lime-400
+            { bg: 'rgba(59, 130, 246, 0.5)', border: 'rgba(59, 130, 246, 1)' },      // Blue-500
+            { bg: 'rgba(139, 69, 19, 0.5)', border: 'rgba(139, 69, 19, 1)' },        // Brown
+            { bg: 'rgba(75, 85, 99, 0.5)', border: 'rgba(75, 85, 99, 1)' },          // Gray-600
+            { bg: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 1)' },      // Pink-500
+        ];
+
+        // Tạo map màu cho từng nguyên vật liệu
+        const material_color_map = {};
+        material_summary.forEach((material, index) => {
+            material_color_map[material.material_name] = material_colors[index % material_colors.length];
+        });
+
+        // Lưu map màu vào object để sử dụng ở biểu đồ thứ hai
+        this.material_color_map = material_color_map;
 
         const datasets = [
             {
@@ -320,26 +350,9 @@ frappe.query_reports["Material Consumption"] = {
         $('.report-wrapper .chart-1').after(chartContainer2);
 
         const labels2 = production_items.map(item => item.name);
-        const material_colors = [
-            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' },      // Indigo
-            { bg: 'rgba(244, 63, 94, 0.5)', border: 'rgba(244, 63, 94, 1)' },        // Rose
-            { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' },      // Sky
-            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple
-            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },       // Amber
-            { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' },        // Green
-            { bg: 'rgba(248, 113, 113, 0.5)', border: 'rgba(248, 113, 113, 1)' },    // Red-400
-            { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' },    // Pink-200
-            { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' },      // Cyan-400
-            { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' },      // Lime-400
-            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },      // Amber-400 (copy để phối)
-            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple-400 (copy để phối)
-        ];
-
-        const unique_materials = [...new Set(data_rows.map(row => row.material_name))];
-        const material_color_map = {};
-        unique_materials.forEach((material, index) => {
-            material_color_map[material] = material_colors[index % material_colors.length];
-        });
+        
+        // Sử dụng bảng màu đã được tạo từ biểu đồ thứ nhất
+        const material_color_map = this.material_color_map || {};
 
         let main_datasets = [];
         let over_limit_datasets = [];
@@ -404,8 +417,8 @@ frappe.query_reports["Material Consumption"] = {
                 over_limit_datasets.push({
                     label: 'Vượt định mức',
                     data: over_limit_data,
-                    backgroundColor: 'rgba(244, 63, 94, 0.5)',
-                    borderColor: 'rgba(244, 63, 94, 1)',
+                    backgroundColor: 'rgba(220, 38, 38, 0.5)',  // Màu đỏ đậm khác biệt
+                    borderColor: 'rgba(220, 38, 38, 1)',
                     borderWidth: 2,
                     stack: material_name_with_unit,
                     skipNull: true,
