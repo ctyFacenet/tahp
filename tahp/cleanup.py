@@ -28,4 +28,17 @@ def cleanup_custom():
             print(f"Deleting unused Custom Field: {dt}.{fname}")
             frappe.delete_doc("Custom Field", field["name"], force=1)
 
+    # --- Kiểm tra và tắt Use Perpetual Inventory ---
+    company = frappe.db.get_single_value("Global Defaults", "default_company")
+    if company:
+        use_perpetual = frappe.db.get_value("Company", company, "enable_perpetual_inventory")
+        if use_perpetual:
+            print(f"Tắt Use Perpetual Inventory cho công ty: {company}")
+            frappe.db.set_value("Company", company, "enable_perpetual_inventory", 0)
+            frappe.db.commit()
+        else:
+            print(f"Use Perpetual Inventory đã tắt sẵn cho công ty: {company}")
+    else:
+        print("Không tìm thấy công ty mặc định trong Global Defaults")
+
     frappe.db.commit()

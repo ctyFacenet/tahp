@@ -73,6 +73,6 @@ export default function getDefaultOptions(instance) {
         hasAction: null,
         title: null,
         styleTitle: null,
-        headerBackground: null
+        headerBackground: "rgba(205, 222, 238, 1)"
     };
 };

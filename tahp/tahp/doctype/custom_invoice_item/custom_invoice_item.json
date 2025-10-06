@@ -1,0 +1,109 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-05 16:57:57.813415",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "qty",
+  "stock_uom",
+  "rate",
+  "amount_before_tax",
+  "tax_rate",
+  "amount_after_tax"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "columns": 1,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u1eb7t h\u00e0ng",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "columns": 1,
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "columns": 1,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ed1 l\u01b0\u1ee3ng",
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "columns": 1,
+   "fetch_from": "item_code.stock_uom",
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb m\u1eb7t h\u00e0ng",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "columns": 1,
+   "fieldname": "tax_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Thu\u1ebf su\u1ea5t (%)"
+  },
+  {
+   "bold": 1,
+   "columns": 2,
+   "fieldname": "amount_after_tax",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ti\u1ec1n sau thu\u1ebf",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "columns": 2,
+   "fieldname": "amount_before_tax",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ti\u1ec1n tr\u01b0\u1edbc thu\u1ebf",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "columns": 1,
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n gi\u00e1",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-06 12:43:48.353484",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Custom Invoice Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
