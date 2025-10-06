@@ -56,8 +56,15 @@ def execute(filters=None, summary=False):
 			"align": "center"
 		},
 		{
+			"fieldname": "stop_time_overall",
+			"label": "Tổng thời gian dừng",
+			"fieldtype": "Data",
+			"width": 110,
+			"align": "center"
+		},
+		{
 			"fieldname": "stop_time",
-			"label": "Thời gian dừng",
+			"label": "Thời gian đang dừng",
 			"fieldtype": "Data",
 			"width": 120,
 			"align": "center"
@@ -172,30 +179,65 @@ def execute(filters=None, summary=False):
 			result_map[orphan.name] = child_item
 
 
-	# --- Step 2: Fill dữ liệu từ Job Card vào con ---
-	job_cards = frappe.db.get_all("Job Card", filters=[["docstatus","!=","2"]], fields=["name", "work_order"], order_by="creation desc")
-	for job_card in job_cards:
-		downtimes = frappe.db.get_all("Job Card Downtime Item", filters={"parent": job_card.name}, fields=["duration", "reason", "group_name", "workstation"])
-		actives = frappe.db.get_all("Job Card Workstation", filters={"parent": job_card.name}, fields=["start_time", "time", "workstation", "status"])
-		shift = frappe.db.get_value("Work Order", job_card.work_order, "custom_shift")
-		team = frappe.db.get_all("Job Card Team", filters={"parent": job_card.name}, fields=["employee"])
+		# --- Step 2: Fill dữ liệu từ Job Card vào con ---
+		# --- Lấy tất cả downtime và active một lượt ---
+		downtimes = frappe.db.get_all(
+			"Job Card Downtime Item",
+			fields=["duration", "reason", "group_name", "workstation", "from_time", "parent"],
+			order_by="from_time desc"
+		)
+		actives = frappe.db.get_all(
+			"Job Card Workstation",
+			fields=["start_time", "time", "workstation", "status", "parent"],
+			order_by="start_time desc"
+		)
+		teams = frappe.db.get_all(
+			"Job Card Team",
+			fields=["employee", "parent"]
+		)
+		work_orders = {
+			j.name: j.work_order for j in frappe.db.get_all(
+				"Job Card",
+				filters=[["docstatus", "!=", "2"]],
+				fields=["name", "work_order"],
+				order_by="creation desc"
+			)
+		}
 
-		for active in actives:
-			if active.workstation in result_map:
-				item = result_map[active.workstation]
-				item_dt = [d for d in downtimes if d.workstation == active.workstation]
-				item_dt_group = item_dt[0].group_name if item_dt else None
-				item_dt_reason = item_dt[0].reason if item_dt else None
-				item_team = team[0].employee if team else None
-				if active.status == "Dừng":
-					item["status"] = "Tạm dừng"
+		# --- Gom dữ liệu mới nhất theo workstation ---
+		latest = {}
+		for a in actives:
+			ws = a.workstation
+			if ws not in latest:  # chỉ lấy lần xuất hiện đầu tiên (mới nhất do order_by)
+				latest[ws] = frappe._dict(
+					active=a,
+					downtime=next((d for d in downtimes if d.workstation == ws), None),
+					downtime_overall = sum(int(d.duration if d.duration else 0) for d in downtimes if d.workstation == ws),
+					team=next((t for t in teams if t.parent == a.parent), None),
+					shift=frappe.db.get_value("Work Order", work_orders.get(a.parent), "custom_shift")
+				)
 
-				item["shift"] = shift
-				item["active_time"] = format_duration(active.time)
-				item["stop_time"] = format_duration(sum(int(d.duration) if d.duration else 0 for d in item_dt), mili=False)
-				item["group_name"] = item_dt_group
-				item["reason"] = item_dt_reason
-				item["employee"] = item_team
+		# --- Gán dữ liệu vào result_map ---
+		for ws, data in latest.items():
+			if ws not in result_map:
+				continue
+			item = result_map[ws]
+			active = data.active
+			downtime = data.downtime
+			downtime_overall = data.downtime_overall
+			team = data.team
+
+			if active.status == "Dừng":
+				item["status"] = "Tạm dừng"
+
+			item["shift"] = data.shift
+			item["active_time"] = format_duration(active.time)
+			item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
+			item["stop_time_overall"] = format_duration(downtime_overall, mili=False)
+			item["group_name"] = downtime.group_name if downtime else None
+			item["reason"] = downtime.reason if downtime else None
+			item["employee"] = team.employee if team else None
+
 
 	# --- Step 3: Update status % cho cha ---
 	for parent in parents:

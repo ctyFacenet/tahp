@@ -450,28 +450,36 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                     scales: {
                         y: { stacked: true }
                     },
-                    onClick: (evt, elements) => {
-                        if (elements.length > 0) {
-                            let chart = this.charts.manufacturing;
-                            let elem = elements[0];
-                            let day = chart.data.labels[elem.index]; // YYYY-MM-DD
-                            let datasetLabel = chart.data.datasets[elem.datasetIndex].label;
+                onClick: (evt, elements) => {
+                    if (elements.length > 0) {
+                        let chart = this.charts.manufacturing;
+                        let elem = elements[0];
+                        let day = chart.data.labels[elem.index]; // YYYY-MM-DD
+                        let datasetLabel = chart.data.datasets[elem.datasetIndex].label;
 
-                            // Xác định lọc theo main hay sub
-                            let isMain = datasetLabel.includes(response.overall.main.label);
+                        // Xác định nhóm main/sub và loại (đã/chưa sản xuất)
+                        let isMain = datasetLabel.includes(response.overall.main.label);
+                        let isProduced = datasetLabel.includes("đã sản xuất");
 
-                            // Route tới Work Order list, filter theo ngày
-                            if (isMain) {
-                                frappe.set_route("List", "Work Order", {
-                                    planned_start_date: ["between", [day + " 00:00:00", day + " 23:59:59"]]
-                                });
-                            } else {
-                                frappe.set_route("List", "Work Order", {
-                                    planned_start_date: ["between", [day + " 00:00:00", day + " 23:59:59"]]
-                                });
-                            }
+                        // Lấy danh sách work order từ response
+                        let wo_list = [];
+                        if (isMain) {
+                            wo_list = isProduced
+                                ? (response.manufacturing_overall[day].main.produced_qty_wo || [])
+                                : (response.manufacturing_overall[day].main.qty_wo || []);
+                        } else {
+                            wo_list = isProduced
+                                ? (response.manufacturing_overall[day].sub.produced_qty_wo || [])
+                                : (response.manufacturing_overall[day].sub.qty_wo || []);
+                        }
+
+                        if (wo_list.length > 0) {
+                            frappe.set_route("List", "Work Order", { name: ["in", wo_list] });
+                        } else {
+                            frappe.msgprint("Không có Work Order nào trong danh sách này.");
                         }
                     }
+                }
                 }
             });
         }
@@ -566,23 +574,38 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                         y: { stacked: true }
                     },
                     onClick: (evt, elements) => {
-                        if (elements.length > 0) {
-                            let elem = elements[0];
-                            let chart = this.charts.bom;
-                            let day = chart.data.labels[elem.index];   // YYYY-MM-DD
-                            let dataset = chart.data.datasets[elem.datasetIndex];
-                            
-                            // dataset.stack chính là item (RM000000, RM001001,...)
-                            let itemCode = dataset.stack;
-                            let woList = bom[day]?.[itemCode]?.work_order || [];
+                        if (elements.length === 0) return;
 
-                            if (woList.length > 0) {
-                                frappe.set_route("List", "Work Order", {
-                                    name: ["in", woList]
-                                });
-                            }
+                        let elem = elements[0];
+                        let chart = this.charts.bom;
+                        let day = chart.data.labels[elem.index];   // YYYY-MM-DD
+                        let dataset = chart.data.datasets[elem.datasetIndex];
+                        let itemCode = dataset.stack;               // ví dụ: RM000000
+
+                        // Lấy object của item trong ngày, nếu có
+                        let dayData = bom?.[day]?.[itemCode];
+                        if (!dayData) {
+                            frappe.msgprint("Không tìm thấy dữ liệu cho nguyên liệu này.");
+                            return;
+                        }
+
+                        // Xác định danh sách work order tương ứng
+                        let woList = [];
+                        if (dataset.label === "Vượt định mức") {
+                            woList = dayData.work_order || [];
+                        } else {
+                            woList = dayData.work_order_norm || [];
+                        }
+
+                        if (woList && woList.length > 0) {
+                            frappe.set_route("List", "Work Order", {
+                                name: ["in", woList]
+                            });
+                        } else {
+                            frappe.msgprint("Không có Work Order nào trong danh sách này.");
                         }
                     }
+
                 }
             });
         }

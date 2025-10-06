@@ -86,7 +86,8 @@ def overall(doc_item, start_date, end_date):
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", start_date],
-            "planned_start_date": ["<", end_date + timedelta(days=1)]
+            "planned_start_date": ["<", end_date + timedelta(days=1)],
+            "docstatus": ["!=", 2]
         },
         fields=["qty", "produced_qty"]
     )
@@ -141,7 +142,8 @@ def category_overall(doc_item, start_date, end_date, attribute_name="Phân loạ
         filters={
             "planned_start_date": [">=", start_date],
             "planned_start_date": ["<", end_date + timedelta(days=1)],
-            "production_item": ["in", item_list]
+            "production_item": ["in", item_list],
+            "docstatus": ["!=", 2]
         },
         fields=["name", "produced_qty", "production_item", "custom_category"]
     )
@@ -241,7 +243,8 @@ def attribute_overall(main, from_date, to_date, attribute="Phân loại", catego
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", from_date],
-            "planned_start_date": ["<", to_date + timedelta(days=1)]
+            "planned_start_date": ["<", to_date + timedelta(days=1)],
+            "docstatus": ["!=", 2]
         },
         fields=["name", "qty", "produced_qty", "production_item", "custom_category"]
     )
@@ -286,8 +289,13 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
     Trả về dict dạng:
     {
         "YYYY-MM-DD": {
-            "main": {"qty":..., "produced_qty":..., "label":"Ca 1"},
-            "sub": {"qty":..., "produced_qty":..., "label":"Ca 2"}
+            "main": {
+                "qty": ...,
+                "produced_qty": ...,
+                "qty_wo": [...],
+                "produced_qty_wo": [...]
+            },
+            "sub": {...}
         }
     }
     """
@@ -314,38 +322,43 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
         filters={
             "planned_start_date": [">=", from_date],
             "planned_start_date": ["<", to_date + timedelta(days=1)],
-            "production_item": ["in", main_items + sub_items]
+            "production_item": ["in", main_items + sub_items],
+            "docstatus": ["!=", 2]
         },
-        fields=["qty", "produced_qty", "planned_start_date", "actual_end_date", "production_item"]
+        fields=["name", "qty", "produced_qty", "planned_start_date", "actual_end_date", "production_item"]
     )
 
     # Khởi tạo dict kết quả
     result = defaultdict(lambda: {
-        "main": {"qty": 0, "produced_qty": 0},
-        "sub": {"qty": 0, "produced_qty": 0}
+        "main": {"qty": 0, "produced_qty": 0, "qty_wo": [], "produced_qty_wo": []},
+        "sub": {"qty": 0, "produced_qty": 0, "qty_wo": [], "produced_qty_wo": []}
     })
 
     for wo in wo_list:
-        # Chuyển sang date để so sánh
         planned_date = wo.planned_start_date.date() if wo.planned_start_date else None
         actual_date = wo.actual_end_date.date() if wo.actual_end_date else None
 
-        # Xác định target main/sub
         if wo.production_item in main_items:
             target = "main"
         elif wo.production_item in sub_items:
             target = "sub"
         else:
-            continue  # Nếu không thuộc main hoặc sub, bỏ qua
-            
-        # Cộng qty theo planned_date
-        if planned_date and from_date <= planned_date <= to_date:
-            if wo.get("produced_qty", 0) < wo.get("qty", 0):
-                result[str(planned_date)][target]["qty"] += (wo.get("qty", 0) - wo.get("produced_qty", 0))
+            continue
 
-        # Cộng produced_qty theo actual_date
+        # Ghi nhận kế hoạch theo ngày planned
+        if planned_date and from_date <= planned_date <= to_date:
+            planned_remaining = wo.get("qty", 0) - wo.get("produced_qty", 0)
+            if planned_remaining > 0:
+                result[str(planned_date)][target]["qty"] += planned_remaining
+                result[str(planned_date)][target]["qty_wo"].append(wo.name)
+
+        # Ghi nhận thực tế theo ngày actual
         if actual_date and from_date <= actual_date <= to_date:
-            result[str(actual_date)][target]["produced_qty"] += wo.get("produced_qty", 0)
+            produced = wo.get("produced_qty", 0)
+            if produced > 0:
+                result[str(actual_date)][target]["produced_qty"] += produced
+                result[str(actual_date)][target]["produced_qty_wo"].append(wo.name)
+
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
@@ -378,7 +391,8 @@ def bom_overall(main, from_date, to_date):
         filters={
             "production_item": ["in", item_list],
             "actual_end_date": [">=", from_date],
-            "actual_end_date": ["<", to_date + timedelta(days=1)]
+            "actual_end_date": ["<", to_date + timedelta(days=1)],
+            "docstatus": 1
         },
         fields=["name", "qty", "produced_qty", "actual_end_date"]
     )
@@ -392,33 +406,38 @@ def bom_overall(main, from_date, to_date):
             continue
 
         for ri in wo_doc.required_items:
-            if ri.item_code in item_list or ri.item_code == main.item_code: continue
-            # Tính tỉ lệ qty/prod
-            try:
-                qty = (ri.required_qty / wo.qty) if wo.qty else 0
-            except:
-                qty = 0
-            try:
-                if (ri.consumed_qty / wo.produced_qty) - qty > 0:
-                    produced_qty = (ri.consumed_qty / wo.produced_qty) - qty if wo.produced_qty else 0
-                else:
-                    produced_qty = 0
-            except:
-                produced_qty = 0
+            if ri.item_code in item_list or ri.item_code == main.item_code:
+                continue
 
-            # Gộp vào result
-            if ri.item_code not in result[str(actual_date)]:
-                result[str(actual_date)][ri.item_code] = {
-                    "qty": 0,
-                    "produced_qty": 0,
+            # Định mức kế hoạch trên 1 tấn thành phẩm
+            planned_per_unit = (ri.required_qty / wo.qty) if wo.qty else 0
+
+            # Tiêu hao thực tế trên 1 tấn thành phẩm
+            actual_per_unit = (ri.consumed_qty / wo.produced_qty) if wo.produced_qty else 0
+
+            # Phần vượt định mức trên 1 tấn
+            over_per_unit = actual_per_unit - planned_per_unit if actual_per_unit > planned_per_unit else 0
+
+            date_key = str(actual_date)
+            if ri.item_code not in result[date_key]:
+                result[date_key][ri.item_code] = {
+                    "qty": 0,                # Tổng định mức (1 tấn)
+                    "produced_qty": 0,       # Tổng vượt định mức (1 tấn)
                     "label": ri.item_name,
-                    "work_order": []
+                    "work_order": [],
+                    "work_order_norm": [],
                 }
 
-            result[str(actual_date)][ri.item_code]["qty"] += qty
-            result[str(actual_date)][ri.item_code]["produced_qty"] += produced_qty
-            result[str(actual_date)][ri.item_code]["work_order"].append(wo.name)
+            # Cộng dồn theo ngày
+            result[date_key][ri.item_code]["qty"] += planned_per_unit
+            result[date_key][ri.item_code]["produced_qty"] += over_per_unit
+            if over_per_unit:
+                result[date_key][ri.item_code]["work_order"].append(wo.name)
+            if planned_per_unit:
+                result[date_key][ri.item_code]["work_order_norm"].append(wo.name)
+
 
     # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
+    print(sorted_result)
     return sorted_result
