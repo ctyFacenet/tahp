@@ -86,7 +86,7 @@ def overall(doc_item, start_date, end_date):
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", start_date],
-            "planned_start_date": ["<", end_date + timedelta(days=1)],
+            "actual_end_date": ["<", end_date + timedelta(days=1)],
             "docstatus": ["!=", 2]
         },
         fields=["qty", "produced_qty"]
@@ -141,7 +141,7 @@ def category_overall(doc_item, start_date, end_date, attribute_name="Phân loạ
         "Work Order",
         filters={
             "planned_start_date": [">=", start_date],
-            "planned_start_date": ["<", end_date + timedelta(days=1)],
+            "actual_end_date": ["<", end_date + timedelta(days=1)],
             "production_item": ["in", item_list],
             "docstatus": ["!=", 2]
         },
@@ -243,7 +243,7 @@ def attribute_overall(main, from_date, to_date, attribute="Phân loại", catego
         filters={
             "production_item": ["in", item_list],
             "planned_start_date": [">=", from_date],
-            "planned_start_date": ["<", to_date + timedelta(days=1)],
+            "actual_end_date": ["<", to_date + timedelta(days=1)],
             "docstatus": ["!=", 2]
         },
         fields=["name", "qty", "produced_qty", "production_item", "custom_category"]
@@ -321,7 +321,7 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
         "Work Order",
         filters={
             "planned_start_date": [">=", from_date],
-            "planned_start_date": ["<", to_date + timedelta(days=1)],
+            "actual_end_date": ["<", to_date + timedelta(days=1)],
             "production_item": ["in", main_items + sub_items],
             "docstatus": ["!=", 2]
         },
@@ -390,7 +390,7 @@ def bom_overall(main, from_date, to_date):
         "Work Order",
         filters={
             "production_item": ["in", item_list],
-            "actual_end_date": [">=", from_date],
+            "planned_start_date": [">=", from_date],
             "actual_end_date": ["<", to_date + timedelta(days=1)],
             "docstatus": 1
         },
