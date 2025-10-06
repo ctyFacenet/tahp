@@ -22,7 +22,7 @@ class CustomInvoice(Document):
 			)
 			valid_seds = []
 			for sed in seds:
-				if sed.qty > sed.custom_approved_qty:
+				if sed.qty > sed.custom_approved_qty and item_code != "RM000000":
 					valid_seds.append(sed)
 			
 			seds_by_date = defaultdict(list)

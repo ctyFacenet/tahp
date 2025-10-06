@@ -1,10 +1,15 @@
 import frappe
 from frappe import _
 
-@frappe.whitelist()
-def download_pdf(html, letterhead=None):
+@frappe.whitelist(allow_guest=False)
+def download_pdf():
+    # Lấy dữ liệu từ body POST (JSON)
+    data = frappe.local.form_dict
+    html = data.get("html", "")
+    letterhead = data.get("letterhead", None)
+
     HTML, CSS = import_weasyprint()
-    
+
     # Thêm letterhead nếu có
     if letterhead and letterhead != _("No Letterhead"):
         from frappe import get_doc

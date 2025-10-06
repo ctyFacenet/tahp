@@ -24,6 +24,8 @@ def get_data(filters):
 	conditions = []
 	params = {}
 
+	conditions.append("sed.item_code != 'RM000000'")
+
 	if filters.get("from_date"):
 		conditions.append("se.posting_date >= %(from_date)s")
 		params["from_date"] = filters["from_date"]

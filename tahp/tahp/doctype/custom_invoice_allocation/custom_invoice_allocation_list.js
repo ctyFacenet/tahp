@@ -94,12 +94,33 @@ async function print(list_view) {
                 </html>
             `;
 
-			console.log(html);
+            try {
+                const response = await fetch('/api/method/tahp.utils.weasyprint.download_pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Frappe-CSRF-Token': frappe.csrf_token,
+                    },
+                    body: JSON.stringify({ html: html, letterhead: null }), // hoặc truyền letterhead nếu cần
+                });
 
-            const params = new URLSearchParams({ html: html });
-            const url = `/api/method/tahp.utils.weasyprint.download_pdf?${params}`;
-            const w = window.open(url);
-            if (!w) frappe.msgprint(__("Please enable pop-ups"));
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'document.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    frappe.msgprint(__('Có lỗi xảy ra khi tạo PDF.'));
+                }
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                frappe.msgprint(__('Không thể tạo PDF. Vui lòng thử lại.'));
+            }
         },
         function() { 
             return;
