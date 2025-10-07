@@ -67,7 +67,7 @@ frappe.query_reports["Downtime Report"] = {
             "on_change": function() {
                 if (!frappe.query_reports["Downtime Report"]._initialized) return;
                 if (frappe.query_reports["Downtime Report"]._isSettingFilterFromChart) return;
-                
+                frappe.query_report.refresh();
                 setTimeout(() => {
                     frappe.query_reports["Downtime Report"].refresh_charts();
                 }, 200);
@@ -81,7 +81,7 @@ frappe.query_reports["Downtime Report"] = {
             "on_change": function() {
                 if (!frappe.query_reports["Downtime Report"]._initialized) return;
                 if (frappe.query_reports["Downtime Report"]._isSettingFilterFromChart) return;
-               
+                frappe.query_report.refresh();
                 setTimeout(() => {
                     frappe.query_reports["Downtime Report"].refresh_charts();
                 }, 200);
@@ -281,7 +281,6 @@ frappe.query_reports["Downtime Report"] = {
             $datatable.before('<h4 class="downtime-report-title" style="margin: 15px 0; font-weight: 600;">Chi tiết theo thiết bị:</h4>');
         }
     },
-    // Thêm vào sau hàm add_custom_title
     after_datatable_render: function(datatable) {
        
         const view_type = frappe.query_report.get_filter_value("view_type");
@@ -300,7 +299,6 @@ frappe.query_reports["Downtime Report"] = {
 async function draw_column_chart() {
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Cleanup existing chart
     let existing_chart = Chart.getChart("myCustomColumnChart_device");
     if (existing_chart) existing_chart.destroy();
     $('.report-wrapper .chart-container-device-column').remove();
@@ -425,7 +423,7 @@ async function draw_column_chart() {
                 }
             },
         });
-        // THÊM TITLE VÀ PLACEHOLDER VÀO ĐÂY
+       
         let titleDiv = document.createElement("div");
         titleDiv.style.textAlign = "center";
         titleDiv.style.fontSize = "16px";
@@ -446,7 +444,7 @@ async function draw_column_chart() {
 async function draw_horizontal_chart() {
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Cleanup existing chart
+   
     let existing_chart = Chart.getChart("myCustomBarChart_device");
     if (existing_chart) existing_chart.destroy();
     $('.report-wrapper .chart-container-device-horizontal').remove();
@@ -679,7 +677,6 @@ async function draw_column_chart1() {
    
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Cleanup existing chart
     let existing_chart = Chart.getChart("myCustomColumnChart_reason");
     if (existing_chart) existing_chart.destroy();
     $('.report-wrapper .chart-container-reason-column').remove();
@@ -749,10 +746,8 @@ async function draw_column_chart1() {
                         const reason = labels[chart.index]; 
                         const currentFilter = frappe.query_report.get_filter_value("reason_group");
                        
-
-                        
                         if(currentFilter === reason) {  
-                            // frappe.query_report.set_filter_value("reason_group", "");
+                           
                             frappe.query_report.set_filter_value("reason_group", "");
                             
                             frappe.show_alert({
@@ -805,7 +800,7 @@ async function draw_column_chart1() {
             },
             
         });
-        // THÊM TITLE HTML
+      
         let titleDiv = document.createElement("div");
         titleDiv.style.textAlign = "center";
         titleDiv.style.fontSize = "16px";
@@ -814,7 +809,7 @@ async function draw_column_chart1() {
         titleDiv.style.marginBottom = "15px";
         titleDiv.innerText = "Thời gian downtime theo nhóm nguyên nhân";
         wrapper.insertBefore(titleDiv, wrapper.firstChild);  
-        // THÊM PLACEHOLDER
+      
         let placeholderDiv = document.createElement("div");
         placeholderDiv.style.height = "85px";
         placeholderDiv.style.marginBottom = "0px";
@@ -827,7 +822,7 @@ async function draw_horizontal_chart1() {
    
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    // Cleanup existing chart
+   
     let existing_chart = Chart.getChart("myCustomBarChart_reason");
     if (existing_chart) existing_chart.destroy();
     $('.report-wrapper .chart-container-reason-horizontal').remove();
@@ -868,13 +863,10 @@ async function draw_horizontal_chart1() {
     if (r.message && r.message.labels && r.message.labels.length > 0) {
         const chartData = r.message;
         
-        
         let combined = chartData.labels.map((label, i) => ({
             label: label,
             value: chartData.values[i],
         }));
-        
-
         
         combined.sort((a, b) => b.value - a.value);
 
