@@ -8,7 +8,7 @@ frappe.query_reports["Production Schedule"] = {
 			"label": __("Từ ngày"),
 			"fieldtype": "Date",
 			"on_change": function() {
-				frappe.query_reports["IDK"].handle_date_range_change();
+				frappe.query_reports["Production Schedule"].handle_date_range_change();
 			}
 		},
 		{
@@ -16,7 +16,7 @@ frappe.query_reports["Production Schedule"] = {
 			"label": __("Đến ngày"),
 			"fieldtype": "Date",
 			"on_change": function() {
-				frappe.query_reports["IDK"].handle_date_range_change();
+				frappe.query_reports["Production Schedule"].handle_date_range_change();
 			}
 		},
 		{
@@ -24,7 +24,7 @@ frappe.query_reports["Production Schedule"] = {
 			"label": __("Tuần"),
 			"fieldtype": "Date",
 			"on_change": function() {
-				frappe.query_reports["IDK"].handle_week_change();
+				frappe.query_reports["Production Schedule"].handle_week_change();
 			}
 		}
 	],
@@ -160,6 +160,62 @@ frappe.query_reports["Production Schedule"] = {
 				
 				.chart-wrapper::-webkit-scrollbar-thumb:hover {
 					background: #a8a8a8;
+				}
+				
+				/* Responsive chart adjustments */
+				@media (max-width: 768px) {
+					.chart-container {
+						height: 250px !important;
+					}
+					
+					.chart-wrapper {
+						padding: 8px !important;
+					}
+					
+					/* Responsive chart title */
+					.chartjs-chart canvas {
+						max-width: 100% !important;
+					}
+				}
+				
+				@media (min-width: 769px) and (max-width: 1024px) {
+					.chart-container {
+						height: 300px !important;
+					}
+				}
+				
+				@media (min-width: 1025px) {
+					.chart-container {
+						height: 350px !important;
+					}
+				}
+				
+				/* Chart title responsive */
+				.chartjs-chart {
+					max-width: 100% !important;
+					overflow: hidden !important;
+				}
+				
+				.chartjs-chart canvas {
+					max-width: 100% !important;
+					height: auto !important;
+				}
+				
+				/* Chart title alignment and wrapping */
+				.chartjs-chart .chartjs-chart-title {
+					text-align: center !important;
+					white-space: normal !important;
+					word-wrap: break-word !important;
+					max-width: 100% !important;
+				}
+				
+				@media (max-width: 768px) {
+					.chartjs-chart .chartjs-chart-title {
+						text-align: left !important;
+						font-size: 14px !important;
+						line-height: 1.3 !important;
+						padding: 5px 0 !important;
+					}
 				}
 			</style>
 		`);
@@ -369,7 +425,7 @@ frappe.query_reports["Production Schedule"] = {
 		
 		let bar_width_per_lsx = is_mobile ? 60 : is_tablet ? 80 : 100;
 		let canvas_width = num_lsx * bar_width_per_lsx;
-		let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320;
+		let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
 		
 		if (canvas_width < 300) canvas_width = 300;
 		if (canvas_width > 1200) canvas_width = 1200;
@@ -416,13 +472,27 @@ frappe.query_reports["Production Schedule"] = {
 				responsive: true,
 				maintainAspectRatio: false,
 				plugins: {
-					legend: { position: 'top' },
+					legend: { 
+						position: 'top',
+						labels: {
+							boxWidth: 12,
+							padding: 10,
+							font: {
+								size: window.innerWidth < 768 ? 10 : 12
+							}
+						}
+					},
 					title: { 
 						display: true, 
-						text: 'Sản lượng sản xuất theo LSX - Week Plan' ,
+						text: 'Sản lượng sản xuất theo LSX - Week Plan',
 						font: {
-							size: 22,
+							size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
 							weight: 'bold'
+						},
+						align: window.innerWidth < 768 ? 'start' : 'center',
+						padding: {
+							top: 10,
+							bottom: 20
 						}
 					},
 				},
