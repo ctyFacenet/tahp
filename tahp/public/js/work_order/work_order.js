@@ -2,6 +2,7 @@ frappe.ui.form.on('Work Order', {
     refresh: async function(frm) {
         frm.set_intro("");
         await finish_button(frm);
+        await change_time(frm);
         frm.remove_custom_button('Close', 'Status');
         frm.remove_custom_button('Stop', 'Status');
         if (frm.doc.status == "In Process") {
@@ -68,6 +69,57 @@ async function autofill_items(frm) {
         }
         frm.refresh_field("operations");
     }, 100);
+}
+
+async function change_time(frm) {
+    if (frappe.session.user !== "Administrator") return;
+    frm.add_custom_button("Chỉnh sửa thời gian", function() {
+        let d = new frappe.ui.Dialog({
+            title: "Chỉnh sửa mốc thời gian",
+            fields: [
+                {
+                    label: "Planned Start Date",
+                    fieldname: "planned_start_date",
+                    fieldtype: "Datetime",
+                    default: frm.doc.planned_start_date
+                },
+                {
+                    label: "Planned End Date",
+                    fieldname: "planned_end_date",
+                    fieldtype: "Datetime",
+                    default: frm.doc.planned_end_date
+                },
+                {
+                    label: "Actual Start Date",
+                    fieldname: "actual_start_date",
+                    fieldtype: "Datetime",
+                    default: frm.doc.actual_start_date
+                },
+                {
+                    label: "Actual End Date",
+                    fieldname: "actual_end_date",
+                    fieldtype: "Datetime",
+                    default: frm.doc.actual_end_date
+                },
+            ],
+            primary_action_label: "Lưu thay đổi",
+            primary_action(values) {
+                frappe.call({
+                    method: "tahp.doc_events.work_order.before_submit.update_dates",
+                    args: {
+                        work_order_name: frm.doc.name,
+                        actual_start_date: values.actual_start_date,
+                        actual_end_date: values.actual_end_date,
+                        planned_start_date: values.planned_start_date,
+                        planned_end_date: values.planned_end_date
+                    },
+                });
+                frappe.msgprint('Cập nhật thành công')
+                d.hide();
+            }
+        });
+        d.show();
+    });    
 }
 
 // Huy Section

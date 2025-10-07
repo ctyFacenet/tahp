@@ -34,7 +34,7 @@ textarea {
   }
 }
 
-.popover {
+.bs-popover-top {
   display: none !important;
 }
 

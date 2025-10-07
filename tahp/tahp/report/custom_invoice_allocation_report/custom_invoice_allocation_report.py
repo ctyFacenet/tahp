@@ -16,7 +16,7 @@ def get_columns():
 		{"label": "Đơn vị", "fieldname": "stock_uom", "fieldtype": "Data", "width": 80},
 		{"label": "SL nhập", "fieldname": "in_qty", "fieldtype": "Float", "width": 100, "precision": 2},
 		{"label": "SL xuất", "fieldname": "out_qty", "fieldtype": "Float", "width": 100, "precision": 2},
-		{"label": "SL đã gửi kế toán", "fieldname": "custom_approved_qty", "fieldtype": "Float", "width": 100 ,"precision": 2},
+		{"label": "SL đã có hóa đơn", "fieldname": "custom_approved_qty", "fieldtype": "Float", "width": 100 ,"precision": 2},
 	]
 
 
@@ -25,6 +25,7 @@ def get_data(filters):
 	params = {}
 
 	conditions.append("sed.item_code != 'RM000000'")
+	conditions.append("sed.item_code != 'TP00001'")
 
 	if filters.get("from_date"):
 		conditions.append("se.posting_date >= %(from_date)s")

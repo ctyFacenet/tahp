@@ -293,3 +293,22 @@ def get_shift_progress():
         })
 
     return result
+
+@frappe.whitelist()
+def update_dates(work_order_name, actual_start_date=None, actual_end_date=None, planned_start_date=None, planned_end_date=None):
+    """Cho phép Administrator cập nhật lại các mốc thời gian của Work Order"""
+    if frappe.session.user != "Administrator":
+        frappe.throw("Chỉ Administrator mới được phép chỉnh sửa các trường này.")
+
+    wo = frappe.get_doc("Work Order", work_order_name)
+
+    if actual_start_date:
+        wo.actual_start_date = actual_start_date
+    if actual_end_date:
+        wo.actual_end_date = actual_end_date
+    if planned_start_date:
+        wo.planned_start_date = planned_start_date
+    if planned_end_date:
+        wo.planned_end_date = planned_end_date
+
+    wo.save(ignore_permissions=True)
