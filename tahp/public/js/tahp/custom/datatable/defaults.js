@@ -25,12 +25,12 @@ export default function getDefaultOptions(instance) {
                     this.sortColumn(column.colIndex, 'none');
                 }
             },
-            {
-                label: instance.translate('Remove column'),
-                action: function (column) {
-                    this.removeColumn(column.colIndex);
-                }
-            }
+            // {
+            //     label: instance.translate('Remove column'),
+            //     action: function (column) {
+            //         this.removeColumn(column.colIndex);
+            //     }
+            // }
         ],
         events: {
             onRemoveColumn(column) {},
@@ -73,6 +73,6 @@ export default function getDefaultOptions(instance) {
         hasAction: null,
         title: null,
         styleTitle: null,
-        headerBackground: null
+        headerBackground: "rgba(205, 222, 238, 1)"
     };
 };

@@ -116,6 +116,12 @@ frappe.ui.form.on('Stock Entry Detail', {
     },
     items_add: function(frm, cdt, cdn) {
         apply_qty_colors(frm);   // khi user thêm dòng mới
+    },
+    item_code: function(frm, cdt, cdn) {
+        if (!frm.is_new()) return;
+        if (frm.doc.stock_entry_type == "Material Receipt") {
+            
+        }
     }
 });
 
@@ -165,6 +171,18 @@ frappe.ui.form.on('Stock Entry Detail', {
             frm.doc.fg_completed_qty = row.qty;
         }
     },
+    item_code: async function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn]
+        if (!row.item_code) return;
+        if (!frm.is_new()) return;
+        if (frm.doc.docstatus !== 0) return;
+        let response = await frappe.call({method: "tahp.doc_events.item.item.get_warehouse", args: {item_code: row.item_code}})
+        if (response.message) {
+            if (frm.doc.stock_entry_type == "Material Receipt") row.t_warehouse = response.message
+            else if (frm.doc.stock_entry_type == "Material Issue") row.s_warehouse = response.message
+        }
+        frm.refresh_field('items');
+    }
 });
 
 

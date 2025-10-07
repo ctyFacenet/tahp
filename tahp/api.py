@@ -19,8 +19,6 @@ def check_wwo():
 		entry_items = []
 		detail = json.loads(detail)
 		for row in detail:
-			if row.get("scrap"):
-				continue
 			bom_name = row.get("bom")
 			item_code = row.get("item")
 			qty = frappe.utils.flt(row.get("qty") or 0)

@@ -2,7 +2,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-12 15:48:13.119753",
+  "modified": "2025-10-06 08:49:28.831119",
   "name": "Công nhân",
   "role_profile": "Công nhân",
   "roles": [
@@ -29,6 +29,12 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock Manager"
+   },
+   {
+    "parent": "Công nhân",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
    }
   ]
  },
@@ -170,7 +176,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-09 11:29:54.565504",
+  "modified": "2025-10-06 08:50:40.059942",
   "name": "Kế hoạch sản xuất",
   "role_profile": "Kế hoạch sản xuất",
   "roles": [
@@ -203,13 +209,19 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock Manager"
+   },
+   {
+    "parent": "Kế hoạch sản xuất",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
    }
   ]
  },
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-09 11:31:09.322114",
+  "modified": "2025-10-06 08:50:37.593328",
   "name": "Phát triển công nghệ",
   "role_profile": "Phát triển công nghệ",
   "roles": [
@@ -242,6 +254,12 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock Manager"
+   },
+   {
+    "parent": "Phát triển công nghệ",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
    }
   ]
  },
@@ -551,7 +569,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-10 08:55:21.789662",
+  "modified": "2025-10-06 08:50:31.828014",
   "name": "Bảo trì",
   "role_profile": "Bảo trì",
   "roles": [
@@ -596,13 +614,19 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Bảo trì"
+   },
+   {
+    "parent": "Bảo trì",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
    }
   ]
  },
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-10 11:16:59.130743",
+  "modified": "2025-10-06 08:50:27.533433",
   "name": "Chủ kho",
   "role_profile": "Chủ kho",
   "roles": [
@@ -635,6 +659,12 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock User"
+   },
+   {
+    "parent": "Chủ kho",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
    },
    {
     "parent": "Chủ kho",

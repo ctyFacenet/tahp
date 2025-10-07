@@ -209,10 +209,12 @@ def execute(filters=None, summary=False):
 		for a in actives:
 			ws = a.workstation
 			if ws not in latest:  # chỉ lấy lần xuất hiện đầu tiên (mới nhất do order_by)
+				related_downtimes = [d for d in downtimes if d.parent == a.parent]
+
 				latest[ws] = frappe._dict(
 					active=a,
 					downtime=next((d for d in downtimes if d.workstation == ws), None),
-					downtime_overall = sum(int(d.duration if d.duration else 0) for d in downtimes if d.workstation == ws),
+					downtime_overall = sum(int(d.duration or 0) for d in related_downtimes),
 					team=next((t for t in teams if t.parent == a.parent), None),
 					shift=frappe.db.get_value("Work Order", work_orders.get(a.parent), "custom_shift")
 				)

@@ -444,7 +444,7 @@ Open Item {0},Mở mặt hàng {0}
 Open BOM {0},Mở CTSX {0}
 Browse BOM,Duyệt cây CTSX
 Update Cost,Cập nhật giá
-Permanently Submit {0}?,Xác nhận hoàn thành {0}?
+Permanently Submit {0}?,Xác nhận duyệt {0}?
 Include Item In Manufacturing,Bao gồm mặt hàng trong sản xuất
 Is Fixed Asset,Là tài sản cố định
 Item UOM,Đơn vị mặt hàng
@@ -6102,7 +6102,7 @@ zoom-out,zoom-out
 {0} to stop receiving emails of this type,{0} to stop receiving emails of this type
 {0} to {1},{0} to {1}
 {0} un-shared this document with {1},{0} un-shared this document with {1}
-{0} values selected,{0} values selected
+{0} values selected,Đã chọn {0} giá trị 
 {0} viewed this,{0} viewed this
 {0} w,{0} w
 {0} y,{0} y
@@ -7876,7 +7876,7 @@ Create a Product,Create a Product
 Create a Quotation,Create a Quotation
 Create a Sales Item,Create a Sales Item
 Create a Sales Order,Create a Sales Order
-Create a Supplier,Create a Supplier
+Create a Supplier,Thêm nhà cung cấp
 Create a Warehouse,Create a Warehouse
 Create a new Item,Create a new Item
 Create a new composite asset,Create a new composite asset
@@ -9814,7 +9814,7 @@ Maintain Asset,Maintain Asset
 Maintain Same Rate Throughout Internal Transaction,Maintain Same Rate Throughout Internal Transaction
 Maintain Same Rate Throughout Sales Cycle,Maintain Same Rate Throughout Sales Cycle
 Maintain Same Rate Throughout the Purchase Cycle,Maintain Same Rate Throughout the Purchase Cycle
-Maintenance,Maintenance
+Maintenance,Bảo trì
 Maintenance Date,Maintenance Date
 Maintenance Details,Maintenance Details
 Maintenance Log,Maintenance Log
@@ -11123,7 +11123,7 @@ Priority is mandatory,Priority is mandatory
 Priority {0} has been repeated.,Priority {0} has been repeated.
 Probability,Probability
 Probability (%),Probability (%)
-Problem,Problem
+Problem,Hỏng
 Procedure,Procedure
 Procedures dropped,Procedures dropped
 Process Deferred Accounting,Process Deferred Accounting
@@ -12757,7 +12757,7 @@ Summary for this week and pending activities,Summary for this week and pending a
 Supplied Item,Supplied Item
 Supplied Items,Supplied Items
 Supplied Qty,Supplied Qty
-Supplier,Supplier
+Supplier,Nhà cung cấp
 Supplier Address,Supplier Address
 Supplier Address Details,Supplier Address Details
 Supplier Addresses And Contacts,Supplier Addresses And Contacts
@@ -12896,9 +12896,9 @@ Tax Assets,Tax Assets
 Tax Breakup,Tax Breakup
 Tax Category,Tax Category
 "Tax Category has been changed to \""Total\"" because all the Items are non-stock items","Tax Category has been changed to \""Total\"" because all the Items are non-stock items"
-Tax ID,Tax ID
-Tax Id,Tax Id
-Tax Id:,Tax Id:
+Tax ID,Mã số thuế
+Tax Id,Mã số thuế
+Tax Id:,Mã số thuế:
 Tax Masters,Tax Masters
 Tax Rate,Tax Rate
 Tax Rates,Tax Rates
@@ -14053,3 +14053,6 @@ Workstation Status Report, Báo cáo trạng thái thiết bị
 Material Consumption, Báo cáo tiêu hao nguyên liệu
 Manufacturing Dashboard, Dashboard sản xuất tổng hợp
 Manufacturing dashboard, Dashboard sản xuất tổng hợp
+Custom Invoice, Hóa đơn
+Custom Invoice Allocation, Hàng hóa theo chứng từ
+Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho
