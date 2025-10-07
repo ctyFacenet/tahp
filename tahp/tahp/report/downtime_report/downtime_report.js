@@ -28,6 +28,7 @@
 
 frappe.query_reports["Downtime Report"] = {
     _initialized: false,
+    _isSettingFilterFromChart: false,
     
     "filters": [
         {
@@ -65,6 +66,7 @@ frappe.query_reports["Downtime Report"] = {
             "default": frappe.datetime.add_days(frappe.datetime.get_today(), -7),
             "on_change": function() {
                 if (!frappe.query_reports["Downtime Report"]._initialized) return;
+                if (frappe.query_reports["Downtime Report"]._isSettingFilterFromChart) return;
                 
                 setTimeout(() => {
                     frappe.query_reports["Downtime Report"].refresh_charts();
@@ -78,6 +80,7 @@ frappe.query_reports["Downtime Report"] = {
             "default": frappe.datetime.get_today(),
             "on_change": function() {
                 if (!frappe.query_reports["Downtime Report"]._initialized) return;
+                if (frappe.query_reports["Downtime Report"]._isSettingFilterFromChart) return;
                
                 setTimeout(() => {
                     frappe.query_reports["Downtime Report"].refresh_charts();
@@ -399,7 +402,27 @@ async function draw_column_chart() {
                         formatter: (value) => value.toFixed(2)
                     }
                 },
-                scales: { y: { beginAtZero: true, suggestedMax: Math.max(...values) * 1.1 } }
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        suggestedMax: Math.max(...values) * 1.1,
+                        title: {
+                            display: true,
+                            text: "Số giờ Downtime",
+                            color: "#333",
+                            font: { size: 14, weight: "bold" }
+                        }
+                        
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false, 
+                            maxRotation: 45, 
+                            minRotation: 0   
+                        }
+                    }
+                     
+                }
             },
         });
         // THÊM TITLE VÀ PLACEHOLDER VÀO ĐÂY
@@ -531,7 +554,14 @@ async function draw_horizontal_chart() {
                 scales: { 
                     x: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...chartData.values) * 1.1  
+                        suggestedMax: Math.max(...chartData.values) * 1.1,
+                        title: {
+                            display: true,
+                            text: "Số giờ Downtime",
+                            color: "#333",
+                            font: { size: 14, weight: "bold" },
+                            
+                        }
                     } 
                 }
             },
@@ -752,7 +782,26 @@ async function draw_column_chart1() {
                         formatter: (value) => value.toFixed(2)
                     }
                 },
-                scales: { y: { beginAtZero: true, suggestedMax: Math.max(...values) * 1.1 } }
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        suggestedMax: Math.max(...values) * 1.1,
+                        title: {
+                            display: true,
+                            text: "Số giờ Downtime",
+                            color: "#333",
+                            font: { size: 14, weight: "bold" },
+                            
+                        } 
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false, 
+                            maxRotation: 45, 
+                            minRotation: 0  
+                        }
+                    }
+                }
             },
             
         });
@@ -888,7 +937,14 @@ async function draw_horizontal_chart1() {
                 scales: { 
                     x: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...chartData.values) * 1.1  
+                        suggestedMax: Math.max(...chartData.values) * 1.1,
+                        title: {
+                            display: true,
+                            text: "Số giờ Downtime",
+                            color: "#333",
+                            font: { size: 14, weight: "bold" },
+                            
+                        }
                     } 
                 }
             },
