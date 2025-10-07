@@ -401,23 +401,23 @@ function validate_dates(cdt, cdn) {
     let start = row.planned_start_time;
     let end = row.planned_end_time;
 
-    // Nếu có ngày bắt đầu
-    if (start) {
-        if (start < today) {
-            frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
-            frappe.model.set_value(cdt, cdn, 'planned_start_time', null);
-            return;
-        }
-    }
+    // // Nếu có ngày bắt đầu
+    // if (start) {
+    //     if (start < today) {
+    //         frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
+    //         frappe.model.set_value(cdt, cdn, 'planned_start_time', null);
+    //         return;
+    //     }
+    // }
 
-    // Nếu có ngày kết thúc
-    if (end) {
-        if (end < today) {
-            frappe.model.set_value(cdt, cdn, 'planned_end_time', null);
-            frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
-            return;
-        }
-    }
+    // // Nếu có ngày kết thúc
+    // if (end) {
+    //     if (end < today) {
+    //         frappe.model.set_value(cdt, cdn, 'planned_end_time', null);
+    //         frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
+    //         return;
+    //     }
+    // }
 
     // Nếu cả hai đều có
     if (start && end) {
