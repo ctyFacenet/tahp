@@ -7,18 +7,20 @@ frappe.query_reports["BOM Custom Search"] = {
         report.page.set_title("Tìm kiếm BOM");
         injectDatatableCSS(report);
 
-        const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
-        if (res?.message) {
-            res.message.forEach(f => {
-                if (f.fieldname === 'week_work_order') {
-                    f.default = report.get_filter_value('week_work_order');
-                }
-                if (f.fieldname === 'item_code') {
-                    f.default = report.get_filter_value('item_code');
-                }
-            });
-            frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(report, () => merge_columns(report)));
-        }
+        // const res = await frappe.call('tahp.tahp.report.bom_custom_search.bom_custom_search.get_filter_columns');
+        // if (res?.message) {
+        //     res.message.forEach(f => {
+        //         if (f.fieldname === 'week_work_order') {
+        //             f.default = report.get_filter_value('week_work_order');
+        //         }
+        //         if (f.fieldname === 'item_code') {
+        //             f.default = report.get_filter_value('item_code');
+        //         }
+        //     });
+        //     frappe.custom_utils_dynamic_filters(report, res.message, () => waitForDataTableReady(report, () => merge_columns(report)));
+        // }
+
+        waitForDataTableReady(report, () => merge_columns(report));
 
         // Override refresh
         const original_refresh = report.refresh;

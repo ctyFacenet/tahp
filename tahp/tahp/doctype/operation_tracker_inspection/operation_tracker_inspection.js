@@ -192,6 +192,8 @@ frappe.ui.form.on("Operation Tracker Inspection", {
         });
 
         history.sort((a, b) => b._from_obj - a._from_obj);
+
+        console.log(history)
         // render bảng
         frm.events.define_table(
             frm, $col31, "Lịch sử đo đạc",
@@ -424,11 +426,15 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 "overflow-x": "auto",
             });
         }
+
         function getFlexStyle() {
-            if (totalColumns > 5) {
-                return 'min-width:70px;'; // tuỳ chỉnh độ rộng tối thiểu mỗi cột
+            if (totalColumns <= 3) {
+                return 'min-width:120px; flex:1;';
+            } else if (totalColumns <= 5) {
+                return 'min-width:90px; flex:1;';
+            } else {
+                return 'min-width:70px;';
             }
-            return 'flex:1;';
         }
 
         if (middles.length) {
@@ -465,7 +471,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $realRight = $('<div class="jc-tb-right"></div>');
                     $right.append($realRight);
                 } else {
-                    $row.css({'width':'fit-content'})
+                    $row.css({'width':'100%'})
                 }
             } else {
                 $left = $(`<div style="${getFlexStyle(2)}" class="text-left"></div>`);
@@ -542,8 +548,10 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     // gán dữ liệu vào đúng cột middle
                     let midIndex = middles.findIndex(m => m.fieldname === col.fieldname)
                     if (midIndex !== -1 && $middlesDivs[midIndex]) {
+                        let displayText = ''
+                        if (row[col.fieldname] && row[col.fieldname] !== "0") displayText = row[col.fieldname]
                         $middlesDivs[midIndex].append(
-                            `<div data-fieldname=${col.fieldname} data-rowindex=${rowIndex}>${row[col.fieldname] || ''}</div>`
+                            `<div data-fieldname=${col.fieldname} data-rowindex=${rowIndex}>${displayText}</div>`
                         )
                     }
                 }
@@ -576,6 +584,14 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 });
 
                 $wrapper.append($secondaryRow);
+
+                setTimeout(() => {
+                    let rowWidth = $row.outerWidth();
+                    $secondaryRow.css({
+                        "min-width": rowWidth + "px",
+                        "width": rowWidth + "px"
+                    });
+                }, 0);
             }
 
 
@@ -673,7 +689,8 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 items: data.map(d => ({
                     specification: d.specification,
                     value: d.value
-                }))
+                })),
+                operation: frm.doc.operation
             }
         });
 

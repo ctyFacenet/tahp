@@ -58,10 +58,10 @@ frappe.ui.form.on('Stock Entry', {
 
             switch (frm.doc.stock_entry_type) {
                 case "Manufacture":
-                    title = "Nhập xuất sau SX";
+                    title = "Nhập xuất theo LSX";
                     break;
                 case "Material Receipt":
-                    title = "Nhập kho";
+                    title = "Nhập kho NVL";
                     break;
                 case "Material Issue":
                     title = "Xuất kho";

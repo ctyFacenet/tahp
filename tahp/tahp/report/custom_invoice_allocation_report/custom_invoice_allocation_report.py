@@ -21,49 +21,89 @@ def get_columns():
 
 
 def get_data(filters):
-	conditions = []
-	params = {}
+	# 1️⃣ Lấy danh sách nhóm con cần bỏ qua (những nhóm có cha chứa "sản phẩm")
+	item_groups_to_exclude = frappe.get_all(
+		"Item Group",
+		filters={"parent_item_group": ["like", "%sản phẩm%"]},
+		pluck="name"
+	)
 
-	conditions.append("sed.item_code != 'RM000000'")
-	conditions.append("sed.item_code != 'TP00001'")
+	# 2️⃣ Lấy danh sách item thuộc các nhóm đó
+	items_to_exclude = frappe.get_all(
+		"Item",
+		filters={"item_group": ["in", item_groups_to_exclude]},
+		pluck="name"
+	)
 
-	if filters.get("from_date"):
-		conditions.append("se.posting_date >= %(from_date)s")
-		params["from_date"] = filters["from_date"]
-
-	if filters.get("to_date"):
-		conditions.append("se.posting_date <= %(to_date)s")
-		params["to_date"] = filters["to_date"]
-
-	if filters.get("item_code"):
-		conditions.append("sed.item_code = %(item_code)s")
-		params["item_code"] = filters["item_code"]
+	# 3️⃣ Điều kiện lọc cơ bản
+	base_filters = {
+		"docstatus": 1  # chỉ lấy chứng từ đã Submit (tuỳ ý)
+	}
 
 	if filters.get("stock_entry"):
-		conditions.append("sed.parent = %(stock_entry)s")
-		params["stock_entry"] = filters["stock_entry"]
+		base_filters["name"] = filters["stock_entry"]
 
-	where_clause = " AND ".join(conditions)
-	if where_clause:
-		where_clause = "WHERE " + where_clause
+	if filters.get("from_date") or filters.get("to_date"):
+		date_filter = []
+		if filters.get("from_date"):
+			date_filter.append([">=", filters["from_date"]])
+		if filters.get("to_date"):
+			date_filter.append(["<=", filters["to_date"]])
+		base_filters["posting_date"] = date_filter
 
-	query = f"""
-		SELECT
-			se.posting_date,
-			sed.parent AS stock_entry,
-			sed.item_code,
-			sed.item_name,
-			sed.description,
-			sed.stock_uom,
-			CASE WHEN sed.t_warehouse IS NOT NULL THEN sed.qty ELSE 0 END AS in_qty,
-			CASE WHEN sed.s_warehouse IS NOT NULL THEN sed.qty ELSE 0 END AS out_qty,
-			sed.custom_approved_qty
-		FROM
-			`tabStock Entry Detail` sed
-		JOIN
-			`tabStock Entry` se ON se.name = sed.parent
-		{where_clause}
-		ORDER BY se.posting_date DESC, sed.parent DESC
-	"""
+	# 4️⃣ Lấy danh sách phiếu kho (Stock Entry)
+	stock_entries = frappe.get_all(
+		"Stock Entry",
+		filters=base_filters,
+		fields=["name", "posting_date"]
+	)
 
-	return frappe.db.sql(query, params, as_dict=True)
+	if not stock_entries:
+		return []
+
+	stock_entry_names = [se.name for se in stock_entries]
+
+	# 5️⃣ Lọc chi tiết Stock Entry Detail
+	sed_filters = {
+		"parent": ["in", stock_entry_names],
+		"item_code": ["not in", ["RM000000", "TP00001"]]
+	}
+
+	if filters.get("item_code"):
+		sed_filters["item_code"] = filters["item_code"]
+
+	if items_to_exclude:
+		sed_filters["item_code"] = ["not in", items_to_exclude]
+
+	sed_rows = frappe.get_all(
+		"Stock Entry Detail",
+		filters=sed_filters,
+		fields=[
+			"parent as stock_entry",
+			"item_code",
+			"item_name",
+			"description",
+			"stock_uom",
+			"qty",
+			"t_warehouse",
+			"s_warehouse",
+			"custom_approved_qty"
+		],
+		order_by="creation desc"
+	)
+
+	# 6️⃣ Bổ sung ngày chứng từ từ bảng Stock Entry
+	se_map = {se.name: se.posting_date for se in stock_entries}
+	for row in sed_rows:
+		row["posting_date"] = se_map.get(row["stock_entry"])
+		row["in_qty"] = row["qty"] if row["t_warehouse"] else 0
+		row["out_qty"] = row["qty"] if row["s_warehouse"] else 0
+		# 💡 Thêm màu nền (Frappe sẽ tự dùng _background khi render)
+		if row.get("custom_approved_qty") == 0:
+			row["_background"] = ""
+		elif row.get("custom_approved_qty") == row.get("qty"):
+			row["_background"] = "#a0ffa0"  # xanh lá nhạt
+		elif (row.get("custom_approved_qty") or 0) < (row.get("qty") or 0):
+			row["_background"] = "#ffe796"  # vàng nhạt (kiểu warning)
+
+	return sed_rows

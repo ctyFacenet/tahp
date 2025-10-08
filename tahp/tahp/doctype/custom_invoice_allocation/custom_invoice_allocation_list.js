@@ -1,11 +1,13 @@
 frappe.listview_settings["Custom Invoice Allocation"] = {
     hide_name_column: true,
-
-    get_indicator: function(doc) {
-        if (doc.docstatus === 0) {
-            return ["Chưa in", "red", "docstatus"];
-        } else if (doc.docstatus === 1) {
-            return ["Đã in", "green", "docstatus"];
+    has_indicator_for_draft: true,
+    get_indicator: function (doc) {
+        if (doc.status === "Chưa in") {
+            return ["Chưa in", "red", "status"];
+        } else if (doc.status === "In xong") {
+            return ["In xong", "green", "status"];
+        } else {
+            return ["Chưa in", "red", "status"];
         }
     },
     refresh: async function(listview) {
@@ -30,9 +32,16 @@ async function print(list_view) {
                 method: "tahp.tahp.doctype.custom_invoice_allocation.custom_invoice_allocation.get_invoice_allocation_items",
                 args: { items: checked_items },
             });
-			list_view.refresh();
+            
+            const { flag, data } = res.message;
 
-			const items_data = res.message; 
+            if (!flag) {
+                frappe.msgprint("Không tìm thấy chứng từ có thể in");
+                return;
+            }
+            
+			list_view.refresh();
+			const items_data = data; 
             
             let html = `
                 <html >

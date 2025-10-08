@@ -129,11 +129,26 @@ def update_params(inspection, items):
 			"feedback_id": feedback_id
 		})
 		jc_doc.save(ignore_permissions=True)
+        
+		wo_doc = frappe.get_doc("Work Order", jc_doc.work_order)
+		shift_leader = wo_doc.custom_shift_leader
+		if shift_leader:
+			user = frappe.db.get_value("Employee", shift_leader, "user_id")
+			if user:
+				frappe.get_doc({
+					"doctype": "Notification Log",
+					"for_user": user,
+					"subject": f"Yêu cầu mới từ bộ phận đo đạc tại công đoạn <b style='font-weight:bold'>{doc.operation}</b>: {send}",
+					"email_content": f"Yêu cầu mới từ bộ phận đo đạc tại công đoạn <b style='font-weight:bold'>{doc.operation}</b>: {send}",
+					"type": "Alert",
+					"document_type": "Job Card",
+					"document_name": doc.job_card
+				}).insert(ignore_permissions=True)
 
 	doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
-def send_recommendation(inspection, items):
+def send_recommendation(inspection, items, operation=None):
     """
     Trả về feedback gợi ý dựa trên Operation Tracker Evaluation.
     items: list of dicts [{specification, value}]
@@ -146,6 +161,7 @@ def send_recommendation(inspection, items):
     # Lấy tất cả evaluation
     evaluations = frappe.get_all(
         "Operation Tracker Evaluation",
+        filters=[["operation", "in", [None, operation]]],
         fields=["specification", "evaluation", "value", "feedback"]
     )
 
