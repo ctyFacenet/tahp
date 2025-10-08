@@ -163,62 +163,6 @@ frappe.query_reports["Production Report"] = {
                 .chart-wrapper::-webkit-scrollbar-thumb:hover {
                     background: #a8a8a8;
                 }
-                
-                /* Responsive chart adjustments */
-                @media (max-width: 768px) {
-                    .chart-container {
-                        height: 250px !important;
-                    }
-                    
-                    .chart-wrapper {
-                        padding: 8px !important;
-                    }
-                    
-                    /* Responsive chart title */
-                    .chartjs-chart canvas {
-                        max-width: 100% !important;
-                    }
-                }
-                
-                @media (min-width: 769px) and (max-width: 1024px) {
-                    .chart-container {
-                        height: 300px !important;
-                    }
-                }
-                
-                @media (min-width: 1025px) {
-                    .chart-container {
-                        height: 350px !important;
-                    }
-                }
-                
-                /* Chart title responsive */
-                .chartjs-chart {
-                    max-width: 100% !important;
-                    overflow: hidden !important;
-                }
-                
-                .chartjs-chart canvas {
-                    max-width: 100% !important;
-                    height: auto !important;
-                }
-                
-                /* Chart title alignment and wrapping */
-                .chartjs-chart .chartjs-chart-title {
-                    text-align: center !important;
-                    white-space: normal !important;
-                    word-wrap: break-word !important;
-                    max-width: 100% !important;
-                }
-                
-                @media (max-width: 768px) {
-                    .chartjs-chart .chartjs-chart-title {
-                        text-align: left !important;
-                        font-size: 14px !important;
-                        line-height: 1.3 !important;
-                        padding: 5px 0 !important;
-                    }
-                }
             </style>
         `);
         $('head').append(style);
@@ -309,7 +253,16 @@ frappe.query_reports["Production Report"] = {
             gap: 12px;
             width: 100%;
         "></div>`);
+
+        const noteTextDiv = document.createElement("div");
+        noteTextDiv.innerHTML = `<div>Phần in đậm là kế hoạch<br>Phần in nhạt là thực tế</div>`
+        noteTextDiv.style.textAlign = "center";
+        noteTextDiv.style.fontWeight = "bold";
+        noteTextDiv.style.paddingTop = "10px";
+
         container.append(gridContainer);
+        container.append(noteTextDiv);
+        
 
         // Create progress card for each item
         summary_data.forEach(item => {
@@ -427,19 +380,19 @@ frappe.query_reports["Production Report"] = {
     "draw_daily_production_chart": function(daily_data, container) {
         const dates = Object.keys(daily_data).sort();
         if (dates.length === 0) return;
-
-        // Calculate canvas size based on device with responsive heights
+    
+        // Calculate canvas size based on device
         const num_days = dates.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
         
         let bar_width_per_day = is_mobile ? 50 : is_tablet ? 70 : 90;
         let canvas_width = num_days * bar_width_per_day;
-        let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
+        let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320;
         
         if (canvas_width < 300) canvas_width = 300;
         if (canvas_width > 1200) canvas_width = 1200;
-
+    
         // Create chart wrapper
         const chartWrapper = $(`<div class="chart-wrapper" style="
             overflow-x: auto;
@@ -460,7 +413,7 @@ frappe.query_reports["Production Report"] = {
             </div>
         </div>`);
         container.append(chartWrapper);
-
+    
         // Format dates to dd/mm
         const formatDM = (s) => {
             if (!s || typeof s !== 'string' || s.indexOf('-') === -1) return s;
@@ -474,17 +427,25 @@ frappe.query_reports["Production Report"] = {
         const othersPlanned = dates.map(date => daily_data[date]["Thạch cao"].planned);
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
-
+    
+        // Calculate maximum values and expand Y axis
+        const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
+        const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
+    
+        // Add 20% padding to create space for unit labels
+        const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
+        const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
+    
         // Create datasets for mixed chart
         const datasets = [
             // Bars for Thạch cao
             { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             // Lines for P2O5
-            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(244, 63, 94, 1)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
-            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(244, 63, 94, 0.6)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderDash: [6,4], borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
+            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
-
+    
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
@@ -496,53 +457,75 @@ frappe.query_reports["Production Report"] = {
                     legend: { 
                         position: 'top',
                         labels: {
-                            boxWidth: 12,
-                            padding: 10,
-                            font: {
-                                size: window.innerWidth < 768 ? 10 : 12
+                            usePointStyle: true,
+                            pointStyle: 'line',
+                            generateLabels: function(chart) {
+                                const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                const labels = original.call(this, chart);
+                                
+                                labels.forEach(label => {
+                                    if (label.text.includes('P2O5')) {
+                                        label.pointStyle = 'line';
+                                    } else {
+                                        label.pointStyle = 'rect';
+                                    }
+                                });
+                                
+                                return labels;
                             }
                         }
                     },
                     title: { 
                         display: true, 
-                        text: 'Sản lượng sản xuất theo ngày',
+                        text: 'Sản lượng sản xuất theo ngày' ,
                         font: {
-                            size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
+                            size: 22,
                             weight: 'bold'
-                        },
-                        align: window.innerWidth < 768 ? 'start' : 'center',
-                        padding: {
-                            top: 10,
-                            bottom: 20
                         }
                     },
-
+    
                 },
                 scales: {
                     x: {
-                        type: 'category',
-                        stacked: true,
                         grid: { 
                             drawOnChartArea: false,
-                            offset: true
                         },
-                        ticks: { 
-                            autoSkip: false,
-                            align: 'center',
-                            crossAlign: 'center'
-                        },
-                        offset: true
                     },
                     y: {
                         stacked: true,
                         beginAtZero: true,
-                        min: 0
+                        // Set expanded maximum value
+                        max: padded_max_y,
+                        grid: {
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            // Customize highest label
+                            callback: function(value, index, ticks) {
+                                // In Chart.js, highest label usually has index 0
+                                if (index === ticks.length - 1) {
+                                    return '( Tấn )'; // Replace number with 'Tấn'
+                                }
+                                // For other labels, display numbers only
+                                return value.toLocaleString('en-US');
+                            }
+                        }
                     },
                     y2: {
                         position: 'right',
                         beginAtZero: true,
-                        min: 0,
-                        grid: { drawOnChartArea: false }
+                        // Set expanded maximum value for y2 axis
+                        max: padded_max_y2,
+                        grid: { drawOnChartArea: false, drawTicks: false, },
+                        ticks: {
+                            // Apply same logic for y2 axis
+                            callback: function(value, index, ticks) {
+                                if (index === ticks.length - 1) {
+                                    return '( Tấn )';
+                                }
+                                return value.toLocaleString('en-US');
+                            }
+                        }
                     }
                 }
             }

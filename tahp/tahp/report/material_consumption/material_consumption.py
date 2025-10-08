@@ -24,7 +24,7 @@ def execute(filters=None):
 
 def process_week_filter(filters):
     """
-    Handle week filter: convert the chosen date in range date from MON to SUN
+    Handle week filter: convert the chosen date to date range from MON to SUN
     """
     if filters.get("week"):
         try:
@@ -41,13 +41,13 @@ def process_week_filter(filters):
             filters["to_date"] = sunday.strftime("%Y-%m-%d")
             
         except Exception as e:
-            frappe.log_error(f"Error processing week filter: {str(e)}", "Week Filter Error")
+            frappe.log_error(f"Week filter error: {str(e)}", "Week Filter Error")
     
     return filters
 
 def process_month_year_filter(filters):
     """
-    Handle month/year filter: convert to range from first date to month
+    Handle month/year filter: convert to date range from first to last day of month
     """
     if filters.get("month") and filters.get("year"):
         try:
@@ -70,13 +70,13 @@ def process_month_year_filter(filters):
             filters["is_month_filter"] = True
             
         except Exception as e:
-            frappe.log_error(f"Error processing month/year filter: {str(e)}", "Month Filter Error")
+            frappe.log_error(f"Month filter error: {str(e)}", "Month Filter Error")
     
     return filters
 
 def get_data(filters):
     """
-    The func to get and process report date
+    Get and process report data
     """
     work_orders = get_work_orders(filters)
     if not work_orders:
@@ -94,7 +94,7 @@ def get_data(filters):
 
 def get_monthly_data(work_orders, wo_list, prod_item_list):
     """
-    Return the agreesive data
+    Return aggregated monthly data
     """
     material_map = {}
     wo_to_prod_item = {wo.name: wo.production_item for wo in work_orders}
@@ -108,7 +108,7 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
         prod_qty_map[prod_item]["produced"] += wo.produced_qty
         prod_qty_map[prod_item]["planned"] += wo.qty
 
-    # STEP 1: get planned data
+    # Get planned data
     bom_items = frappe.db.sql("""
         SELECT parent, item_code, required_qty, stock_uom
         FROM `tabWork Order Item` WHERE parent IN %(work_orders)s
@@ -127,7 +127,7 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
         material_map[material][planned_key] = material_map[material].get(planned_key, 0) + item.required_qty
         material_map[material]['total_planned_qty'] += item.required_qty
 
-    # STEP 2: Get actual data
+    # Get actual data
     actual_items = frappe.db.sql("""
         SELECT se_detail.item_code, se_detail.qty, se.work_order
         FROM `tabStock Entry Detail` se_detail
@@ -144,7 +144,7 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
             actual_key = frappe.scrub(prod_item) + "_actual"
             material_map[material][actual_key] = material_map[material].get(actual_key, 0) + item.qty
 
-    # STEP 3: prepare output data
+    # Prepare output data
     material_codes = list(material_map.keys())
     if not material_codes:
         return []
@@ -162,7 +162,7 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
             "material_name": material_name, 
             "uom": row_data.get("uom"),
             
-            # Original data for charts and total columns
+            # Data for charts and total columns
             "total_actual_qty": row_data.get("total_actual_qty", 0),
             "total_planned_qty": row_data.get("total_planned_qty", 0),
         }
@@ -193,17 +193,17 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
 
 def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
     """
-    Return detailed data for the day compltete the work order
+    Return detailed data for completed work orders
     """
     wo_to_info = {wo.name: wo for wo in work_orders}
 
-    # STEP 1: GET PLANNED data for WORK ORDER and DATE
+    # Get planned data for work orders
     bom_items = frappe.db.sql("""
         SELECT parent, item_code, required_qty, stock_uom
         FROM `tabWork Order Item` WHERE parent IN %(work_orders)s
     """, {"work_orders": wo_list}, as_dict=1)
 
-    # STEP 2: GET actual data
+    # Get actual data
     actual_items = frappe.db.sql("""
         SELECT se_detail.item_code, se_detail.qty, se.work_order
         FROM `tabStock Entry Detail` se_detail
@@ -212,7 +212,7 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
         AND se.purpose IN ('Manufacture', 'Material Consumption for Manufacture')
     """, {"work_orders": wo_list}, as_dict=1)
 
-    # STEP 3: PREPARE Detailed data by WORK ORDER AND DATE
+    # Prepare detailed data by work order and date
     material_codes = list(set([item.item_code for item in bom_items]))
     if not material_codes:
         return []
@@ -253,7 +253,7 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
             "material_name": material_name, 
             "uom": item.stock_uom,
             
-            # Original data for charts and total columns
+            # Data for charts and total columns
             "total_actual_qty": actual_material_qty,
             "total_planned_qty": planned_material_qty,
         }
@@ -294,8 +294,8 @@ def get_columns(filters):
     
     if is_month_filter:
         columns = [
-            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 250},
-            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 150},
+            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
+            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
             {"label": _("Tổng Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150},
             {"label": _("Tổng Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150},
         ]
@@ -303,10 +303,10 @@ def get_columns(filters):
         columns = [
             {"label": _("Ngày hoàn thành"), "fieldname": "consumption_date", "fieldtype": "Date", "width": 120},
             {"label": _("Work Order"), "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order", "width": 150},
-            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 250},
-            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 150},
-            {"label": _("SL Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 100},
-            {"label": _("SL Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 100},
+            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
+            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
+            {"label": _("SL Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150},
+            {"label": _("SL Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150},
         ]
 
     work_orders = get_work_orders(filters)
@@ -322,7 +322,7 @@ def get_columns(filters):
             item_name = production_items_map[item_code]
             scrubbed_name = frappe.scrub(item_code)
             
-            width = 150 if is_month_filter else 120
+            width = 200
             
             columns.append({
                 "label": f"<br><b>{_('Thực tế / tấn')}</b>", 
@@ -356,11 +356,16 @@ def get_columns(filters):
 
 def get_work_orders(filters):
     """
-    Lấy danh sách Work Order dựa trên bộ lọc, bao gồm cả số lượng sản xuất
+    Get work orders based on filters, including production quantities
     """
+    
     conditions = ""
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += " AND wo.creation BETWEEN %(from_date)s AND %(to_date)s"
+        conditions += " AND wo.actual_end_date BETWEEN %(from_date)s AND %(to_date)s"
+    elif filters.get("from_date"):
+        conditions += " AND wo.actual_end_date >= %(from_date)s"
+    elif filters.get("to_date"):
+        conditions += " AND wo.actual_end_date <= %(to_date)s"
     if filters.get("company"):
         conditions += " AND wo.company = %(company)s"
 
@@ -371,7 +376,7 @@ def get_work_orders(filters):
 
     conditions += " AND wo.status IN ('Completed', 'In Process')"
 
-    work_orders = frappe.db.sql("""
+    sql_query = """
         SELECT
             wo.name,
             wo.production_item,
@@ -388,7 +393,10 @@ def get_work_orders(filters):
             `tabBOM` bom ON wo.bom_no = bom.name 
         WHERE
             wo.docstatus = 1 {conditions}
-    """.format(conditions=conditions), filters, as_dict=1)
+    """.format(conditions=conditions)
+    
+    
+    work_orders = frappe.db.sql(sql_query, filters, as_dict=1)
 
     return work_orders
 

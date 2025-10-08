@@ -89,6 +89,7 @@ def get_columns(work_orders):
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
             "width": 250,
+            "align": "left",
             "parent": group_label  # For multi-level header - parent shows the system category
         })
         
@@ -124,7 +125,7 @@ def get_data(work_orders, columns):
             
             if actual_qty > 0 or planned_qty > 0:
                 # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"
+                row[fieldname] = f"<div style='text-align: center;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"
                 total_summary[fieldname]["planned"] += planned_qty
                 total_summary[fieldname]["actual"] += actual_qty
             else:
