@@ -415,120 +415,161 @@ frappe.query_reports["Production Schedule"] = {
 		return wwo_summary;
 	},
 
-	"draw_daily_production_chart": function(wwo_data, container) {
-		const wwo_names = Object.keys(wwo_data).sort();
-		if (wwo_names.length === 0) return;
+    "draw_daily_production_chart": function(wwo_data, container) {
+        const wwo_names = Object.keys(wwo_data).sort();
+        if (wwo_names.length === 0) return;
 
-		const num_lsx = wwo_names.length;
-		const is_mobile = window.innerWidth < 768;
-		const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-		
-		let bar_width_per_lsx = is_mobile ? 60 : is_tablet ? 80 : 100;
-		let canvas_width = num_lsx * bar_width_per_lsx;
-		let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
-		
-		if (canvas_width < 300) canvas_width = 300;
-		if (canvas_width > 1200) canvas_width = 1200;
+        // Xóa biểu đồ cũ nếu tồn tại để tránh lỗi
+        let existing_chart = Chart.getChart("week-plan-chart");
+        if (existing_chart) {
+            existing_chart.destroy();
+        }
 
-		const chartWrapper = $(`<div class="chart-wrapper" style="
-			overflow-x: auto;
-			overflow-y: hidden;
-			border-radius: 12px;
-			background: #fff;
-			box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-			padding: 15px;
-			margin-top: 15px;
-		">
-			<div class="chart-container" style="
-				position: relative; 
-				height: ${canvas_height}px;
-				min-width: ${canvas_width}px;
-				width: 100%;
-			">
-				<canvas id="week-plan-chart"></canvas>
-			</div>
-		</div>`);
-		container.append(chartWrapper);
+        const num_lsx = wwo_names.length;
+        const is_mobile = window.innerWidth < 768;
+        const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+        
+        let bar_width_per_lsx = is_mobile ? 60 : is_tablet ? 80 : 100;
+        let canvas_width = num_lsx * bar_width_per_lsx;
+        let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
+        
+        if (canvas_width < 300) canvas_width = 300;
+        if (canvas_width > 1200) canvas_width = 1200;
 
-		const labels = wwo_names;
-		
-		const othersActual = wwo_names.map(wwo => wwo_data[wwo]["Thạch cao"].actual);
-		const othersPlanned = wwo_names.map(wwo => wwo_data[wwo]["Thạch cao"].planned);
-		const p2o5Actual = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].actual);
-		const p2o5Planned = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].planned);
+        // Xóa wrapper cũ trước khi tạo mới để không bị trùng lặp
+        container.find('.chart-wrapper').remove();
+        const chartWrapper = $(`<div class="chart-wrapper" style="
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            padding: 15px;
+            margin-top: 15px;
+        ">
+            <div class="chart-container" style="
+                position: relative; 
+                height: ${canvas_height}px;
+                min-width: ${canvas_width}px;
+                width: 100%;
+            ">
+                <canvas id="week-plan-chart"></canvas>
+            </div>
+        </div>`);
+        container.append(chartWrapper);
 
-		const datasets = [
-			{ label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-			{ label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-			{ label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(244, 63, 94, 1)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true },
-			{ label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(244, 63, 94, 0.6)', backgroundColor: 'rgba(244, 63, 94, 0.0)', borderDash: [6,4], borderWidth: 3, fill: false, tension: 0.2, pointRadius: 5, pointHoverRadius: 7, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
-		];
+        const labels = wwo_names;
+        
+        const othersActual = wwo_names.map(wwo => wwo_data[wwo]["Thạch cao"].actual);
+        const othersPlanned = wwo_names.map(wwo => wwo_data[wwo]["Thạch cao"].planned);
+        const p2o5Actual = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].actual);
+        const p2o5Planned = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].planned);
 
-		const ctx = document.getElementById('week-plan-chart').getContext('2d');
-		new Chart(ctx, {
-			type: 'bar',
-			data: { labels, datasets },
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				plugins: {
-					legend: { 
-						position: 'top',
-						labels: {
-							boxWidth: 12,
-							padding: 10,
-							font: {
-								size: window.innerWidth < 768 ? 10 : 12
-							}
-						}
-					},
-					title: { 
-						display: true, 
-						text: 'Sản lượng sản xuất theo LSX - Week Plan',
-						font: {
-							size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
-							weight: 'bold'
-						},
-						align: window.innerWidth < 768 ? 'start' : 'center',
-						padding: {
-							top: 10,
-							bottom: 20
-						}
-					},
-				},
-				scales: {
-					x: {
-						type: 'category',
-						stacked: true,
-						grid: { 
-							drawOnChartArea: false,
-							offset: true
-						},
-						ticks: { 
-							autoSkip: false,
-							align: 'center',
-							crossAlign: 'center',
-							font: {
-								size: 10
-							}
-						},
-						offset: true
-					},
-					y: {
-						stacked: true,
-						beginAtZero: true,
-						min: 0
-					},
-					y2: {
-						position: 'right',
-						beginAtZero: true,
-						min: 0,
-						grid: { drawOnChartArea: false }
-					}
-				}
-			}
-		});
-	},
+        // *** BƯỚC 1: TÍNH TOÁN GIÁ TRỊ TỐI ĐA VÀ NỚI RỘNG TRỤC Y ***
+        const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
+        const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
+
+        // Thêm khoảng đệm 20% để tạo không gian cho nhãn đơn vị
+        const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
+        const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
+
+        const datasets = [
+            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
+            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+        ];
+
+        const ctx = document.getElementById('week-plan-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    },
+                    title: { 
+                        display: true, 
+                        text: 'Sản lượng sản xuất theo LSX ',
+                        font: {
+                            size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
+                            weight: 'bold'
+                        },
+                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                },
+                scales: {
+                    x: {
+                        type: 'category',
+                        stacked: true,
+                        grid: { 
+                            drawOnChartArea: false,
+                            offset: true
+                        },
+                        ticks: { 
+                            autoSkip: false,
+                            align: 'center',
+                            crossAlign: 'center',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        offset: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        // Đặt giá trị tối đa đã được nới rộng
+                        max: padded_max_y,
+                        grid: {
+                            drawTicks: false,
+                        },
+                        ticks: {
+                            // *** BƯỚC 2: TÙY CHỈNH NHÃN CAO NHẤT ***
+                            callback: function(value, index, ticks) {
+                                // Trong Chart.js, nhãn trên cùng thường có index là 0
+                                if (index === ticks.length - 1) {
+                                    return '( Tấn )'; // Thay thế số bằng chữ 'Tấn'
+                                }
+                                // Với các nhãn khác, chỉ hiển thị số
+                                return value.toLocaleString('en-US');
+                            }
+                        }
+                    },
+                    y2: {
+                        position: 'right',
+                        beginAtZero: true,
+                        // Đặt giá trị tối đa đã được nới rộng cho trục y2
+                        max: padded_max_y2,
+                        grid: { drawOnChartArea: false, drawTicks: false },
+                        ticks: {
+                            // Áp dụng logic tương tự cho trục y2
+                            callback: function(value, index, ticks) {
+                                if (index === ticks.length - 1) {
+                                    return '( Tấn )';
+                                }
+                                return value.toLocaleString('en-US');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
 
 	"handle_date_range_change": function() {
 		const from_date = frappe.query_report.get_filter_value("from_date");

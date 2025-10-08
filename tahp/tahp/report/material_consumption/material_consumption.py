@@ -358,9 +358,16 @@ def get_work_orders(filters):
     """
     Lấy danh sách Work Order dựa trên bộ lọc, bao gồm cả số lượng sản xuất
     """
+    # Debug logging
+    frappe.log_error(f"Material Consumption Filters: {filters}", "Material Consumption Debug")
+    
     conditions = ""
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += " AND wo.creation BETWEEN %(from_date)s AND %(to_date)s"
+        conditions += " AND wo.actual_end_date BETWEEN %(from_date)s AND %(to_date)s"
+    elif filters.get("from_date"):
+        conditions += " AND wo.actual_end_date >= %(from_date)s"
+    elif filters.get("to_date"):
+        conditions += " AND wo.actual_end_date <= %(to_date)s"
     if filters.get("company"):
         conditions += " AND wo.company = %(company)s"
 
@@ -371,7 +378,7 @@ def get_work_orders(filters):
 
     conditions += " AND wo.status IN ('Completed', 'In Process')"
 
-    work_orders = frappe.db.sql("""
+    sql_query = """
         SELECT
             wo.name,
             wo.production_item,
@@ -388,7 +395,13 @@ def get_work_orders(filters):
             `tabBOM` bom ON wo.bom_no = bom.name 
         WHERE
             wo.docstatus = 1 {conditions}
-    """.format(conditions=conditions), filters, as_dict=1)
+    """.format(conditions=conditions)
+    
+    # Debug logging
+    frappe.log_error(f"Material Consumption SQL: {sql_query}", "Material Consumption Debug")
+    frappe.log_error(f"Material Consumption SQL Params: {filters}", "Material Consumption Debug")
+    
+    work_orders = frappe.db.sql(sql_query, filters, as_dict=1)
 
     return work_orders
 
