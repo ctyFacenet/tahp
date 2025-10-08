@@ -253,7 +253,16 @@ frappe.query_reports["Production Report"] = {
             gap: 12px;
             width: 100%;
         "></div>`);
+
+        const noteTextDiv = document.createElement("div");
+        noteTextDiv.innerHTML = `<div>Phần in đậm là kế hoạch<br>Phần in nhạt là thực tế</div>`
+        noteTextDiv.style.textAlign = "center";
+        noteTextDiv.style.fontWeight = "bold";
+        noteTextDiv.style.paddingTop = "10px";
+
         container.append(gridContainer);
+        container.append(noteTextDiv);
+        
 
         // Create progress card for each item
         summary_data.forEach(item => {
