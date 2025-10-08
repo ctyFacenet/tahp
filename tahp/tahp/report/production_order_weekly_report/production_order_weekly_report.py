@@ -36,8 +36,8 @@ def execute(filters=None):
         {"label": "Chênh lệch", "fieldname": "variance", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "%Thực tế/Kế hoạch", "fieldname": "percent_actual", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
         {"label": "Lũy kế thực tế", "fieldname": "cumulative_actual", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
-        {"label": "Lũy kế kế hoạch", "fieldname": "cumulative_planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
-        {"label": "%Lũy kế thực tế/Kế hoạch", "fieldname": "percent_cumulative", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
+        {"label": "kế hoạch tuần", "fieldname": "cumulative_planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "%Hoàn thành", "fieldname": "percent_cumulative", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
     ]
     data = []
     if isinstance(filters, str):
@@ -60,6 +60,7 @@ def execute(filters=None):
 
         work_orders = frappe.get_all('Work Order', {
             'custom_plan': selected_ww_order,
+            'production_item': item,
             'status': 'Completed'
         })
         
@@ -91,10 +92,11 @@ def execute(filters=None):
     return columns, data
 
 
+
 @frappe.whitelist()
 def get_actual_vs_planned(filters=None):
     """
-    Lấy dữ liệu sản lượng Thực tế và Kế hoạch theo từng ngày.
+    Lấy dữ liệu sản lượng Thực tế và Kế hoạch theo từng ngày, phân tách theo item.
 
     Args:
         filters (dict hoặc str, optional): Bộ lọc báo cáo.
@@ -103,8 +105,9 @@ def get_actual_vs_planned(filters=None):
     Returns:
         dict: Dữ liệu dạng ngày, gồm:
             - labels (list[str]): Danh sách ngày (YYYY-MM-DD)
-            - actual (list[float]): Sản lượng thực tế từng ngày
-            - planned (list[float]): Sản lượng kế hoạch từng ngày
+            - items (dict): Mỗi key là tên item, value là dict gồm:
+                - actual (list[float]): Sản lượng thực tế từng ngày
+                - planned (list[float]): Sản lượng kế hoạch từng ngày
     """
     if isinstance(filters, str):
         filters = json.loads(filters)
@@ -112,8 +115,13 @@ def get_actual_vs_planned(filters=None):
     selected_ww_order = filters.get("ww_order") if filters else None
     
     if not selected_ww_order:
-        return {"labels": [], "actual": [], "planned": []}
+        return {"labels": [], "items": {}}
  
+    # Lấy danh sách items từ Week Work Order
+    doc_wwo = frappe.get_doc("Week Work Order", selected_ww_order)
+    items_list = [x.item for x in doc_wwo.items]
+    
+    # Lấy tất cả Work Orders đã hoàn thành
     work_orders = frappe.get_all(
         "Work Order",
         filters={
@@ -121,34 +129,31 @@ def get_actual_vs_planned(filters=None):
             "status": "Completed"
         },
         fields=[
+            "production_item",
             "planned_start_date", "planned_end_date",
             "actual_start_date", "actual_end_date",
             "qty", "produced_qty"
         ]
     )
     
-
     if not work_orders:
-        return {"labels": [], "actual": [], "planned": []}
+        return {"labels": [], "items": {item: {"actual": [], "planned": []} for item in items_list}}
 
+    # Tìm khoảng thời gian tổng thể
     planned_dates = []
     actual_dates = []
 
     for wo in work_orders:
         p_dates = [d for d in [wo.planned_start_date, wo.actual_start_date] if d]
         if p_dates:
-            min_p = min(p_dates)
-            planned_dates.append(min_p)
-           
+            planned_dates.append(min(p_dates))
 
         a_dates = [d for d in [wo.planned_end_date, wo.actual_end_date] if d]
         if a_dates:
-            max_a = max(a_dates)
-            actual_dates.append(max_a)
-            
+            actual_dates.append(max(a_dates))
 
     if not planned_dates or not actual_dates:
-        return {"labels": [], "actual": [], "planned": []}
+        return {"labels": [], "items": {item: {"actual": [], "planned": []} for item in items_list}}
 
     min_start = min(planned_dates)
     max_end = max(actual_dates)
@@ -156,78 +161,127 @@ def get_actual_vs_planned(filters=None):
     start_date = min_start.date() if hasattr(min_start, "date") else getdate(min_start)
     end_date = max_end.date() if hasattr(max_end, "date") else getdate(max_end)
 
-    
-
+    # Tạo danh sách labels (ngày)
     labels = []
     d = start_date
     while d <= end_date:
         labels.append(d.strftime("%Y-%m-%d"))
         d += timedelta(days=1)
  
+    # Khởi tạo dictionary cho từng item
+    items_data = {}
+    for item in items_list:
+        items_data[item] = {
+            "planned_map": {},
+            "actual_map": {}
+        }
 
-    planned_map = {}
-    actual_map = {}
-
+    # Phân bổ dữ liệu theo item và ngày
     for wo in work_orders:
+        item = wo.production_item
+        
+        if item not in items_data:
+            continue
+            
         a_dates = [d for d in [wo.actual_start_date, wo.actual_end_date] if d]
         if a_dates:
             final_day = max(a_dates)
             wo_final_day = str(final_day.date() if hasattr(final_day, "date") else getdate(final_day))
 
-            planned_map[wo_final_day] = planned_map.get(wo_final_day, 0) + float(wo.qty or 0)
-            actual_map[wo_final_day] = actual_map.get(wo_final_day, 0) + float(wo.produced_qty or 0)
+            items_data[item]["planned_map"][wo_final_day] = \
+                items_data[item]["planned_map"].get(wo_final_day, 0) + float(wo.qty or 0)
+            
+            items_data[item]["actual_map"][wo_final_day] = \
+                items_data[item]["actual_map"].get(wo_final_day, 0) + float(wo.produced_qty or 0)
 
-
-    planned = [planned_map.get(day, 0) for day in labels]
-    actual = [actual_map.get(day, 0) for day in labels]
+    # Chuyển đổi sang format cuối cùng
+    result_items = {}
+    for item in items_list:
+        result_items[item] = {
+            "planned": [items_data[item]["planned_map"].get(day, 0) for day in labels],
+            "actual": [items_data[item]["actual_map"].get(day, 0) for day in labels]
+        }
 
     return {
         "labels": labels,
-        "planned": planned,
-        "actual": actual
+        "items": result_items
     }
-
-
 @frappe.whitelist()
 def get_cumulative_actual_vs_planned(filters=None):
     """
-    Tính lũy kế sản lượng Thực tế và Kế hoạch từ dữ liệu ngày.
+    Tính lũy kế sản lượng Thực tế, Kế hoạch và % hoàn thành theo từng item.
 
     Args:
         filters (dict hoặc str, optional): Bộ lọc báo cáo.
             - 'ww_order': Tên Week Work Order. Mặc định None.
 
     Returns:
-        dict: Dữ liệu lũy kế gồm:
+        dict: Dữ liệu lũy kế theo item, gồm:
             - labels (list[str]): Danh sách ngày
-            - cumulative_actual (list[float]): Lũy kế sản lượng thực tế
-            - cumulative_planned (list[float]): Lũy kế sản lượng kế hoạch
+            - items (dict): Mỗi key là tên item, value là dict gồm:
+                - cumulative_actual (list[float]): Lũy kế sản lượng thực tế
+                - cumulative_planned (list[float]): Lũy kế sản lượng kế hoạch
+                - percent_cumulative (list[float]): % Lũy kế thực tế/Kế hoạch
     """
     if isinstance(filters, str):
         filters = json.loads(filters)
     
+    selected_ww_order = filters.get("ww_order") if filters else None
+    
+    if not selected_ww_order:
+        return {"labels": [], "items": {}}
+    
+    # Lấy tổng kế hoạch từ Week Work Order
+    doc_wwo = frappe.get_doc("Week Work Order", selected_ww_order)
+    total_planned_by_item = {}
+    for x in doc_wwo.items:
+        total_planned_by_item[x.item] = x.qty
+    
+    # Lấy dữ liệu theo ngày
     data = get_actual_vs_planned(filters)
 
     if not data or not data.get("labels"):
-        return {"labels": [], "cumulative_actual": [], "cumulative_planned": []}
+        return {"labels": [], "items": {}}
 
-    cumulative_actual = []
-    cumulative_planned = []
-    total_actual = 0
-    total_planned = 0
+    labels = data["labels"]
+    items_data = data.get("items", {})
+    
+    if not items_data:
+        return {"labels": [], "items": {}}
 
-    for i in range(len(data["labels"])):
-        total_actual += data["actual"][i]
-        total_planned += data["planned"][i]
-        cumulative_actual.append(total_actual)
-        cumulative_planned.append(total_planned)
+    result_items = {}
+
+    # Tính lũy kế cho từng item
+    for item_name, item_values in items_data.items():
+        cumulative_actual = []
+        cumulative_planned = []
+        percent_cumulative = []
+        
+        running_actual = 0
+        total_planned = total_planned_by_item.get(item_name, 0)
+
+        for i in range(len(labels)):
+            running_actual += item_values["actual"][i]
+            
+            cumulative_actual.append(running_actual)
+            cumulative_planned.append(total_planned)
+            
+            # Tính % = (Lũy kế thực tế) / (Tổng kế hoạch) * 100
+            percent = (running_actual / total_planned * 100) if total_planned > 0 else 0
+            percent_cumulative.append(round(percent, 2))
+
+        result_items[item_name] = {
+            "cumulative_actual": cumulative_actual,
+            "cumulative_planned": cumulative_planned,
+            "percent_cumulative": percent_cumulative
+        }
 
     return {
-        "labels": data["labels"],
-        "cumulative_actual": cumulative_actual,
-        "cumulative_planned": cumulative_planned
+        "labels": labels,
+        "items": result_items
     }
 
+    
 
 @frappe.whitelist()
 def get_ww_orders():
@@ -261,3 +315,4 @@ def get_ww_orders():
                 latest = ww.name  
 
     return {"options": result, "default": latest}
+    
