@@ -232,5 +232,23 @@
   "name": "Đợi GĐ duyệt",
   "style": "",
   "workflow_state_name": "Đợi GĐ duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-08 15:53:23.707881",
+  "name": "Đợi kế toán duyệt",
+  "style": "Info",
+  "workflow_state_name": "Đợi kế toán duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-08 15:53:16.877391",
+  "name": "Kế toán đã duyệt",
+  "style": "Success",
+  "workflow_state_name": "Kế toán đã duyệt"
  }
 ]

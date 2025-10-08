@@ -138,5 +138,12 @@
   "modified": "2025-09-15 11:46:06.495481",
   "name": "Chọn",
   "workflow_action_name": "Chọn"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-10-08 15:48:03.884722",
+  "name": "Gửi Kế toán",
+  "workflow_action_name": "Gửi Kế toán"
  }
 ]
