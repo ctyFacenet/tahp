@@ -21,8 +21,8 @@ frappe.query_reports["Workstation Status Report"] = {
 		];
 	},
 
-	formatter: function (value, row, column, data, default_formatter) {
-		value = default_formatter(value, row, column, data);
+    formatter: function (value, row, column, data, default_formatter) {
+        value = default_formatter(value, row, column, data);
 
         if (column.fieldname === "status") {
             let base_style = `
@@ -40,16 +40,12 @@ frappe.query_reports["Workstation Status Report"] = {
                 overflow: hidden;
             `;
 
-            // CSS animation với hiệu ứng ripple mượt mà
+            // CSS animation ripple
             const animations = `
                 <style>
                 @keyframes ripple-flow {
-                    0% {
-                        background-position: -200% center;
-                    }
-                    100% {
-                        background-position: 200% center;
-                    }
+                    0% { background-position: -200% center; }
+                    100% { background-position: 200% center; }
                 }
                 </style>
             `;
@@ -61,9 +57,9 @@ frappe.query_reports["Workstation Status Report"] = {
                 document.head.appendChild(styleEl);
             }
 
-            // Tạo delay ngẫu nhiên từ 0-1s cho mỗi ô
             const randomDelay = (Math.random() * 1).toFixed(2);
 
+            // ---- Xử lý trạng thái ----
             if (data.status === "Đang chạy") {
                 value = `<span style="${base_style} 
                     background: linear-gradient(90deg, 
@@ -76,7 +72,9 @@ frappe.query_reports["Workstation Status Report"] = {
                     background-size: 200% 100%;
                     animation: ripple-flow 3s linear infinite;
                     animation-delay: -${randomDelay}s;">${value}</span>`;
-            } else if (data.status && data.status.endsWith("Đang chạy")) {
+            } 
+            else if (data.status && data.status.endsWith("Đang chạy")) {
+                // ví dụ: "75% Đang chạy"
                 value = `<span style="${base_style} 
                     background: linear-gradient(90deg, 
                         #d4f4dd 0%, 
@@ -90,19 +88,21 @@ frappe.query_reports["Workstation Status Report"] = {
                     font-weight: bold;
                     animation: ripple-flow 3s linear infinite;
                     animation-delay: -${randomDelay}s;">${value}</span>`;
-            } else if (data.status === "Tạm dừng") {
+            } 
+            else if (data.status === "Tạm dừng") {
                 value = `<span style="${base_style} 
                     background: linear-gradient(90deg, 
                         #ffc107 0%, 
-                        #ffd24cff 25%,
+                        #ffd24c 25%,
                         #ffc107 50%, 
-                        #ffd24cff 75%,
+                        #ffd24c 75%,
                         #ffc107 100%
                     );
                     background-size: 200% 100%;
                     animation: ripple-flow 4s linear infinite;
                     animation-delay: -${randomDelay}s;">${value}</span>`;
-            } else if (["Bảo trì", "Sự cố"].includes(data.status)) {
+            } 
+            else if (["Bảo trì", "Sự cố"].includes(data.status)) {
                 value = `<span style="${base_style} 
                     background: linear-gradient(90deg, 
                         #ff8a8a 0%, 
@@ -114,7 +114,24 @@ frappe.query_reports["Workstation Status Report"] = {
                     background-size: 200% 100%;
                     animation: ripple-flow 4s linear infinite;
                     animation-delay: -${randomDelay}s;">${value}</span>`;
-            } else if (["Đang tắt"].includes(data.status)) {
+            }
+            else if (data.status && (data.status.endsWith("Sự cố") || data.status.endsWith("Bảo trì"))) {
+                // ví dụ: "60% Sự cố" hoặc "40% Bảo trì"
+                value = `<span style="${base_style} 
+                    background: linear-gradient(90deg, 
+                        #ffd6d6 0%, 
+                        #ffe1e1 25%,
+                        #ffd6d6 50%, 
+                        #ffe1e1 75%,
+                        #ffd6d6 100%
+                    );
+                    background-size: 200% 100%;
+                    color:#d63031; 
+                    font-weight: bold;
+                    animation: ripple-flow 4s linear infinite;
+                    animation-delay: -${randomDelay}s;">${value}</span>`;
+            }
+            else if (["Đang tắt"].includes(data.status)) {
                 value = `<span style="${base_style} 
                     background: linear-gradient(90deg, 
                         #e0e0e0 0%, 
@@ -129,14 +146,16 @@ frappe.query_reports["Workstation Status Report"] = {
             }
         }
 
-		if (column.fieldname === "workstation" && row[0].indent === 0) {
-			let base_style = `
-				font-weight: bold;
-				padding: 2px 8px;
-			`;
-			value = `<span style="${base_style}">${value}</span>`;
-		}
+        // In đậm cụm máy cha
+        if (column.fieldname === "workstation" && row[0].indent === 0) {
+            let base_style = `
+                font-weight: bold;
+                padding: 2px 8px;
+            `;
+            value = `<span style="${base_style}">${value}</span>`;
+        }
 
+        // --- Đếm thời gian runtime ---
         function parseDuration(text) {
             if (!text) return 0;
             let parts = text.split(':').map(Number);
@@ -156,8 +175,6 @@ frappe.query_reports["Workstation Status Report"] = {
             (data.status === "Đang chạy" && column.fieldname === "active_time")
         ) {
             let seconds = parseDuration(data[column.fieldname]);
-
-            // Dùng ID duy nhất cho mỗi ô
             const cellId = `${column.fieldname}-${data.name || data.id || Math.random().toString(36).slice(2)}`;
 
             value = `
@@ -172,30 +189,25 @@ frappe.query_reports["Workstation Status Report"] = {
             setTimeout(() => {
                 const el = document.getElementById(cellId);
                 if (!el) return;
-
-                // Clear timer cũ nếu có
                 if (el.dataset.timerId) {
                     clearInterval(Number(el.dataset.timerId));
                     delete el.dataset.timerId;
                 }
-
-                // Nếu "Đang chạy" hoặc "Tạm dừng" thì mới chạy timer
                 if (["Đang chạy", "Tạm dừng"].includes(el.dataset.status)) {
                     let current = Number(el.dataset.seconds);
-
                     const id = setInterval(() => {
                         current++;
                         el.dataset.seconds = current;
                         el.textContent = formatDuration(current);
                     }, 1000);
-
                     el.dataset.timerId = id;
                 }
             }, 0);
         }
 
-		return value;
-	},
+        return value;
+    },
+
 	
     get_datatable_options(options) {
         return { ...options, headerBackground: "rgba(205, 222, 238, 1)"};
@@ -267,7 +279,7 @@ async function execute_summary(report) {
             html += `</tr>`;
         });
 
-        html += `</tbody></table></div>`;
+        html += `</tbody></table>*Dữ liệu được cập nhật theo ca gần nhất</div>`;
         return html;
     }
 

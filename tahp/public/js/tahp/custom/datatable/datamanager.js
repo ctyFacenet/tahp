@@ -432,7 +432,6 @@ init(data, columns) {
                 row = [val].concat(row);
             }
         }
-
         const _row = this.prepareRow(row, {rowIndex});
         const index = this.rows.findIndex(row => row[0].rowIndex === rowIndex);
         this.rows[index] = _row;

@@ -13,6 +13,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         bom: null
     };
 
+    page.set_title('Báo cáo sản lượng theo phân loại');
     // debounce control
     this.refreshTimeout = null;
 

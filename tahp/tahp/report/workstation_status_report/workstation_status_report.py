@@ -41,11 +41,11 @@ def execute(filters=None, summary=False):
 			"align": "center"
 		},
 		{
-			"fieldname": "shift",
-			"label": "Ca gần nhất",
+			"fieldname": "work_order",
+			"label": "LSX ca gần nhất",
 			"fieldtype": "Link",
-			"options": "Shift",
-			"width": 150,
+			"options": "Work Order",
+			"width": 200,
 			"align": "center"
 		},
 		{
@@ -91,12 +91,13 @@ def execute(filters=None, summary=False):
 			"align": "center"
 		},
 	]
+
 	# --- Step 1: Gen sẵn cây cha-con từ Workstation ---
 	workstations = frappe.db.get_all(
 		"Workstation", 
 		fields=["status","name","custom_parent","custom_is_parent", "modified"]
 	)
-	# if isinstance(filters, str): filters = json.loads(filters)
+
 	if filters and filters.get("category"):
 		category = filters["category"]
 		routing_names = frappe.db.get_all(
@@ -117,10 +118,8 @@ def execute(filters=None, summary=False):
 	result_map = {}
 
 	# dựng cha + con
-	# --- Step 1: Gen sẵn cây cha-con từ Workstation ---
 	parents = [ws for ws in workstations if ws.custom_is_parent]
 
-	# dựng cha + con thật
 	for parent in parents:
 		parent_item = {
 			"workstation": parent.name,
@@ -146,20 +145,18 @@ def execute(filters=None, summary=False):
 			result.append(child_item)
 			result_map[child.name] = child_item
 
-	# tìm máy lẻ (không có parent và cũng không phải parent)
 	orphans = [
 		ws for ws in workstations
 		if not ws.custom_parent and not ws.custom_is_parent
 	]
 
 	if orphans:
-		# tạo cụm "Máy khác"
 		other_parent = {
 			"workstation": "Máy khác",
 			"parent": None,
 		}
 		result.append(other_parent)
-		parents.append(frappe._dict(name="Máy khác", custom_is_parent=True))  # giả cha
+		parents.append(frappe._dict(name="Máy khác", custom_is_parent=True))
 
 		for orphan in orphans:
 			child_item = {
@@ -178,9 +175,7 @@ def execute(filters=None, summary=False):
 			result.append(child_item)
 			result_map[orphan.name] = child_item
 
-
 		# --- Step 2: Fill dữ liệu từ Job Card vào con ---
-		# --- Lấy tất cả downtime và active một lượt ---
 		downtimes = frappe.db.get_all(
 			"Job Card Downtime Item",
 			fields=["duration", "reason", "group_name", "workstation", "from_time", "parent"],
@@ -204,11 +199,10 @@ def execute(filters=None, summary=False):
 			)
 		}
 
-		# --- Gom dữ liệu mới nhất theo workstation ---
 		latest = {}
 		for a in actives:
 			ws = a.workstation
-			if ws not in latest:  # chỉ lấy lần xuất hiện đầu tiên (mới nhất do order_by)
+			if ws not in latest:
 				related_downtimes = [d for d in downtimes if d.parent == a.parent]
 
 				latest[ws] = frappe._dict(
@@ -216,10 +210,9 @@ def execute(filters=None, summary=False):
 					downtime=next((d for d in downtimes if d.workstation == ws), None),
 					downtime_overall = sum(int(d.duration or 0) for d in related_downtimes),
 					team=next((t for t in teams if t.parent == a.parent), None),
-					shift=frappe.db.get_value("Work Order", work_orders.get(a.parent), "custom_shift")
+					work_order=work_orders.get(a.parent)
 				)
 
-		# --- Gán dữ liệu vào result_map ---
 		for ws, data in latest.items():
 			if ws not in result_map:
 				continue
@@ -232,7 +225,7 @@ def execute(filters=None, summary=False):
 			if active.status == "Dừng":
 				item["status"] = "Tạm dừng"
 
-			item["shift"] = data.shift
+			item["work_order"] = data.work_order
 			item["active_time"] = format_duration(active.time)
 			item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
 			item["stop_time_overall"] = format_duration(downtime_overall, mili=False)
@@ -240,16 +233,49 @@ def execute(filters=None, summary=False):
 			item["reason"] = downtime.reason if downtime else None
 			item["employee"] = team.employee if team else None
 
-
-	# --- Step 3: Update status % cho cha ---
 	for parent in parents:
 		children = [row for row in result if row.get("indent") == 1 and row["parent"] == parent.name]
 		total = len(children)
-		running = len([c for c in children if c.get("status") == "Đang chạy"])
+		if total == 0:
+			continue
+
+		# Đếm trạng thái con
+		status_counts = {
+			"Đang chạy": len([c for c in children if c.get("status") == "Đang chạy"]),
+			"Tạm dừng": len([c for c in children if c.get("status") == "Tạm dừng"]),
+			"Đang tắt": len([c for c in children if c.get("status") == "Đang tắt"]),
+			"Bảo trì": len([c for c in children if c.get("status") == "Bảo trì"]),
+			"Sự cố": len([c for c in children if c.get("status") == "Sự cố"]),
+		}
+
 		parent_item = next(r for r in result if r["workstation"] == parent.name)
-		if total > 0 and running > 0:
-			percent = round(running / total * 100)
+
+		# --- ƯU TIÊN ---
+		# 1️⃣ Nếu có ít nhất 1 con "Đang chạy" → % Đang chạy
+		if status_counts["Đang chạy"] > 0:
+			percent = round(status_counts["Đang chạy"] / total * 100)
 			parent_item["status"] = f"{percent}% Đang chạy"
+
+		elif status_counts["Tạm dừng"] == total:
+			parent_item["status"] = "Tạm dừng"
+
+		# 2️⃣ Nếu toàn bộ con "Đang tắt"
+		elif status_counts["Đang tắt"] == total:
+			parent_item["status"] = "Đang tắt"
+
+		# 3️⃣ Nếu có Sự cố hoặc Bảo trì → chọn loại xuất hiện nhiều hơn
+		else:
+			maintenance = status_counts["Bảo trì"]
+			error = status_counts["Sự cố"]
+			if maintenance == 0 and error == 0:
+				parent_item["status"] = "Không xác định"
+			elif maintenance >= error:
+				percent = round(maintenance / total * 100)
+				parent_item["status"] = f"{percent}% Bảo trì"
+			else:
+				percent = round(error / total * 100)
+				parent_item["status"] = f"{percent}% Sự cố"
+
 
 	sorted_result = []
 	for parent in parents:
@@ -259,15 +285,13 @@ def execute(filters=None, summary=False):
 		group_has_running = any(c.get("status") == "Đang chạy" for c in children)
 		priority_running = 0 if group_has_running else 1
 
-		has_shift = bool(parent_item.get("shift") or any(c.get("shift") for c in children))
-		priority_shift = 0 if has_shift else 1
+		has_work_order = bool(parent_item.get("work_order") or any(c.get("work_order") for c in children))
+		priority_work_order = 0 if has_work_order else 1
 
-		# riêng "Máy khác" vẫn được sort ưu tiên nếu có máy chạy
-		sorted_result.append((priority_running, priority_shift, parent_item, children))
+		sorted_result.append((priority_running, priority_work_order, parent_item, children))
 
 	sorted_result.sort(key=lambda x: (x[0], x[1]))
 
-	# flatten lại
 	final_result = []
 	for _, _, parent_item, children in sorted_result:
 		final_result.append(parent_item)

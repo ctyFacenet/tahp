@@ -13,11 +13,17 @@
   "item_code",
   "item_name",
   "stock_uom",
+  "type_posting",
   "column_break_nbdw",
   "in_qty",
   "out_qty",
   "note",
-  "amended_from"
+  "amended_from",
+  "column_break_qsfj",
+  "invoice",
+  "amount_before_tax",
+  "tax_rate",
+  "amount_after_tax"
  ],
  "fields": [
   {
@@ -61,7 +67,6 @@
    "fieldname": "item_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "T\u00ean m\u1eb7t h\u00e0ng",
    "read_only": 1
   },
@@ -117,6 +122,45 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "type_posting",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Ki\u1ec3u phi\u1ebfu",
+   "options": "Phi\u1ebfu nh\u1eadp\nPhi\u1ebfu xu\u1ea5t"
+  },
+  {
+   "fieldname": "column_break_qsfj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "H\u00f3a \u0111\u01a1n",
+   "options": "Custom Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount_before_tax",
+   "fieldtype": "Currency",
+   "label": "G\u00ed\u00e1 tr\u01b0\u1edbc thu\u1ebf",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_rate",
+   "fieldtype": "Float",
+   "label": "Thu\u1ebf su\u1ea5t",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount_after_tax",
+   "fieldtype": "Currency",
+   "label": "Gi\u00e1 sau thu\u1ebf",
+   "precision": "2",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -125,7 +169,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-07 12:06:37.821870",
+ "modified": "2025-10-08 09:00:06.672636",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Custom Invoice Allocation",
@@ -164,5 +208,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "posting_date"
+ "title_field": "type_posting"
 }

@@ -51,7 +51,11 @@ class CustomInvoice(Document):
 							"item_code": t_item.item_code,
 							"in_qty": used_qty,
 							"note": self.supplier,
-							"posting_date": date_key
+							"posting_date": date_key,
+							"type_posting": "Phiếu nhập",
+							"amount_before_tax": item.rate * item.qty,
+							"tax_rate": item.tax_rate,
+							"amount_after_tax": item.rate * item.qty * (1 + item.tax_rate / 100) 
 						})
 						sed_doc = frappe.get_doc("Stock Entry Detail", t_item.name)
 						sed_doc.custom_approved_qty += used_qty
@@ -68,7 +72,8 @@ class CustomInvoice(Document):
 							"item_code": s_item.item_code,
 							"out_qty": used_qty,
 							"note": "",
-							"posting_date": date_key
+							"posting_date": date_key,
+							"type_posting": "Phiếu xuất"
 						})
 						sed_doc = frappe.get_doc("Stock Entry Detail", s_item.name)
 						sed_doc.custom_approved_qty += used_qty
@@ -85,4 +90,10 @@ class CustomInvoice(Document):
 			new_doc.out_qty = res.get("out_qty", None)
 			new_doc.note = res.get("note", None)
 			new_doc.posting_date = res.get("posting_date", None)
+			new_doc.type_posting = res.get("type_posting", None)
+			new_doc.invoice = self.name
+			new_doc.amount_before_tax = res.get("amount_before_tax", None)
+			new_doc.amount_after_tax = res.get("amount_after_tax", None)
+			new_doc.tax_rate = res.get("tax_rate", None)
+			new_doc.status = "Chưa in"
 			new_doc.save(ignore_permissions=True)
