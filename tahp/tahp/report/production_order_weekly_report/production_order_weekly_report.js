@@ -201,7 +201,7 @@ async function refresh_charts(report) {
             backgroundColor: itemColor.bg,
             borderColor: itemColor.border,
             borderWidth: 1,
-            stack: stackId, // Gán cùng stack
+            stack: stackId, 
             barPercentage: 1.0,
             categoryPercentage: 0.8
         });
@@ -242,7 +242,7 @@ async function refresh_charts(report) {
 
     const datasets2 = [];
     let colorIndex2 = 0;
-    let maxPercent = 0;  // Thêm biến này
+    let maxPercent = 0;  
 
     Object.keys(itemsData2).forEach((itemName) => {
         const itemColor = ITEM_COLORS[colorIndex2 % ITEM_COLORS.length];
@@ -272,7 +272,7 @@ async function refresh_charts(report) {
 
     report.charts[1].options.data.labels = labels2;
     report.charts[1].options.data.datasets = datasets2;
-    report.charts[1].options.options.scales.y.suggestedMax = suggestedMax2;  // Thêm dòng này
+    report.charts[1].options.options.scales.y.suggestedMax = suggestedMax2;  
 
     report.refresh();
 }

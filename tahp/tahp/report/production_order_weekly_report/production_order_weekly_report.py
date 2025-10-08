@@ -23,9 +23,9 @@ def execute(filters=None):
                 - planned: Sản lượng kế hoạch
                 - variance: Chênh lệch (planned - actual)
                 - percent_actual: % Thực tế/Kế hoạch
-                - cumulative_actual: Lũy kế thực tế
-                - cumulative_planned: Lũy kế kế hoạch
-                - percent_cumulative: % Lũy kế thực tế/Kế hoạch
+                - cumulative_actual: Lũy kế thực tế (riêng từng item)
+                - cumulative_planned: Lũy kế kế hoạch (riêng từng item)
+                - percent_cumulative: % Lũy kế thực tế/Kế hoạch (riêng từng item)
             - data (list[dict]): Danh sách dữ liệu từng dòng theo mặt hàng.
     """
     columns = [
@@ -49,9 +49,6 @@ def execute(filters=None):
         return columns, data  
         
     doc_wwo = frappe.get_doc("Week Work Order", selected_ww_order)
-    
-    cumulative_actual = 0
-    cumulative_planned = 0
 
     for x in doc_wwo.items:
         item = x.item
@@ -72,9 +69,10 @@ def execute(filters=None):
             
         variance = planned - actual
         percent_actual = (actual / planned * 100) if planned else 0
-            
-        cumulative_actual += actual
-        cumulative_planned += planned
+        
+       
+        cumulative_actual = actual
+        cumulative_planned = planned
         percent_cumulative = (cumulative_actual / cumulative_planned * 100) if cumulative_planned else 0
 
         data.append({
@@ -117,11 +115,11 @@ def get_actual_vs_planned(filters=None):
     if not selected_ww_order:
         return {"labels": [], "items": {}}
  
-    # Lấy danh sách items từ Week Work Order
+   
     doc_wwo = frappe.get_doc("Week Work Order", selected_ww_order)
     items_list = [x.item for x in doc_wwo.items]
     
-    # Lấy tất cả Work Orders đã hoàn thành
+   
     work_orders = frappe.get_all(
         "Work Order",
         filters={
@@ -139,7 +137,7 @@ def get_actual_vs_planned(filters=None):
     if not work_orders:
         return {"labels": [], "items": {item: {"actual": [], "planned": []} for item in items_list}}
 
-    # Tìm khoảng thời gian tổng thể
+   
     planned_dates = []
     actual_dates = []
 
@@ -161,14 +159,14 @@ def get_actual_vs_planned(filters=None):
     start_date = min_start.date() if hasattr(min_start, "date") else getdate(min_start)
     end_date = max_end.date() if hasattr(max_end, "date") else getdate(max_end)
 
-    # Tạo danh sách labels (ngày)
+   
     labels = []
     d = start_date
     while d <= end_date:
         labels.append(d.strftime("%Y-%m-%d"))
         d += timedelta(days=1)
  
-    # Khởi tạo dictionary cho từng item
+   
     items_data = {}
     for item in items_list:
         items_data[item] = {
@@ -176,7 +174,7 @@ def get_actual_vs_planned(filters=None):
             "actual_map": {}
         }
 
-    # Phân bổ dữ liệu theo item và ngày
+    
     for wo in work_orders:
         item = wo.production_item
         
@@ -194,7 +192,7 @@ def get_actual_vs_planned(filters=None):
             items_data[item]["actual_map"][wo_final_day] = \
                 items_data[item]["actual_map"].get(wo_final_day, 0) + float(wo.produced_qty or 0)
 
-    # Chuyển đổi sang format cuối cùng
+   
     result_items = {}
     for item in items_list:
         result_items[item] = {
@@ -231,13 +229,13 @@ def get_cumulative_actual_vs_planned(filters=None):
     if not selected_ww_order:
         return {"labels": [], "items": {}}
     
-    # Lấy tổng kế hoạch từ Week Work Order
+   
     doc_wwo = frappe.get_doc("Week Work Order", selected_ww_order)
     total_planned_by_item = {}
     for x in doc_wwo.items:
         total_planned_by_item[x.item] = x.qty
     
-    # Lấy dữ liệu theo ngày
+  
     data = get_actual_vs_planned(filters)
 
     if not data or not data.get("labels"):
@@ -251,7 +249,7 @@ def get_cumulative_actual_vs_planned(filters=None):
 
     result_items = {}
 
-    # Tính lũy kế cho từng item
+   
     for item_name, item_values in items_data.items():
         cumulative_actual = []
         cumulative_planned = []
@@ -266,7 +264,7 @@ def get_cumulative_actual_vs_planned(filters=None):
             cumulative_actual.append(running_actual)
             cumulative_planned.append(total_planned)
             
-            # Tính % = (Lũy kế thực tế) / (Tổng kế hoạch) * 100
+            
             percent = (running_actual / total_planned * 100) if total_planned > 0 else 0
             percent_cumulative.append(round(percent, 2))
 
