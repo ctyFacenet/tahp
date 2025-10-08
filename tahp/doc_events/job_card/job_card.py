@@ -301,7 +301,7 @@ def update_workstations(job_card, workstations):
         group_name = item.get("group_name", "")
         workstation_doc = frappe.get_doc("Workstation", workstation)
         if status == "Hỏng":
-            send_noti_workstation(doc.operation, workstation_doc.name, job_card)
+            send_noti_workstation(doc.operation, workstation_doc.name, job_card, reason)
             workstation_doc.status = "Problem"
             workstation_doc.save()
         if status == "Chạy" or status == "Dừng":
@@ -588,7 +588,7 @@ def submit(job_card):
         inspection.submit()
 
 @frappe.whitelist()
-def send_noti_workstation(operation, workstation, job_card):
+def send_noti_workstation(operation, workstation, job_card, reason):
     users = frappe.db.get_all(
         "User",
         filters={"role_profile_name": "Bảo trì", "enabled": 1},
@@ -598,7 +598,7 @@ def send_noti_workstation(operation, workstation, job_card):
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
-            "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Vui lòng kiểm tra!",
+            "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}",
             "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Vui lòng kiểm tra!",
             "document_type": "Workstation",
             "document_name": workstation,
@@ -614,8 +614,8 @@ def send_noti_workstation(operation, workstation, job_card):
             frappe.get_doc({
                 "doctype": "Notification Log",
                 "for_user": user,
-                "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
-                "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
+                "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
+                "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "document_type": "Job Card",
                 "document_name": doc.name
             }).insert(ignore_permissions=True)

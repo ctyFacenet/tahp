@@ -193,7 +193,6 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
         history.sort((a, b) => b._from_obj - a._from_obj);
 
-        console.log(history)
         // render bảng
         frm.events.define_table(
             frm, $col31, "Lịch sử đo đạc",
@@ -471,7 +470,12 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $realRight = $('<div class="jc-tb-right"></div>');
                     $right.append($realRight);
                 } else {
-                    $row.css({'width':'100%'})
+                    if (totalColumns <= 4) {
+                        $row.css({'width':'100%'})
+                    } else {
+                        $row.css({'width':'fit-content'})
+                    }
+                    
                 }
             } else {
                 $left = $(`<div style="${getFlexStyle(2)}" class="text-left"></div>`);
@@ -637,9 +641,9 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                                     () => {
                                         const result = covertAllData(data, inputs);
                                         if (action) frm.events[action](frm, result, action_param);;
-                                        disableEditing(inputs, $btn);
+                                        disableEditing(inputs, $btn, true);
                                     },
-                                    () => { disableEditing(inputs, $btn); }
+                                    () => { disableEditing(inputs, $btn, false); }
                                 );
                             } else {
                                 const result = covertAllData(data, inputs);
@@ -654,10 +658,12 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             if (inputs[0]) scrollAndFocus(inputs, 0);
         }
 
-        function disableEditing(inputs, $btn) {
+        function disableEditing(inputs, $btn, reset = false) {
             editing = false;
             inputs.forEach($input => {
-                $input.val($input.data("original-value"));
+                if (reset) {
+                    $input.val($input.data("original-value"));
+                }
                 $input
                     .css('pointer-events', 'none')
                     .removeClass('jc-edit-editing')
@@ -666,7 +672,6 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             });
             if ($btn) $btn.removeClass('jc-edit-btn-save').text('Sửa');
         }
-
         // Desktop: vẫn dùng nút Sửa
         $wrapper.on("click", ".jc-edit-btn", function() {
             const $btn = $(this);
@@ -681,6 +686,11 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
     update_params: async function(frm, data, from_time) {
         if (!Array.isArray(data) || !data.length) return;
+        const hasZero = data.some(row => row.value == 0);
+        if (hasZero) {
+            frappe.msgprint("Vui lòng nhập đủ mọi chỉ số!");
+            return;
+        }
 
         let feedback_map = await frappe.call({
             method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.send_recommendation",
@@ -709,6 +719,54 @@ frappe.ui.form.on("Operation Tracker Inspection", {
             }
         }
 
+        const handleUpdate = async (feedback = "") => {
+            const items = data.map(d => ({
+                specification: d.specification,
+                value: d.value,
+                from_time: from_time,
+                feedback: feedback || null
+            }));
+
+            const qr_check = await frappe.call({
+                method: "tahp.tahp.doctype.operation_tracker.operation_tracker.is_qr_check"
+            });
+
+            if (qr_check.message) {
+                if (await ensureCameraAccess()) {
+                    new frappe.ui.Scanner({
+                        dialog: true,
+                        multiple: false,
+                        async on_scan(scan_data) {
+                            const scanned = scan_data.decodedText;
+
+                            const res = await frappe.call({
+                                method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.check_qr",
+                                args: {
+                                    inspection: frm.doc.name,
+                                    scanned: scanned
+                                }
+                            });
+
+                            if (res.message) {
+                                await frappe.call({
+                                    method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                                    args: { inspection: frm.doc.name, items: items }
+                                });
+                            } else {
+                                frappe.msgprint(__("Mã QR không đúng, vui lòng quét lại."));
+                                showPrompt(); // quay lại dialog nếu sai QR
+                            }
+                        }
+                    });
+                }
+            } else {
+                await frappe.call({
+                    method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
+                    args: { inspection: frm.doc.name, items: items }
+                });
+            }
+        };
+
         const showPrompt = () => {
             frappe.prompt(
                 {
@@ -720,63 +778,26 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 },
                 async (values) => {
                     const feedback = values.feedback?.trim() || "";
-
-                    const items = data.map(d => ({
-                        specification: d.specification,
-                        value: d.value,
-                        from_time: from_time,
-                        feedback: feedback || null
-                    }));
-
-                    // Gọi check is_qr_check trước
-                    const qr_check = await frappe.call({
-                        method: "tahp.tahp.doctype.operation_tracker.operation_tracker.is_qr_check"
-                    });
-
-                    if (qr_check.message) {
-                        // Bật scanner
-                        if (await ensureCameraAccess()) {
-                            new frappe.ui.Scanner({
-                                dialog: true,
-                                multiple: false,
-                                async on_scan(scan_data) {
-                                    const scanned = scan_data.decodedText;
-
-                                    const res = await frappe.call({
-                                        method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.check_qr",
-                                        args: {
-                                            inspection: frm.doc.name,
-                                            scanned: scanned
-                                        }
-                                    });
-
-                                    if (res.message) {
-                                        // Đúng QR → gọi update_params
-                                        await frappe.call({
-                                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
-                                            args: { inspection: frm.doc.name, items: items }
-                                        });
-                                    } else {
-                                        frappe.msgprint(__("Mã QR không đúng, vui lòng quét lại."));
-                                        showPrompt(); // quay lại dialog
-                                    }
-                                }
-                            });
-                        }
-                    } else {
-                        // Không yêu cầu QR → gọi thẳng update_params
-                        await frappe.call({
-                            method: "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.update_params",
-                            args: { inspection: frm.doc.name, items: items }
-                        });
-                    }
+                    await handleUpdate(feedback);
                 },
                 __("Hoàn tất phiếu đo đạc chỉ số"),
                 __("OK")
             );
         };
 
-        showPrompt();
+        // 🔹 Nếu không có feedback → bỏ qua prompt, gọi luôn handleUpdate()
+        if (!feedback_map.message || !feedback_map.message.trim()) {
+            frappe.confirm(
+                __("Bạn có muốn lưu lại lịch sử đo đạc không?"),
+                async () => {
+                    await handleUpdate();
+                },
+                () => {}
+            );
+        } else {
+            showPrompt();
+        }
+
     }
 });
 

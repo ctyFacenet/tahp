@@ -175,63 +175,63 @@ def execute(filters=None, summary=False):
 			result.append(child_item)
 			result_map[orphan.name] = child_item
 
-		# --- Step 2: Fill dữ liệu từ Job Card vào con ---
-		downtimes = frappe.db.get_all(
-			"Job Card Downtime Item",
-			fields=["duration", "reason", "group_name", "workstation", "from_time", "parent"],
-			order_by="from_time desc"
+	# --- Step 2: Fill dữ liệu từ Job Card vào con ---
+	downtimes = frappe.db.get_all(
+		"Job Card Downtime Item",
+		fields=["duration", "reason", "group_name", "workstation", "from_time", "parent"],
+		order_by="from_time desc"
+	)
+	actives = frappe.db.get_all(
+		"Job Card Workstation",
+		fields=["start_time", "time", "workstation", "status", "parent"],
+		order_by="start_time desc"
+	)
+	teams = frappe.db.get_all(
+		"Job Card Team",
+		fields=["employee", "parent"]
+	)
+	work_orders = {
+		j.name: j.work_order for j in frappe.db.get_all(
+			"Job Card",
+			filters=[["docstatus", "!=", "2"]],
+			fields=["name", "work_order"],
+			order_by="creation desc"
 		)
-		actives = frappe.db.get_all(
-			"Job Card Workstation",
-			fields=["start_time", "time", "workstation", "status", "parent"],
-			order_by="start_time desc"
-		)
-		teams = frappe.db.get_all(
-			"Job Card Team",
-			fields=["employee", "parent"]
-		)
-		work_orders = {
-			j.name: j.work_order for j in frappe.db.get_all(
-				"Job Card",
-				filters=[["docstatus", "!=", "2"]],
-				fields=["name", "work_order"],
-				order_by="creation desc"
+	}
+
+	latest = {}
+	for a in actives:
+		ws = a.workstation
+		if ws not in latest:
+			related_downtimes = [d for d in downtimes if d.parent == a.parent]
+
+			latest[ws] = frappe._dict(
+				active=a,
+				downtime=next((d for d in downtimes if d.workstation == ws), None),
+				downtime_overall = sum(int(d.duration or 0) for d in related_downtimes),
+				team=next((t for t in teams if t.parent == a.parent), None),
+				work_order=work_orders.get(a.parent)
 			)
-		}
 
-		latest = {}
-		for a in actives:
-			ws = a.workstation
-			if ws not in latest:
-				related_downtimes = [d for d in downtimes if d.parent == a.parent]
+	for ws, data in latest.items():
+		if ws not in result_map:
+			continue
+		item = result_map[ws]
+		active = data.active
+		downtime = data.downtime
+		downtime_overall = data.downtime_overall
+		team = data.team
 
-				latest[ws] = frappe._dict(
-					active=a,
-					downtime=next((d for d in downtimes if d.workstation == ws), None),
-					downtime_overall = sum(int(d.duration or 0) for d in related_downtimes),
-					team=next((t for t in teams if t.parent == a.parent), None),
-					work_order=work_orders.get(a.parent)
-				)
+		if active.status == "Dừng":
+			item["status"] = "Tạm dừng"
 
-		for ws, data in latest.items():
-			if ws not in result_map:
-				continue
-			item = result_map[ws]
-			active = data.active
-			downtime = data.downtime
-			downtime_overall = data.downtime_overall
-			team = data.team
-
-			if active.status == "Dừng":
-				item["status"] = "Tạm dừng"
-
-			item["work_order"] = data.work_order
-			item["active_time"] = format_duration(active.time)
-			item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
-			item["stop_time_overall"] = format_duration(downtime_overall, mili=False)
-			item["group_name"] = downtime.group_name if downtime else None
-			item["reason"] = downtime.reason if downtime else None
-			item["employee"] = team.employee if team else None
+		item["work_order"] = data.work_order
+		item["active_time"] = format_duration(active.time)
+		item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
+		item["stop_time_overall"] = format_duration(downtime_overall, mili=False)
+		item["group_name"] = downtime.group_name if downtime else None
+		item["reason"] = downtime.reason if downtime else None
+		item["employee"] = team.employee if team else None
 
 	for parent in parents:
 		children = [row for row in result if row.get("indent") == 1 and row["parent"] == parent.name]

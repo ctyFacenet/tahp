@@ -28,6 +28,15 @@ textarea {
   }
 }
 
+@media (max-width: 767.98px) {
+    .dropdown-notifications .notifications-list {
+        max-height: 100vh;
+        min-width: 80vw;
+        width: calc(-60px + 90vw);
+        right: -68px;
+    }
+}
+
 @media (min-width: 768px) {
   .layout-side-section {
       display: none !important;

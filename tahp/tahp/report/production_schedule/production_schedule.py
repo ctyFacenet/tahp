@@ -167,7 +167,7 @@ def get_columns(week_work_orders):
     """Generate dynamic columns for week plan report with multi-level headers"""
     columns = [
         {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 120},
-        {"label": _("LSX Tuần"), "fieldname": "wwo_name", "fieldtype": "Data", "width": 150},
+        {"label": _("LSX Tuần"), "fieldname": "wwo_name", "fieldtype": "Link", "options": "Week Work Order", "width": 150},
     ]
 
     if not week_work_orders:
