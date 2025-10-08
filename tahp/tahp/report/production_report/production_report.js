@@ -481,7 +481,8 @@ frappe.query_reports["Production Report"] = {
                         font: {
                             size: 22,
                             weight: 'bold'
-                        }
+                        },
+                        align: window.innerWidth < 768 ? 'start' : 'center',
                     },
     
                 },
