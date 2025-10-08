@@ -27,7 +27,7 @@ frappe.ui.form.on("Custom Invoice Item", {
     item_code(frm, cdt, cdn) {
         let row = locals[cdt][cdn]
         if (!row.qty) row.qty = 1
-        if (!row.rate) row.rate = 10000
+        if (!row.rate) row.rate = 0
         calculate_amounts(frm, cdt, cdn);
     },
     rate(frm, cdt, cdn) {

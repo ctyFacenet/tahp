@@ -26,25 +26,64 @@ frappe.query_reports["Custom Invoice Allocation Report"] = {
 			"options": "Stock Entry"
 		},
 	],
+
 	formatter: function (value, row, column, data, default_formatter) {
 		let formatted_value = default_formatter(value, row, column, data);
+		let color = "";
+		let url = "";
+		let is_link = false;
 
-		// Nếu giá trị là số lượng và bằng 0 thì trả về chuỗi rỗng
-		if (["in_qty", "out_qty", "custom_approved_qty"].includes(column.fieldname) && value === 0) {
-			formatted_value = "";
+		const numeric_fields = ["in_qty", "out_qty", "custom_approved_qty"];
+		if (numeric_fields.includes(column.fieldname) && value === 0) {
+			return "";
 		}
 
-		if (data && data.custom_approved_qty > 0) {
-			if (data.custom_approved_qty < data.in_qty || data.custom_approved_qty < data.out_qty) {
-				formatted_value = `<span style="font-weight: bold; color: red;">${formatted_value}</span>`;
-			} else if (data.custom_approved_qty == data.in_qty || data.custom_approved_qty == data.out_qty) {
-				formatted_value = `<span style="font-weight: bold; color: green">${formatted_value}</span>`;
-			} else {
-				formatted_value = `<span style="font-weight: bold; ">${formatted_value}</span>`;
+		// Xác định màu dựa trên approved qty
+		if (data) {
+			const approved = data.custom_approved_qty || 0;
+
+			if (approved === 0) {
+				color = "red";
+			} else if (approved < data.in_qty || approved < data.out_qty) {
+				color = "#d6a100"; // vàng dịu, dễ nhìn
+			} else if (approved == data.in_qty || approved == data.out_qty) {
+				color = "green";
 			}
 		}
 
+		// Nếu là cột stock_entry
+		if (column.fieldname === "stock_entry" && value) {
+			url = `/app/stock-entry/${value}`;
+			is_link = true;
+		}
+
+		// Nếu là cột item_code
+		if (column.fieldname === "item_code" && value) {
+			url = `/app/item/${value}`;
+			is_link = true;
+		}
+
+		// Áp dụng format cuối
+		if (is_link) {
+			formatted_value = `
+				<a href="${url}" style="
+					font-weight:bold;
+					color:${color || '#007bff'};
+					text-decoration: underline;
+					text-underline-offset: 2px;
+				">${value}</a>
+			`;
+		} else if (color) {
+			formatted_value = `
+				<span style="font-weight:bold; color:${color};">
+					${formatted_value}
+				</span>
+			`;
+		}
+
 		return formatted_value;
-	},
+	}
+
+
 
 };

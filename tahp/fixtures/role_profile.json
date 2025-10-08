@@ -95,27 +95,6 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-08-07 20:27:13.035574",
-  "name": "Accounts",
-  "role_profile": "Accounts",
-  "roles": [
-   {
-    "parent": "Accounts",
-    "parentfield": "roles",
-    "parenttype": "Role Profile",
-    "role": "Accounts User"
-   },
-   {
-    "parent": "Accounts",
-    "parentfield": "roles",
-    "parenttype": "Role Profile",
-    "role": "Accounts Manager"
-   }
-  ]
- },
- {
-  "docstatus": 0,
-  "doctype": "Role Profile",
   "modified": "2025-08-07 20:27:13.043016",
   "name": "Sales",
   "role_profile": "Sales",
@@ -671,6 +650,57 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Supplier"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2025-10-08 15:51:38.889129",
+  "name": "Kế toán",
+  "role_profile": "Kế toán",
+  "roles": [
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Accounts Manager"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Accounts User"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing Manager"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing User"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
+   },
+   {
+    "parent": "Kế toán",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Stock Manager"
    }
   ]
  }
