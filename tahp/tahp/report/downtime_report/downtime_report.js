@@ -403,20 +403,22 @@ async function draw_column_chart() {
                 scales: { 
                     y: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...values) * 1.1,
-                        title: {
-                            display: true,
-                            text: "Số giờ Downtime",
-                            color: "#333",
-                            font: { size: 14, weight: "bold" }
+                        suggestedMax: Math.max(...values) * 1.2,
+                        ticks: {
+                           
+                            callback: function(value, index, ticks) {
+                                return index === ticks.length - 1 ? '(Giờ)' : value.toLocaleString('en-US');
+                            }
                         }
+                       
                         
                     },
                     x: {
                         ticks: {
                             autoSkip: false, 
                             maxRotation: 45, 
-                            minRotation: 0   
+                            minRotation: 0,
+                            
                         }
                     }
                      
@@ -552,13 +554,12 @@ async function draw_horizontal_chart() {
                 scales: { 
                     x: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...chartData.values) * 1.1,
-                        title: {
-                            display: true,
-                            text: "Số giờ Downtime",
-                            color: "#333",
-                            font: { size: 14, weight: "bold" },
-                            
+                        suggestedMax: Math.max(...chartData.values) * 1.2,
+                        ticks: {
+                           
+                            callback: function(value, index, ticks) {
+                                return index === ticks.length - 1 ? '(Giờ)' : value.toLocaleString('en-US');
+                            }
                         }
                     } 
                 }
@@ -780,20 +781,20 @@ async function draw_column_chart1() {
                 scales: { 
                     y: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...values) * 1.1,
-                        title: {
-                            display: true,
-                            text: "Số giờ Downtime",
-                            color: "#333",
-                            font: { size: 14, weight: "bold" },
-                            
-                        } 
+                        suggestedMax: Math.max(...values) * 1.2,
+                        ticks: {
+                           
+                            callback: function(value, index, ticks) {
+                                return index === ticks.length - 1 ? '(Giờ)' : value.toLocaleString('en-US');
+                            }
+                        }
                     },
                     x: {
                         ticks: {
                             autoSkip: false, 
                             maxRotation: 45, 
-                            minRotation: 0  
+                            minRotation: 0,
+
                         }
                     }
                 }
@@ -929,13 +930,12 @@ async function draw_horizontal_chart1() {
                 scales: { 
                     x: { 
                         beginAtZero: true, 
-                        suggestedMax: Math.max(...chartData.values) * 1.1,
-                        title: {
-                            display: true,
-                            text: "Số giờ Downtime",
-                            color: "#333",
-                            font: { size: 14, weight: "bold" },
-                            
+                        suggestedMax: Math.max(...chartData.values) * 1.2,
+                        ticks: {
+                           
+                            callback: function(value, index, ticks) {
+                                return index === ticks.length - 1 ? '(Giờ)' : value.toLocaleString('en-US');
+                            }
                         }
                     } 
                 }
