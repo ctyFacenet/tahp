@@ -11,11 +11,7 @@ class CustomInvoiceAllocation(Document):
 
 @frappe.whitelist()
 def get_invoice_allocation_items(items):
-    """
-    items: list các name của Custom Invoice Allocation
-    Trả về danh sách chi tiết + flag
-    """
-    data = []
+    data = {"Phiếu nhập kho": [], "Phiếu xuất kho": []}
     flag = False
 
     if isinstance(items, str):
@@ -24,21 +20,35 @@ def get_invoice_allocation_items(items):
     for name in items:
         doc = frappe.get_doc("Custom Invoice Allocation", name)
         if doc.docstatus == 0:
-            flag = True  # có ít nhất 1 bản ghi chưa submit
-            data.append({
-                "posting_date": doc.posting_date,
-                "stock_entry": doc.stock_entry,
-                "approved_date": doc.approved_date,
-                "item_code": doc.item_code,
-                "item_name": doc.item_name,
-                "stock_uom": doc.stock_uom,
-                "in_qty": doc.in_qty,
-                "out_qty": doc.out_qty,
-            })
+            flag = True 
+            if doc.type_posting == "Phiếu nhập":
+                data["Phiếu nhập kho"].append({
+                    "invoice_allocation": name,
+                    "qty": doc.in_qty
+                })
+            elif doc.type_posting == "Phiếu xuất":
+                data["Phiếu xuất kho"].append({
+                    "invoice_allocation": name,
+                    "qty": doc.out_qty
+                })                
             doc.status = "In xong"
             doc.submit()
         else:
-            # chỉ bỏ qua, không thêm data
             continue
 
-    return {"flag": flag, "data": data}
+    result = []
+
+    for key, row in data.items():
+        if len(row) > 0:
+            summary = frappe.new_doc("Custom Invoice Summary")
+            summary.type_posting = key
+            for value in row:
+                summary.append("items", value)
+            employee_name = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+            if employee_name:
+                summary.w_representative = employee_name
+            summary.save(ignore_permissions=True)
+            summary.submit()
+            result.append(summary.name)
+
+    return {"flag": flag, "result": result}

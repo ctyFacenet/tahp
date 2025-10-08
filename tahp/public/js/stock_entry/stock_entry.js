@@ -198,9 +198,9 @@ async function set_code(frm) {
     if (frm.doc.custom_code || !frm.doc.stock_entry_type) return;
 
     const map = {
-        "Material Receipt": "NK",
-        "Material Issue": "XK",
-        "Manufacture": "SX"
+        "Material Receipt": "NKT",
+        "Material Issue": "XKT",
+        "Manufacture": "SXT"
     };
     const code = map[frm.doc.stock_entry_type] || "UNK";
 
