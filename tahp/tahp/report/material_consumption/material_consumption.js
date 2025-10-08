@@ -194,14 +194,14 @@ frappe.query_reports["Material Consumption"] = {
 
         let material_summary = this.aggregate_data_for_charts(data_rows);
         
-        // Lọc bỏ tất cả nguyên vật liệu có tổng tiêu thụ thực tế bằng 0 hoặc không có.
+        // Filter out materials with zero actual consumption
         material_summary = material_summary.filter(material => material.total_actual_qty > 0);
 
-        // `draw_first_chart` sẽ nhận được dữ liệu đã được lọc sạch.
+        // Draw first chart with filtered data
         this.draw_first_chart(material_summary);
         
         setTimeout(() => {
-            // `draw_second_chart` cũng sẽ dùng dữ liệu đã lọc thông qua `this.material_color_map`
+            // Draw second chart using filtered data through material_color_map
             this.draw_second_chart(data_rows);
             this.isDrawing = false;
         }, 100);
@@ -313,7 +313,7 @@ frappe.query_reports["Material Consumption"] = {
                 if (hoveredLine) {
                     chart.canvas.style.cursor = 'pointer';
                     const canvasRect = chart.canvas.getBoundingClientRect();
-                    chart.customTooltip.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString()}</div>`;
+                    chart.customTooltip.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}</div>`;
                     chart.customTooltip.style.display = 'block';
                     chart.customTooltip.style.left = (canvasRect.left + x + 15) + 'px';
                     chart.customTooltip.style.top = (canvasRect.top + y - 40) + 'px';
@@ -348,7 +348,6 @@ frappe.query_reports["Material Consumption"] = {
             borderWidth: 2.5,
             pointStyle: 'line',
             fill: false,
-            hidden: true,
             showLine: false
         });
 
@@ -367,7 +366,15 @@ frappe.query_reports["Material Consumption"] = {
                 scales: { 
                     x: { 
                         beginAtZero: true,
-                        max: Math.max(Math.max(...actual_data), Math.max(...planned_data)) * 1.1
+                        max: Math.max(Math.max(...actual_data), Math.max(...planned_data)) * 1.1,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 1
+                                });
+                            }
+                        }
                     } 
                 }
             },
@@ -381,23 +388,34 @@ frappe.query_reports["Material Consumption"] = {
 
         columns.forEach(col => {
             if (col.fieldname && col.fieldname.endsWith('_actual')) {
-                const item_name = col.parent || col.label.split('<br>')[0];
-                production_items.push({
-                    name: item_name,
-                    actual_field: col.fieldname,
-                    planned_field: col.fieldname.replace('_actual', '_planned')
-                });
+                // Get product name from col.parent if available, otherwise from fieldname
+                let item_name = col.parent;
+                if (!item_name) {
+                    // If no col.parent, get from fieldname by removing "_actual"
+                    const fieldname_without_suffix = col.fieldname.replace('_actual', '');
+                    // Find corresponding column with same fieldname to get product name
+                    const corresponding_col = columns.find(c => c.fieldname === fieldname_without_suffix + '_actual_per_ton');
+                    if (corresponding_col && corresponding_col.parent) {
+                        item_name = corresponding_col.parent;
+                    }
+                }
+                if (item_name) {
+                    production_items.push({
+                        name: item_name,
+                        actual_field: col.fieldname,
+                        planned_field: col.fieldname.replace('_actual', '_planned')
+                    });
+                }
             }
         });
 
         if (production_items.length === 0) return;
 
-        // SỬA LỖI CHO BIỂU ĐỒ 2
-        // Lấy danh sách các nguyên vật liệu hợp lệ (đã được lọc ở draw_chart) từ `material_color_map`
+        // Get valid materials list (filtered in draw_chart) from material_color_map
         const material_color_map = this.material_color_map || {};
         const valid_material_names = Object.keys(material_color_map);
         
-        // Nếu không có nguyên vật liệu hợp lệ nào thì không vẽ biểu đồ 2
+        // Don't draw chart 2 if no valid materials
         if (valid_material_names.length === 0) return;
         
         const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px;">
@@ -477,7 +495,7 @@ frappe.query_reports["Material Consumption"] = {
                 if (hoveredLine) {
                     chart.canvas.style.cursor = 'pointer';
                     const canvasRect = chart.canvas.getBoundingClientRect();
-                    chart.customTooltip2.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString()}</div>`;
+                    chart.customTooltip2.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}</div>`;
                     chart.customTooltip2.style.display = 'block';
                     chart.customTooltip2.style.left = `${canvasRect.left + event.x + 15}px`;
                     chart.customTooltip2.style.top = `${canvasRect.top + event.y - 15}px`;
@@ -496,7 +514,7 @@ frappe.query_reports["Material Consumption"] = {
         const material_summary_by_product = {};
         data_rows.forEach(row => {
             const material_name = row.material_name;
-            // Chỉ xử lý các nguyên vật liệu hợp lệ
+            // Only process valid materials
             if (!valid_material_names.includes(material_name)) {
                 return;
             }
@@ -555,8 +573,27 @@ frappe.query_reports["Material Consumption"] = {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: { stacked: false, grid: { display: false }, ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } },
-                    y: { stacked: false, beginAtZero: true }
+                    x: { 
+                        stacked: false, 
+                        grid: { display: false }, 
+                        ticks: { 
+                            autoSkip: false, 
+                            maxRotation: 45, 
+                            minRotation: 0 
+                        } 
+                    },
+                    y: { 
+                        stacked: false, 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 1
+                                });
+                            }
+                        }
+                    }
                 },
                 plugins: {
                     title: { display: true, text: 'Nguyên liệu tiêu thụ theo từng sản phẩm', font: { size: 18 } },
