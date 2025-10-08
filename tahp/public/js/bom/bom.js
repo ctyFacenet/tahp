@@ -140,6 +140,18 @@ frappe.ui.form.on('BOM', {
       d.show();
     });
 
+    frm.add_custom_button("Open CRUD Vue", () => {
+      const d = new frappe.ui.Dialog({
+        title: "Demo CRUD Vue",
+        size: "extra-large"
+      });
+
+      const wrapper = $('<div></div>').appendTo(d.body);
+      new tahp.ui.CrudItemDemoComponent({
+        wrapper,
+      });
+      d.show();
+    });
   },
 
   with_operations: function (frm) {

@@ -1,3 +1,5 @@
+
+frappe.provide("tahp.ui");
 import ProductionReport from "../../hello_vue/pages/ProductionReport.vue";
 
 class HelloWorldComponent {
@@ -11,7 +13,6 @@ class HelloWorldComponent {
   }
 }
 
-frappe.provide("tahp.ui");
 tahp.ui.HelloWorldComponent = HelloWorldComponent;
 
 export default HelloWorldComponent;
