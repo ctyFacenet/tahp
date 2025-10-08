@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:data",
  "creation": "2025-09-06 10:56:02.270974",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -14,16 +15,18 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "T\u00ean Gyps",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-07 19:48:00.588784",
+ "modified": "2025-10-08 17:06:24.956784",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Manufacturing Category Material",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
