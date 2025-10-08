@@ -163,6 +163,62 @@ frappe.query_reports["Production Report"] = {
                 .chart-wrapper::-webkit-scrollbar-thumb:hover {
                     background: #a8a8a8;
                 }
+                
+                /* Responsive chart adjustments */
+                @media (max-width: 768px) {
+                    .chart-container {
+                        height: 250px !important;
+                    }
+                    
+                    .chart-wrapper {
+                        padding: 8px !important;
+                    }
+                    
+                    /* Responsive chart title */
+                    .chartjs-chart canvas {
+                        max-width: 100% !important;
+                    }
+                }
+                
+                @media (min-width: 769px) and (max-width: 1024px) {
+                    .chart-container {
+                        height: 300px !important;
+                    }
+                }
+                
+                @media (min-width: 1025px) {
+                    .chart-container {
+                        height: 350px !important;
+                    }
+                }
+                
+                /* Chart title responsive */
+                .chartjs-chart {
+                    max-width: 100% !important;
+                    overflow: hidden !important;
+                }
+                
+                .chartjs-chart canvas {
+                    max-width: 100% !important;
+                    height: auto !important;
+                }
+                
+                /* Chart title alignment and wrapping */
+                .chartjs-chart .chartjs-chart-title {
+                    text-align: center !important;
+                    white-space: normal !important;
+                    word-wrap: break-word !important;
+                    max-width: 100% !important;
+                }
+                
+                @media (max-width: 768px) {
+                    .chartjs-chart .chartjs-chart-title {
+                        text-align: left !important;
+                        font-size: 14px !important;
+                        line-height: 1.3 !important;
+                        padding: 5px 0 !important;
+                    }
+                }
             </style>
         `);
         $('head').append(style);
@@ -372,14 +428,14 @@ frappe.query_reports["Production Report"] = {
         const dates = Object.keys(daily_data).sort();
         if (dates.length === 0) return;
 
-        // Calculate canvas size based on device - reduced heights
+        // Calculate canvas size based on device with responsive heights
         const num_days = dates.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
         
         let bar_width_per_day = is_mobile ? 50 : is_tablet ? 70 : 90;
         let canvas_width = num_days * bar_width_per_day;
-        let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320; // Reduced heights
+        let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
         
         if (canvas_width < 300) canvas_width = 300;
         if (canvas_width > 1200) canvas_width = 1200;
@@ -437,13 +493,27 @@ frappe.query_reports["Production Report"] = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'top' },
+                    legend: { 
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    },
                     title: { 
                         display: true, 
-                        text: 'Sản lượng sản xuất theo ngày' ,
+                        text: 'Sản lượng sản xuất theo ngày',
                         font: {
-                            size: 22,
+                            size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
                             weight: 'bold'
+                        },
+                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        padding: {
+                            top: 10,
+                            bottom: 20
                         }
                     },
 

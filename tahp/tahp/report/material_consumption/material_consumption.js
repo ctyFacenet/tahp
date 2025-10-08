@@ -59,7 +59,9 @@ frappe.query_reports["Material Consumption"] = {
     
     "onload": function(report) {
         setTimeout(() => {
-            this.draw_chart();
+            if (!this.isDrawing) {
+                this.draw_chart();
+            }
         }, 500);
 
         let previous_values = {
@@ -70,21 +72,15 @@ frappe.query_reports["Material Consumption"] = {
             year: report.get_filter_value("year")
         };
 
-        // Create a single, reusable handler for date changes.
         const on_date_cleared_handler = (fieldname) => {
             const new_value = report.page.fields_dict[fieldname].get_value();
             const old_value = previous_values[fieldname];
-
-            // Core Logic: Trigger refresh only if the field was cleared.
             if (old_value && !new_value) {
                 report.refresh();
             }
-
-            // Update the stored value to the new value for the next event.
             previous_values[fieldname] = new_value;
         };
 
-        // Attach the custom handler to all filter inputs.
         report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
         report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
         report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
@@ -93,27 +89,28 @@ frappe.query_reports["Material Consumption"] = {
     },
 
     "handle_filter_change": function() {
-        // Generic filter change handler - just refresh
         frappe.query_report.refresh();
         setTimeout(() => {
-            this.draw_chart();
+            if (!this.isDrawing) {
+                this.draw_chart();
+            }
         }, 500);
     },
 
     "handle_date_range_change": function() {
-        // When from_date or to_date changes, clear week and month filters
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
         
         if (from_date || to_date) {
-            // Clear other filters silently (without triggering their on_change)
             frappe.query_report.set_filter_value("week", "", false);
             frappe.query_report.set_filter_value("month", "", false);
         }
         
         frappe.query_report.refresh();
         setTimeout(() => {
-            this.draw_chart();
+            if (!this.isDrawing) {
+                this.draw_chart();
+            }
         }, 500);
     },
 
@@ -121,26 +118,24 @@ frappe.query_reports["Material Consumption"] = {
         const week_value = frappe.query_report.get_filter_value("week");
         
         if (week_value) {
-            // Clear other date filters silently
             frappe.query_report.set_filter_value("from_date", "", false);
             frappe.query_report.set_filter_value("to_date", "", false);
             frappe.query_report.set_filter_value("month", "", false);
             
-            // Calculate and display the week range for user reference
             const selected_date = frappe.datetime.str_to_obj(week_value);
             const monday = this.getMonday(selected_date);
             const sunday = this.getSunday(monday);
             
-            // Show a message to user about the calculated week range
             frappe.show_alert({
                 message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
                 indicator: 'blue'
             }, 5);
             
-            // Refresh immediately after setting week
             frappe.query_report.refresh();
             setTimeout(() => {
-                this.draw_chart();
+                if (!this.isDrawing) {
+                    this.draw_chart();
+                }
             }, 500);
         }
     },
@@ -149,36 +144,32 @@ frappe.query_reports["Material Consumption"] = {
         const month_value = frappe.query_report.get_filter_value("month");
         const year_value = frappe.query_report.get_filter_value("year");
         
-        // Only process if month is selected (year always has a default value)
         if (month_value) {
-            // Clear other date filters silently (without triggering their on_change)
             frappe.query_report.set_filter_value("from_date", "", false);
             frappe.query_report.set_filter_value("to_date", "", false);
             frappe.query_report.set_filter_value("week", "", false);
             
-            // Show a message to user about the selected month/year
             frappe.show_alert({
                 message: __(`Đã chọn tháng ${month_value}/${year_value}`),
                 indicator: 'green'
             }, 5);
             
-            // Refresh immediately after setting month
             frappe.query_report.refresh();
             setTimeout(() => {
-                this.draw_chart();
+                if (!this.isDrawing) {
+                    this.draw_chart();
+                }
             }, 500);
         }
     },
 
-    // Helper function to get Monday of the week containing the given date
     "getMonday": function(date) {
         const d = new Date(date);
         const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
         return new Date(d.setDate(diff));
     },
 
-    // Helper function to get Sunday of the week (6 days after Monday)
     "getSunday": function(monday) {
         const sunday = new Date(monday);
         sunday.setDate(monday.getDate() + 6);
@@ -186,6 +177,9 @@ frappe.query_reports["Material Consumption"] = {
     },
 
     "draw_chart": function() {
+        if (this.isDrawing) return;
+        this.isDrawing = true;
+        
         let existing_chart1 = Chart.getChart("myCustomChart");
         if (existing_chart1) existing_chart1.destroy();
         let existing_chart2 = Chart.getChart("mySecondChart");
@@ -193,17 +187,23 @@ frappe.query_reports["Material Consumption"] = {
         $('.report-wrapper .chart-container').remove();
         
         const data_rows = frappe.query_report.data;
-        if (!data_rows || data_rows.length === 0) return;
+        if (!data_rows || data_rows.length === 0) {
+            this.isDrawing = false;
+            return;
+        }
 
-        // data summary by ingredients to draw chart
-        const material_summary = this.aggregate_data_for_charts(data_rows);
+        let material_summary = this.aggregate_data_for_charts(data_rows);
+        
+        // Filter out materials with zero actual consumption
+        material_summary = material_summary.filter(material => material.total_actual_qty > 0);
 
-        // Vẽ biểu đồ thứ nhất trước để tạo material_color_map
+        // Draw first chart with filtered data
         this.draw_first_chart(material_summary);
         
-        // Vẽ biểu đồ thứ hai sau khi đã có material_color_map
         setTimeout(() => {
+            // Draw second chart using filtered data through material_color_map
             this.draw_second_chart(data_rows);
+            this.isDrawing = false;
         }, 100);
     },
 
@@ -228,102 +228,157 @@ frappe.query_reports["Material Consumption"] = {
             material_map[key].total_planned_qty += (row.total_planned_qty || 0);
         });
         
-        const result = Object.values(material_map).map(item => {
-            const total_actual = item.total_actual_qty;
-            const total_planned = item.total_planned_qty;
-            
-            const over_limit = Math.max(0, total_actual - total_planned);
-            
-            const within_limit = total_actual - over_limit;
-            
-            return {
-                material_name: item.material_name,
-                uom: item.uom,
-                within_limit_qty: within_limit,
-                over_limit_qty: over_limit
-            };
-        });
-        
-        return result;
+        return Object.values(material_map);
     },
 
     "draw_first_chart": function(material_summary) {
+        if (material_summary.length === 0) return;
+        
         const bar_thickness = 40;
         const chart_padding = 120;
         const num_bars = material_summary.length;
         let calculated_height = (num_bars * bar_thickness) + chart_padding;
-        if (calculated_height < 300) {
-            calculated_height = 200;
-        }
-
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: 200px; margin-bottom: 40px;">
-            <canvas id="myCustomChart"></canvas>
-        </div>`);
+        calculated_height = Math.max(300, Math.min(600, calculated_height));
+        const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 20px; display: flex; align-items: center;"><canvas id="myCustomChart" style="flex: 1; margin-right: 20px;"></canvas></div>`);
         $('.report-wrapper').prepend(chartContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
+        const actual_data = material_summary.map(row => row.total_actual_qty);
+        const planned_data = material_summary.map(row => row.total_planned_qty);
 
-        // Tạo bảng màu chung cho tất cả nguyên vật liệu (loại bỏ màu đỏ để tránh trùng với "Vượt định mức")
         const material_colors = [
-            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' },      // Indigo
-            { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' },      // Sky
-            { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' },      // Purple
-            { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' },       // Amber
-            { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' },        // Green
-            { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' },    // Pink-200
-            { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' },      // Cyan-400
-            { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' },      // Lime-400
-            { bg: 'rgba(59, 130, 246, 0.5)', border: 'rgba(59, 130, 246, 1)' },      // Blue-500
-            { bg: 'rgba(139, 69, 19, 0.5)', border: 'rgba(139, 69, 19, 1)' },        // Brown
-            { bg: 'rgba(75, 85, 99, 0.5)', border: 'rgba(75, 85, 99, 1)' },          // Gray-600
-            { bg: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 1)' },      // Pink-500
+            { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' }, { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' }, { bg: 'rgba(168, 85, 247, 0.5)', border: 'rgba(168, 85, 247, 1)' }, { bg: 'rgba(251, 191, 36, 0.5)', border: 'rgba(251, 191, 36, 1)' }, { bg: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 1)' }, { bg: 'rgba(251, 207, 232, 0.5)', border: 'rgba(251, 207, 232, 1)' }, { bg: 'rgba(34, 211, 238, 0.5)', border: 'rgba(34, 211, 238, 1)' }, { bg: 'rgba(132, 204, 22, 0.5)', border: 'rgba(132, 204, 22, 1)' }, { bg: 'rgba(59, 130, 246, 0.5)', border: 'rgba(59, 130, 246, 1)' }, { bg: 'rgba(139, 69, 19, 0.5)', border: 'rgba(139, 69, 19, 1)' }, { bg: 'rgba(75, 85, 99, 0.5)', border: 'rgba(75, 85, 99, 1)' }, { bg: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 1)' },
         ];
-
-        // Tạo map màu cho từng nguyên vật liệu
         const material_color_map = {};
         material_summary.forEach((material, index) => {
             material_color_map[material.material_name] = material_colors[index % material_colors.length];
         });
-
-        // Lưu map màu vào object để sử dụng ở biểu đồ thứ hai
         this.material_color_map = material_color_map;
 
-        const datasets = [
-            {
-                label: 'Thực tế',
-                data: material_summary.map(row => row.within_limit_qty),
-                backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                borderColor: 'rgba(99, 102, 241, 1)',
-                borderWidth: 2
+        const plannedLinePlugin = {
+            id: 'plannedLinePlugin',
+            afterDatasetsDraw(chart) {
+                const { ctx, scales: { x, y } } = chart;
+                ctx.save();
+                ctx.strokeStyle = 'rgba(244, 63, 94, 1)';
+                ctx.lineWidth = 2.5;
+                
+                chart.plannedLines = [];
+                
+                planned_data.forEach((plannedValue, i) => {
+                    if (plannedValue > 0) {
+                        const yValue = y.getPixelForValue(i);
+                        const barHeight = 40;
+                        const xValue = x.getPixelForValue(plannedValue);
+                        
+                        const chartArea = chart.chartArea;
+                        if (xValue >= chartArea.left && xValue <= chartArea.right) {
+                            chart.plannedLines.push({
+                                x: xValue, y: yValue, value: plannedValue,
+                                label: labels[i], barHeight: barHeight
+                            });
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(xValue, yValue - barHeight / 2);
+                            ctx.lineTo(xValue, yValue + barHeight / 2);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                ctx.restore();
             },
-            {
-                label: 'Vượt định mức',
-                data: material_summary.map(row => row.over_limit_qty),
-                backgroundColor: 'rgba(244, 63, 94, 0.5)',
-                borderColor: 'rgba(244, 63, 94, 1)',
-                borderWidth: 2
+            
+            afterEvent(chart, args) {
+                const { event } = args;
+                if (!chart.plannedLines) return;
+                
+                const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                const x = canvasPosition.x;
+                const y = canvasPosition.y;
+                
+                if (!chart.customTooltip) {
+                    chart.customTooltip = document.createElement('div');
+                    chart.customTooltip.id = 'planned-line-tooltip';
+                    chart.customTooltip.style.cssText = `
+                        position: fixed; background: #000; color: #fff; padding: 10px 15px; border-radius: 6px; font-size: 13px;
+                        pointer-events: none; z-index: 999999; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                    `;
+                    document.body.appendChild(chart.customTooltip);
+                }
+                
+                const hoveredLine = chart.plannedLines.find(line => {
+                    return Math.abs(x - line.x) <= 15 && y >= line.y - line.barHeight/2 && y <= line.y + line.barHeight/2;
+                });
+                
+                if (hoveredLine) {
+                    chart.canvas.style.cursor = 'pointer';
+                    const canvasRect = chart.canvas.getBoundingClientRect();
+                    chart.customTooltip.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}</div>`;
+                    chart.customTooltip.style.display = 'block';
+                    chart.customTooltip.style.left = (canvasRect.left + x + 15) + 'px';
+                    chart.customTooltip.style.top = (canvasRect.top + y - 40) + 'px';
+                } else {
+                    chart.canvas.style.cursor = 'default';
+                    if (chart.customTooltip) {
+                        chart.customTooltip.style.display = 'none';
+                    }
+                }
             }
-        ];
+        };
+
+        const material_datasets = material_summary.map((material, index) => {
+            const data = new Array(material_summary.length).fill(0);
+            data[index] = material.total_actual_qty;
+            
+            return {
+                label: `${material.material_name} (${material.uom})`,
+                data: data,
+                backgroundColor: material_color_map[material.material_name]?.bg || 'rgba(75, 85, 99, 0.5)',
+                borderColor: material_color_map[material.material_name]?.border || 'rgba(75, 85, 99, 1)',
+                borderWidth: 1,
+                stack: 'actual'
+            };
+        });
+
+        material_datasets.push({
+            label: 'Định mức',
+            data: new Array(material_summary.length).fill(null),
+            type: 'line',
+            borderColor: 'rgba(244, 63, 94, 1)',
+            borderWidth: 2.5,
+            pointStyle: 'line',
+            fill: false,
+            showLine: false
+        });
 
         const ctx = document.getElementById('myCustomChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
-            data: { labels, datasets },
+            data: { labels, datasets: material_datasets },
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: { x: { stacked: true,  }, y: { stacked: true } },
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Số lượng nguyên vật liệu tiêu hao',
-                        font: {
-                            size: 18
+                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 15, padding: 15 } },
+                    title: { display: true, text: 'Số lượng nguyên vật liệu tiêu hao (Thực tế vs. Định mức)', font: { size: 18 } }
+                },
+                scales: { 
+                    x: { 
+                        beginAtZero: true,
+                        max: Math.max(Math.max(...actual_data), Math.max(...planned_data)) * 1.1,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 1
+                                });
+                            }
                         }
-                    }
+                    } 
                 }
-            }
+            },
+            plugins: [plannedLinePlugin]
         });
     },
 
@@ -333,104 +388,183 @@ frappe.query_reports["Material Consumption"] = {
 
         columns.forEach(col => {
             if (col.fieldname && col.fieldname.endsWith('_actual')) {
-                const item_name = col.parent || col.label.split('<br>')[0];
-                production_items.push({
-                    name: item_name,
-                    actual_field: col.fieldname,
-                    planned_field: col.fieldname.replace('_actual', '_planned')
-                });
+                // Get product name from col.parent if available, otherwise from fieldname
+                let item_name = col.parent;
+                if (!item_name) {
+                    // If no col.parent, get from fieldname by removing "_actual"
+                    const fieldname_without_suffix = col.fieldname.replace('_actual', '');
+                    // Find corresponding column with same fieldname to get product name
+                    const corresponding_col = columns.find(c => c.fieldname === fieldname_without_suffix + '_actual_per_ton');
+                    if (corresponding_col && corresponding_col.parent) {
+                        item_name = corresponding_col.parent;
+                    }
+                }
+                if (item_name) {
+                    production_items.push({
+                        name: item_name,
+                        actual_field: col.fieldname,
+                        planned_field: col.fieldname.replace('_actual', '_planned')
+                    });
+                }
             }
         });
 
         if (production_items.length === 0) return;
 
+        // Get valid materials list (filtered in draw_chart) from material_color_map
+        const material_color_map = this.material_color_map || {};
+        const valid_material_names = Object.keys(material_color_map);
+        
+        // Don't draw chart 2 if no valid materials
+        if (valid_material_names.length === 0) return;
+        
         const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px;">
             <canvas id="mySecondChart"></canvas>
         </div>`);
         $('.report-wrapper .chart-1').after(chartContainer2);
 
         const labels2 = production_items.map(item => item.name);
-        
-        // Sử dụng bảng màu đã được tạo từ biểu đồ thứ nhất
-        const material_color_map = this.material_color_map || {};
 
-        let main_datasets = [];
-        let over_limit_datasets = [];
+        const plannedLinePlugin2 = {
+            id: 'plannedLinePlugin2',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                ctx.save();
+                
+                chart.plannedLines2 = [];
+                
+                chart.data.datasets.forEach((dataset, i) => {
+                    if (!dataset.plannedData || chart.isDatasetVisible(i) === false) return;
+                    
+                    const meta = chart.getDatasetMeta(i);
+                    
+                    ctx.beginPath();
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = 'rgba(244, 63, 94, 1)'; 
+
+                    meta.data.forEach((bar, index) => {
+                        const plannedValue = dataset.plannedData[index];
+                        const actualValue = dataset.data[index];
+                        
+                        if (plannedValue > 0 && actualValue !== null) {
+                            const y = chart.scales.y.getPixelForValue(plannedValue);
+                            const x = bar.x;
+                            const barWidth = bar.width;
+                            const lineStartX = x - barWidth / 2;
+                            const lineEndX = x + barWidth / 2;
+                            
+                            if (y >= chart.chartArea.top && y <= chart.chartArea.bottom) {
+                                ctx.moveTo(lineStartX, y);
+                                ctx.lineTo(lineEndX, y);
+                                
+                                chart.plannedLines2.push({
+                                    x: lineStartX, y: y, width: barWidth,
+                                    value: plannedValue, label: `${dataset.label}`
+                                });
+                            }
+                        }
+                    });
+                    ctx.stroke();
+                });
+                
+                ctx.restore();
+            },
+            afterEvent(chart, args) {
+                const { event } = args;
+                if (!chart.plannedLines2) return;
+                
+                const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                const x = canvasPosition.x;
+                const y = canvasPosition.y;
+
+                if (!chart.customTooltip2) {
+                    chart.customTooltip2 = document.createElement('div');
+                    chart.customTooltip2.id = 'planned-line-tooltip-2';
+                    chart.customTooltip2.style.cssText = `
+                        position: fixed; background: #000; color: #fff; padding: 10px 15px; border-radius: 6px;
+                        font-size: 13px; pointer-events: none; z-index: 999999; display: none;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                    `;
+                    document.body.appendChild(chart.customTooltip2);
+                }
+
+                const hoveredLine = chart.plannedLines2.find(line => 
+                    x >= line.x && x <= line.x + line.width && Math.abs(y - line.y) < 5
+                );
+
+                if (hoveredLine) {
+                    chart.canvas.style.cursor = 'pointer';
+                    const canvasRect = chart.canvas.getBoundingClientRect();
+                    chart.customTooltip2.innerHTML = `<div><strong>${hoveredLine.label}</strong></div><div>Định mức: ${hoveredLine.value.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}</div>`;
+                    chart.customTooltip2.style.display = 'block';
+                    chart.customTooltip2.style.left = `${canvasRect.left + event.x + 15}px`;
+                    chart.customTooltip2.style.top = `${canvasRect.top + event.y - 15}px`;
+                } else {
+                    chart.canvas.style.cursor = 'default';
+                    if (chart.customTooltip2) {
+                        chart.customTooltip2.style.display = 'none';
+                    }
+                }
+            }
+        };
+
+        let datasets2 = [];
         const transform_zero_to_null = (value) => (value === 0 || !value ? null : value);
 
-        const material_summary = {};
+        const material_summary_by_product = {};
         data_rows.forEach(row => {
             const material_name = row.material_name;
-            if (!material_summary[material_name]) {
-                material_summary[material_name] = {
-                    material_name: material_name,
-                    uom: row.uom,
-                    data: {}
+            // Only process valid materials
+            if (!valid_material_names.includes(material_name)) {
+                return;
+            }
+
+            if (!material_summary_by_product[material_name]) {
+                material_summary_by_product[material_name] = {
+                    material_name: material_name, uom: row.uom, data: {}
                 };
                 production_items.forEach(item => {
-                    material_summary[material_name].data[item.actual_field] = 0;
-                    material_summary[material_name].data[item.planned_field] = 0;
+                    material_summary_by_product[material_name].data[item.actual_field] = 0;
+                    material_summary_by_product[material_name].data[item.planned_field] = 0;
                 });
             }
             
             production_items.forEach(item => {
-                material_summary[material_name].data[item.actual_field] += (row[item.actual_field] || 0);
-                material_summary[material_name].data[item.planned_field] += (row[item.planned_field] || 0);
+                material_summary_by_product[material_name].data[item.actual_field] += (row[item.actual_field] || 0);
+                material_summary_by_product[material_name].data[item.planned_field] += (row[item.planned_field] || 0);
             });
         });
 
-        Object.values(material_summary).forEach(material_data => {
+        Object.values(material_summary_by_product).forEach(material_data => {
             const material_name = material_data.material_name;
             const material_name_with_unit = `${material_name} (${material_data.uom})`;
-            const color_info = material_color_map[material_name];
+            const color_info = material_color_map[material_name] || { bg: 'rgba(128,128,128,0.5)', border: 'rgba(128,128,128,1)'};
             
-            const within_limit_data = production_items.map(item => 
-                transform_zero_to_null(Math.min(
-                    material_data.data[item.actual_field] || 0, 
-                    material_data.data[item.planned_field] || 0
-                ))
+            const actual_data = production_items.map(item => 
+                transform_zero_to_null(material_data.data[item.actual_field] || 0)
             );
             
-            const over_limit_data = production_items.map(item => 
-                transform_zero_to_null(Math.max(0, 
-                    (material_data.data[item.actual_field] || 0) - (material_data.data[item.planned_field] || 0)
-                ))
+            const planned_data = production_items.map(item => 
+                transform_zero_to_null(material_data.data[item.planned_field] || 0)
             );
-            
-            const bar_thickness = 35;
 
-            main_datasets.push({
+            datasets2.push({
                 label: material_name_with_unit,
-                data: within_limit_data,
+                data: actual_data,
+                plannedData: planned_data,
                 backgroundColor: color_info.bg,
                 borderColor: color_info.border,
-                borderWidth: 2,
-                stack: material_name_with_unit,
+                borderWidth: 1,
                 skipNull: true,
-                barThickness: bar_thickness,
-                maxBarThickness: bar_thickness + 10,
-                categoryPercentage: 0.9, 
-                barPercentage: 0.9
             });
-
-            if (over_limit_data.some(d => d !== null)) {
-                over_limit_datasets.push({
-                    label: 'Vượt định mức',
-                    data: over_limit_data,
-                    backgroundColor: 'rgba(220, 38, 38, 0.5)',  // Màu đỏ đậm khác biệt
-                    borderColor: 'rgba(220, 38, 38, 1)',
-                    borderWidth: 2,
-                    stack: material_name_with_unit,
-                    skipNull: true,
-                    barThickness: bar_thickness,
-                    maxBarThickness: bar_thickness + 10,
-                    categoryPercentage: 0.9,
-                    barPercentage: 0.9
-                });
-            }
         });
         
-        const datasets2 = [...main_datasets, ...over_limit_datasets];
+        datasets2.push({
+            label: 'Định mức', data: [], type: 'line',
+            borderColor: 'rgba(244, 63, 94, 1)', 
+            borderWidth: 2.5, pointStyle: 'line', fill: false,
+        });
+
         const ctx2 = document.getElementById('mySecondChart').getContext('2d');
         new Chart(ctx2, {
             type: 'bar',
@@ -439,50 +573,36 @@ frappe.query_reports["Material Consumption"] = {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    x: {
-                        stacked: false,
-                        grid: { drawOnChartArea: false, offset: true },
-                        ticks: {
-                            autoSkip: false,
-                            maxRotation: 45,
-                            minRotation: 0
-                        }
+                    x: { 
+                        stacked: false, 
+                        grid: { display: false }, 
+                        ticks: { 
+                            autoSkip: false, 
+                            maxRotation: 45, 
+                            minRotation: 0 
+                        } 
                     },
-                    y: {
-                        stacked: true,
+                    y: { 
+                        stacked: false, 
                         beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 1
+                                });
+                            }
+                        }
                     }
                 },
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Nguyên liệu tiêu thụ theo từng sản phẩm',
-                        font: { size: 18 }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            filter: function(legendItem, chartData) {
-                                const label = legendItem.text;
-                                const firstDataset = chartData.datasets.find(d => d.label === label);
-                                return legendItem.datasetIndex === chartData.datasets.indexOf(firstDataset);
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const stack_name = context.dataset.stack;
-                                const value = context.raw;
-                                if (context.dataset.label === 'Vượt định mức') {
-                                    return `${stack_name} (Vượt định mức): ${value}`;
-                                }
-                                return `${stack_name}: ${value}`;
-                            }
-                        }
-                    }
+                    title: { display: true, text: 'Nguyên liệu tiêu thụ theo từng sản phẩm', font: { size: 18 } },
+                    legend: { position: 'bottom', labels: { usePointStyle: true } },
+                    tooltip: { mode: 'point', intersect: true }
                 }
-            }
+            },
+            plugins: [plannedLinePlugin2]
         });
     }
 };
+
