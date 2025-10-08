@@ -10,13 +10,14 @@ def execute(filters=None):
 def get_columns():
 	return [
 		{"label": "Ngày tạo phiếu", "fieldname": "posting_date", "fieldtype": "Date", "width": 120},
-		{"label": "Mã phiếu", "fieldname": "stock_entry", "fieldtype": "Link", "options": "Stock Entry", "width": 150},
-		{"label": "Mã mặt hàng", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 300},
+		{"label": "Mã phiếu", "fieldname": "stock_entry", "fieldtype": "Data", "options": "Stock Entry", "width": 150},
+		{"label": "Mã mặt hàng", "fieldname": "item_code", "fieldtype": "Data", "options": "Item", "width": 150},
+		{"label": "Tên mặt hàng", "fieldname": "item_name", "fieldtype": "Data", "width": 250},
 		{"label": "Mô tả", "fieldname": "description", "fieldtype": "Data", "width": 200},
 		{"label": "Đơn vị", "fieldname": "stock_uom", "fieldtype": "Data", "width": 80},
-		{"label": "SL nhập", "fieldname": "in_qty", "fieldtype": "Float", "width": 100, "precision": 2},
-		{"label": "SL xuất", "fieldname": "out_qty", "fieldtype": "Float", "width": 100, "precision": 2},
-		{"label": "SL đã có hóa đơn", "fieldname": "custom_approved_qty", "fieldtype": "Float", "width": 100 ,"precision": 2},
+		{"label": "SL nhập", "fieldname": "in_qty", "fieldtype": "Float", "width": 150, "precision": 2},
+		{"label": "SL xuất", "fieldname": "out_qty", "fieldtype": "Float", "width": 150, "precision": 2},
+		{"label": "SL đã có hóa đơn", "fieldname": "custom_approved_qty", "fieldtype": "Float", "width": 160 ,"precision": 2},
 	]
 
 
