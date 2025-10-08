@@ -9,17 +9,20 @@ from datetime import datetime, timedelta
 
 def execute(filters=None):
     """Main function to execute the week plan report"""
-    if not filters:
-        filters = {}
+    try:
+        if not filters:
+            filters = {}
 
-    filters = process_week_filter(filters)
-    week_work_orders = get_week_work_orders(filters)
-    planned_data = get_planned_data(week_work_orders, filters)
-    actual_data = get_actual_data(week_work_orders, filters)
-    columns = get_columns(week_work_orders)
-    data = get_data(planned_data, actual_data, columns)
-    
-    return columns, data, None, None, None
+        filters = process_week_filter(filters)
+        week_work_orders = get_week_work_orders(filters)
+        planned_data = get_planned_data(week_work_orders, filters)
+        columns = get_columns(week_work_orders)
+        data = get_data(planned_data, columns)
+        
+        return columns, data, None, None, None
+    except Exception as e:
+        frappe.log_error(f"Production Schedule Report Error: {str(e)}", "Production Schedule Error")
+        return [{"label": "Error", "fieldname": "error", "fieldtype": "Data"}], [{"error": f"Lỗi: {str(e)}"}], None, None, None
 
 def process_week_filter(filters):
     """Convert week selection to date range (Monday to Sunday)"""
@@ -80,12 +83,13 @@ def get_week_work_orders(filters):
     return week_work_orders
 
 def get_planned_data(week_work_orders, filters):
-    """Get planned data from Week Work Order Items"""
+    """Get planned data from Week Work Order Items - cumulative data per LSX tuần"""
     if not week_work_orders:
         return {}
     
     wwo_names = [wwo.name for wwo in week_work_orders]
     
+    # Get planned quantities from Week Work Order Items
     planned_items = frappe.db.sql("""
         SELECT
             wwo.name as wwo_name,
@@ -106,58 +110,58 @@ def get_planned_data(week_work_orders, filters):
         ORDER BY wwoi.planned_start_time, item.item_name
     """, {"wwo_names": wwo_names}, as_dict=1)
     
-    planned_data = defaultdict(lambda: defaultdict(lambda: {"qty": 0, "system": None, "wwo_name": None}))
+    # Get start dates for each Week Work Order
+    wwo_dates = frappe.db.sql("""
+        SELECT
+            wwo.name as wwo_name,
+            MIN(wwoi.planned_start_time) as start_date
+        FROM
+            `tabWeek Work Order` wwo
+        JOIN `tabWeek Work Order Item` wwoi ON wwo.name = wwoi.parent
+        WHERE wwo.name IN %(wwo_names)s
+        AND wwo.docstatus = 1
+        GROUP BY wwo.name
+    """, {"wwo_names": wwo_names}, as_dict=1)
     
-    for item in planned_items:
-        date_str = item.planned_start_time.strftime('%Y-%m-%d')
-        scrubbed_name = frappe.scrub(item.item)
-        system_category = (item.manufacturing_category or '').strip()
-        
-        planned_data[date_str][scrubbed_name]["qty"] += item.qty
-        planned_data[date_str][scrubbed_name]["system"] = system_category
-        planned_data[date_str][scrubbed_name]["wwo_name"] = item.wwo_name
+    # Create date mapping
+    date_mapping = {item.wwo_name: item.start_date for item in wwo_dates}
     
-    return planned_data
-
-def get_actual_data(week_work_orders, filters):
-    """Get actual data from Work Orders - only those with custom_plan (LSX tuần)"""
-    if not week_work_orders:
-        return {}
-    
-    wwo_names = [wwo.name for wwo in week_work_orders]
-    
+    # Get actual quantities from Work Orders
     actual_items = frappe.db.sql("""
         SELECT
             wo.custom_plan as wwo_name,
             wo.production_item,
-            item.item_name,
-            item.item_group,
-            bom.custom_category AS manufacturing_category,
-            wo.produced_qty,
-            wo.actual_end_date
+            SUM(wo.produced_qty) as total_produced
         FROM
             `tabWork Order` wo
-        JOIN `tabItem` item ON wo.production_item = item.name
-        LEFT JOIN `tabBOM` bom ON wo.bom_no = bom.name
         WHERE wo.custom_plan IN %(wwo_names)s
         AND wo.custom_plan IS NOT NULL
         AND wo.custom_plan != ''
         AND wo.docstatus = 1
         AND wo.status = 'Completed'
-        ORDER BY wo.actual_end_date, item.item_name
+        GROUP BY wo.custom_plan, wo.production_item
     """, {"wwo_names": wwo_names}, as_dict=1)
     
-    actual_data = defaultdict(lambda: defaultdict(lambda: {"qty": 0, "system": None}))
+    # Group by LSX tuần (wwo_name)
+    planned_data = defaultdict(lambda: defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}))
     
-    for item in actual_items:
-        date_str = item.actual_end_date.strftime('%Y-%m-%d')
-        scrubbed_name = frappe.scrub(item.production_item)
+    # Process planned quantities
+    for item in planned_items:
+        scrubbed_name = frappe.scrub(item.item)
         system_category = (item.manufacturing_category or '').strip()
         
-        actual_data[date_str][scrubbed_name]["qty"] += item.produced_qty
-        actual_data[date_str][scrubbed_name]["system"] = system_category
+        planned_data[item.wwo_name][scrubbed_name]["planned_qty"] += (item.qty or 0)
+        planned_data[item.wwo_name][scrubbed_name]["system"] = system_category
+        planned_data[item.wwo_name][scrubbed_name]["start_date"] = date_mapping.get(item.wwo_name)
     
-    return actual_data
+    # Process actual quantities
+    for item in actual_items:
+        scrubbed_name = frappe.scrub(item.production_item)
+        if item.wwo_name in planned_data and scrubbed_name in planned_data[item.wwo_name]:
+            planned_data[item.wwo_name][scrubbed_name]["actual_qty"] += (item.total_produced or 0)
+    
+    return planned_data
+
 
 def get_columns(week_work_orders):
     """Generate dynamic columns for week plan report with multi-level headers"""
@@ -256,54 +260,38 @@ def get_columns(week_work_orders):
         
     return columns
 
-def get_data(planned_data, actual_data, columns):
-    """Generate report data grouped by LSX (Week Work Order)"""
-    if not planned_data and not actual_data:
-        return [{"production_date": "Không có dữ liệu", "wwo_name": "", "no_data": "Không tìm thấy dữ liệu trong khoảng thời gian đã chọn"}]
-
-    wwo_data = defaultdict(lambda: {
-        "planned": defaultdict(lambda: {"qty": 0, "system": None}),
-        "actual": defaultdict(lambda: {"qty": 0, "system": None}),
-        "wwo_name": "",
-        "dates": set()
-    })
-    
-    for date, items in planned_data.items():
-        for fieldname, item_data in items.items():
-            wwo_name = item_data.get("wwo_name", "")
-            if wwo_name:
-                wwo_data[wwo_name]["planned"][fieldname]["qty"] += item_data["qty"]
-                wwo_data[wwo_name]["planned"][fieldname]["system"] = item_data["system"]
-                wwo_data[wwo_name]["wwo_name"] = wwo_name
-                wwo_data[wwo_name]["dates"].add(date)
-    
-    for date, items in actual_data.items():
-        for fieldname, item_data in items.items():
-            for wwo_name, wwo_info in wwo_data.items():
-                if fieldname in wwo_info["planned"]:
-                    wwo_info["actual"][fieldname]["qty"] += item_data["qty"]
-                    wwo_info["actual"][fieldname]["system"] = item_data["system"]
-                    wwo_info["dates"].add(date)
-                    break
-    
-    if not wwo_data:
+def get_data(planned_data, columns):
+    """Generate report data grouped by LSX (Week Work Order) - cumulative data"""
+    if not planned_data:
         return [{"production_date": "Không có dữ liệu", "wwo_name": "", "no_data": "Không tìm thấy dữ liệu trong khoảng thời gian đã chọn"}]
 
     dataset = []
     product_fieldnames = [c["fieldname"] for c in columns if c["fieldname"] not in ["production_date", "wwo_name", "no_data"]]
     total_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
 
-    sorted_wwo_names = sorted(wwo_data.keys())
-    for wwo_name in sorted_wwo_names:
-        wwo_info = wwo_data[wwo_name]
+    # Sort by start date instead of wwo_name
+    wwo_with_dates = []
+    for wwo_name, wwo_info in planned_data.items():
+        start_date = None
+        for fieldname, item_data in wwo_info.items():
+            if item_data.get("start_date"):
+                start_date = item_data["start_date"]
+                break
+        wwo_with_dates.append((wwo_name, start_date))
+    
+    # Sort by start_date (None dates will be at the end)
+    wwo_with_dates.sort(key=lambda x: x[1] if x[1] else datetime.max)
+    
+    for wwo_name, start_date in wwo_with_dates:
+        wwo_info = planned_data[wwo_name]
         
-        dates = sorted(wwo_info["dates"])
-        date_range = f"{dates[0]} - {dates[-1]}" if len(dates) > 1 else dates[0] if dates else ""
+        # Format start date for display
+        display_date = start_date.strftime("%d/%m/%Y") if start_date else ""
         
-        row = {"production_date": date_range, "wwo_name": wwo_name}
+        row = {"production_date": display_date, "wwo_name": wwo_name}
         for fieldname in product_fieldnames:
-            planned_qty = wwo_info["planned"][fieldname]["qty"]
-            actual_qty = wwo_info["actual"][fieldname]["qty"]
+            planned_qty = wwo_info.get(fieldname, {}).get("planned_qty", 0)
+            actual_qty = wwo_info.get(fieldname, {}).get("actual_qty", 0)
             
             if actual_qty > 0 or planned_qty > 0:
                 row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"

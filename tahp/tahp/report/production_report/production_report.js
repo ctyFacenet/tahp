@@ -419,11 +419,11 @@ frappe.query_reports["Production Report"] = {
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
     
-        // *** BƯỚC 1: TÍNH TOÁN GIÁ TRỊ TỐI ĐA VÀ NỚI RỘNG TRỤC Y ***
+        // Calculate maximum values and expand Y axis
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
         const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
     
-        // Thêm khoảng đệm 20% để tạo không gian cho nhãn đơn vị
+        // Add 20% padding to create space for unit labels
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
     
@@ -431,7 +431,7 @@ frappe.query_reports["Production Report"] = {
         const datasets = [
             // Bars for Thạch cao
             { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             // Lines for P2O5
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
@@ -485,19 +485,19 @@ frappe.query_reports["Production Report"] = {
                     y: {
                         stacked: true,
                         beginAtZero: true,
-                        // Đặt giá trị tối đa đã được nới rộng
+                        // Set expanded maximum value
                         max: padded_max_y,
                         grid: {
                             drawTicks: false,
                         },
                         ticks: {
-                            // *** BƯỚC 2: TÙY CHỈNH NHÃN CAO NHẤT ***
+                            // Customize highest label
                             callback: function(value, index, ticks) {
-                                // Trong Chart.js, nhãn trên cùng thường có index là 0
+                                // In Chart.js, highest label usually has index 0
                                 if (index === ticks.length - 1) {
-                                    return '( Tấn )'; // Thay thế số bằng chữ 'Tấn'
+                                    return '( Tấn )'; // Replace number with 'Tấn'
                                 }
-                                // Với các nhãn khác, chỉ hiển thị số
+                                // For other labels, display numbers only
                                 return value.toLocaleString('en-US');
                             }
                         }
@@ -505,11 +505,11 @@ frappe.query_reports["Production Report"] = {
                     y2: {
                         position: 'right',
                         beginAtZero: true,
-                        // Đặt giá trị tối đa đã được nới rộng cho trục y2
+                        // Set expanded maximum value for y2 axis
                         max: padded_max_y2,
                         grid: { drawOnChartArea: false, drawTicks: false, },
                         ticks: {
-                            // Áp dụng logic tương tự cho trục y2
+                            // Apply same logic for y2 axis
                             callback: function(value, index, ticks) {
                                 if (index === ticks.length - 1) {
                                     return '( Tấn )';

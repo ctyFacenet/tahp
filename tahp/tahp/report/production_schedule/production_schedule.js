@@ -416,7 +416,17 @@ frappe.query_reports["Production Schedule"] = {
 	},
 
     "draw_daily_production_chart": function(wwo_data, container) {
-        const wwo_names = Object.keys(wwo_data).sort();
+        // Use the order from backend data instead of sorting by name
+        const data_rows = frappe.query_report.data;
+        const wwo_names = [];
+        
+        // Extract wwo names in the order they appear in the data
+        for (let row of data_rows) {
+            if (row.wwo_name && row.wwo_name !== "" && wwo_data[row.wwo_name]) {
+                wwo_names.push(row.wwo_name);
+            }
+        }
+        
         if (wwo_names.length === 0) return;
 
         // Xóa biểu đồ cũ nếu tồn tại để tránh lỗi
@@ -465,11 +475,11 @@ frappe.query_reports["Production Schedule"] = {
         const p2o5Actual = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].actual);
         const p2o5Planned = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].planned);
 
-        // *** BƯỚC 1: TÍNH TOÁN GIÁ TRỊ TỐI ĐA VÀ NỚI RỘNG TRỤC Y ***
+        // Calculate maximum values and expand Y axis
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
         const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
 
-        // Thêm khoảng đệm 20% để tạo không gian cho nhãn đơn vị
+        // Add 20% padding to create space for unit labels
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
 
@@ -491,10 +501,21 @@ frappe.query_reports["Production Schedule"] = {
                     legend: { 
                         position: 'top',
                         labels: {
-                            boxWidth: 12,
-                            padding: 10,
-                            font: {
-                                size: window.innerWidth < 768 ? 10 : 12
+                            usePointStyle: true,
+                            pointStyle: 'line',
+                            generateLabels: function(chart) {
+                                const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                const labels = original.call(this, chart);
+                                
+                                labels.forEach(label => {
+                                    if (label.text.includes('P2O5')) {
+                                        label.pointStyle = 'line';
+                                    } else {
+                                        label.pointStyle = 'rect';
+                                    }
+                                });
+                                
+                                return labels;
                             }
                         }
                     },
@@ -533,19 +554,19 @@ frappe.query_reports["Production Schedule"] = {
                     y: {
                         stacked: true,
                         beginAtZero: true,
-                        // Đặt giá trị tối đa đã được nới rộng
+                        // Set expanded maximum value
                         max: padded_max_y,
                         grid: {
                             drawTicks: false,
                         },
                         ticks: {
-                            // *** BƯỚC 2: TÙY CHỈNH NHÃN CAO NHẤT ***
+                            // Customize highest label
                             callback: function(value, index, ticks) {
-                                // Trong Chart.js, nhãn trên cùng thường có index là 0
+                                // In Chart.js, highest label usually has index 0
                                 if (index === ticks.length - 1) {
-                                    return '( Tấn )'; // Thay thế số bằng chữ 'Tấn'
+                                    return '( Tấn )'; // Replace number with 'Tấn'
                                 }
-                                // Với các nhãn khác, chỉ hiển thị số
+                                // For other labels, display numbers only
                                 return value.toLocaleString('en-US');
                             }
                         }
@@ -553,11 +574,11 @@ frappe.query_reports["Production Schedule"] = {
                     y2: {
                         position: 'right',
                         beginAtZero: true,
-                        // Đặt giá trị tối đa đã được nới rộng cho trục y2
+                        // Set expanded maximum value for y2 axis
                         max: padded_max_y2,
                         grid: { drawOnChartArea: false, drawTicks: false },
                         ticks: {
-                            // Áp dụng logic tương tự cho trục y2
+                            // Apply same logic for y2 axis
                             callback: function(value, index, ticks) {
                                 if (index === ticks.length - 1) {
                                     return '( Tấn )';
