@@ -75,7 +75,7 @@ frappe.query_reports["Production Order Weekly Report"] = {
                         { label: "Thực tế", data: [], backgroundColor: "rgba(54, 162, 235, 0.5)", borderColor: "rgba(54, 162, 235, 1)", borderWidth: 1 },
                         { label: "Kế hoạch", data: [], backgroundColor: "rgba(255, 99, 132, 0.5)", borderColor: "rgba(255, 99, 132, 1)", borderWidth: 1 }
                     ] },
-                    options: { responsive: true, plugins: { legend: { position: "top" }, title: { display: true, text: "Thực tế vs Kế hoạch theo ngày", font: { size: 16, weight: "bold" } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+                    options: { responsive: true, plugins: { legend: { position: "top" }, title: { display: true, text: "Thực tế vs Kế hoạch theo ngày", font: { size: 16, weight: "bold" } } }, scales: { x: { stacked: true,   }, y: { stacked: true, beginAtZero: true, ticks: { callback: (value, index, ticks) => index === ticks.length - 1 ? '(Tấn)' : value.toLocaleString('en-US') }  } } }
                 }
             },
             {
@@ -86,7 +86,7 @@ frappe.query_reports["Production Order Weekly Report"] = {
                         { label: "Lũy kế Thực tế", data: [], borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0.2)", fill: false, tension: 0.1 },
                         { label: "Lũy kế Kế hoạch", data: [], borderColor: "rgba(255, 99, 132, 1)", backgroundColor: "rgba(255, 99, 132, 0.2)", fill: false, tension: 0.1 }
                     ] },
-                    options: { responsive: true, plugins: { legend: { position: "top" }, title: { display: true, text: "Biểu đồ Lũy kế Thực tế vs Kế hoạch", font: { size: 16, weight: "bold" } } }, scales: { y: { beginAtZero: true } } }
+                    options: { responsive: true, plugins: { legend: { position: "top" }, title: { display: true, text: "Biểu đồ Lũy kế Thực tế vs Kế hoạch", font: { size: 16, weight: "bold" } } }, scales: { y: { beginAtZero: true, ticks: { callback: (value, index, ticks) => index === ticks.length - 1 ? '(Tấn)' : value.toLocaleString('en-US') } } } }
                 }
             }
         ];
@@ -133,13 +133,13 @@ async function refresh_charts(report) {
     const actual = r1.message.actual || [];
     const planned = r1.message.planned || [];
     const maxStacked = labels1.map((_, i) => (actual[i] || 0) + (planned[i] || 0));
-    const suggestedMax1 = maxStacked.length > 0 ? Math.max(...maxStacked) * 1.1 : 100;
+    const suggestedMax1 = maxStacked.length > 0 ? Math.max(...maxStacked) * 1.2 : 100;
 
     const labels2 = r2.message.labels || [];
     const cumulative_actual = r2.message.cumulative_actual || [];
     const cumulative_planned = r2.message.cumulative_planned || [];
     const max2 = Math.max(...cumulative_actual, ...cumulative_planned);
-    const suggestedMax2 = max2 > 0 ? max2 * 1.1 : 100;
+    const suggestedMax2 = max2 > 0 ? max2 * 1.2 : 100;
 
     report.charts[0].options.data.labels = labels1;
     report.charts[0].options.data.datasets[0].data = actual;
