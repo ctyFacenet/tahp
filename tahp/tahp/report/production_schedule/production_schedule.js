@@ -305,6 +305,14 @@ frappe.query_reports["Production Schedule"] = {
 		"></div>`);
 		container.append(gridContainer);
 
+		const noteTextDiv = document.createElement("div");
+        noteTextDiv.innerHTML = `<div>Phần in đậm là kế hoạch<br>Phần in nhạt là thực tế</div>`
+        noteTextDiv.style.textAlign = "center";
+        noteTextDiv.style.fontWeight = "bold";
+        noteTextDiv.style.paddingTop = "10px";
+		container.append(noteTextDiv);
+
+
 		summary_data.forEach(item => {
 			const percentage = (item.planned > 0) ? (item.actual / item.planned) * 100 : 0;
 			const card = $(`
