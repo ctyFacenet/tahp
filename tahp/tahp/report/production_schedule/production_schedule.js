@@ -475,7 +475,7 @@ frappe.query_reports["Production Schedule"] = {
 
         const datasets = [
             { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Còn lại (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];

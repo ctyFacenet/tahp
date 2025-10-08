@@ -41,7 +41,7 @@ def process_week_filter(filters):
             filters["to_date"] = sunday.strftime("%Y-%m-%d")
             
         except Exception as e:
-            frappe.log_error(f"Error processing week filter: {str(e)}", "Week Filter Error")
+            frappe.log_error(f"Week filter error: {str(e)}", "Week Filter Error")
     
     return filters
 
@@ -70,7 +70,7 @@ def process_month_year_filter(filters):
             filters["is_month_filter"] = True
             
         except Exception as e:
-            frappe.log_error(f"Error processing month/year filter: {str(e)}", "Month Filter Error")
+            frappe.log_error(f"Month filter error: {str(e)}", "Month Filter Error")
     
     return filters
 
@@ -294,8 +294,8 @@ def get_columns(filters):
     
     if is_month_filter:
         columns = [
-            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 250},
-            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 150},
+            {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
+            {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
             {"label": _("Tổng Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150},
             {"label": _("Tổng Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150},
         ]
@@ -358,8 +358,8 @@ def get_work_orders(filters):
     """
     Lấy danh sách Work Order dựa trên bộ lọc, bao gồm cả số lượng sản xuất
     """
-    # Debug logging
-    frappe.log_error(f"Material Consumption Filters: {filters}", "Material Consumption Debug")
+    # Debug logging - shortened title to avoid truncation
+    # frappe.log_error(f"Material Consumption Filters: {filters}", "Material Consumption Debug")
     
     conditions = ""
     if filters.get("from_date") and filters.get("to_date"):
@@ -397,9 +397,9 @@ def get_work_orders(filters):
             wo.docstatus = 1 {conditions}
     """.format(conditions=conditions)
     
-    # Debug logging
-    frappe.log_error(f"Material Consumption SQL: {sql_query}", "Material Consumption Debug")
-    frappe.log_error(f"Material Consumption SQL Params: {filters}", "Material Consumption Debug")
+    # Debug logging - commented out to avoid title truncation
+    # frappe.log_error(f"Material Consumption SQL: {sql_query}", "Material Consumption Debug")
+    # frappe.log_error(f"Material Consumption SQL Params: {filters}", "Material Consumption Debug")
     
     work_orders = frappe.db.sql(sql_query, filters, as_dict=1)
 
