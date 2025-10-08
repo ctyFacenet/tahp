@@ -29,7 +29,6 @@ def reject(name, comment):
         "document_name": doc.name
     }).insert(ignore_permissions=True)
 
-    # Thêm comment vào Work Order (hoặc bạn đổi sang Shift Handover nếu muốn)
     frappe.get_doc({
         "doctype": "Comment",
         "comment_type": "Comment",
@@ -39,7 +38,6 @@ def reject(name, comment):
         "comment_email": frappe.session.user,
         "comment_by": frappe.session.user_fullname
     }).insert(ignore_permissions=True)
-    doc.workflow_state = "Draft"
     doc.save(ignore_permissions=True)
 
 
@@ -90,7 +88,6 @@ def create_shift_handover(work_order_name):
         )
         
         operation_doc = frappe.get_doc('Operation', op.operation)
-        print('check1')
         shift_handover.append("table", {
             "caption": operation_doc.name,
             "status":'',

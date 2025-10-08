@@ -73,6 +73,7 @@ async function autofill_items(frm) {
 
 async function change_time(frm) {
     if (frappe.session.user !== "Administrator") return;
+    if (!frm.doc.docstatus == 1) return;
     frm.add_custom_button("Chỉnh sửa thời gian", function() {
         let d = new frappe.ui.Dialog({
             title: "Chỉnh sửa mốc thời gian",
