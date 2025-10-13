@@ -19,7 +19,7 @@ class JobCard(ERPJobCard):
         if self.get("time_logs"):
             for d in self.get("time_logs"):
                 if d.to_time and get_datetime(d.from_time) > get_datetime(d.to_time):
-                    frappe.throw(_("Row {0}: From time must be less than to time").format(d.idx))
+                    frappe.throw(("Row {0}: From time must be less than to time").format(d.idx))
 
                 if d.from_time and d.to_time:
                     d.time_in_mins = time_diff_in_hours(d.to_time, d.from_time) * 60
