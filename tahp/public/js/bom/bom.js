@@ -38,6 +38,22 @@ frappe.ui.form.on('BOM', {
   refresh: function (frm) {
     frm.set_df_property("routing", "only_select", 1);
 
+    if (!frm.counter_wrapper) {
+      frm.counter_wrapper = $('<div id="vue-counter" style="margin: 10px 0;"></div>')
+        .appendTo(frm.page.wrapper);
+    }
+
+    if (frm.counter_component) {
+      frm.counter_component.destroy();
+    }
+
+    frm.counter_component = new tahp.ui.CounterComponent({
+      wrapper: frm.counter_wrapper,
+      value: frm.doc.custom_counter || 0,
+      onUpdateValue: (v) => frm.set_value("custom_counter", v)
+    });
+
+
     if (!frm.vue_wrapper) {
       frm.vue_wrapper = $(`<div id="vue-test" style="padding:10px; border:1px solid #ddd"></div>`)
         .appendTo(frm.page.wrapper);

@@ -4,7 +4,7 @@
     <div class="tw-flex tw-items-center tw-justify-between tw-flex-wrap tw-gap-3">
       <h2 class="tw-text-xl tw-font-semibold tw-flex tw-items-center tw-gap-2 tw-text-gray-800">
         <Package class="tw-w-5 tw-h-5 tw-text-green-600" />
-        <span>CRUD Demo – Quản lý Item</span>
+        <span>CRUD Demo - Quản lý Item</span>
       </h2>
 
       <button
