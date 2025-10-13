@@ -41,6 +41,7 @@ app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
+    "/assets/tahp/css/work_order.css",
     "/assets/tahp/css/report.css",
     "/assets/tahp/js/tahp/custom/datatable/style.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -111,7 +112,6 @@ doctype_js = {
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
-    "Job Card": ["public/js/job_card/job_card_list.js"]
 }
 
 # doctype_js = {

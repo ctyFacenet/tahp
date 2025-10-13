@@ -39,13 +39,3 @@ class WorkOrder(ERPWorkOrder):
 			status = "Cancelled"
 
 		return status
-		table = frappe.qb.DocType("Stock Entry")
-		process_loss_qty = (
-			frappe.qb.from_(table)
-			.select(Sum(table.process_loss_qty))
-			.where(
-				(table.work_order == self.name) & (table.purpose == "Manufacture") & (table.docstatus == 1)
-			)
-		).run()[0][0]
-
-		self.db_set("process_loss_qty", flt(process_loss_qty))

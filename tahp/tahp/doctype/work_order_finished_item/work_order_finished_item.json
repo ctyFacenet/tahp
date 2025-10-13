@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-10 08:32:18.958599",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "work_order",
+  "item_code",
+  "item_code_new",
+  "item_name",
+  "posting_date",
+  "amended_from",
+  "column_break_wxbu",
+  "standard_qty",
+  "actual_qty",
+  "warehouse",
+  "type_posting"
+ ],
+ "fields": [
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "LSX Ca",
+   "options": "Work Order",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng theo k\u1ebf ho\u1ea1ch",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "fieldname": "standard_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL k\u1ebf ho\u1ea1ch",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "actual_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL th\u1ef1c t\u1ebf",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y ch\u1ed1t",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "type_posting",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "M\u00f4 t\u1ea3",
+   "options": "Th\u00e0nh ph\u1ea9m\nNguy\u00ean li\u1ec7u ti\u00eau hao\nPh\u1ee5 ph\u1ea9m\nTh\u00e0nh ph\u1ea9m sau QC",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Work Order Finished Item",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Kho",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_wxbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.type_posting != 'Nguy\u00ean li\u1ec7u ti\u00eau hao'",
+   "fieldname": "item_code_new",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng th\u1ef1c t\u1ebf",
+   "options": "Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-10-13 16:03:25.235438",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Work Order Finished Item",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "work_order"
+}

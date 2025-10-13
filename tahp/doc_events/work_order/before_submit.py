@@ -3,7 +3,6 @@ from tahp.doc_events.work_order.work_order_api import execute_shift_handover
 
 def before_submit(doc, method):
     check_shift_leader(doc)
-    check_stock_qty(doc)
     check_workstation(doc)
     warn_workstation(doc)
     execute_shift_handover(doc)
@@ -53,7 +52,6 @@ def check_stock_qty(doc):
         """
         frappe.throw(msg=msg, title="Kho đang thiếu số lượng nguyên vật liệu")
             
-
 def check_shift_leader(doc):
     if doc.custom_shift_leader:
         leader_user = frappe.db.get_value("Employee", doc.custom_shift_leader, "user_id")

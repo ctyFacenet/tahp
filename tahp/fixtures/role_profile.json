@@ -155,7 +155,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-10-06 08:50:40.059942",
+  "modified": "2025-10-10 22:46:13.324009",
   "name": "Kế hoạch sản xuất",
   "role_profile": "Kế hoạch sản xuất",
   "roles": [
@@ -194,13 +194,19 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Employee"
+   },
+   {
+    "parent": "Kế hoạch sản xuất",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Quản đốc"
    }
   ]
  },
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-10-06 08:50:37.593328",
+  "modified": "2025-10-10 22:46:43.259787",
   "name": "Phát triển công nghệ",
   "role_profile": "Phát triển công nghệ",
   "roles": [
@@ -239,13 +245,19 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Employee"
+   },
+   {
+    "parent": "Phát triển công nghệ",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Quản đốc"
    }
   ]
  },
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-09-09 11:31:16.734968",
+  "modified": "2025-10-10 22:46:34.387194",
   "name": "Giám đốc",
   "role_profile": "Giám đốc",
   "roles": [
@@ -542,6 +554,18 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Workspace Manager"
+   },
+   {
+    "parent": "Giám đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Quản đốc"
+   },
+   {
+    "parent": "Giám đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Bảo trì"
    }
   ]
  },
@@ -701,6 +725,51 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Stock Manager"
+   }
+  ]
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2025-10-10 22:46:01.137057",
+  "name": "Quản đốc",
+  "role_profile": "Quản đốc",
+  "roles": [
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Item Manager"
+   },
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing Manager"
+   },
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Manufacturing User"
+   },
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Employee"
+   },
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Stock Manager"
+   },
+   {
+    "parent": "Quản đốc",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Quản đốc"
    }
   ]
  }

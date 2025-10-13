@@ -1,0 +1,199 @@
+/* --- Layout --- */
+.wo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.wo-header-title {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* --- Nút sửa --- */
+.wo-btn-edit {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.15s ease;
+}
+.wo-btn-edit:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+.wo-btn-edit:active {
+    transform: translateY(0);
+}
+
+/* --- Desktop table --- */
+.wo-desktop {
+    overflow-x: auto;
+}
+
+.wo-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    table-layout: fixed;
+    white-space: 'normal';
+}
+
+.wo-table th, .wo-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+.wo-table tr {
+    background-color: #e0e0e0;
+}
+
+/* --- Inputs --- */
+.wo-input,
+.wo-input-value {
+    width: 100%;
+    height: 48px;
+    padding:5px 5px;
+    border: none;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    text-align: left;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.wo-select-middle {
+    word-break: break-word;
+    white-space: normal;
+    width: 90%;
+    height: 48px;
+    padding:5px 5px;
+    border: 1px solid #ccc !important;
+    border-bottom: 1px solid transparent;
+    background: #fff;
+    text-align: left;
+    transition: border-color 0.2s, background-color 0.2s;
+    border-radius: 5px;
+}
+
+.wo-input:focus,
+.wo-input-value:focus {
+    outline: none;
+    border-bottom: 1px solid #007bff;
+    background-color: #eef6ff;
+}
+
+/* 🔲 Style đặc biệt cho input có is_value */
+.wo-value-input {
+    border: 1px solid #ccc !important;
+    border-radius: 6px;
+    background-color: #fff;
+    padding-inline: 8px;
+    padding-left: 15px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.wo-value-input:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Ẩn nút tăng giảm của input[type=number] trên Chrome, Edge, Safari */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Ẩn trên Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* --- Mobile view --- */
+.wo-mobile {
+    display: none;
+}
+@media (max-width: 768px) {
+    .wo-desktop {
+        display: none;
+    }
+    .wo-mobile {
+        display: block;
+    }
+
+    .wo-tb-mobile-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 10px;
+        border-top: 1px solid #ccc;
+    }
+
+    .wo-col-left {
+        flex: 1;
+    }
+
+    .wo-col-middle {
+        flex: 1;
+        text-align: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .wo-col-right {
+        flex: 0 0 120px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .wo-primary {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .wo-secondary {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .wo-unit {
+        margin-left: 4px;
+        color: #555;
+        font-size: 0.8rem;
+    }
+
+    /* 🔍 Phóng to font cho ô nhập giá trị trên mobile */
+    .wo-value-input {
+        font-size: 1rem;
+        padding: 8px 10px;
+        margin-right: 5px;
+    }
+}
+
+.wo-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    background-color: #e0e0e0;
+    padding: 8px 12px;
+}
+
+.wo-mobile-header-cell {
+    flex: 1;
+    text-align: center;
+}
+
+.wo-middle-item {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25rem;
+
+}
