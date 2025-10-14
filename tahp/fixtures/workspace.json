@@ -13187,7 +13187,7 @@
     "hidden": 0,
     "icon": null,
     "is_query_report": 1,
-    "label": "Tiêu hao nguyên liệu theo LSX Tuần",
+    "label": "Production Schedule",
     "link_count": 0,
     "link_to": "Production Schedule",
     "link_type": "Report",
@@ -13308,7 +13308,7 @@
     "type": "Link"
    }
   ],
-  "modified": "2025-10-13 11:53:08.134525",
+  "modified": "2025-10-14 15:17:46.272600",
   "module": "Manufacturing",
   "name": "Manufacturing",
   "number_cards": [],
