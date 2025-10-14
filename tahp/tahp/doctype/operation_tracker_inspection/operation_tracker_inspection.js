@@ -76,6 +76,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
     define_label: function(frm, $row) {
         $row.empty();
 
+        // Phiếu đã hoàn thành
         if (frm.doc.docstatus === 1) {
             $row.append($(`
                 <div class="next_time alert w-100 text-center alert-success border border-success" style="margin:0" role="alert">
@@ -89,23 +90,24 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     Phiếu đã bị huỷ
                 </div>
             `));
-            return;
+            return;            
         }
 
         let reference_time = null;
         let latest_post = null;
 
         if (frm.doc.posts && frm.doc.posts.length) {
+            // Lấy post mới nhất dựa trên created_date
             latest_post = frm.doc.posts.reduce((latest, post) => {
                 if (!latest) return post;
-                return frappe.datetime.str_to_obj(post.created_date) > frappe.datetime.str_to_obj(latest.created_date)
-                    ? post
-                    : latest;
+                return frappe.datetime.str_to_obj(post.created_date) > frappe.datetime.str_to_obj(latest.created_date) ? post : latest;
             }, null);
             reference_time = frappe.datetime.str_to_obj(latest_post.created_date);
         } else if (frm.doc.next_time) {
+            // Nếu chưa có post, dùng next_time - frequency
             reference_time = new Date(frappe.datetime.str_to_obj(frm.doc.next_time).getTime() - frm.doc.frequency * 60 * 1000);
         } else {
+            // Không có gì để tính
             $row.append($(`
                 <div class="next_time alert w-100 text-center alert-warning border border-warning" style="margin:0" role="alert">
                     Chưa có phiếu nào
@@ -133,6 +135,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                     $next_time_div
                         .removeClass("alert-danger border-danger alert-info border-info")
                         .addClass("alert-info border border-info");
+                    clearInterval(interval);
                     return;
                 } else {
                     let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
@@ -152,6 +155,7 @@ frappe.ui.form.on("Operation Tracker Inspection", {
                 $next_time_div
                     .removeClass("alert-info border-info")
                     .addClass("alert-danger border border-danger");
+                clearInterval(interval);
                 return;
             }
 
@@ -168,7 +172,6 @@ frappe.ui.form.on("Operation Tracker Inspection", {
         let interval = setInterval(updateCountdown, 1000);
         updateCountdown();
     },
-
     
     display_post: async function(frm, $wrapper) {
         $wrapper.empty();

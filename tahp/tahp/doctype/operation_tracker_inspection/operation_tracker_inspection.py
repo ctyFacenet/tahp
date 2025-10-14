@@ -122,7 +122,7 @@ def update_params(inspection, items, parent_name=None, feedback=None):
 				break
 
 	# --- Cập nhật feedback cho post nếu có ---
-	if parent_name and feedback:
+	if parent_name:
 		for post in doc.posts:
 			if post.name == parent_name:
 				post.filled_date = now
