@@ -55,6 +55,7 @@ app_include_js = [
     "tahp.bundle.js",
     "/assets/tahp/js/menu/router.js",
     "/assets/tahp/js/menu/page.js",
+    "/assets/tahp/js/custom_field.js",
     # "/assets/tahp/js/menu/workspace.js",
     "/assets/tahp/js/theme.js",
     "/assets/tahp/js/custom_logout_redirect.js",
@@ -92,7 +93,9 @@ web_include_css = [
 
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+# doctype_js = {
+#     "BOM": "public/js/custom_field.js"
+# }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}

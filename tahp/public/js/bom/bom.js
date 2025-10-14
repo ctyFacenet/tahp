@@ -36,24 +36,47 @@ frappe.ui.form.on('BOM', {
   },
 
   refresh: function (frm) {
+
     frm.set_df_property("routing", "only_select", 1);
 
-    if (!frm.counter_wrapper) {
-      frm.counter_wrapper = $('<div id="vue-counter" style="margin: 10px 0;"></div>')
-        .appendTo(frm.page.wrapper);
-    }
+    frappe.after_ajax(() => {
+      const field = frm.fields_dict.custom_vue_counter;
+      if (!field) return;
 
-    if (frm.counter_component) {
-      frm.counter_component.destroy();
-    }
+      if (!(field instanceof frappe.ui.form.ControlVueCounter)) {
+        const wrapper = field.$wrapper;
+        const df = field.df;
 
-    frm.counter_component = new tahp.ui.CounterComponent({
-      wrapper: frm.counter_wrapper,
-      value: frm.doc.custom_counter || 0,
-      onUpdateValue: (v) => frm.set_value("custom_counter", v)
+        wrapper.empty();
+
+        const new_control = new frappe.ui.form.ControlVueCounter({
+          df,
+          frm,
+          parent: wrapper,
+          doctype: frm.doctype,
+          docname: frm.docname,
+        });
+
+        frm.fields_dict[df.fieldname] = new_control;
+        new_control.make_input();
+        new_control.set_value(frm.doc[df.fieldname] || 0);
+      }
+
+      // Đảm bảo hiển thị trong tab đang mở
+      const $tab_wrapper = $(".form-tab-content .tab-pane.active:visible");
+      if ($tab_wrapper.length) {
+        field.$wrapper.detach().appendTo($tab_wrapper.find(".form-column").first());
+        field.$wrapper.show();
+        console.log("✅ Moved ControlVueCounter into active tab");
+      } else {
+        const $fallback = frm.fields_dict.item_name?.$wrapper.closest(".form-column");
+        if ($fallback?.length) {
+          field.$wrapper.detach().appendTo($fallback);
+          field.$wrapper.show();
+          console.log("✅ Moved ControlVueCounter into main section");
+        }
+      }
     });
-
-
     if (!frm.vue_wrapper) {
       frm.vue_wrapper = $(`<div id="vue-test" style="padding:10px; border:1px solid #ddd"></div>`)
         .appendTo(frm.page.wrapper);
@@ -89,6 +112,7 @@ frappe.ui.form.on('BOM', {
 
       d.show();
     });
+
 
     frm.add_custom_button("Open Dialog", () => {
       const d = new frappe.ui.Dialog({

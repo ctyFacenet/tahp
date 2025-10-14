@@ -203,7 +203,7 @@ async function deleteItem(item) {
           text: "Hủy",
           class: "btn-secondary",
           onClick: () => {
-            frappe.show_alert({ message: "❌ Đã huỷ thao tác xoá", indicator: "gray" });
+            frappe.show_alert({ message: "Đã huỷ thao tác xoá", indicator: "warning" });
           },
         },
         {
