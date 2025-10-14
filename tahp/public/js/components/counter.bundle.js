@@ -1,6 +1,6 @@
 frappe.provide("tahp.ui");
 
-import Counter from "../../hello_vue/components/partials/Counter.vue";
+import Counter from "../../hello_vue/components/fields/Counter.vue";
 import { mountVue, unmountVue } from "../vue_helper";
 
 class CounterComponent {
