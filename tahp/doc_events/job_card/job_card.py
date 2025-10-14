@@ -725,8 +725,8 @@ def update_feedback(docname):
     for insp in inspections:
         insp_doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
         update = False
-        for row in insp_doc.items:
-            if row.feedback_id and row.feedback_id == latest_fb.feedback_id:
-                row.sent = True
+        for row in insp_doc.posts:
+            if row.name == latest_fb.feedback_id:
+                row.approved_date = now_datetime()
                 update = True
         if update: insp_doc.save(ignore_permissions=True)
