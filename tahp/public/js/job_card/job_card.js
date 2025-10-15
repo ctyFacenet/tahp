@@ -16,18 +16,12 @@ frappe.ui.form.on('Job Card', {
         frm.comment_box.comment_wrapper.hide()
 
         let background = '#f4f7fc';
-        const isMobile = window.innerWidth <= 768;
 
         // Lấy wrapper chỉ cho form này
         let $wrapper = $(frm.$wrapper);
 
         $wrapper.find('.tab-content').css({'background': background})
         $wrapper.find('.page-container').css({'background': background})
-        if (isMobile) {
-            $wrapper.find('.form-tabs-list').css({'background': background, 'display': 'none'})
-        } else {
-            $wrapper.find('.form-tabs-list').css({'background': background})
-        }
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item').css({'background': background})
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item .nav-link').css({'background': background})
         $wrapper.find('.layout-main').css({'margin-inline': '-30px'})

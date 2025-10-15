@@ -8,7 +8,6 @@
  "field_order": [
   "creation_date",
   "work_order",
-  "stock_entry",
   "column_break_mdwj",
   "shift_leader_1",
   "shift_leader_2",
@@ -72,13 +71,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "stock_entry",
-   "fieldtype": "Link",
-   "label": "Phi\u1ebfu v\u1eadn chuy\u1ec3n",
-   "options": "Stock Entry",
-   "read_only": 1
-  },
-  {
    "fieldname": "table",
    "fieldtype": "Table",
    "label": "Bi\u00ean b\u1ea3n giao ca",
@@ -107,7 +99,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-08 21:30:59.793017",
+ "modified": "2025-10-13 13:49:02.851032",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",

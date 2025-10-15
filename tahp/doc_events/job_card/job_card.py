@@ -40,6 +40,40 @@ def get_team(job_card):
             })
     return result
 
+def check_member(employee_id, current_job_card):
+    job_cards = frappe.get_all("Job Card",
+        filters={
+            "docstatus": 0,
+            "status": ["!=", "Open"],
+            "name": ["!=", current_job_card]
+        },
+        fields=["name"]
+    )
+    for jc in job_cards:
+        jc_doc = frappe.get_doc("Job Card", jc.name)
+        team_rows = jc_doc.custom_team_table or []
+        team_member = [r for r in team_rows if r.employee == employee_id]
+        if not team_member: continue
+
+        if len(team_rows) > 1:
+            from_time = now_datetime()
+            jc_doc.append("custom_teams", {
+                "employee": employee_id,
+                "employee_name": team_member[0].employee_name,
+                "from_time": from_time,
+                "exit": True
+            })
+
+            jc_doc.custom_team_table = [
+                r for r in team_rows if r.employee != employee_id
+            ]
+
+            jc_doc.save(ignore_permissions=True)
+        else:
+            frappe.throw(f"Nhân viên {employee_id} không thể thêm/đổi công đoạn do Công đoạn hiện tại chỉ có duy nhất 1 nhân viên")
+            return            
+
+
 @frappe.whitelist()
 def set_team(job_card, team):
     """
@@ -70,6 +104,7 @@ def set_team(job_card, team):
         if not emp_id or not emp_name:
             continue
         if emp_id not in existing_employees:
+            check_member(emp_id, job_card)
             row = doc.append("custom_team_table", {
                 "employee": emp_id,
                 "employee_name": emp_name
@@ -133,6 +168,8 @@ def change_member(job_card, employee, new_employee):
                 "from_time": current_time,
                 "exit": True
             })
+
+            check_member(new_employee, job_card)
 
             doc.append("custom_teams", {
                 "employee": new_employee,
@@ -688,8 +725,8 @@ def update_feedback(docname):
     for insp in inspections:
         insp_doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
         update = False
-        for row in insp_doc.items:
-            if row.feedback_id and row.feedback_id == latest_fb.feedback_id:
-                row.sent = True
+        for row in insp_doc.posts:
+            if row.name == latest_fb.feedback_id:
+                row.approved_date = now_datetime()
                 update = True
         if update: insp_doc.save(ignore_permissions=True)

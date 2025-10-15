@@ -108,20 +108,20 @@ frappe.ui.form.on('Week Work Order', {
         }
         
         if (frm.doc.workflow_state === "Đã được PTCN duyệt" && frm.selected_workflow_action === "Gửi GĐ") {
-            frappe.dom.unfreeze();
-            // const ok = true;
-            let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
-            const { ok, messages } = res;
-            if (!ok) {
-                const table = missing_material(messages);
-                frappe.msgprint({
-                    title: "Thiếu nguyên liệu",
-                    message: table,
-                    indicator: "red"
-                });
+            // frappe.dom.unfreeze();
+            // // const ok = true;
+            // let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
+            // const { ok, messages } = res;
+            // if (!ok) {
+            //     const table = missing_material(messages);
+            //     frappe.msgprint({
+            //         title: "Thiếu nguyên liệu",
+            //         message: table,
+            //         indicator: "red"
+            //     });
         
-                // throw __("Không thể gửi Giám đốc duyệt khi LSX đang thiếu nguyên liệu");
-            }
+            //     // throw __("Không thể gửi Giám đốc duyệt khi LSX đang thiếu nguyên liệu");
+            // }
         }
         
         if (frm.doc.workflow_state === "Nháp" && !frm.doc.plan) {

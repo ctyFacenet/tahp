@@ -84,15 +84,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-09-07 19:30:40.758642",
-  "name": "Duyệt xong",
-  "style": "Success",
-  "workflow_state_name": "Duyệt xong"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-09-07 19:30:51.370900",
   "name": "Đợi PTCN Duyệt",
   "style": "Warning",
@@ -106,15 +97,6 @@
   "name": "Đã được PTCN duyệt",
   "style": "Info",
   "workflow_state_name": "Đã được PTCN duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-22 14:10:19.576199",
-  "name": "Draft",
-  "style": "Danger",
-  "workflow_state_name": "Draft"
  },
  {
   "docstatus": 0,
@@ -250,5 +232,41 @@
   "name": "Kế toán đã duyệt",
   "style": "Success",
   "workflow_state_name": "Kế toán đã duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-13 16:25:12.101138",
+  "name": "Bắt đầu",
+  "style": "",
+  "workflow_state_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:40.758642",
+  "name": "Duyệt xong",
+  "style": "Success",
+  "workflow_state_name": "Duyệt xong"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-22 14:10:19.576199",
+  "name": "Draft",
+  "style": "Danger",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-10 22:47:41.373736",
+  "name": "Đợi Quản đốc duyệt",
+  "style": "Warning",
+  "workflow_state_name": "Đợi Quản đốc duyệt"
  }
 ]

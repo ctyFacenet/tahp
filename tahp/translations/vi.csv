@@ -14051,10 +14051,11 @@ Problem Reason, Lý do hỏng máy
 Production Report, Báo cáo sản lượng Thạch cao & P2O5
 Workstation Status Report, Báo cáo trạng thái thiết bị
 Material Consumption, Báo cáo tiêu hao nguyên liệu theo LSX Ca
-Production Schedule, Báo cáo tiêu hao nguyên liệu theo LSX Tuần
+Production Schedule, Báo cáo tiến độ sản xuất theo LSX
 Manufacturing Dashboard, Báo cáo sản lượng theo phân loại
 Manufacturing dashboard, Báo cáo sản lượng theo phân loại
 Custom Invoice, Hóa đơn
 Custom Invoice Allocation, Phiếu nhập xuất có hóa đơn
 Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho
 Custom Invoice Summary, Phiếu tổng hợp nhập xuất có hóa đơn
+Work Order Finished Item, Kết quả LSX Ca

@@ -1,0 +1,19 @@
+.tracker-btn-confirm {
+    background: #6a8df7;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.tracker-btn-confirm:hover {
+    color: white;
+    background: #64b0f5;
+    transform: translateY(-2px);
+}
+
+.tracker-btn-confirm:active {
+    color: white;
+    transform: translateY(0);
+}

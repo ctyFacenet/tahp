@@ -195,6 +195,17 @@ frappe.query_reports["Material Consumption"] = {
         report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
         report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
         report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
+
+        // Thêm event listener cho window resize để responsive tốt hơn
+        let resizeTimeout;
+        $(window).on('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (!this.isDrawing) {
+                    this.draw_chart();
+                }
+            }, 300);
+        });
     },
 
     "handle_filter_change": function() {
@@ -356,7 +367,11 @@ frappe.query_reports["Material Consumption"] = {
         const num_bars = material_summary.length;
         let calculated_height = (num_bars * bar_thickness) + chart_padding;
         calculated_height = Math.max(300, Math.min(600, calculated_height));
-        const chartContainer = $(`<div class="chart-container chart-1" style="height: ${calculated_height}px; margin-bottom: 20px; display: flex; align-items: center;"><canvas id="myCustomChart" style="flex: 1; margin-right: 20px;"></canvas></div>`);
+        const chartContainer = $(`<div class="chart-container chart-1" style="position: relative; height: ${calculated_height}px; width: 100%; margin-bottom: 20px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;">
+            <div style="min-width: 600px; width: 100%; height: 100%;">
+                <canvas id="myCustomChart" style="width: 100%; height: 100%;"></canvas>
+            </div>
+        </div>`);
         $('.report-wrapper').prepend(chartContainer);
 
         const labels = material_summary.map(row => `${row.material_name} (${row.uom})`);
@@ -378,14 +393,14 @@ frappe.query_reports["Material Consumption"] = {
                 const { ctx, scales: { x, y } } = chart;
                 ctx.save();
                 ctx.strokeStyle = 'rgba(244, 63, 94, 1)';
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 1.5;
                 
                 chart.plannedLines = [];
                 
                 planned_data.forEach((plannedValue, i) => {
                     if (plannedValue > 0) {
                         const yValue = y.getPixelForValue(i);
-                        const barHeight = 40;
+                        const barHeight = 20; // Giảm độ dài đường từ 40 xuống 20
                         const xValue = x.getPixelForValue(plannedValue);
                         
                         const chartArea = chart.chartArea;
@@ -462,7 +477,7 @@ frappe.query_reports["Material Consumption"] = {
             data: new Array(material_summary.length).fill(null),
             type: 'line',
             borderColor: 'rgba(244, 63, 94, 1)',
-            borderWidth: 2.5,
+            borderWidth: 1.5,
             pointStyle: 'line',
             fill: false,
             showLine: false
@@ -477,14 +492,34 @@ frappe.query_reports["Material Consumption"] = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 15, padding: 15 } },
-                    title: { display: true, text: 'Số lượng nguyên vật liệu tiêu hao (Thực tế vs. Định mức)', font: { size: 18 } }
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            usePointStyle: true, 
+                            boxWidth: 15, 
+                            padding: 15,
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        } 
+                    },
+                    title: { 
+                        display: true, 
+                        text: 'Số lượng nguyên vật liệu tiêu hao', 
+                        font: { 
+                            size: window.innerWidth < 768 ? 14 : 18 
+                        },
+                        align: window.innerWidth < 768 ? 'start' : 'center'
+                    }
                 },
                 scales: { 
                     x: { 
                         beginAtZero: true,
                         max: Math.max(Math.max(...actual_data), Math.max(...planned_data)) * 1.1,
                         ticks: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN', {
                                     minimumFractionDigits: 0,
@@ -492,7 +527,14 @@ frappe.query_reports["Material Consumption"] = {
                                 });
                             }
                         }
-                    } 
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
+                        }
+                    }
                 }
             },
             plugins: [plannedLinePlugin]
@@ -535,9 +577,40 @@ frappe.query_reports["Material Consumption"] = {
         // Don't draw chart 2 if no valid materials
         if (valid_material_names.length === 0) return;
         
-        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px;">
-            <canvas id="mySecondChart"></canvas>
+        const chartContainer2 = $(`<div class="chart-container chart-2" style="position: relative; height: 400px; width: 100%; margin-top: 40px; margin-bottom: 40px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;">
+            <div style="min-width: 600px; width: 100%; height: 100%;">
+                <canvas id="mySecondChart" style="width: 100%; height: 100%;"></canvas>
+            </div>
         </div>`);
+        
+        // Thêm CSS cho mobile responsive cho cả hai chart
+        if (!document.getElementById('mobile-chart-styles')) {
+            const style = document.createElement('style');
+            style.id = 'mobile-chart-styles';
+            style.textContent = `
+                @media (max-width: 768px) {
+                    .chart-container.chart-1, .chart-container.chart-2 {
+                        height: 350px !important;
+                        margin-top: 20px !important;
+                        margin-bottom: 20px !important;
+                    }
+                    .chart-container.chart-1 > div, .chart-container.chart-2 > div {
+                        min-width: 500px !important;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .chart-container.chart-1, .chart-container.chart-2 {
+                        height: 300px !important;
+                        margin-top: 15px !important;
+                        margin-bottom: 15px !important;
+                    }
+                    .chart-container.chart-1 > div, .chart-container.chart-2 > div {
+                        min-width: 450px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
         $('.report-wrapper .chart-1').after(chartContainer2);
 
         const labels2 = production_items.map(item => item.name);
@@ -689,6 +762,10 @@ frappe.query_reports["Material Consumption"] = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
                 scales: {
                     x: { 
                         stacked: false, 
@@ -696,13 +773,19 @@ frappe.query_reports["Material Consumption"] = {
                         ticks: { 
                             autoSkip: false, 
                             maxRotation: 45, 
-                            minRotation: 0 
+                            minRotation: 0,
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            }
                         } 
                     },
                     y: { 
                         stacked: false, 
                         beginAtZero: true,
                         ticks: {
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN', {
                                     minimumFractionDigits: 0,
@@ -713,9 +796,34 @@ frappe.query_reports["Material Consumption"] = {
                     }
                 },
                 plugins: {
-                    title: { display: true, text: 'Nguyên liệu tiêu thụ theo từng sản phẩm', font: { size: 18 } },
-                    legend: { position: 'bottom', labels: { usePointStyle: true } },
-                    tooltip: { mode: 'point', intersect: true }
+                    title: { 
+                        display: true, 
+                        text: 'Nguyên liệu tiêu thụ theo từng sản phẩm', 
+                        font: { 
+                            size: window.innerWidth < 768 ? 14 : 18 
+                        },
+                        align: window.innerWidth < 768 ? 'start' : 'center'
+                    },
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            usePointStyle: true,
+                            font: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            },
+                            padding: window.innerWidth < 768 ? 10 : 15
+                        } 
+                    },
+                    tooltip: { 
+                        mode: 'index', 
+                        intersect: false,
+                        titleFont: {
+                            size: window.innerWidth < 768 ? 11 : 13
+                        },
+                        bodyFont: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
                 }
             },
             plugins: [plannedLinePlugin2]

@@ -16,13 +16,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-18 12:35:54.969203",
-  "name": "Từ chối",
-  "workflow_action_name": "Từ chối"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-08-07 20:24:40.524744",
   "name": "Approve",
   "workflow_action_name": "Approve"
@@ -145,5 +138,26 @@
   "modified": "2025-10-08 15:48:03.884722",
   "name": "Gửi Kế toán",
   "workflow_action_name": "Gửi Kế toán"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-10-13 16:25:28.850258",
+  "name": "Bắt đầu",
+  "workflow_action_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-18 12:35:54.969203",
+  "name": "Từ chối",
+  "workflow_action_name": "Từ chối"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-10-10 22:42:41.579406",
+  "name": "Gửi Quản đốc",
+  "workflow_action_name": "Gửi Quản đốc"
  }
 ]

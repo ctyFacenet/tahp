@@ -152,13 +152,13 @@ def get_completed_work_orders(filters):
     """Get completed work orders based on filters"""
     conditions = ""
     
-    # Handle date filters
+    # Handle date filters (inclusive by date, ignore time component)
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += " AND wo.actual_end_date BETWEEN %(from_date)s AND %(to_date)s"
+        conditions += " AND DATE(wo.actual_end_date) BETWEEN %(from_date)s AND %(to_date)s"
     elif filters.get("from_date"):
-        conditions += " AND wo.actual_end_date >= %(from_date)s"
+        conditions += " AND DATE(wo.actual_end_date) >= %(from_date)s"
     elif filters.get("to_date"):
-        conditions += " AND wo.actual_end_date <= %(to_date)s"
+        conditions += " AND DATE(wo.actual_end_date) <= %(to_date)s"
     
     if filters.get("company"):
         conditions += " AND wo.company = %(company)s"

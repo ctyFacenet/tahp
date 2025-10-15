@@ -17,6 +17,7 @@
   "start_time",
   "next_time",
   "section_break_pbds",
+  "posts",
   "items",
   "parameters",
   "section_break_kdph",
@@ -108,13 +109,19 @@
    "in_list_view": 1,
    "label": "Nh\u00e2n vi\u00ean",
    "options": "Employee"
+  },
+  {
+   "fieldname": "posts",
+   "fieldtype": "Table",
+   "options": "Operation Tracker Inspection Post"
   }
  ],
  "grid_page_length": 50,
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-25 22:39:48.280174",
+ "modified": "2025-10-14 15:17:31.016930",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Inspection",

@@ -6,27 +6,11 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "from_time",
-  "to_time",
+  "parent_name",
   "specification",
-  "value",
-  "feedback",
-  "sent",
-  "feedback_id"
+  "value"
  ],
  "fields": [
-  {
-   "fieldname": "from_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "Ghi nh\u1eadn"
-  },
-  {
-   "fieldname": "to_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "Th\u1eddi \u0111i\u1ec3m x\u00e1c nh\u1eadn"
-  },
   {
    "fieldname": "specification",
    "fieldtype": "Data",
@@ -40,28 +24,17 @@
    "label": "Gi\u00e1 tr\u1ecb \u0111o \u0111\u1ea1t"
   },
   {
-   "fieldname": "feedback",
-   "fieldtype": "Text",
+   "fieldname": "parent_name",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Y\u00eau c\u1ea7u sau \u0111o \u0111\u1ea1c"
-  },
-  {
-   "default": "0",
-   "fieldname": "sent",
-   "fieldtype": "Check",
-   "in_list_view": 1,
-   "label": "\u0110\u00e3 x\u00e1c nh\u1eadn phi\u1ebfu"
-  },
-  {
-   "fieldname": "feedback_id",
-   "fieldtype": "Data"
+   "label": "M\u00e3 phi\u1ebfu g\u1ed1c"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-25 17:07:37.598424",
+ "modified": "2025-10-14 09:31:23.077963",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Inspection Item",
