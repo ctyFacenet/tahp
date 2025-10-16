@@ -504,3 +504,10 @@ body.dt-resize {
   }
 }
 
+
+.bom-chart-wrapper {
+    flex: 1 1 45%; /* 2 chart / hàng desktop */
+    min-width: 300px;
+    max-width: 600px;
+    margin-bottom: 30px;
+}

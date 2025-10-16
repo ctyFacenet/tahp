@@ -10,6 +10,7 @@ app_license = "mit"
 
 fixtures = [
     {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
+    {"dt": "Custom Field", "filters": [["fieldname", "=", "workflow_state"]]},
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
     {"doctype": "Workflow Action Master"},
@@ -273,6 +274,9 @@ doc_events = {
         "after_insert": [
             "tahp.doc_events.job_card.after_insert.after_insert"
         ],
+        "on_submit": [
+            "tahp.doc_events.job_card.on_submit.on_submit"
+        ]
     },
 }
 

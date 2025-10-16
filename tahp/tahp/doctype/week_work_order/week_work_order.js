@@ -291,7 +291,7 @@ function validate_roles(frm) {
         });
     } else if (state === "Đợi PTCN Duyệt") {
         if (frappe.user_roles.includes('Phát triển công nghệ')) {
-            locked_fields = item_fields.filter(f => f !== 'bom');
+            locked_fields = item_fields;
             $('.btn-open-row').each(function() {
                 const $btn = $(this);
             

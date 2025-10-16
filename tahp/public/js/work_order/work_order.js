@@ -350,9 +350,12 @@ async function complete_wo(frm) {
 async function autofill_items(frm) {
     setTimeout(async () => {
         for (let row of frm.doc.operations) {
-            let op_doc = await frappe.db.get_doc("Operation", row.operation);
-            if (op_doc.custom_team && op_doc.custom_team.length > 0) {
-                frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
+            // chỉ xử lý nếu custom_employee chưa có
+            if (!row.custom_employee) {
+                let op_doc = await frappe.db.get_doc("Operation", row.operation);
+                if (op_doc.custom_team && op_doc.custom_team.length > 0) {
+                    frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
+                }
             }
         }
         frm.refresh_field("operations");

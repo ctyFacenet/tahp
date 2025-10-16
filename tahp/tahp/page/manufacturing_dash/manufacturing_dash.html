@@ -2,7 +2,7 @@
   <div class="row g-3">
 
     <!-- HÀNG 1: 3 CỘT NGANG (1:2:1) -->
-    <div class="col-lg-2 col-md-12">
+    <div class="col-lg-3 col-md-12">
       <!-- Cột 1: Main + Sub Card -->
       <div class="d-flex flex-column h-100" style="gap: 10px;">
         <!-- Main Card -->
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Cột 2: Chart Category -->
-    <div class="col-lg-5 col-md-12">
+    <div class="col-lg-6 col-md-12">
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title category-title">Sản lượng mặt hàng theo hệ</h5>
@@ -56,28 +56,22 @@
     </div>
 
     <!-- Cột 3: Chart Attribute + Select -->
-    <div class="col-lg-5 col-md-12">
+    <div class="col-lg-3 col-md-12">
       <div class="card h-100">
         <div class="card-body">
-          <div class="row h-100">
-            <!-- Cột trái: tiêu đề + select -->
-            <div class="col-3 d-flex flex-column justify-content-start">
-              <h6 class="card-title attribute-title mb-2" style="font-size: 12px;">
-                Sản lượng<br>hoàn thành
-              </h6>
-              <div class="form-group">
-                <select id="attribute-system-select" class="custom-select" style="font-size: 10px;">
-                  <!-- options fill bằng JS -->
-                </select>
-              </div>
-            </div>
+          <!-- Hàng trên: Tiêu đề + Select -->
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h5 class="card-title attribute-title">
+              Sản lượng hoàn thành
+            </h5>
+            <select id="attribute-system-select" class="custom-select" style="width: auto;">
+              <!-- options fill bằng JS -->
+            </select>
+          </div>
 
-            <!-- Cột phải: biểu đồ -->
-            <div class="col-9">
-              <div class="chart-container" style="position: relative; height:250px;">
-                <canvas id="chart-attribute"></canvas>
-              </div>
-            </div>
+          <!-- Hàng dưới: Biểu đồ -->
+          <div class="chart-container" style="position: relative; height:250px;">
+            <canvas id="chart-attribute"></canvas>
           </div>
         </div>
       </div>
@@ -105,8 +99,8 @@
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title bom-title">Báo cáo tiêu hao NVL / 1 tấn thành phẩm</h5>
-          <div class="chart-container" style="position: relative; height:355px;">
-            <canvas id="chart-bom"></canvas>
+          <div id="charts-container" class="charts-container" style="position: relative;display: flex;flex-wrap: wrap;justify-content: space-around;">
+            <!-- JS sẽ tạo canvas cho từng mặt hàng vào đây -->
           </div>
         </div>
       </div>

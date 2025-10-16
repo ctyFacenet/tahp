@@ -170,10 +170,14 @@ def send_recommendation(inspection, items, operation=None):
 		import json
 		items = json.loads(items)
 
+	job_card = frappe.db.get_value("Operation Tracker Inspection", inspection, "job_card")
+	work_order = frappe.db.get_value("Job Card", job_card, "work_order")
+	production_item = frappe.db.get_value("Work Order", work_order, "production_item")
+
 	# Lấy tất cả evaluation
 	evaluations = frappe.get_all(
 		"Operation Tracker Evaluation",
-		filters=[["operation", "in", [None, operation]]],
+		filters=[["operation", "in", [None, operation]], ["item_code", "in", [None, production_item]]],
 		fields=["specification", "evaluation", "value", "feedback"]
 	)
 

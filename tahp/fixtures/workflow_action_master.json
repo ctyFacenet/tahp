@@ -142,13 +142,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-10-13 16:25:28.850258",
-  "name": "Bắt đầu",
-  "workflow_action_name": "Bắt đầu"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-18 12:35:54.969203",
   "name": "Từ chối",
   "workflow_action_name": "Từ chối"
@@ -159,5 +152,12 @@
   "modified": "2025-10-10 22:42:41.579406",
   "name": "Gửi Quản đốc",
   "workflow_action_name": "Gửi Quản đốc"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-10-13 16:25:28.850258",
+  "name": "Bắt đầu",
+  "workflow_action_name": "Bắt đầu"
  }
 ]

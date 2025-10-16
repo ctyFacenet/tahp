@@ -95,84 +95,102 @@ frappe.ui.form.on("Operation Tracker Inspection", {
 
         let reference_time = null;
         let latest_post = null;
+        let has_posts = frm.doc.posts && frm.doc.posts.length;
 
-        if (frm.doc.posts && frm.doc.posts.length) {
-            // Lấy post mới nhất dựa trên created_date
-            latest_post = frm.doc.posts.reduce((latest, post) => {
-                if (!latest) return post;
-                return frappe.datetime.str_to_obj(post.created_date) > frappe.datetime.str_to_obj(latest.created_date) ? post : latest;
-            }, null);
+        if (has_posts) {
+            latest_post = frm.doc.posts[frm.doc.posts.length - 1];
             reference_time = frappe.datetime.str_to_obj(latest_post.created_date);
         } else if (frm.doc.next_time) {
-            // Nếu chưa có post, dùng next_time - frequency
             reference_time = new Date(frappe.datetime.str_to_obj(frm.doc.next_time).getTime() - frm.doc.frequency * 60 * 1000);
-        } else {
-            // Không có gì để tính
-            $row.append($(`
-                <div class="next_time alert w-100 text-center alert-warning border border-warning" style="margin:0" role="alert">
-                    Chưa có phiếu nào
-                </div>
-            `));
-            return;
         }
 
         let $next_time_div = $(`
-            <div class="next_time alert w-100 text-center alert-danger border border-danger" style="margin:0" role="alert">
-                Thời gian còn lại: 00:00:00
+            <div class="next_time alert w-100 text-center alert-info border border-info" style="margin:0" role="alert">
+                Phiếu mới xuất hiện sau: 00:00:00
             </div>
         `);
         $row.append($next_time_div);
 
         function updateCountdown() {
             let now = new Date();
-            let end_time = new Date(reference_time.getTime() + frm.doc.frequency * 60 * 1000);
-            let diff = end_time.getTime() - now.getTime();
 
-            if (latest_post && latest_post.checked_date) {
-                // Phiếu hiện tại đã điền → countdown tới phiếu mới
+            // Chưa có phiếu nào
+            if (!has_posts) {
+                let end_time = new Date(reference_time.getTime() + frm.doc.frequency * 60 * 1000);
+                let diff = end_time.getTime() - now.getTime();
+
                 if (diff <= 0) {
-                    $next_time_div.text("Đang tạo phiếu mới...");
+                    $next_time_div.text("Đang tạo phiếu mới, vui lòng đợi...");
                     $next_time_div
-                        .removeClass("alert-danger border-danger alert-info border-info")
+                        .removeClass("alert-info border-info alert-danger border-danger")
                         .addClass("alert-info border border-info");
                     clearInterval(interval);
                     return;
-                } else {
-                    let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
-                    let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-                    let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
-                    $next_time_div.text(`Phiếu mới xuất hiện sau: ${hours}:${minutes}:${seconds}`);
-                    $next_time_div
-                        .removeClass("alert-danger border-danger alert-info border-info")
-                        .addClass("alert-info border border-info");
-                    return;
                 }
-            }
 
-            // Phiếu chưa điền → countdown tới hết thời gian điền
-            if (diff <= 0) {
-                $next_time_div.text("Thời gian điền phiếu sắp hết...");
+                let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+                let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+                $next_time_div.text(`Phiếu mới xuất hiện sau: ${hours}:${minutes}:${seconds}`);
                 $next_time_div
-                    .removeClass("alert-info border-info")
-                    .addClass("alert-danger border border-danger");
-                clearInterval(interval);
+                    .removeClass("alert-danger border-danger")
+                    .addClass("alert-info border border-info");
                 return;
             }
 
-            let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
-            let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-            let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+            // Phiếu đã có nhưng chưa checked_time
+            if (latest_post && !latest_post.checked_date) {
+                let end_time = new Date(reference_time.getTime() + frm.doc.frequency * 60 * 1000);
+                let diff = end_time.getTime() - now.getTime();
 
-            $next_time_div.text(`Thời gian còn lại: ${hours}:${minutes}:${seconds}`);
-            $next_time_div
-                .removeClass("alert-info border-info")
-                .addClass("alert-danger border border-danger");
+                if (diff <= 0) {
+                    $next_time_div.text("Thời gian lấy mẫu sắp kết thúc...");
+                    $next_time_div
+                        .removeClass("alert-info border-info")
+                        .addClass("alert-danger border border-danger");
+                    clearInterval(interval);
+                    return;
+                }
+
+                let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+                let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+                $next_time_div.text(`Thời gian lấy mẫu còn lại: ${hours}:${minutes}:${seconds}`);
+                $next_time_div
+                    .removeClass("alert-info border-info")
+                    .addClass("alert-danger border border-danger");
+                return;
+            }
+
+            // Phiếu đã có và đã checked_time → countdown tới phiếu mới
+            if (latest_post && latest_post.checked_date) {
+                let end_time = new Date(reference_time.getTime() + frm.doc.frequency * 60 * 1000);
+                let diff = end_time.getTime() - now.getTime();
+
+                if (diff <= 0) {
+                    $next_time_div.text("Đang tạo phiếu mới, vui lòng đợi...");
+                    $next_time_div
+                        .removeClass("alert-danger border-danger")
+                        .addClass("alert-info border border-info");
+                    clearInterval(interval);
+                    return;
+                }
+
+                let hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+                let minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                let seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, "0");
+                $next_time_div.text(`Phiếu mới xuất hiện sau: ${hours}:${minutes}:${seconds}`);
+                $next_time_div
+                    .removeClass("alert-danger border-danger")
+                    .addClass("alert-info border border-info");
+                return;
+            }
         }
 
         let interval = setInterval(updateCountdown, 1000);
         updateCountdown();
     },
-    
+
     display_post: async function(frm, $wrapper) {
         $wrapper.empty();
         let created_str = frm.doc.posts[frm.doc.posts.length - 1].created_date
