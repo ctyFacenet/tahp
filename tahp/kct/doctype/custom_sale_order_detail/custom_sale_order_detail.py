@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class CustomStrictSaleOrder(Document):
+class CustomSaleOrderDetail(Document):
 	pass

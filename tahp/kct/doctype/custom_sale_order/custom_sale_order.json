@@ -18,14 +18,24 @@
  ],
  "fields": [
   {
-   "fieldname": "ordercreationdate",
-   "fieldtype": "Date",
-   "label": "Ng\u00e0y t\u1ea1o \u0111\u01a1n"
+   "fieldname": "remainingquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng c\u00f2n l\u1ea1i"
+  },
+  {
+   "fieldname": "actions",
+   "fieldtype": "Rating",
+   "label": "Thao t\u00e1c"
   },
   {
    "fieldname": "masterordercode",
    "fieldtype": "Data",
    "label": "M\u00e3 \u0111\u01a1n h\u00e0ng t\u1ed5ng"
+  },
+  {
+   "fieldname": "ordercreationdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o \u0111\u01a1n"
   },
   {
    "fieldname": "customername",
@@ -48,11 +58,6 @@
    "label": "S\u1ed1 l\u01b0\u1ee3ng \u0111\u00e3 giao"
   },
   {
-   "fieldname": "remainingquantity",
-   "fieldtype": "Float",
-   "label": "S\u1ed1 l\u01b0\u1ee3ng c\u00f2n l\u1ea1i"
-  },
-  {
    "fieldname": "deliverydate",
    "fieldtype": "Date",
    "label": "Ng\u00e0y giao h\u00e0ng"
@@ -61,17 +66,12 @@
    "fieldname": "salesperson",
    "fieldtype": "Small Text",
    "label": "Nh\u00e2n vi\u00ean b\u00e1n h\u00e0ng"
-  },
-  {
-   "fieldname": "actions",
-   "fieldtype": "Rating",
-   "label": "Thao t\u00e1c"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 09:29:58.362853",
+ "modified": "2025-10-16 14:04:38.099967",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Sale Order",

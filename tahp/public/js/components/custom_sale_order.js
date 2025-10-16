@@ -1,6 +1,6 @@
 frappe.provide("tahp.ui");
 
-import CustomSaleOrder from "../../hello_vue/components/doctype/custom-sale-order/CustomSaleOrderTable.vue";
+import CustomSaleOrder from "../../hello_vue/components/doctype/custom-sale-order/CustomSaleOrderList.vue";
 import { mountVue, unmountVue } from "../vue_helper";
 
 class CustomSaleOrderComponent {

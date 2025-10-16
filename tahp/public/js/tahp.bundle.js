@@ -8,6 +8,7 @@ import "./components/list_view.bundle.js";
 import "./components/dash_board_grid.bundle.js";
 import "./components/counter.bundle.js";
 import "./components/custom_sale_order.js";
+import "./components/custom_sale_order_detail.js";
 
 frappe.provide("tahp.vue");
 tahp.vue.mountVue = mountVue;

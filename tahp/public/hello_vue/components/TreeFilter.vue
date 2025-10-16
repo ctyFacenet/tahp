@@ -1,9 +1,6 @@
 <template>
-  <div class="tw-bg-white tw-p-4 tw-w-full tw-rounded-lg tw-shadow-sm">
+  <div class="tw-p-4">
     <div class="tw-mb-4">
-      <label class="tw-block tw-text-sm tw-font-medium tw-mb-1">
-        Ngày bắt đầu - kết thúc
-      </label>
       <a-range-picker
         v-model:value="dateRange"
         format="DD/MM/YYYY"
@@ -13,7 +10,7 @@
       />
     </div>
 
-    <div class="tw-border tw-rounded-lg tw-p-2 tw-max-h-96 tw-overflow-y-auto">
+    <div class="tw-border tw-rounded-lg tw-p-2 tw-max-h-[70vh] tw-overflow-y-auto">
       <a-tree
         checkable
         :tree-data="treeData"
@@ -34,7 +31,7 @@ const props = defineProps({
 const dateRange = ref([]);
 const checkedKeys = ref([]);
 
-const years = [2025, 2024, 2023, 2022, 2021, 2020];
+const years = [2025, 2024];
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const getDaysInMonth = (year, month) => {
