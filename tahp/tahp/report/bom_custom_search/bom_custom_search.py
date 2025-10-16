@@ -23,7 +23,7 @@ def execute(filters=None):
     indent = 0
     for bom in boms:
         doc = frappe.get_doc("BOM", bom.name)
-
+        if doc.custom_hide: continue
         row = {
             "bom_name": doc.name,
             "custom_note": doc.custom_note,

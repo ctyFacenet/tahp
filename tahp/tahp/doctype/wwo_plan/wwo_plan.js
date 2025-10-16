@@ -624,7 +624,7 @@ function setup_bom_tooltip_events() {
         e.stopPropagation();
         const bomName = $(this).text().trim();
         if (bomName && bomName !== "CTSX") {
-            window.open(`/app/bom/${encodeURIComponent(bomName)}`, '_blank');
+            window.open(`/app/bom/${encodeURIComponent(bomName)}`, '_self');
         }
     });
 
@@ -691,7 +691,7 @@ function setup_item_tooltip_events() {
 
         const itemCode = $(this).text().trim();
         if (itemCode && itemCode !== "Mặt hàng") {
-            window.open(`/app/item/${encodeURIComponent(itemCode)}`, '_blank');
+            window.open(`/app/item/${encodeURIComponent(itemCode)}`, '_self');
         }
     });
 

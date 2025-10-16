@@ -1,7 +1,7 @@
 frappe.query_reports["BOM Custom Search"] = {
     filters: [
         {"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1},
-        {"fieldname": "item_code", "label": "Item", "fieldtype": "Data","hidden": 1},
+        {"fieldname": "item_code", "label": "Item", "fieldtype": "Data"},
     ],
     onload: async function(report) {
         report.page.set_title("Tìm kiếm BOM");

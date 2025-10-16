@@ -88,6 +88,7 @@ frappe.ui.form.on('BOM Item', {
             frappe.model.set_value(cdt, cdn, "source_warehouse", null);
             return;
         }
+        frappe.model.set_value(cdt, cdn, "bom_no", null);
         if (row.source_warehouse) return;
         let { message } = await frappe.db.get_value("Item", row.item_code, "item_group");
         if (!message || !message.item_group) return;
@@ -144,7 +145,7 @@ function control_operation(frm, cdt, cdn) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (frm.doc.docstatus === 0) {
+        // if (frm.doc.docstatus === 0) {
             let dialog = new frappe.ui.Dialog({
                 title: 'Chọn công đoạn muốn theo dõi SL',
                 fields: [
@@ -173,21 +174,21 @@ function control_operation(frm, cdt, cdn) {
             });
 
             dialog.show();
-        } else {
-            let dialog = new frappe.ui.Dialog({
-                title: 'Danh sách công đoạn đã chọn',
-                fields: [
-                    {
-                        fieldname: 'ops_html',
-                        fieldtype: 'HTML',
-                        options: selectedOps.length > 0
-                            ? `<ul style="padding-left:16px; margin:0;font-size:15px;">${selectedOps.map(op => `<li>${op}</li>`).join("")}</ul>`
-                            : '<p><i>Không có công đoạn nào</i></p>'
-                    }
-                ]
-            });
-            dialog.show();            
-        }
+        // } else {
+        //     let dialog = new frappe.ui.Dialog({
+        //         title: 'Danh sách công đoạn đã chọn',
+        //         fields: [
+        //             {
+        //                 fieldname: 'ops_html',
+        //                 fieldtype: 'HTML',
+        //                 options: selectedOps.length > 0
+        //                     ? `<ul style="padding-left:16px; margin:0;font-size:15px;">${selectedOps.map(op => `<li>${op}</li>`).join("")}</ul>`
+        //                     : '<p><i>Không có công đoạn nào</i></p>'
+        //             }
+        //         ]
+        //     });
+        //     dialog.show();            
+        // }
 
     });
 
