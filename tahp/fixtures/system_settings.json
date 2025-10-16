@@ -52,7 +52,7 @@
   "max_file_size": 0,
   "max_report_rows": 100000,
   "minimum_password_score": "2",
-  "modified": "2025-09-24 13:42:52.287941",
+  "modified": "2025-09-29 08:45:54.158488",
   "name": "System Settings",
   "number_format": "#,###.##",
   "otp_issuer_name": "Frappe Framework",

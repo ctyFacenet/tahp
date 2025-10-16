@@ -1,7 +1,7 @@
 <template>
-  <div class="tw-bg-white tw-p-4 tw-w-full">
+  <div class="tw-bg-white tw-p-4 tw-w-full tw-rounded-lg tw-shadow-sm">
     <div class="tw-mb-4">
-      <label class="tw-block tw-text-md tw-font-medium tw-mb-1">
+      <label class="tw-block tw-text-sm tw-font-medium tw-mb-1">
         Ngày bắt đầu - kết thúc
       </label>
       <a-range-picker
@@ -13,7 +13,7 @@
       />
     </div>
 
-    <div class="tw-border tw-rounded tw-p-2 tw-max-h-96 tw-overflow-y-auto">
+    <div class="tw-border tw-rounded-lg tw-p-2 tw-max-h-96 tw-overflow-y-auto">
       <a-tree
         checkable
         :tree-data="treeData"

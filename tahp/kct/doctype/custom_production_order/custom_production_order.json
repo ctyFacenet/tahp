@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-15 10:24:14.172400",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "status"
+ ],
+ "fields": [
+  {
+   "default": "B\u1ea3n nh\u00e1p",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "\u0110\u00e3 t\u1ea1o l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 t\u1ea1o 1 ph\u1ea7n l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 duy\u1ec7t\n\u0110\u00e3 h\u1ee7y\nHo\u00e0n th\u00e0nh\nB\u1ea3n nh\u00e1p"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-15 10:26:53.068217",
+ "modified_by": "Administrator",
+ "module": "KCT",
+ "name": "Custom Production Order",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

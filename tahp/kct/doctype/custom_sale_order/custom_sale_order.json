@@ -1,0 +1,97 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-15 08:58:41.956998",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "masterordercode",
+  "ordercreationdate",
+  "customername",
+  "orderdescription",
+  "requestedquantity",
+  "deliveredquantity",
+  "remainingquantity",
+  "deliverydate",
+  "salesperson",
+  "actions"
+ ],
+ "fields": [
+  {
+   "fieldname": "ordercreationdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o \u0111\u01a1n"
+  },
+  {
+   "fieldname": "masterordercode",
+   "fieldtype": "Data",
+   "label": "M\u00e3 \u0111\u01a1n h\u00e0ng t\u1ed5ng"
+  },
+  {
+   "fieldname": "customername",
+   "fieldtype": "Text",
+   "label": "Kh\u00e1ch h\u00e0ng"
+  },
+  {
+   "fieldname": "orderdescription",
+   "fieldtype": "Text",
+   "label": "Di\u1ec5n gi\u1ea3i"
+  },
+  {
+   "fieldname": "requestedquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng y\u00eau c\u1ea7u"
+  },
+  {
+   "fieldname": "deliveredquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng \u0111\u00e3 giao"
+  },
+  {
+   "fieldname": "remainingquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng c\u00f2n l\u1ea1i"
+  },
+  {
+   "fieldname": "deliverydate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y giao h\u00e0ng"
+  },
+  {
+   "fieldname": "salesperson",
+   "fieldtype": "Small Text",
+   "label": "Nh\u00e2n vi\u00ean b\u00e1n h\u00e0ng"
+  },
+  {
+   "fieldname": "actions",
+   "fieldtype": "Rating",
+   "label": "Thao t\u00e1c"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-16 09:29:58.362853",
+ "modified_by": "Administrator",
+ "module": "KCT",
+ "name": "Custom Sale Order",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
