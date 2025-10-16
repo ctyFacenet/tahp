@@ -29,7 +29,7 @@ frappe.listview_settings["Custom Sale Order Detail"] = {
         productName: row.productname,
         requestedQuantity: row.requestedquantity,
         reservedQuantity: row.reservedquantity,
-        requiredProductionQty: row.productionquantity || row.requiredproductionqty,
+        requiredProductionQty: row.productionquantity,
         deliveredQuantity: row.deliveredquantity,
         remainingDeliveryQuantity: row.remainingdeliveryquantity,
         completedQuantity: row.completedquantity,

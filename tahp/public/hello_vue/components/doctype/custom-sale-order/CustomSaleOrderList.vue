@@ -6,39 +6,38 @@
 
     <div class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-overflow-hidden">
       <div class="tw-pb-2 tw-mb-3 tw-relative tw-shrink-0">
-        <h2
-          class="tw-text-[14px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center"
-        >
+        <h2 class="tw-text-[14px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center">
           DANH SÁCH ĐƠN HÀNG TỔNG
         </h2>
 
-        <div
-          class="tw-absolute tw-top-0 tw-right-0 tw-flex tw-items-center tw-gap-2"
-        >
-          <a-button
-            type="link"
-            class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0"
-          >
+        <div class="tw-absolute tw-top-0 tw-right-0 tw-flex tw-items-center tw-gap-2">
+          <a-button type="link"
+            class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
             <template #icon>
               <PlusOutlined />
             </template>
             Thêm mới
           </a-button>
 
-          <a-button
-            type="text"
-            class="tw-border tw-border-gray-300 tw-rounded-md tw-h-[28px] tw-flex tw-items-center tw-justify-center tw-px-2"
-          >
-            <CopyOutlined class="tw-text-[#2490ef]" />
-          </a-button>
+          <a-dropdown trigger="click" placement="bottomRight">
+            <template #overlay>
+              <a-menu>
+                <a-menu-item v-for="col in allColumns" :key="col.key" class="tw-text-[13px]">
+                  <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
+                    {{ col.title }}
+                  </a-checkbox>
+                </a-menu-item>
+              </a-menu>
+            </template>
 
-          <a-input
-            v-model:value="searchKeyword"
-            placeholder="Nhập thông tin để tìm kiếm"
+            <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
+              <CopyOutlined class="tw-text-[#2490ef] tw-text-[13px] hover:tw-text-[#1677c8]" />
+            </a-button>
+          </a-dropdown>
+
+          <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
             class="tw-w-[220px] tw-h-[28px] tw-text-[13px] tw-rounded-md tw-border-[#2490ef] focus:tw-shadow-none"
-            size="small"
-            allowClear
-          >
+            size="small" allowClear>
             <template #prefix>
               <SearchOutlined class="tw-text-gray-400" />
             </template>
@@ -47,20 +46,14 @@
       </div>
 
       <div class="tw-flex-1 tw-w-full tw-h-full tw-overflow-hidden">
-        <BaseTable
-          :columns="columns"
-          :rows="filteredRows"
-          @view="onView"
-          @edit="onEdit"
-          @delete="onDelete"
-        />
+        <BaseTable :columns="displayedColumns" :rows="filteredRows" @view="onView" @edit="onEdit" @delete="onDelete" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, reactive } from "vue";
 import { PlusOutlined, CopyOutlined, SearchOutlined } from "@ant-design/icons-vue";
 import BaseTable from "../../BaseTable.vue";
 import TreeFilter from "../../TreeFilter.vue";
@@ -71,7 +64,7 @@ const props = defineProps({
 
 const searchKeyword = ref("");
 
-const columns = [
+const allColumns = [
   { title: "Mã đơn hàng tổng", key: "masterordercode" },
   { title: "Ngày tạo đơn", key: "ordercreationdate", fieldtype: "Date" },
   { title: "Khách hàng", key: "customername" },
@@ -83,6 +76,13 @@ const columns = [
   { title: "Nhân viên bán hàng", key: "salesperson" },
   { title: "Thao tác", key: "actions" },
 ];
+const visibleColumns = reactive({});
+allColumns.forEach((col) => (visibleColumns[col.key] = true));
+
+const updateVisibleColumns = () => {
+  displayedColumns.value = allColumns.filter((c) => visibleColumns[c.key]);
+};
+const displayedColumns = ref([...allColumns]);
 
 const filteredRows = computed(() => {
   if (!searchKeyword.value.trim()) return props.rows;
