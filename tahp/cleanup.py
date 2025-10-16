@@ -24,7 +24,7 @@ def cleanup_custom():
         dt = field["dt"]
         fname = field["fieldname"]
 
-        if dt in result and fname not in result[dt]:
+        if dt in result and fname not in result[dt] and fname != "workflow_state":
             print(f"Deleting unused Custom Field: {dt}.{fname}")
             frappe.delete_doc("Custom Field", field["name"], force=1)
 
