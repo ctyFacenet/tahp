@@ -47,13 +47,21 @@ def check_member(employee_id, current_job_card):
             "status": ["!=", "Open"],
             "name": ["!=", current_job_card]
         },
-        fields=["name"]
+        fields=["name"],
+        order_by="creation asc"
     )
+
+    active_jobs = []
+
     for jc in job_cards:
         jc_doc = frappe.get_doc("Job Card", jc.name)
         team_rows = jc_doc.custom_team_table or []
         team_member = [r for r in team_rows if r.employee == employee_id]
         if not team_member: continue
+        active_jobs.append((jc_doc, team_rows, team_member))
+
+    if len(active_jobs) > 2:
+        jc_doc, team_rows, team_member = active_jobs[-1] 
 
         if len(team_rows) > 1:
             from_time = now_datetime()
@@ -63,16 +71,16 @@ def check_member(employee_id, current_job_card):
                 "from_time": from_time,
                 "exit": True
             })
-
             jc_doc.custom_team_table = [
                 r for r in team_rows if r.employee != employee_id
             ]
-
             jc_doc.save(ignore_permissions=True)
         else:
-            frappe.throw(f"Nhân viên {employee_id} không thể thêm/đổi công đoạn do Công đoạn hiện tại chỉ có duy nhất 1 nhân viên")
-            return            
-
+            frappe.throw(
+                f"Nhân viên {employee_id} không thể thêm/đổi công đoạn "
+                f"do Công đoạn {jc_doc.name} chỉ có duy nhất 1 nhân viên"
+            )
+            return        
 
 @frappe.whitelist()
 def set_team(job_card, team):
@@ -296,6 +304,14 @@ def set_configs(job_card, configs=None, workstation=None):
                             "unit": config.unit, 
                             "workstation": ws.workstation
                         })
+                        if config.config_default:
+                            doc.append("custom_configs", {
+                                "config_name": config.config_name, 
+                                "config_value": config.config_default, 
+                                "unit": config.unit, 
+                                "workstation": ws.workstation,
+                                "from_time": from_time
+                            })
                 else:
                     doc.append("custom_config_table", {
                         "config_name": config.config_name, 
@@ -303,6 +319,14 @@ def set_configs(job_card, configs=None, workstation=None):
                         "unit": config.unit, 
                         "workstation": getattr(config, "workstation")
                     })
+                    if config.config_default:
+                        doc.append("custom_configs", {
+                            "config_name": config.config_name, 
+                            "config_value": config.config_default, 
+                            "unit": config.unit, 
+                            "workstation": getattr(config, "workstation"),
+                            "from_time": from_time
+                        })
         doc.save(ignore_permissions=True)
         return
 

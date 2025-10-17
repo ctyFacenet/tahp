@@ -355,6 +355,7 @@ async function autofill_items(frm) {
                 let op_doc = await frappe.db.get_doc("Operation", row.operation);
                 if (op_doc.custom_team && op_doc.custom_team.length > 0) {
                     frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
+                    frappe.model.set_value(row.doctype, row.name, 'custom_employee_name', op_doc.custom_team[0].employee_name);
                 }
             }
         }
