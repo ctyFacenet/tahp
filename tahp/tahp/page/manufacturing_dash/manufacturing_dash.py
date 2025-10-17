@@ -426,6 +426,7 @@ def bom_overall(main, from_date, to_date):
                     "label": ri.item_name,
                     "work_order": [],
                     "work_order_norm": [],
+                    "unit": ri.stock_uom
                 }
 
             # Cộng dồn theo ngày
