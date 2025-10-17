@@ -196,10 +196,12 @@ const isDropdownOpen = ref(false);
 const statusColors = {
   "Bản nháp": "tw-bg-gray-300 tw-text-gray-800",
   "Đã duyệt": "tw-bg-orange-400 tw-text-white",
-  "Hoàn thành": "tw-bg-green-500 tw-text-white",
+  "Đã hoàn thành": "tw-bg-green-500 tw-text-white",
   "Đã tạo lệnh sản xuất": "tw-bg-purple-500 tw-text-white",
   "Đã tạo 1 phần lệnh sản xuất": "tw-bg-blue-500 tw-text-white",
   "Đã hủy": "tw-bg-red-500 tw-text-white",
+  "Sử dụng hàng tồn kho": "tw-bg-blue-500 tw-text-white",
+  "Chờ tạo lệnh sản xuất":"tw-bg-orange-400 tw-text-white"
 };
 
 const filters = ref({});

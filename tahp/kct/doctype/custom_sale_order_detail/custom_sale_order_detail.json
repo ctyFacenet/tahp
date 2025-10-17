@@ -35,7 +35,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Tr\u1ea1ng th\u00e1i",
-   "options": "\u0110\u00e3 t\u1ea1o 1 ph\u1ea7n l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 t\u1ea1o l\u1ec7nh s\u1ea3n xu\u1ea5t\nB\u1ea3n nh\u00e1p\n\u0110\u00e3 ho\u00e0n th\u00e0nh"
+   "options": "B\u1ea3n nh\u00e1p\nS\u1eed d\u1ee5ng h\u00e0ng t\u1ed3n kho\n\u0110\u00e3 duy\u1ec7t\nCh\u1edd t\u1ea1o l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 t\u1ea1o 1 ph\u1ea7n l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 t\u1ea1o l\u1ec7nh s\u1ea3n xu\u1ea5t\n\u0110\u00e3 ho\u00e0n th\u00e0nh\n\u0110\u00e3 h\u1ee7y"
   },
   {
    "fieldname": "detailordercreationdate",
@@ -116,7 +116,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-16 11:29:28.551194",
+ "modified": "2025-10-17 09:12:29.087258",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Sale Order Detail",
