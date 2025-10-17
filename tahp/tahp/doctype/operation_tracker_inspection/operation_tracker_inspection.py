@@ -72,15 +72,16 @@ def add_inspection():
 			doc.employee,
 			["user_id", "employee_name"]
 		)
-		frappe.get_doc({
-			"doctype": "Notification Log",
-			"for_user": user,
-			"subject": f"Yêu cầu nhân viên {employee_name} tới công đoạn {doc.operation} lấy mẫu đo đạc",
-			"email_content": "",
-			"type": "Alert",
-			"document_type": "Operation Tracker Inspection",
-			"document_name": doc.name
-		}).insert(ignore_permissions=True)
+		if user != "":
+			frappe.get_doc({
+				"doctype": "Notification Log",
+				"for_user": user,
+				"subject": f"Yêu cầu nhân viên {employee_name} tới công đoạn {doc.operation} lấy mẫu đo đạc",
+				"email_content": "",
+				"type": "Alert",
+				"document_type": "Operation Tracker Inspection",
+				"document_name": doc.name
+			}).insert(ignore_permissions=True)
 		
 		doc.append("posts", {
 			"created_date": now,
