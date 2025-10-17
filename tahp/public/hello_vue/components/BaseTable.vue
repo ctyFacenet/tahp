@@ -63,17 +63,11 @@
                 <a-range-picker v-model:value="dateFilters[col.key]" format="DD/MM/YYYY" size="small"
                   class="tw-w-full tw-text-xs" :placeholder="['Từ ngày', 'Đến ngày']" />
               </template>
-              <template v-else-if="col.key === 'status'">
-                <div class="tw-relative tw-w-full">
-                  <a-select v-model:value="statusFilter" mode="multiple" allow-clear show-search size="small"
-                    placeholder="" class="tw-w-full tw-text-xs tw-pr-6" :options="statusOptions"
-                    :max-tag-count="1" :dropdown-match-select-width="true"
-                    @dropdownVisibleChange="isDropdownOpen = $event" />
 
-                  <component :is="isDropdownOpen ? SearchOutlined : DownOutlined"
-                    class="tw-absolute tw-right-2 tw-top-1/2 -tw-translate-y-1/2 tw-text-gray-400 tw-text-[12px] tw-pointer-events-none tw-transition-transform tw-duration-200"
-                    :class="!isDropdownOpen ? 'tw-rotate-0' : ''" />
-                </div>
+              <template v-else-if="col.key === 'status'">
+                <a-select v-model:value="statusFilter" show-search placeholder="" style="width: 200px"
+                  :options="statusOptions" :filter-option="filterOption" @focus="handleFocus" @blur="handleBlur"
+                  @change="handleChange"></a-select>
               </template>
 
               <template v-else-if="col.key !== 'actions'">
@@ -132,15 +126,14 @@
               <template v-else-if="col.key === 'status'">
                 <span :class="[
                   'tw-inline-block tw-rounded-md tw-px-2 tw-py-[2px] tw-text-[12px] tw-font-medium tw-text-center tw-whitespace-nowrap',
-                  statusColors[row[col.key]] ||
-                  'tw-bg-gray-200 tw-text-gray-700',
+                  statusColors[row[col.key]] || 'tw-bg-gray-200 tw-text-gray-700',
                 ]">
                   {{ row[col.key] }}
                 </span>
               </template>
 
               <template v-else>
-                {{ row[col.key] || "" }}
+                {{ row[col.key] || '' }}
               </template>
             </td>
           </tr>
@@ -160,9 +153,7 @@
       <div
         class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-gap-3 tw-text-center sm:tw-text-left tw-mt-2 sm:tw-mt-0">
         <span class="tw-hidden sm:tw-inline">
-          Trang số {{ currentPage }} của {{ totalPages }} ({{
-            filteredRows.length
-          }}
+          Trang số {{ currentPage }} của {{ totalPages }} ({{ filteredRows.length }}
           bản ghi)
         </span>
         <a-pagination v-model:current="currentPage" :total="filteredRows.length" :pageSize="pageSize"
@@ -183,15 +174,17 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { EyeOutlined, EditOutlined, DeleteOutlined, DownOutlined, SearchOutlined, CheckOutlined } from "@ant-design/icons-vue";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
   rows: { type: Array, required: true },
   columns: { type: Array, required: true },
 });
-
-const isDropdownOpen = ref(false);
 
 const statusColors = {
   "Bản nháp": "tw-bg-gray-300 tw-text-gray-800",
@@ -201,7 +194,7 @@ const statusColors = {
   "Đã tạo 1 phần lệnh sản xuất": "tw-bg-blue-500 tw-text-white",
   "Đã hủy": "tw-bg-red-500 tw-text-white",
   "Sử dụng hàng tồn kho": "tw-bg-blue-500 tw-text-white",
-  "Chờ tạo lệnh sản xuất":"tw-bg-orange-400 tw-text-white"
+  "Chờ tạo lệnh sản xuất": "tw-bg-orange-400 tw-text-white",
 };
 
 const filters = ref({});
@@ -211,6 +204,13 @@ const statusOptions = Object.keys(statusColors).map((label) => ({
   label,
   value: label,
 }));
+
+const filterOption = (input, option) =>
+  option.label.toLowerCase().includes(input.toLowerCase());
+
+const handleChange = (value) => console.log("Chọn:", value);
+const handleFocus = () => console.log("Focus vào select");
+const handleBlur = () => console.log("Blur khỏi select");
 
 const colWidths = ref({});
 const resizing = ref({ active: false, colKey: null, startX: 0, startWidth: 0 });
@@ -247,11 +247,9 @@ const filteredRows = computed(() =>
   props.rows.filter((row) =>
     props.columns.every((col) => {
       if (col.key === "actions") return true;
-
       if (col.key === "status" && statusFilter.value.length > 0) {
         return statusFilter.value.includes(row[col.key]);
       }
-
       if (col.fieldtype === "Date") {
         const range = dateFilters.value[col.key];
         if (!range || range.length !== 2) return true;
@@ -261,7 +259,6 @@ const filteredRows = computed(() =>
           cellDate.isBefore(dayjs(range[1]).endOf("day"))
         );
       }
-
       const cell = row[col.key]?.toString().toLowerCase() || "";
       const filter = filters.value[col.key].toLowerCase();
       return cell.includes(filter);
