@@ -315,7 +315,7 @@ def wwo_flow():
 				if other.name != wwo_name:
 					other_doc.workflow_state = "Nháp"
 					other_doc.plan = None
-					other_doc.save();
+					other_doc.save()
 
 			plan_doc.save()
 			wwo_doc.submit()
