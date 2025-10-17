@@ -28,7 +28,8 @@
                 width: colWidths[col.key] + 'px',
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }">
-              <div class="tw-relative tw-text-center tw-font-semibold tw-px-4">
+              <div
+                class="tw-relative tw-text-center tw-font-semibold tw-px-4 tw-flex tw-items-center tw-justify-center">
                 <a-tooltip :title="col.title">
                   <span
                     class="tw-inline-block tw-max-w-[calc(100%-16px)] tw-truncate tw-align-middle tw-cursor-default">
@@ -44,7 +45,6 @@
                 class="tw-absolute tw-top-0 tw-right-0 tw-w-[6px] tw-h-full tw-cursor-col-resize tw-bg-transparent hover:tw-bg-blue-300 tw-opacity-0 group-hover:tw-opacity-100"
                 @mousedown="startResize($event, col.key)"></div>
             </th>
-
           </tr>
 
           <tr class="tw-bg-white tw-border-b tw-border-gray-200">
@@ -54,6 +54,7 @@
             <th
               class="tw-sticky tw-left-[45px] tw-z-30 tw-bg-[#f8faff] tw-px-2 tw-py-1 tw-border tw-shadow-[3px_0_8px_rgba(0,0,0,0.12)]">
             </th>
+
             <th v-for="col in columns" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white" :class="{
               'tw-sticky tw-right-0 tw-z-30 tw-bg-[#f8faff] tw-shadow-[-4px_0_8px_rgba(0,0,0,0.15)]':
                 col.key === 'actions',
@@ -61,6 +62,18 @@
               <template v-if="col.fieldtype === 'Date'">
                 <a-range-picker v-model:value="dateFilters[col.key]" format="DD/MM/YYYY" size="small"
                   class="tw-w-full tw-text-xs" :placeholder="['Từ ngày', 'Đến ngày']" />
+              </template>
+              <template v-else-if="col.key === 'status'">
+                <div class="tw-relative tw-w-full">
+                  <a-select v-model:value="statusFilter" mode="multiple" allow-clear show-search size="small"
+                    placeholder="" class="tw-w-full tw-text-xs tw-pr-6" :options="statusOptions"
+                    :max-tag-count="1" :dropdown-match-select-width="true"
+                    @dropdownVisibleChange="isDropdownOpen = $event" />
+
+                  <component :is="isDropdownOpen ? SearchOutlined : DownOutlined"
+                    class="tw-absolute tw-right-2 tw-top-1/2 -tw-translate-y-1/2 tw-text-gray-400 tw-text-[12px] tw-pointer-events-none tw-transition-transform tw-duration-200"
+                    :class="!isDropdownOpen ? 'tw-rotate-0' : ''" />
+                </div>
               </template>
 
               <template v-else-if="col.key !== 'actions'">
@@ -116,6 +129,16 @@
                 </slot>
               </template>
 
+              <template v-else-if="col.key === 'status'">
+                <span :class="[
+                  'tw-inline-block tw-rounded-md tw-px-2 tw-py-[2px] tw-text-[12px] tw-font-medium tw-text-center tw-whitespace-nowrap',
+                  statusColors[row[col.key]] ||
+                  'tw-bg-gray-200 tw-text-gray-700',
+                ]">
+                  {{ row[col.key] }}
+                </span>
+              </template>
+
               <template v-else>
                 {{ row[col.key] || "" }}
               </template>
@@ -137,8 +160,10 @@
       <div
         class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-gap-3 tw-text-center sm:tw-text-left tw-mt-2 sm:tw-mt-0">
         <span class="tw-hidden sm:tw-inline">
-          Trang số {{ currentPage }} của {{ totalPages }}
-          ({{ filteredRows.length }} bản ghi)
+          Trang số {{ currentPage }} của {{ totalPages }} ({{
+            filteredRows.length
+          }}
+          bản ghi)
         </span>
         <a-pagination v-model:current="currentPage" :total="filteredRows.length" :pageSize="pageSize"
           @change="onPageChange" :showSizeChanger="false" size="small" />
@@ -150,7 +175,7 @@
       </div>
     </div>
 
-    <div class="tw-text-center tw-py-2 tw-text-gray-600 tw-text-[12px] tw-border-t tw-border-gray-200">
+    <div class="tw-text-center tw-py-2 tw-text-gray-600 tw-text-[16px] tw-border-t tw-border-gray-200">
       © Copyright FaceNet. All Rights Reserved, Designed by FaceNet
     </div>
   </div>
@@ -158,7 +183,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import { EyeOutlined, EditOutlined, DeleteOutlined, DownOutlined, SearchOutlined, CheckOutlined } from "@ant-design/icons-vue";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -166,8 +191,25 @@ const props = defineProps({
   columns: { type: Array, required: true },
 });
 
+const isDropdownOpen = ref(false);
+
+const statusColors = {
+  "Bản nháp": "tw-bg-gray-300 tw-text-gray-800",
+  "Đã duyệt": "tw-bg-orange-400 tw-text-white",
+  "Hoàn thành": "tw-bg-green-500 tw-text-white",
+  "Đã tạo lệnh sản xuất": "tw-bg-purple-500 tw-text-white",
+  "Đã tạo 1 phần lệnh sản xuất": "tw-bg-blue-500 tw-text-white",
+  "Đã hủy": "tw-bg-red-500 tw-text-white",
+};
+
 const filters = ref({});
 const dateFilters = ref({});
+const statusFilter = ref([]);
+const statusOptions = Object.keys(statusColors).map((label) => ({
+  label,
+  value: label,
+}));
+
 const colWidths = ref({});
 const resizing = ref({ active: false, colKey: null, startX: 0, startWidth: 0 });
 
@@ -203,6 +245,11 @@ const filteredRows = computed(() =>
   props.rows.filter((row) =>
     props.columns.every((col) => {
       if (col.key === "actions") return true;
+
+      if (col.key === "status" && statusFilter.value.length > 0) {
+        return statusFilter.value.includes(row[col.key]);
+      }
+
       if (col.fieldtype === "Date") {
         const range = dateFilters.value[col.key];
         if (!range || range.length !== 2) return true;
@@ -212,6 +259,7 @@ const filteredRows = computed(() =>
           cellDate.isBefore(dayjs(range[1]).endOf("day"))
         );
       }
+
       const cell = row[col.key]?.toString().toLowerCase() || "";
       const filter = filters.value[col.key].toLowerCase();
       return cell.includes(filter);
