@@ -51,29 +51,28 @@
             </template>
           </a-input>
         </div>
-
-
       </div>
 
       <div class="tw-flex-1 tw-overflow-hidden">
-        <BaseTable :columns="displayedColumns" :rows="filteredRows">
+        <BaseTable
+          :columns="displayedColumns"
+          :rows="filteredRows"
+          group-by="detailOrderCode"
+        >
           <template #actions="{ row }">
             <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
               <a-tooltip title="Phê duyệt">
                 <LockOutlined class="tw-text-green-500 hover:tw-text-green-600 tw-cursor-pointer" />
               </a-tooltip>
-
               <a-tooltip title="Hủy phê duyệt">
                 <UnlockOutlined class="tw-text-red-500 hover:tw-text-red-600 tw-cursor-pointer" />
               </a-tooltip>
-
               <a-tooltip title="Xem lịch sử thay đổi">
                 <HistoryOutlined class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer" />
               </a-tooltip>
             </div>
           </template>
         </BaseTable>
-
       </div>
     </div>
   </div>
@@ -86,7 +85,7 @@ import {
   UnlockOutlined,
   CopyOutlined,
   SearchOutlined,
-  HistoryOutlined
+  HistoryOutlined,
 } from "@ant-design/icons-vue";
 import BaseTable from "../../BaseTable.vue";
 import TreeFilter from "../../TreeFilter.vue";
@@ -100,9 +99,9 @@ const searchKeyword = ref("");
 const allColumns = [
   { title: "Mã đơn hàng chi tiết", key: "detailOrderCode" },
   { title: "Trạng thái", key: "status" },
-  { title: "Ngày tạo đơn chi tiết", key: "detailOrderCreationDate" },
+  { title: "Ngày tạo đơn chi tiết", key: "detailOrderCreationDate", fieldtype: "Date" },
   { title: "Mã đơn hàng tổng", key: "masterOrderCode" },
-  { title: "Ngày tạo đơn hàng tổng", key: "masterOrderCreationDate" },
+  { title: "Ngày tạo đơn hàng tổng", key: "masterOrderCreationDate", fieldtype: "Date" },
   { title: "Mã khách hàng", key: "customerCode" },
   { title: "Khách hàng", key: "customerName" },
   { title: "Mã hàng", key: "productCode" },
@@ -110,26 +109,26 @@ const allColumns = [
   { title: "Số lượng yêu cầu", key: "requestedQuantity" },
   { title: "Số lượng giữ", key: "reservedQuantity" },
   { title: "Số lượng cần sản xuất", key: "requiredProductionQty" },
-  { title: "Số lượng đã giao", key: "deliveredquantity" },
+  { title: "Số lượng đã giao", key: "deliveredQuantity" },
   { title: "Số lượng còn phải giao", key: "remainingQuantity" },
   { title: "Số lượng hoàn thành", key: "completedQuantity" },
   { title: "Đơn vị tính", key: "unitOfMeasure" },
-  { title: "Ngày giao hàng", key: "deliveryDate" },
+  { title: "Ngày giao hàng", key: "deliveryDate", fieldtype: "Date" },
   { title: "Thao tác", key: "actions" },
 ];
 
 const visibleColumns = reactive({});
 allColumns.forEach((col) => (visibleColumns[col.key] = true));
 
+const displayedColumns = ref([...allColumns]);
 const updateVisibleColumns = () => {
   displayedColumns.value = allColumns.filter((c) => visibleColumns[c.key]);
 };
 
-const displayedColumns = ref([...allColumns]);
-
 const filteredRows = computed(() => {
   const key = searchKeyword.value.trim().toLowerCase();
   if (!key) return props.rows;
+
   return props.rows.filter((row) =>
     Object.values(row).some((val) =>
       val?.toString().toLowerCase().includes(key)
