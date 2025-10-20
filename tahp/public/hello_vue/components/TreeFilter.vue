@@ -5,7 +5,7 @@
         v-model:value="dateRange"
         format="DD/MM/YYYY"
         class="tw-w-full"
-        :placeholder="['Ngày bắt đầu', 'Ngày kết thúc']"
+        :placeholder="['Từ ngày', 'Đến ngày']"
         :suffix-icon="null"
       />
     </div>
