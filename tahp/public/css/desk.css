@@ -290,5 +290,5 @@ body[data-route="modern-menu"] .btn-back {
   left: auto !important;
   bottom: auto !important;
   transform: none !important;
-  z-index: 1050;
+  z-index: 1050000 !important;
 }
