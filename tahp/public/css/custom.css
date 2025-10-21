@@ -52,7 +52,7 @@ textarea {
 }
 
 .list-subject {
-  flex: 1;
+  flex: 1.2;
 }
 
 .list-row .level-left, .list-row-head .level-left {
