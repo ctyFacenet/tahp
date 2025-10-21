@@ -502,7 +502,7 @@ async function open_create_shift_dialog(frm) {
                         dialog.set_value('bom', row.bom);
                         dialog.set_value('item', row.item);
                         dialog.set_value('qty', remaining_qty);
-                        dialog.set_value('note', row.note);
+                        dialog.set_value('note', frm.doc.note);
                         dialog.set_value('planned_start_time', row.planned_start_time);
                         dialog.set_value('produced_qty', row.got_qty || 0);
                         dialog.set_value('planned_qty', row.pl_qty || 0);
@@ -525,7 +525,7 @@ async function open_create_shift_dialog(frm) {
             { fieldname: 'shift_leader', label: 'Trưởng ca', fieldtype: 'Link', options: 'Employee', reqd: 1 },
             
             { fieldname: 'col_break_2', fieldtype: 'Column Break' },
-            { fieldname: 'note', label: 'Ghi chú', fieldtype: 'Text' },
+            { fieldname: 'note', label: 'Ghi chú', fieldtype: 'Text', default: frm.doc.note },
         ],
         primary_action_label: 'Đồng ý',
         primary_action: async function(values) {
