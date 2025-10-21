@@ -502,30 +502,33 @@ async function open_create_shift_dialog(frm) {
                         dialog.set_value('bom', row.bom);
                         dialog.set_value('item', row.item);
                         dialog.set_value('qty', remaining_qty);
-                        dialog.set_value('note', frm.doc.note);
+                        dialog.set_value('note', '');
                         dialog.set_value('planned_start_time', row.planned_start_time);
                         dialog.set_value('produced_qty', row.got_qty || 0);
                         dialog.set_value('planned_qty', row.pl_qty || 0);
+                        dialog.set_value('uom', row.uom);
                     }
                 }
             },
 
             { fieldname: 'section1', fieldtype: 'Section Break', label: '' },
 
-            { fieldname: 'bom', label: 'Công thức sản xuất', fieldtype: 'Data' },
+            { fieldname: 'uom', label: 'Đơn vị đo', fieldtype: 'Link', options: "UOM", default: "Tấn"},
             { fieldname: 'item', label: 'Mã hàng', fieldtype: 'Data' },
             { fieldname: 'qty', label: 'Chọn số lượng thành phẩm', fieldtype: 'Float' },
             { fieldname: 'produced_qty', label: 'Tiến độ hiện tại: SL đã sản xuất xong', fieldtype: 'Float', read_only: 1 },
             { fieldname: 'planned_qty', label: 'Tiến độ hiện tại: SL đã lên lịch sản xuất', fieldtype: 'Float', read_only: 1 },
 
             { fieldname: 'col_break_1', fieldtype: 'Column Break' },
+            { fieldname: 'bom', label: 'Công thức sản xuất', fieldtype: 'Data' },
             { fieldname: 'worker_qty', label: 'Số lượng công nhân', fieldtype: 'Int' },
             { fieldname: 'planned_start_time', label: 'Ngày dự kiến thực hiện', fieldtype: 'Date' },
             { fieldname: 'shift', label: 'Ca', fieldtype: 'Link', options: 'Shift', reqd: 1 },
             { fieldname: 'shift_leader', label: 'Trưởng ca', fieldtype: 'Link', options: 'Employee', reqd: 1 },
             
             { fieldname: 'col_break_2', fieldtype: 'Column Break' },
-            { fieldname: 'note', label: 'Ghi chú', fieldtype: 'Text', default: frm.doc.note },
+            { fieldname: 'default_note', label: 'Ghi chú từ LSX Tuần', fieldtype: 'Small Text', default: frm.doc.note, read_only: 1 },
+            { fieldname: 'note', label: 'Viết ghi chú cho công nhân', fieldtype: 'Text'},
         ],
         primary_action_label: 'Đồng ý',
         primary_action: async function(values) {
@@ -589,12 +592,13 @@ async function open_create_shift_dialog(frm) {
                         };
                     })
                 );
-    
+
                 const wo_doc = {
                     doctype: 'Work Order',
                     production_item: values.item,
                     bom_no: values.bom,
                     qty: values.qty,
+                    stock_uom: values.uom,
                     planned_start_date: values.planned_start_time,
                     planned_end_date: values.planned_start_time,
                     custom_note: values.note,
@@ -618,6 +622,7 @@ async function open_create_shift_dialog(frm) {
     });
 
     dialog.show();
+    dialog.fields_dict.note.$wrapper.find("textarea")[0].style.setProperty("height", "140px", "important");
 }
 
 async function update_quantity(frm) {

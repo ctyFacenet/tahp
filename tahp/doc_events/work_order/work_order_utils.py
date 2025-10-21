@@ -113,7 +113,34 @@ def process_consumed_produced_items(work_order, required, produced, planned_star
     wo_doc.save(ignore_permissions=True)
 
     noti_shift_handover(wo_doc)
+    update_wwo(wo_doc)
     return
+
+def update_wwo(wo_doc):
+    if not wo_doc.custom_plan and not wo_doc.custom_plan_code: return
+    wwo = frappe.get_doc("Week Work Order", wo_doc.custom_plan)
+    work_orders = frappe.get_all(
+        "Work Order",
+        filters={"custom_plan": wo_doc.custom_plan},
+        fields=["produced_qty", "custom_plan_code"]
+    )
+    produced_map = {}
+    for wo in work_orders:
+        if not wo.custom_plan_code:
+            continue
+        produced_map.setdefault(wo.custom_plan_code, 0)
+        produced_map[wo.custom_plan_code] += wo.produced_qty or 0 
+    
+    all_done = True
+    for item in wwo.items:
+        produced = produced_map.get(item.name, 0)
+        if produced < item.qty:
+            all_done = False
+            break
+
+    if all_done and wwo.wo_status != "Completed":
+        wwo.wo_status = "Completed"
+        wwo.save(ignore_permissions=True)
 
 @frappe.whitelist()
 def noti_qc(doc):

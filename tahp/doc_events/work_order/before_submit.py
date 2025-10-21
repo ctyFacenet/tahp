@@ -6,7 +6,15 @@ def before_submit(doc, method):
     check_workstation(doc)
     warn_workstation(doc)
     execute_shift_handover(doc)
+    update_wwo(doc)
     doc.status = "In Process"
+
+def update_wwo(doc):
+    if not doc.custom_plan: return
+    wwo = frappe.get_doc("Week Work Order", doc.custom_plan)
+    if wwo.wo_status != "In Process":
+        wwo.wo_status = "In Process"
+        wwo.save(ignore_permissions=True)
 
 def check_stock_qty(doc):
     if not doc.required_items:

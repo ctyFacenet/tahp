@@ -12,7 +12,6 @@ def before_save(doc, method):
     if flag:
         frappe.throw("Vui lòng điền đủ cụm thiết bị/ thiết bị cho công đoạn")
 
-
 def noti_work_order(doc):
     if doc.workflow_state == "Đợi Quản đốc duyệt":
         users = frappe.db.get_all("User", filters={"enabled": 1}, fields=["name", "full_name"])
