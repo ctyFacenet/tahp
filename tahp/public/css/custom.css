@@ -50,3 +50,12 @@ textarea {
 .notification-item.unread {
   background: rgb(243, 248, 255);
 }
+
+.list-subject {
+  flex: 1;
+}
+
+.list-row .level-left, .list-row-head .level-left {
+    flex: 4;
+    min-width: 90%;
+}

@@ -15,8 +15,11 @@
   "section_break_jnld",
   "plan",
   "wo_status",
+  "item_list",
   "column_break_djft",
   "creation_time",
+  "start_date",
+  "end_date",
   "amended_from",
   "section_break_ohpc",
   "wo_detail"
@@ -46,6 +49,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "columns": 1,
    "fieldname": "plan",
    "fieldtype": "Link",
    "label": "K\u1ebf ho\u1ea1ch s\u1ea3n xu\u1ea5t",
@@ -57,6 +61,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "columns": 1,
    "default": "Today",
    "fieldname": "creation_time",
    "fieldtype": "Datetime",
@@ -82,7 +87,6 @@
   {
    "fieldname": "code_name",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "M\u00e3 l\u1ec7nh s\u1ea3n xu\u1ea5t",
    "reqd": 1,
    "unique": 1
@@ -93,13 +97,40 @@
    "fieldtype": "Data",
    "label": "Tr\u1ea1ng th\u00e1i",
    "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "item_list",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "DS M\u1eb7t h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y b\u1eaft \u0111\u1ea7u",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y k\u1ebft th\u00fac",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-21 11:50:08.859250",
+ "modified": "2025-10-21 16:48:41.208620",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order",

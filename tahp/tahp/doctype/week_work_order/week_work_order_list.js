@@ -29,5 +29,10 @@ frappe.listview_settings['Week Work Order'] = {
         // Còn lại hiển thị theo workflow_state
         const color = color_map[state] || "gray";
         return [__(state), color, `workflow_state,=,${state}`];
+    },
+    refresh: function(listview){
+        document.querySelectorAll('.list-row .level-right').forEach(function(col){
+            col.style.flex = '1';
+        })
     }
 };
