@@ -16,23 +16,10 @@ function getRoute(item) {
   const type = (item.link_type || item.type || "").toLowerCase();
   if (!item.link_to) return "#";
 
-  if (type === "doctype") {
-    return `/app/${slugify(item.link_to)}`;
-  }
-
-  if (type === "report") {
-    return `/app/query-report/${encodeURIComponent(item.link_to)}`;
-  }
-
-  if (type === "page") {
-    return `/app/page/${slugify(item.link_to)}`;
-  }
-
-  if (type === "dashboard") {
-    return `/app/dashboard-view/${slugify(item.link_to)}`;
-  }
-
-  // fallback
+  if (type === "doctype") return `/app/${slugify(item.link_to)}`;
+  if (type === "report") return `/app/query-report/${encodeURIComponent(item.link_to)}`;
+  if (type === "page") return `/app/page/${slugify(item.link_to)}`;
+  if (type === "dashboard") return `/app/dashboard-view/${slugify(item.link_to)}`;
   return `/app/${slugify(item.link_to)}`;
 }
 
@@ -83,11 +70,8 @@ function renderDropdownContent(dropdown, page) {
         a.href = getRoute(item);
         a.innerHTML = `${getItemIcon(item)} ${item.label}`;
 
-        if (currentGroup) {
-          currentGroup.appendChild(a);
-        } else {
-          dropdown.appendChild(a);
-        }
+        if (currentGroup) currentGroup.appendChild(a);
+        else dropdown.appendChild(a);
       }
     });
   }
@@ -95,6 +79,60 @@ function renderDropdownContent(dropdown, page) {
   if (!dropdown.innerHTML.trim()) {
     dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
   }
+}
+
+function renderDoctypeBar(workspaceName) {
+  const container = document.querySelector(".workspace-navbar .container");
+  if (!container) return;
+
+  const page = workspaceCache[slugify(workspaceName)];
+  if (!page) return;
+
+  let oldBar = document.querySelector(".doctype-bar");
+  if (oldBar) oldBar.remove();
+
+  const bar = document.createElement("div");
+  bar.className = "doctype-bar";
+
+  const allItems = [
+    ...(Array.isArray(page.shortcuts) ? page.shortcuts : []),
+    ...(Array.isArray(page.links) ? page.links.filter(l => l.type !== "Card Break") : []),
+  ];
+
+  if (allItems.length === 0) return;
+
+  const currentRoute = decodeURIComponent(window.location.pathname || "");
+
+  allItems.forEach(item => {
+    const a = document.createElement("a");
+    a.href = getRoute(item);
+    a.textContent = item.label;
+    a.className = "doctype-link";
+
+    if (currentRoute.includes(slugify(item.link_to))) {
+      a.classList.add("active");
+    }
+
+    a.addEventListener("click", (e) => {
+      document.querySelectorAll(".doctype-link").forEach(el => el.classList.remove("active"));
+      a.classList.add("active");
+    });
+
+    bar.appendChild(a);
+  });
+
+  // Shadow 2 bên
+  bar.addEventListener("scroll", () => {
+    if (bar.scrollLeft > 5) bar.classList.add("scroll-left");
+    else bar.classList.remove("scroll-left");
+
+    if (bar.scrollLeft + bar.clientWidth < bar.scrollWidth - 5)
+      bar.classList.add("scroll-right");
+    else bar.classList.remove("scroll-right");
+  });
+
+  setTimeout(() => bar.dispatchEvent(new Event("scroll")), 200);
+  container.parentNode.insertBefore(bar, container.nextSibling);
 }
 
 async function preloadWorkspaces() {
@@ -106,10 +144,8 @@ async function preloadWorkspaces() {
 
     if (Array.isArray(response.message)) {
       response.message.forEach(page => {
-
         workspaceCache[slugify(page.name)] = page;
       });
-      // console.log("⚡ Workspaces preloaded:", Object.keys(workspaceCache));
     }
   } catch (e) {
     console.error("❌ Preload error:", e);
@@ -118,11 +154,8 @@ async function preloadWorkspaces() {
 
 function loadWorkspaceData(workspaceName, dropdown) {
   const page = workspaceCache[slugify(workspaceName)];
-  if (page) {
-    renderDropdownContent(dropdown, page);
-  } else {
-    dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
-  }
+  if (page) renderDropdownContent(dropdown, page);
+  else dropdown.innerHTML = `<div style="padding:8px 12px;color:#888;">Không có menu</div>`;
 }
 
 function initDropdowns() {
@@ -155,9 +188,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (document.querySelectorAll(".workspace-block").length) {
       initDropdowns();
       obs.disconnect();
-      // console.log("🛑 Observer stopped - Dropdowns initialized");
     }
   });
-
   observer.observe(document.body, { childList: true, subtree: true });
+
+  setTimeout(() => {
+    const initial_workspace = frappe.get_route_str().split('/')[1] || '';
+    if (initial_workspace) renderDoctypeBar(initial_workspace);
+  }, 500);
+
+  $(document).on("page-change", function () {
+    const current_workspace_name = frappe.get_route_str().split('/')[1] || '';
+    if (current_workspace_name) renderDoctypeBar(current_workspace_name);
+  });
 });

@@ -10,6 +10,7 @@ import "./components/counter.bundle.js";
 import "./components/custom_sale_order.bundle.js";
 import "./components/custom_sale_order_detail.bundle.js";
 import "./components/custom_product_order.bundle.js";
+import "./components/custom_statistical_report.bundle.js";
 
 frappe.provide("tahp.vue");
 tahp.vue.mountVue = mountVue;
