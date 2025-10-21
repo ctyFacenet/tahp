@@ -5,10 +5,15 @@
         <a class="navbar-brand navbar-home ml-3" href="/app/modern-menu ">
           <img class="app-logo" src="{{ frappe.boot.app_logo_url }}" alt="{{ __(" App Logo") }}">
         </a>
+        <button type="button" class="btn-back mr-2" onclick="window.history.back();">
+					<i class="fa-solid fa-angle-left"></i>
+				</button>
+				<a class="m-0 navbar-title" href="#">
+					{{ frappe.breadcrumbs.current_title || "Home" }}
+				</a>
       </div>
 
       			
-      <ul class="nav navbar-nav d-none d-sm-flex" id="navbar-breadcrumbs"></ul>
       <div class="collapse navbar-collapse justify-content-end">
         <form class="form-inline fill-width justify-content-end" role="search" onsubmit="return false;">
           {% if (frappe.boot.read_only) { %}
