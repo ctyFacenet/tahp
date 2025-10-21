@@ -71,7 +71,7 @@
             </a-dropdown>
 
             <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
-              class="tw-w-[220px] tw-h-[28px] tw-text-[13px] tw-rounded-md tw-border-[#2490ef] focus:tw-shadow-none"
+              class="tw-w-[300px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none"
               size="small" allowClear>
               <template #prefix>
                 <SearchOutlined class="tw-text-gray-400" />
