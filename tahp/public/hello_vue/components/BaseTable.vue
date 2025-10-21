@@ -11,16 +11,16 @@
       @scroll="handleScroll"
     >
       <table class="tw-min-w-max tw-border-collapse tw-w-full" ref="tableRef">
-        <thead class="tw-sticky tw-top-0 tw-z-10">
+        <thead class="tw-sticky tw-top-0 tw-z-20">
           <tr class="tw-bg-blue-50 tw-border-b tw-border-gray-300 tw-text-gray-700 tw-text-[13px]">
             <th
-              class="tw-sticky tw-left-0 tw-z-40 tw-bg-[#f8faff] tw-w-[45px] tw-border tw-border-gray-200 tw-text-center tw-py-2 tw-shadow-[3px_0_8px_rgba(0,0,0,0.12)]"
+              class="tw-sticky tw-left-0 tw-top-0 tw-z-40 tw-bg-[#f8faff] tw-w-[45px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]"
             >
               <input type="checkbox" ref="selectAllRef" v-model="selectAll" @change="toggleSelectAll" />
             </th>
 
             <th
-              class="tw-sticky tw-left-[45px] tw-z-40 tw-bg-[#f8faff] tw-w-[50px] tw-border tw-border-gray-200 tw-text-center tw-py-2 tw-shadow-[3px_0_8px_rgba(0,0,0,0.12)]"
+              class="tw-sticky tw-left-[45px] tw-top-0 tw-z-40 tw-bg-[#f8faff] tw-w-[50px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]"
             >
               STT
             </th>
@@ -28,9 +28,9 @@
             <th
               v-for="col in columns || []"
               :key="col.key"
-              class="tw-relative tw-px-2 tw-py-2 tw-border tw-border-gray-200 tw-font-semibold tw-group"
+              class="tw-relative tw-border tw-border-gray-200 tw-font-semibold tw-text-center tw-px-3 tw-py-2 tw-group"
               :class="{
-                'tw-sticky tw-right-0 tw-z-40 tw-bg-[#f8faff] tw-shadow-[-4px_0_8px_rgba(0,0,0,0.15)]':
+                'tw-sticky tw-right-0 tw-z-40 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                   col.key === 'actions',
               }"
               :style="{
@@ -38,17 +38,15 @@
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }"
             >
-              <div
-                class="tw-relative tw-text-center tw-font-semibold tw-px-4 tw-flex tw-items-center tw-justify-center"
-              >
+              <div class="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 <a-tooltip :title="col.title">
-                  <span class="tw-inline-block tw-max-w-[calc(100%-16px)] tw-truncate">{{ col.title }}</span>
+                  <span class="tw-truncate tw-font-semibold">{{ col.title }}</span>
                 </a-tooltip>
                 <img
                   v-if="col.key !== 'actions'"
                   src="/assets/tahp/hello_vue/assets/icons/filter.svg"
                   alt="filter"
-                  class="tw-w-3 tw-h-3 tw-opacity-70 tw-cursor-pointer hover:tw-opacity-100 tw-absolute tw-right-1 tw-top-1/2 -tw-translate-y-1/2"
+                  class="tw-w-3 tw-h-3 tw-opacity-70 tw-cursor-pointer hover:tw-opacity-100"
                 />
               </div>
 
@@ -60,15 +58,15 @@
           </tr>
 
           <tr class="tw-bg-white tw-border-b tw-border-gray-200">
-            <th class="tw-sticky tw-left-0 tw-z-30 tw-bg-[#f8faff] tw-px-2 tw-py-1 tw-border"></th>
-            <th class="tw-sticky tw-left-[45px] tw-z-30 tw-bg-[#f8faff] tw-px-2 tw-py-1 tw-border"></th>
+            <th class="tw-sticky tw-left-0 tw-top-[33px] tw-z-30 tw-bg-[#f8faff] tw-border"></th>
+            <th class="tw-sticky tw-left-[45px] tw-top-[33px] tw-z-30 tw-bg-[#f8faff] tw-border"></th>
 
             <th
               v-for="col in columns || []"
               :key="col.key"
               class="tw-px-2 tw-py-1 tw-border tw-bg-white"
               :class="{
-                'tw-sticky tw-right-0 tw-z-30 tw-bg-[#f8faff] tw-shadow-[-4px_0_8px_rgba(0,0,0,0.15)]':
+                'tw-sticky tw-right-0 tw-z-30 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                   col.key === 'actions',
               }"
               :style="{ width: colWidths[col.key] + 'px' }"
@@ -139,14 +137,15 @@
                     : 'hover:tw-bg-gray-50',
                 ]"
               >
-                <td class="tw-sticky tw-left-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
+                <td class="tw-sticky tw-left-0 tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
                   <input
                     type="checkbox"
                     :checked="selectedRows.has(row)"
                     @change="toggleRow(group.key, row, $event)"
                   />
                 </td>
-                <td class="tw-sticky tw-left-[45px] tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
+
+                <td class="tw-sticky tw-left-[45px] tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
                   {{ i + 1 + totalPreviousRows(gIndex) }}
                 </td>
 
@@ -155,7 +154,7 @@
                   :key="col.key"
                   class="tw-border tw-px-2 tw-py-1"
                   :class="{
-                    'tw-sticky tw-right-0 tw-z-20 tw-bg-[#f8faff] tw-text-center tw-shadow-[-4px_0_8px_rgba(0,0,0,0.15)]':
+                    'tw-sticky tw-right-0 tw-z-20 tw-bg-[#f8faff] tw-text-center tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                       col.key === 'actions',
                   }"
                   :style="{ width: colWidths[col.key] + 'px' }"
@@ -251,6 +250,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, watch } from "vue";
