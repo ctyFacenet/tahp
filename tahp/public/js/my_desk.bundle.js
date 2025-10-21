@@ -8,3 +8,6 @@ import "./tahp/views/reports/report_view.js";
 import "./tahp/views/reports/query_report.js";
 import "./utils/supplier_quick_entry.js";
 import "./tahp/form/controls/attach.js";
+import "./tahp/list/list_view.js";
+import "./tahp/list/bulk_operations.js";
+import "./tahp/list/list_settings.js";

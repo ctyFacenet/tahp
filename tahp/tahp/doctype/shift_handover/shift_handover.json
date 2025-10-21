@@ -8,6 +8,9 @@
  "field_order": [
   "creation_date",
   "work_order",
+  "column_break_ocis",
+  "kho_nh\u1eadp_th\u00e0nh_ph\u1ea9m",
+  "percent_gap",
   "column_break_mdwj",
   "shift_leader_1",
   "shift_leader_2",
@@ -93,13 +96,30 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "percent_gap",
+   "fieldtype": "Int",
+   "label": "Kho \u0111\u00e3 \u0111\u1ea7y bao nhi\u00eau %?",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ocis",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "work_order.fg_warehouse",
+   "fieldname": "kho_nh\u1eadp_th\u00e0nh_ph\u1ea9m",
+   "fieldtype": "Data",
+   "label": "Kho nh\u1eadp th\u00e0nh ph\u1ea9m",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-13 13:49:02.851032",
+ "modified": "2025-10-21 15:53:55.598637",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",
