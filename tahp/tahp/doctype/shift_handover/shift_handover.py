@@ -90,23 +90,7 @@ def create_shift_handover(work_order_name):
         operation_doc = frappe.get_doc('Operation', op.operation)
         shift_handover.append("table", {
             "caption": operation_doc.name,
-            "status":'',
-            "safe": '',
-            "clean": '',
-            'is_header': 1
-            
         })
-        if hasattr(operation_doc, 'custom_subtasks') and operation_doc.custom_subtasks:
-                subtasks = operation_doc.custom_subtasks
-                for subtask_row in subtasks:
-                    if hasattr(subtask_row, 'reason') and subtask_row.reason:
-                        reason = subtask_row.reason.strip()
-                        if reason :
-                            shift_handover.append("table", {
-                                "caption": reason,
-                                'is_header': 0
-                            })
-               
        
         for jd in job_cards:
             shift_handover.append("job_card_list", {
