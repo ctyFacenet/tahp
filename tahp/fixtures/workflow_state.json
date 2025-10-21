@@ -84,15 +84,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-09-07 19:30:51.370900",
-  "name": "Đợi PTCN Duyệt",
-  "style": "Warning",
-  "workflow_state_name": "Đợi PTCN Duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-09-07 19:30:37.079586",
   "name": "Đã được PTCN duyệt",
   "style": "Info",
@@ -201,24 +192,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:25.464673",
-  "name": "Nháp",
-  "style": "",
-  "workflow_state_name": "Nháp"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-10-08 15:53:23.707881",
   "name": "Đợi kế toán duyệt",
   "style": "Info",
@@ -237,10 +210,19 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-10-13 16:25:12.101138",
-  "name": "Bắt đầu",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
   "style": "",
-  "workflow_state_name": "Bắt đầu"
+  "workflow_state_name": "Nháp"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
  },
  {
   "docstatus": 0,
@@ -255,10 +237,28 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2025-10-13 16:25:12.101138",
+  "name": "Bắt đầu",
+  "style": "",
+  "workflow_state_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-09-22 14:10:19.576199",
   "name": "Draft",
   "style": "Danger",
   "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:51.370900",
+  "name": "Đợi PTCN Duyệt",
+  "style": "Warning",
+  "workflow_state_name": "Đợi PTCN Duyệt"
  },
  {
   "docstatus": 0,

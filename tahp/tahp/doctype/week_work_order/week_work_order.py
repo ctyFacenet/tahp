@@ -5,23 +5,26 @@ import frappe
 from frappe.model.document import Document
 
 class WeekWorkOrder(Document):
-	def before_save(doc):
-		if not doc.plan and doc.get("__islocal"):
-			try:
-				plan = frappe.new_doc('WWO Plan')
-				plan.insert(ignore_permissions=True)
-				doc.plan = plan.get_title()
-			except Exception as e:
-				frappe.throw(f"Lỗi: {e}")
+	def before_save(self):
+		if not self.plan and self.get("__islocal"):
+			plan = frappe.new_doc('WWO Plan')
+			plan.insert(ignore_permissions=True)
+
+			if self.code_name:
+				new_name = f"KHSX.{self.code_name}"
+				frappe.rename_doc("WWO Plan", plan.name, new_name, force=True)
+				self.plan = new_name
+			else:
+				self.plan = plan.name
 	# Kiểm tra trùng lặp LSX cùng ngày cùng ca
-		start_times = [frappe.utils.get_datetime(row.planned_start_time).date() for row in doc.items if row.planned_start_time]
-		end_times = [frappe.utils.get_datetime(row.planned_end_time).date() for row in doc.items if row.planned_end_time]
+		start_times = [frappe.utils.get_datetime(row.planned_start_time).date() for row in self.items if row.planned_start_time]
+		end_times = [frappe.utils.get_datetime(row.planned_end_time).date() for row in self.items if row.planned_end_time]
 
 		if not start_times or not end_times:
 			frappe.throw("LSX Tuần chưa khai báo đủ thời gian dự kiến bắt đầu/kết thúc")
 
-		doc.calendar_start_date = min(start_times)
-		doc.calendar_end_date = max(end_times)	
+		self.calendar_start_date = min(start_times)
+		self.calendar_end_date = max(end_times)	
 	# def before_insert(doc):
 	# 	planned_start_date = doc.planned_start_date 
 	# 	shift = doc.custom_shift

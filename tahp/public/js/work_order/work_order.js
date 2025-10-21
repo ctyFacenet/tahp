@@ -200,6 +200,11 @@ frappe.ui.form.on('Work Order Operation', {
             frappe.model.set_value(cdt, cdn, 'sequence_id', 1);
             if (operation_doc.custom_team && operation_doc.custom_team.length > 0) {
                 frappe.model.set_value(cdt, cdn, 'custom_employee', operation_doc.custom_team[0].employee);
+                frappe.model.set_value(cdt, cdn, 'custom_employee_name', operation_doc.custom_team[0].employee_name);
+                if (operation_doc.custom_team && operation_doc.custom_team.length > 1) {
+                    frappe.model.set_value(cdt, cdn, 'custom_v_employee', operation_doc.custom_team[1].employee);
+                    frappe.model.set_value(cdt, cdn, 'custom_v_employee_name', operation_doc.custom_team[1].employee_name);                    
+                }
             }
         }
     }
@@ -356,6 +361,10 @@ async function autofill_items(frm) {
                 if (op_doc.custom_team && op_doc.custom_team.length > 0) {
                     frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
                     frappe.model.set_value(row.doctype, row.name, 'custom_employee_name', op_doc.custom_team[0].employee_name);
+                    if (op_doc.custom_team && op_doc.custom_team.length > 1) {
+                        frappe.model.set_value(row.doctype, row.name, 'custom_v_employee', op_doc.custom_team[1].employee);
+                        frappe.model.set_value(row.doctype, row.name, 'custom_v_employee_name', op_doc.custom_team[1].employee_name);                    
+                    }
                 }
             }
         }

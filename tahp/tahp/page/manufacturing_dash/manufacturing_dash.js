@@ -513,9 +513,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                     grid: {
                         drawOnChartArea: false
                     },
-                    ticks: {
-                        beginAtZero: true
-                    }
+                    min: 0,
                 };
             }
 
@@ -625,8 +623,8 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                 const chartDiv = document.createElement("div");
                 chartDiv.className = "bom-chart-wrapper"; 
                 chartDiv.style.width = "100%";
-                chartDiv.style.maxWidth = "700px";
-                chartDiv.style.height = "200px";
+                chartDiv.style.maxWidth = "800px";
+                chartDiv.style.height = "250px";
                 const canvas = document.createElement("canvas");
                 chartDiv.appendChild(canvas);
                 container.appendChild(chartDiv);

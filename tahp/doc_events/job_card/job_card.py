@@ -7,37 +7,56 @@ from tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection
 @frappe.whitelist()
 def get_team(job_card):
     result = []
+    emp_code = set()  # dùng set cho nhanh
+
     doc = frappe.get_doc("Job Card", job_card)
     operation = doc.operation
     team = doc.custom_team_table
-    if not team:
-        emp_code = []
-        operation_doc = frappe.get_doc("Operation", operation)
-        if getattr(operation_doc, "custom_team", None):
-            for emp in operation_doc.custom_team:
-                if emp.employee and emp.employee not in emp_code:
-                    result.append({"employee": emp.employee, "employee_name": emp.employee_name})
-                    emp_code.append(emp.employee)
 
-        if len(result) == 0:
-            wo_doc = frappe.get_doc("Work Order", doc.work_order)
-            for op in wo_doc.operations:
-                if op.operation == operation and op.custom_employee and op.custom_employee not in emp_code:
-                     emp = frappe.get_doc("Employee", op.custom_employee)
-                     result.append({"employee": emp.employee, "employee_name": emp.employee_name})
-
-            if len(result) == 0:
-                current_user = frappe.session.user
-                current_employee = frappe.db.get_value("Employee", {"user_id":current_user}, ["name", "employee_name"])
-                if current_employee and current_employee[0] not in emp_code: 
-                    result.append({"employee": current_employee[0], "employee_name": current_employee[1]})
-
-    else:
+    # --- Nếu Job Card đã có team thì trả về luôn ---
+    if team:
         for row in team:
             result.append({
                 "employee": row.employee,
                 "employee_name": row.employee_name
             })
+        return result
+
+    # --- Bước 1: Lấy từ Work Order ---
+    wo_doc = frappe.get_doc("Work Order", doc.work_order)
+    for op in wo_doc.operations:
+        if op.operation == operation:
+            if op.custom_employee and op.custom_employee not in emp_code:
+                emp = frappe.get_doc("Employee", op.custom_employee)
+                result.append({"employee": emp.name, "employee_name": emp.employee_name})
+                emp_code.add(emp.name)
+            if op.custom_v_employee and op.custom_v_employee not in emp_code:
+                emp = frappe.get_doc("Employee", op.custom_v_employee)
+                result.append({"employee": emp.name, "employee_name": emp.employee_name})
+                emp_code.add(emp.name)
+
+    # --- Bước 2: Lấy từ Operation (MDM) nếu có ---
+    operation_doc = frappe.get_doc("Operation", operation)
+    if getattr(operation_doc, "custom_team", None):
+        for emp in operation_doc.custom_team:
+            if emp.employee and emp.employee not in emp_code:
+                result.append({"employee": emp.employee, "employee_name": emp.employee_name})
+                emp_code.add(emp.employee)
+
+    # --- Bước 3: Nếu vẫn không có ai, thêm current user ---
+    if not result:
+        current_user = frappe.session.user
+        current_employee = frappe.db.get_value(
+            "Employee",
+            {"user_id": current_user},
+            ["name", "employee_name"]
+        )
+        if current_employee:
+            result.append({
+                "employee": current_employee[0],
+                "employee_name": current_employee[1]
+            })
+
     return result
 
 def check_member(employee_id, current_job_card):
@@ -59,8 +78,7 @@ def check_member(employee_id, current_job_card):
         team_member = [r for r in team_rows if r.employee == employee_id]
         if not team_member: continue
         active_jobs.append((jc_doc, team_rows, team_member))
-
-    if len(active_jobs) > 2:
+    if len(active_jobs) > 1:
         jc_doc, team_rows, team_member = active_jobs[-1] 
 
         if len(team_rows) > 1:

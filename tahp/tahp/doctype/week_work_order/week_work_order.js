@@ -78,13 +78,14 @@ frappe.ui.form.on('Week Work Order', {
     },
     onload: function(frm) {
         show_duplicate(frm);
-        frm.set_query('bom', function(){
-             return {
-                 filters: {
-                    item :  from.doc.item 
+        frm.fields_dict["items"].grid.get_field("bom").get_query = function(doc, cdt, cdn) {
+            let row = locals[cdt][cdn];
+            return {
+                filters: {
+                    item: row.item
                 }
-            }
-        })
+            };
+        };
     },
     before_workflow_action: async function (frm) {
         if (!frm.doc.items.length) {
@@ -291,7 +292,7 @@ function validate_roles(frm) {
         });
     } else if (state === "Đợi PTCN Duyệt") {
         if (frappe.user_roles.includes('Phát triển công nghệ')) {
-            locked_fields = item_fields;
+            locked_fields = item_fields.filter(r => r != "bom");
             $('.btn-open-row').each(function() {
                 const $btn = $(this);
             

@@ -1,10 +1,16 @@
 from erpnext.manufacturing.doctype.work_order.work_order import WorkOrder as ERPWorkOrder, StockOverProductionError
 from frappe.query_builder.functions import Sum
-from frappe.utils import get_link_to_form, flt
+from frappe.utils import get_link_to_form, flt, today
 from frappe import _
 import frappe
 
 class WorkOrder(ERPWorkOrder):
+	def autoname(self):
+		date_str = frappe.utils.formatdate(today(), "yy.MM.dd")
+		prefix = f"WO.{date_str}"
+		count = frappe.db.count("Work Order", filters={"name": ["like", f"{prefix}.%"]})
+		seq = str(count + 1).zfill(3)
+		self.name = f"{prefix}.{seq}"
 
 	def update_status(self, status=None):
 		"""Update status of work order if unknown"""

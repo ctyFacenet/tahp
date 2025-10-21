@@ -4,7 +4,6 @@ from frappe.utils import get_datetime, time_diff_in_hours, flt
 
 class JobCard(ERPJobCard):
     def update_status_in_workstation(self, status):
-        print('hello')
         if not self.workstation:
             return
         ws_doc = frappe.get_doc('Workstation', self.workstation)
