@@ -7,38 +7,98 @@ from tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection
 @frappe.whitelist()
 def get_team(job_card):
     result = []
+    emp_code = set()  # dùng set cho nhanh
+
     doc = frappe.get_doc("Job Card", job_card)
     operation = doc.operation
     team = doc.custom_team_table
-    if not team:
-        emp_code = []
-        operation_doc = frappe.get_doc("Operation", operation)
-        if getattr(operation_doc, "custom_team", None):
-            for emp in operation_doc.custom_team:
-                if emp.employee and emp.employee not in emp_code:
-                    result.append({"employee": emp.employee, "employee_name": emp.employee_name})
-                    emp_code.append(emp.employee)
 
-        if len(result) == 0:
-            wo_doc = frappe.get_doc("Work Order", doc.work_order)
-            for op in wo_doc.operations:
-                if op.operation == operation and op.custom_employee and op.custom_employee not in emp_code:
-                     emp = frappe.get_doc("Employee", op.custom_employee)
-                     result.append({"employee": emp.employee, "employee_name": emp.employee_name})
-
-            if len(result) == 0:
-                current_user = frappe.session.user
-                current_employee = frappe.db.get_value("Employee", {"user_id":current_user}, ["name", "employee_name"])
-                if current_employee and current_employee[0] not in emp_code: 
-                    result.append({"employee": current_employee[0], "employee_name": current_employee[1]})
-
-    else:
+    # --- Nếu Job Card đã có team thì trả về luôn ---
+    if team:
         for row in team:
             result.append({
                 "employee": row.employee,
                 "employee_name": row.employee_name
             })
+        return result
+
+    # --- Bước 1: Lấy từ Work Order ---
+    wo_doc = frappe.get_doc("Work Order", doc.work_order)
+    for op in wo_doc.operations:
+        if op.operation == operation:
+            if op.custom_employee and op.custom_employee not in emp_code:
+                emp = frappe.get_doc("Employee", op.custom_employee)
+                result.append({"employee": emp.name, "employee_name": emp.employee_name})
+                emp_code.add(emp.name)
+            if op.custom_v_employee and op.custom_v_employee not in emp_code:
+                emp = frappe.get_doc("Employee", op.custom_v_employee)
+                result.append({"employee": emp.name, "employee_name": emp.employee_name})
+                emp_code.add(emp.name)
+
+    # --- Bước 2: Lấy từ Operation (MDM) nếu có ---
+    operation_doc = frappe.get_doc("Operation", operation)
+    if getattr(operation_doc, "custom_team", None):
+        for emp in operation_doc.custom_team:
+            if emp.employee and emp.employee not in emp_code:
+                result.append({"employee": emp.employee, "employee_name": emp.employee_name})
+                emp_code.add(emp.employee)
+
+    # --- Bước 3: Nếu vẫn không có ai, thêm current user ---
+    if not result:
+        current_user = frappe.session.user
+        current_employee = frappe.db.get_value(
+            "Employee",
+            {"user_id": current_user},
+            ["name", "employee_name"]
+        )
+        if current_employee:
+            result.append({
+                "employee": current_employee[0],
+                "employee_name": current_employee[1]
+            })
+
     return result
+
+def check_member(employee_id, current_job_card):
+    job_cards = frappe.get_all("Job Card",
+        filters={
+            "docstatus": 0,
+            "status": ["!=", "Open"],
+            "name": ["!=", current_job_card]
+        },
+        fields=["name"],
+        order_by="creation asc"
+    )
+
+    active_jobs = []
+
+    for jc in job_cards:
+        jc_doc = frappe.get_doc("Job Card", jc.name)
+        team_rows = jc_doc.custom_team_table or []
+        team_member = [r for r in team_rows if r.employee == employee_id]
+        if not team_member: continue
+        active_jobs.append((jc_doc, team_rows, team_member))
+    if len(active_jobs) > 1:
+        jc_doc, team_rows, team_member = active_jobs[-1] 
+
+        if len(team_rows) > 1:
+            from_time = now_datetime()
+            jc_doc.append("custom_teams", {
+                "employee": employee_id,
+                "employee_name": team_member[0].employee_name,
+                "from_time": from_time,
+                "exit": True
+            })
+            jc_doc.custom_team_table = [
+                r for r in team_rows if r.employee != employee_id
+            ]
+            jc_doc.save(ignore_permissions=True)
+        else:
+            frappe.throw(
+                f"Nhân viên {employee_id} không thể thêm/đổi công đoạn "
+                f"do Công đoạn {jc_doc.name} chỉ có duy nhất 1 nhân viên"
+            )
+            return        
 
 @frappe.whitelist()
 def set_team(job_card, team):
@@ -70,6 +130,7 @@ def set_team(job_card, team):
         if not emp_id or not emp_name:
             continue
         if emp_id not in existing_employees:
+            check_member(emp_id, job_card)
             row = doc.append("custom_team_table", {
                 "employee": emp_id,
                 "employee_name": emp_name
@@ -133,6 +194,8 @@ def change_member(job_card, employee, new_employee):
                 "from_time": current_time,
                 "exit": True
             })
+
+            check_member(new_employee, job_card)
 
             doc.append("custom_teams", {
                 "employee": new_employee,
@@ -259,6 +322,14 @@ def set_configs(job_card, configs=None, workstation=None):
                             "unit": config.unit, 
                             "workstation": ws.workstation
                         })
+                        if config.config_default:
+                            doc.append("custom_configs", {
+                                "config_name": config.config_name, 
+                                "config_value": config.config_default, 
+                                "unit": config.unit, 
+                                "workstation": ws.workstation,
+                                "from_time": from_time
+                            })
                 else:
                     doc.append("custom_config_table", {
                         "config_name": config.config_name, 
@@ -266,6 +337,14 @@ def set_configs(job_card, configs=None, workstation=None):
                         "unit": config.unit, 
                         "workstation": getattr(config, "workstation")
                     })
+                    if config.config_default:
+                        doc.append("custom_configs", {
+                            "config_name": config.config_name, 
+                            "config_value": config.config_default, 
+                            "unit": config.unit, 
+                            "workstation": getattr(config, "workstation"),
+                            "from_time": from_time
+                        })
         doc.save(ignore_permissions=True)
         return
 
@@ -301,7 +380,7 @@ def update_workstations(job_card, workstations):
         group_name = item.get("group_name", "")
         workstation_doc = frappe.get_doc("Workstation", workstation)
         if status == "Hỏng":
-            send_noti_workstation(doc.operation, workstation_doc.name, job_card)
+            send_noti_workstation(doc.operation, workstation_doc.name, job_card, reason)
             workstation_doc.status = "Problem"
             workstation_doc.save()
         if status == "Chạy" or status == "Dừng":
@@ -337,7 +416,7 @@ def update_workstations(job_card, workstations):
                             "from_time": from_time,
                             "reason": reason,
                             "is_danger": 1 if status == "Hỏng" else 0,
-                            "group_name": "Dừng do hỏng" if status == "Hỏng" else group_name
+                            "group_name": group_name
                         })
 
                 row.status = status
@@ -588,7 +667,7 @@ def submit(job_card):
         inspection.submit()
 
 @frappe.whitelist()
-def send_noti_workstation(operation, workstation, job_card):
+def send_noti_workstation(operation, workstation, job_card, reason):
     users = frappe.db.get_all(
         "User",
         filters={"role_profile_name": "Bảo trì", "enabled": 1},
@@ -598,7 +677,7 @@ def send_noti_workstation(operation, workstation, job_card):
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
-            "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Vui lòng kiểm tra!",
+            "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}",
             "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Vui lòng kiểm tra!",
             "document_type": "Workstation",
             "document_name": workstation,
@@ -614,8 +693,8 @@ def send_noti_workstation(operation, workstation, job_card):
             frappe.get_doc({
                 "doctype": "Notification Log",
                 "for_user": user,
-                "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
-                "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Trưởng ca vui lòng tiến hành kiểm tra",
+                "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
+                "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "document_type": "Job Card",
                 "document_name": doc.name
             }).insert(ignore_permissions=True)
@@ -688,8 +767,8 @@ def update_feedback(docname):
     for insp in inspections:
         insp_doc = frappe.get_doc("Operation Tracker Inspection", insp.name)
         update = False
-        for row in insp_doc.items:
-            if row.feedback_id and row.feedback_id == latest_fb.feedback_id:
-                row.sent = True
+        for row in insp_doc.posts:
+            if row.name == latest_fb.feedback_id:
+                row.approved_date = now_datetime()
                 update = True
         if update: insp_doc.save(ignore_permissions=True)

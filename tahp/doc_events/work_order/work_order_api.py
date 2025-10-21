@@ -22,7 +22,6 @@ def check_shift_handover(work_order, custom_plan, custom_plan_code):
             'custom_plan': custom_plan,
             'custom_plan_code': custom_plan_code,
             "name": ["!=", work_order],
-            "docstatus": 1
         },
         fields = ['name', 'creation']
     )
@@ -40,7 +39,7 @@ def check_shift_handover(work_order, custom_plan, custom_plan_code):
             for sh in shift_handover:
                 if sh.workflow_state != "Completed":
                     # link đến Shift Handover chưa Submit
-                    work_order_link = f'<a href="/app/shift-handover/{sh.name}" target="_blank">{sh.name}</a>'
+                    work_order_link = f'<a href="/app/shift-handover/{sh.name}">{sh.name}</a>'
                     return {
                         "warning": f"Biên bản giao ca <b>{work_order_link}</b> của LSX <b>{late_work_order.name}</b> chưa được hoàn thành bàn giao. Vui lòng vào biên bản để nhấn 'Nhận bàn giao'."
                     }

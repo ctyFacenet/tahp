@@ -10,6 +10,7 @@ app_license = "mit"
 
 fixtures = [
     {"doctype": "Role", "filters": [["is_custom", "=", 1]]},
+    {"dt": "Custom Field", "filters": [["fieldname", "=", "workflow_state"]]},
     {"doctype": "Workflow"},
     {"doctype": "Workflow State"},
     {"doctype": "Workflow Action Master"},
@@ -17,7 +18,6 @@ fixtures = [
     {"doctype": "Website Settings"},
     {"doctype": "System Settings"},
     {"doctype": "Custom HTML Block"},
-    {"doctype": "Downtime Reason"},
     {"doctype": "Role Profile"},
 ]
 
@@ -42,7 +42,9 @@ app_include_css = [
     "/assets/tahp/css/desk.css",
     "/assets/tahp/css/custom.css",
     "/assets/tahp/css/job_card.css",
+    "/assets/tahp/css/work_order.css",
     "/assets/tahp/css/report.css",
+    "/assets/tahp/css/tracker.css",
     "/assets/tahp/js/tahp/custom/datatable/style.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 ]
@@ -101,7 +103,8 @@ doctype_js = {
     "Warehouse": "/public/js/warehouse/warehouse.js",
     "Job Card": "/public/js/job_card/job_card.js",
     "Employee": "/public/js/employee/employee.js",
-    "Workstation": "/public/js/workstation/workstation.js"
+    "Workstation": "/public/js/workstation/workstation.js",
+    "Supplier": "/public/js/supplier/supplier.js"
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -111,7 +114,6 @@ doctype_js = {
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
-    "Job Card": ["public/js/job_card/job_card_list.js"]
 }
 
 # doctype_js = {
@@ -212,6 +214,7 @@ override_doctype_class = {
 	"Employee": "tahp.overrides.employee.Employee",
     "Stock Entry": "tahp.overrides.stock_entry.StockEntry",
     "Job Card": "tahp.overrides.job_card.JobCard",
+    "Work Order": "tahp.overrides.work_order.WorkOrder",
 }
 
 # Document Events
@@ -271,6 +274,9 @@ doc_events = {
         "after_insert": [
             "tahp.doc_events.job_card.after_insert.after_insert"
         ],
+        "on_submit": [
+            "tahp.doc_events.job_card.on_submit.on_submit"
+        ]
     },
 }
 

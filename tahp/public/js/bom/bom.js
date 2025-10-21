@@ -18,6 +18,14 @@ frappe.ui.form.on('BOM', {
                 control_operation(frm, d.doctype, d.name);
             });
         }
+        frm.set_query('item', function(doc) {
+            return {
+                filters: {
+                    "disabled": 0,
+                    "has_variants": 0 
+                }
+            };
+        });
     },
 
     with_operations: function(frm) {
@@ -42,13 +50,13 @@ frappe.ui.form.on('BOM', {
             title: `Cập nhật Hệ sản xuất: ${frm.doc.custom_category}`,
             fields: [
                 {
-                    label: "Mẫu QC đầu vào",
+                    label: "Mẫu chỉ só đầu vào",
                     fieldname: "qc_template",
                     fieldtype: "Link",
                     options: "Quality Inspection Template"
                 },
                 {
-                    label: "Mẫu QC đầu ra",
+                    label: "Mẫu chỉ số đầu ra",
                     fieldname: "qc_template_out",
                     fieldtype: "Link",
                     options: "Quality Inspection Template"
@@ -56,8 +64,8 @@ frappe.ui.form.on('BOM', {
             ],
             primary_action_label: "Xác nhận",
             primary_action(values) {
-                if (!frm.doc.custom_qc_template) frm.set_value("custom_qc_template", values.qc_template)
-                if (!frm.doc.custom_qc_template_out) frm.set_value("custom_qc_template_out", values.qc_template_out);
+                if (!frm.doc.custom_qc_template || frm.doc.custom_qc_template !== values.qc_template) frm.set_value("custom_qc_template", values.qc_template)
+                if (!frm.doc.custom_qc_template_out || frm.doc.custom_qc_template_out !== values.qc_template_out) frm.set_value("custom_qc_template_out", values.qc_template_out);
                 frappe.db.set_value("Manufacturing Category",frm.doc.custom_category,{qc_template: values.qc_template, qc_template_out: values.qc_template_out})
                 d.hide();
             }
@@ -80,6 +88,7 @@ frappe.ui.form.on('BOM Item', {
             frappe.model.set_value(cdt, cdn, "source_warehouse", null);
             return;
         }
+        frappe.model.set_value(cdt, cdn, "bom_no", null);
         if (row.source_warehouse) return;
         let { message } = await frappe.db.get_value("Item", row.item_code, "item_group");
         if (!message || !message.item_group) return;
@@ -136,7 +145,7 @@ function control_operation(frm, cdt, cdn) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (frm.doc.docstatus === 0) {
+        // if (frm.doc.docstatus === 0) {
             let dialog = new frappe.ui.Dialog({
                 title: 'Chọn công đoạn muốn theo dõi SL',
                 fields: [
@@ -165,21 +174,21 @@ function control_operation(frm, cdt, cdn) {
             });
 
             dialog.show();
-        } else {
-            let dialog = new frappe.ui.Dialog({
-                title: 'Danh sách công đoạn đã chọn',
-                fields: [
-                    {
-                        fieldname: 'ops_html',
-                        fieldtype: 'HTML',
-                        options: selectedOps.length > 0
-                            ? `<ul style="padding-left:16px; margin:0;font-size:15px;">${selectedOps.map(op => `<li>${op}</li>`).join("")}</ul>`
-                            : '<p><i>Không có công đoạn nào</i></p>'
-                    }
-                ]
-            });
-            dialog.show();            
-        }
+        // } else {
+        //     let dialog = new frappe.ui.Dialog({
+        //         title: 'Danh sách công đoạn đã chọn',
+        //         fields: [
+        //             {
+        //                 fieldname: 'ops_html',
+        //                 fieldtype: 'HTML',
+        //                 options: selectedOps.length > 0
+        //                     ? `<ul style="padding-left:16px; margin:0;font-size:15px;">${selectedOps.map(op => `<li>${op}</li>`).join("")}</ul>`
+        //                     : '<p><i>Không có công đoạn nào</i></p>'
+        //             }
+        //         ]
+        //     });
+        //     dialog.show();            
+        // }
 
     });
 

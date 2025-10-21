@@ -6,4 +6,8 @@ from frappe.model.document import Document
 
 
 class Shift(Document):
-	pass
+    def autoname(self):
+        if self.category:
+            self.name = f"{self.shift_name} - {self.category}"
+        else:
+            self.name = self.shift_name

@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-08 11:47:55.426255",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "invoice_allocation",
+  "invoice_name",
+  "invoice",
+  "column_break_hnna",
+  "supplier",
+  "stock_uom",
+  "qty",
+  "note"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fetch_from": "invoice_allocation.item_code",
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng",
+   "options": "Item"
+  },
+  {
+   "columns": 2,
+   "fetch_from": "invoice_allocation.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng"
+  },
+  {
+   "columns": 1,
+   "fetch_from": "item_code.stock_uom",
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb",
+   "options": "UOM"
+  },
+  {
+   "columns": 1,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ed1 l\u01b0\u1ee3ng"
+  },
+  {
+   "columns": 4,
+   "fetch_from": "invoice_allocation.note",
+   "fieldname": "note",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ghi ch\u00fa"
+  },
+  {
+   "fieldname": "column_break_hnna",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "invoice_allocation",
+   "fieldtype": "Link",
+   "label": "B\u1ea3n ghi nh\u1eadp xu\u1ea5t c\u00f3 h\u00f3a \u0111\u01a1n",
+   "options": "Custom Invoice Allocation"
+  },
+  {
+   "fetch_from": "invoice_allocation.invoice",
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "H\u00f3a \u0111\u01a1n",
+   "options": "Custom Invoice",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "invoice_allocation.supplier",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "invoice_allocation.s\u1ed1_h\u00f3a_\u0111\u01a1n",
+   "fieldname": "invoice_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "S\u1ed1 h\u00f3a \u0111\u01a1n",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-08 15:45:20.676486",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Custom Invoice Summary Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

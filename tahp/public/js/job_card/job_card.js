@@ -16,18 +16,12 @@ frappe.ui.form.on('Job Card', {
         frm.comment_box.comment_wrapper.hide()
 
         let background = '#f4f7fc';
-        const isMobile = window.innerWidth <= 768;
 
         // Lấy wrapper chỉ cho form này
         let $wrapper = $(frm.$wrapper);
 
         $wrapper.find('.tab-content').css({'background': background})
         $wrapper.find('.page-container').css({'background': background})
-        if (isMobile) {
-            $wrapper.find('.form-tabs-list').css({'background': background, 'display': 'none'})
-        } else {
-            $wrapper.find('.form-tabs-list').css({'background': background})
-        }
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item').css({'background': background})
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item .nav-link').css({'background': background})
         $wrapper.find('.layout-main').css({'margin-inline': '-30px'})
@@ -126,33 +120,7 @@ frappe.ui.form.on('Job Card', {
                             label: "Báo hỏng",
                             class: "btn btn-sm btn-warning jc-btn",
                             condition: (row) => row.status !== "Hỏng" && row.status !== "Sẵn sàng",
-                            handler: async (row) => {
-                                frappe.prompt(
-                                    [
-                                        {
-                                            fieldname: "reason",
-                                            fieldtype: "Data",
-                                            label: "Lý do hỏng",
-                                            reqd: 1
-                                        }
-                                    ],
-                                    async (values) => {
-                                        await frappe.call({
-                                            method: "tahp.doc_events.job_card.job_card.update_workstations",
-                                            args: {
-                                                job_card: frm.doc.name,
-                                                workstations: [{
-                                                    ...row,
-                                                    status: "Hỏng",
-                                                    reason: values.reason
-                                                }]
-                                            }
-                                        });
-                                    },
-                                    "Nhập lý do hỏng",
-                                    "Xác nhận"
-                                );
-                            },
+                            handler: async (row) => await frm.events.problem_workstation(frm, row),
                         },
                         {
                             label: "Khôi phục",
@@ -368,7 +336,7 @@ frappe.ui.form.on('Job Card', {
 
     update_feedback: async function(frm, $col0) {
         const tracker = frm.doc.custom_tracker;
-        if (!tracker || !tracker.length) {
+        if (!tracker || !tracker.length || frm.doc.docstatus != 0) {
             $col0.hide();
             return;
         }
@@ -847,6 +815,11 @@ frappe.ui.form.on('Job Card', {
         let desktopInputs = [];
         data.forEach((row, rowIndex) => {
             let $tr = $('<tr></tr>')
+            if (rowIndex % 2 === 0) {
+                $tr.css("background-color", "#f5f5f5ff");
+            } else {
+                $tr.css("background-color", "#ffffff");
+            }
             columns.forEach(col => {
                 let $td
                 if (col.action && frm.doc.docstatus === 0) {
@@ -867,6 +840,7 @@ frappe.ui.form.on('Job Card', {
                         $input.attr('data-fieldname', col.fieldname);
                         $input.attr('data-rowindex', rowIndex);
                         $input.css('pointer-events', 'none')
+                        $input.css('background', 'transparent')
                         $td = $('<td></td>');
                         desktopInputs.push($input);
                         $td.append($input);
@@ -1210,6 +1184,11 @@ frappe.ui.form.on('Job Card', {
                     args: { job_card: frm.doc.name }
                 })).message;
 
+                if (!workstations || workstations.length === 0) {
+                    frappe.msgprint("Không có thiết bị nào để chọn.");
+                    return reject();
+                }
+
                 const d = new frappe.ui.Dialog({
                     title: 'Chọn thiết bị',
                     fields: [{ fieldname: "html_table", fieldtype: "HTML" }],
@@ -1227,19 +1206,35 @@ frappe.ui.form.on('Job Card', {
 
                 const renderTable = () => {
                     const html = `<table class="table table-bordered">
-                        <thead style="background: #eee"><tr><th>Tên thiết bị</th><th>Hành động</th></tr></thead>
-                        <tbody>${workstations.map((ws,i) =>
-                            `<tr>
-                                <td>${ws.workstation}</td>
-                                <td><button class="btn btn-xs btn-danger" data-idx="${i}">Xóa</button></td>
-                            </tr>`).join('')}</tbody>
+                        <thead style="background: #eee">
+                            <tr>
+                                <th>Tên thiết bị</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${workstations.map((ws, i) =>
+                                `<tr>
+                                    <td>${ws.workstation}</td>
+                                    <td>
+                                        ${workstations.length > 1 
+                                            ? `<button class="btn btn-xs btn-danger" data-idx="${i}">Xóa</button>` 
+                                            : ""}
+                                    </td>
+                                </tr>`
+                            ).join('')}
+                        </tbody>
                     </table>`;
+
                     d.fields_dict.html_table.$wrapper.html(html);
-                    d.fields_dict.html_table.$wrapper.find('button').click(e => {
-                        const i = $(e.currentTarget).data('idx');
-                        workstations.splice(i,1);
-                        renderTable();
-                    });
+
+                    if (workstations.length > 1) {
+                        d.fields_dict.html_table.$wrapper.find('button').click(e => {
+                            const i = $(e.currentTarget).data('idx');
+                            workstations.splice(i, 1);
+                            renderTable();
+                        });
+                    }
                 };
 
                 renderTable();
@@ -1546,77 +1541,65 @@ frappe.ui.form.on('Job Card', {
             },
         });
 
-        const group_field = d.get_field("group_name");
+        // === LOGIC CHÍNH ===
         const reason_field = d.get_field("reason");
-        const other_reason_field = d.get_field("other_reason");
+        const group_field = d.get_field("group_name");
         const toggle_field = d.get_field("other_reason_toggle");
+        const other_reason_field = d.get_field("other_reason");
 
-        function updateReasonField(group_name, reason_field, items, ws, set_default = false) {
-            if (!group_name) {
+        // Lọc danh sách theo operation
+        let filtered = items.filter(i => i.operation === frm.doc.operation);
+        if (filtered.length === 0) {
+            filtered = items.filter(i => !i.operation || i.operation.trim() === "");
+        } else {
+            filtered = filtered.concat(items.filter(i => !i.operation || i.operation.trim() === ""));
+        }
+
+        if (filtered.length > 0) {
+            // Cập nhật danh sách lý do ban đầu
+            reason_field.df.options = filtered.map(i => i.reason).join("\n");
+            reason_field.refresh();
+
+            // Xác định default
+            let default_item = filtered.find(i => i.operation === frm.doc.operation);
+            if (!default_item) default_item = filtered[0];
+
+            if (default_item.group_name) {
+                group_field.set_value(default_item.group_name);
+            }
+            if (default_item.reason) {
+                reason_field.set_value(default_item.reason);
+            }
+        } else {
+            reason_field.wrapper.style.display = 'none';
+            group_field.wrapper.style.display = 'none';
+            toggle_field.set_value(1);
+            toggle_field.refresh();
+        }
+
+        // --- Xử lý đổi group_name ---
+        group_field.df.change = function () {
+            const selected_group = d.get_value("group_name");
+            if (!selected_group) return;
+
+            let group_filtered = filtered.filter(i => i.group_name === selected_group);
+            if (group_filtered.length === 0) {
+                // Nếu không có reason nào thuộc group này thì ẩn field reason
                 reason_field.wrapper.style.display = 'none';
-                reason_field.refresh();
                 reason_field.set_value("");
+                reason_field.refresh();
                 return;
             }
 
-            let filtered = items.filter(i => i.group_name === group_name && i.operation === ws);
-            if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
+            // Cập nhật danh sách reason cho group đã chọn
+            reason_field.df.options = group_filtered.map(i => i.reason).join("\n");
+            reason_field.refresh();
 
-            if (filtered.length > 0) {
-                reason_field.wrapper.style.display = '';
-                reason_field.df.options = filtered.map(i => i.reason).join("\n");
-                reason_field.refresh();
+            // Gán default = reason đầu tiên
+            reason_field.set_value(group_filtered[0].reason);
+        };
 
-                const current_value = reason_field.get_value();
-                const valid = filtered.some(i => i.reason === current_value);
-
-                if (!valid) {
-                    reason_field.set_value(set_default ? filtered[0].reason : "");
-                } else if (set_default && !current_value) {
-                    reason_field.set_value(filtered[0].reason);
-                }
-            } else {
-                reason_field.wrapper.style.display = 'none';
-                reason_field.refresh();
-                reason_field.set_value("");
-            }
-        }
-
-        function getDefaultGroup(groups, items, ws) {
-            let g = groups.find(g =>
-                items.some(i => i.group_name === g.group_name && i.operation === ws)
-            );
-            if (!g) {
-                const first_item = items.find(i => i.group_name);
-                if (first_item) g = groups.find(gr => gr.group_name === first_item.group_name);
-            }
-            return g ? g.group_name : "";
-        }
-
-        const ws = frm.doc.workstation;
-
-        if (!groups || groups.length === 0 || !items || items.length === 0 ) {
-            reason_field.wrapper.style.display = 'none';
-            group_field.wrapper.style.display = 'none';
-            toggle_field.set_value(1)
-            toggle_field.refresh()
-        } else {
-            const default_group = getDefaultGroup(groups, items, ws);
-
-            if (default_group) {
-                group_field.set_value(default_group);
-                updateReasonField(default_group, reason_field, items, ws, true);
-            } else {
-                reason_field.wrapper.style.display = 'none';
-                reason_field.refresh();
-            }
-
-            group_field.df.change = function () {
-                const group_name = d.get_value("group_name");
-                updateReasonField(group_name, reason_field, items, ws, true);
-            };
-        }
-
+        // Toggle cơ chế nhập lý do khác
         toggle_field.df.change = function () {
             const use_other = d.get_value("other_reason_toggle");
             if (use_other) {
@@ -1625,7 +1608,15 @@ frappe.ui.form.on('Job Card', {
                 other_reason_field.wrapper.style.display = '';
                 other_reason_field.refresh();
             } else {
-                if (!items || items.length === 0) return;
+                if (!filtered.length) return;
+                if (reason_field.wrapper.style.display == 'none') {
+                    let exists = filtered.some(row => row.group_name == d.get_value("group_name"));
+                    if (!exists) {
+                        d.set_value("other_reason_toggle", 1)
+                        other_reason_field.refresh();
+                        return;
+                    }
+                }
                 other_reason_field.wrapper.style.display = 'none';
                 other_reason_field.refresh();
                 reason_field.wrapper.style.display = '';
@@ -1635,15 +1626,14 @@ frappe.ui.form.on('Job Card', {
 
         other_reason_field.df.change = function () {
             const other = d.get_value("other_reason");
-            const reason =  d.get_value("reason");
+            const reason = d.get_value("reason");
             if (reason && other) {
                 reason_field.set_value("");
                 reason_field.refresh();
             }
-        }
+        };
 
         toggle_field.df.change();
-
         d.show();
     },
 
@@ -1669,7 +1659,7 @@ frappe.ui.form.on('Job Card', {
                         fieldname: "reason",
                         label: __("Lý do dừng"),
                         fieldtype: "Select",
-                        options: items.map(i => i.reason),
+                        options: [""],
                         in_place_edit: 1
                     },
                     {
@@ -1703,75 +1693,65 @@ frappe.ui.form.on('Job Card', {
                 },
             });
 
-            const group_field = d.get_field("group_name");
+            // === LOGIC CHÍNH ===
             const reason_field = d.get_field("reason");
-            const other_reason_field = d.get_field("other_reason");
+            const group_field = d.get_field("group_name");
             const toggle_field = d.get_field("other_reason_toggle");
+            const other_reason_field = d.get_field("other_reason");
 
-            function updateReasonField(group_name, reason_field, items, ws_list, set_default = false) {
-                if (!group_name) {
+            // Lọc danh sách theo operation
+            let filtered = items.filter(i => i.operation === frm.doc.operation);
+            if (filtered.length === 0) {
+                filtered = items.filter(i => !i.operation || i.operation.trim() === "");
+            } else {
+                filtered = filtered.concat(items.filter(i => !i.operation || i.operation.trim() === ""));
+            }
+
+            if (filtered.length > 0) {
+                // Cập nhật danh sách lý do ban đầu
+                reason_field.df.options = filtered.map(i => i.reason).join("\n");
+                reason_field.refresh();
+
+                // Xác định default
+                let default_item = filtered.find(i => i.operation === frm.doc.operation);
+                if (!default_item) default_item = filtered[0];
+
+                if (default_item.group_name) {
+                    group_field.set_value(default_item.group_name);
+                }
+                if (default_item.reason) {
+                    reason_field.set_value(default_item.reason);
+                }
+            } else {
+                reason_field.wrapper.style.display = 'none';
+                group_field.wrapper.style.display = 'none';
+                toggle_field.set_value(1);
+                toggle_field.refresh();
+            }
+
+            // --- Xử lý đổi group_name ---
+            group_field.df.change = function () {
+                const selected_group = d.get_value("group_name");
+                if (!selected_group) return;
+
+                let group_filtered = filtered.filter(i => i.group_name === selected_group);
+                if (group_filtered.length === 0) {
+                    // Nếu không có reason nào thuộc group này thì ẩn field reason
                     reason_field.wrapper.style.display = 'none';
-                    reason_field.refresh();
                     reason_field.set_value("");
+                    reason_field.refresh();
                     return;
                 }
 
-                let filtered = items.filter(i => i.group_name === group_name && ws_list.includes(i.operation));
-                if (filtered.length === 0) filtered = items.filter(i => i.group_name === group_name || !i.group_name);
+                // Cập nhật danh sách reason cho group đã chọn
+                reason_field.df.options = group_filtered.map(i => i.reason).join("\n");
+                reason_field.refresh();
 
-                if (filtered.length > 0) {
-                    reason_field.wrapper.style.display = '';
-                    reason_field.df.options = filtered.map(i => i.reason).join("\n");
-                    reason_field.refresh();
+                // Gán default = reason đầu tiên
+                reason_field.set_value(group_filtered[0].reason);
+            };
 
-                    const current_value = reason_field.get_value();
-                    const valid = filtered.some(i => i.reason === current_value);
-
-                    if (!valid) {
-                        reason_field.set_value(set_default ? filtered[0].reason : "");
-                    } else if (set_default && !current_value) {
-                        reason_field.set_value(filtered[0].reason);
-                    }
-                } else {
-                    reason_field.wrapper.style.display = 'none';
-                    reason_field.refresh();
-                    reason_field.set_value("");
-                }
-            }
-
-            function getDefaultGroup(groups, items, ws_list) {
-                let g = groups.find(g =>
-                    items.some(i => i.group_name === g.group_name && ws_list.includes(i.operation))
-                );
-                if (!g) {
-                    const first_item = items.find(i => i.group_name);
-                    if (first_item) g = groups.find(gr => gr.group_name === first_item.group_name);
-                }
-                return g ? g.group_name : "";
-            }
-
-            if (!groups || groups.length === 0 || !items || items.length === 0 ) {
-                reason_field.wrapper.style.display = 'none';
-                group_field.wrapper.style.display = 'none';
-                toggle_field.set_value(1)
-                toggle_field.refresh()
-            } else {
-                const default_group = getDefaultGroup(groups, items, ws_list);
-
-                if (default_group) {
-                    group_field.set_value(default_group);
-                    updateReasonField(default_group, reason_field, items, ws_list, true);
-                } else {
-                    reason_field.wrapper.style.display = 'none';
-                    reason_field.refresh();
-                }
-
-                group_field.df.change = function () {
-                    const group_name = d.get_value("group_name");
-                    updateReasonField(group_name, reason_field, items, ws_list, true);
-                };
-            }
-
+            // Toggle cơ chế nhập lý do khác
             toggle_field.df.change = function () {
                 const use_other = d.get_value("other_reason_toggle");
                 if (use_other) {
@@ -1780,7 +1760,15 @@ frappe.ui.form.on('Job Card', {
                     other_reason_field.wrapper.style.display = '';
                     other_reason_field.refresh();
                 } else {
-                    if (!items || items.length === 0) return;
+                    if (!filtered.length) return;
+                    if (reason_field.wrapper.style.display == 'none') {
+                        let exists = filtered.some(row => row.group_name == d.get_value("group_name"));
+                        if (!exists) {
+                            d.set_value("other_reason_toggle", 1)
+                            other_reason_field.refresh();
+                            return;
+                        }
+                    }
                     other_reason_field.wrapper.style.display = 'none';
                     other_reason_field.refresh();
                     reason_field.wrapper.style.display = '';
@@ -1790,17 +1778,80 @@ frappe.ui.form.on('Job Card', {
 
             other_reason_field.df.change = function () {
                 const other = d.get_value("other_reason");
-                const reason =  d.get_value("reason");
+                const reason = d.get_value("reason");
                 if (reason && other) {
                     reason_field.set_value("");
                     reason_field.refresh();
                 }
-            }
+            };
 
             toggle_field.df.change();
             d.show();
         });
-    }
+    },
+
+    problem_workstation: async function(frm, workstation) {
+        const response = await frappe.call({
+            method: "tahp.tahp.doctype.problem_reason.problem_reason.get"
+        });
+
+        const groups = (response.message.items || []).filter(
+            g => !g.workstation || g.workstation === frm.doc.workstation
+        );
+
+        let default_group = null;
+        if (groups.length) {
+            const matched = groups.find(g => g.workstation === frm.doc.workstation);
+            default_group = matched ? matched.group_name : groups[0].group_name;
+        } else {
+            default_group = "Hỏng máy";
+        }
+
+        const d = new frappe.ui.Dialog({
+            title: `Báo cáo hỏng máy - ${workstation.workstation}`,
+            fields: [
+                {
+                    fieldname: "group_name",
+                    label: __("Chọn phân loại"),
+                    fieldtype: "Select",
+                    options: groups.length ? groups.map(g => g.group_name) : ["Hỏng máy"],
+                    default: default_group
+                },
+                {
+                    fieldname: "reason",
+                    label: __("Mô tả sự cố"),
+                    fieldtype: "Small Text",
+                }
+            ],
+            primary_action_label: "Xác nhận",
+            primary_action: async function() {
+                const values = d.get_values();
+                if (!values) return;
+
+                if (!values.reason) {
+                    frappe.msgprint("Vui lòng nhập mô tả sự cố");
+                    return;
+                }
+
+                await frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.update_workstations",
+                    args: {
+                        job_card: frm.doc.name,
+                        workstations: [{
+                            workstation: workstation.workstation,
+                            status: "Hỏng",
+                            reason: values.reason,
+                            group_name: values.group_name ? values.group_name : null
+                        }]
+                    }
+                });
+
+                d.hide();
+            },
+        });
+
+        d.show();
+    },
 });
 
 

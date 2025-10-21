@@ -1,0 +1,227 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-05 22:29:50.325511",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "stock_entry",
+  "approved_date",
+  "status",
+  "column_break_snvz",
+  "item_code",
+  "item_name",
+  "stock_uom",
+  "amended_from",
+  "column_break_nbdw",
+  "in_qty",
+  "out_qty",
+  "type_posting",
+  "note",
+  "column_break_qsfj",
+  "invoice",
+  "s\u1ed1_h\u00f3a_\u0111\u01a1n",
+  "amount_before_tax",
+  "tax_rate",
+  "amount_after_tax",
+  "supplier"
+ ],
+ "fields": [
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o phi\u1ebfu",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "M\u00e3 phi\u1ebfu",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approved_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Ng\u00e0y ch\u1ee9ng t\u1eeb",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_snvz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.stock_uom",
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "label": "\u0110\u01a1n v\u1ecb m\u1eb7t h\u00e0ng",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_nbdw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "in_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL nh\u1eadp",
+   "read_only": 1
+  },
+  {
+   "fieldname": "out_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL xu\u1ea5t",
+   "read_only": 1
+  },
+  {
+   "columns": 3,
+   "fieldname": "note",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ghi ch\u00fa"
+  },
+  {
+   "default": "Ch\u01b0a in",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "Ch\u01b0a in\nIn xong",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Custom Invoice Allocation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "type_posting",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Ki\u1ec3u phi\u1ebfu",
+   "options": "Phi\u1ebfu nh\u1eadp\nPhi\u1ebfu xu\u1ea5t"
+  },
+  {
+   "fieldname": "column_break_qsfj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amount_before_tax",
+   "fieldtype": "Currency",
+   "label": "G\u00ed\u00e1 tr\u01b0\u1edbc thu\u1ebf",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_rate",
+   "fieldtype": "Float",
+   "label": "Thu\u1ebf su\u1ea5t",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount_after_tax",
+   "fieldtype": "Currency",
+   "label": "Gi\u00e1 sau thu\u1ebf",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "invoice",
+   "fieldtype": "Link",
+   "label": "H\u00f3a \u0111\u01a1n",
+   "options": "Custom Invoice",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "invoice.supplier",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier"
+  },
+  {
+   "fetch_from": "invoice.invoice_no",
+   "fieldname": "s\u1ed1_h\u00f3a_\u0111\u01a1n",
+   "fieldtype": "Data",
+   "label": "S\u1ed1 h\u00f3a \u0111\u01a1n",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "hide_toolbar": 1,
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-10-08 15:43:23.200123",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Custom Invoice Allocation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "read_only": 1,
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "type_posting"
+}

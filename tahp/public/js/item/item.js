@@ -10,12 +10,18 @@ frappe.ui.form.on("Item", {
     stock_uom: function(frm) {
         change_label(frm);
     },
+
     refresh: function(frm) {
         frm.set_intro("");
         frm.clear_custom_buttons();
-        frm.add_custom_button("Thêm mẫu mã cho mặt hàng", () => {
+        if (frm.is_new()) return;
+        frm.fields_dict["attributes"].grid.set_column_disp("attribute_value", true);
+        frm.add_custom_button("Thêm nhanh mẫu mã cho mặt hàng", () => {
             erpnext.item.show_multiple_variants_dialog(frm);
         })
+        frm.add_custom_button("Tạo mẫu mã mới", () => {
+            erpnext.item.show_single_variant_dialog(frm);
+        }).addClass('btn-primary')
     },
 });
 

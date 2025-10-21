@@ -41,13 +41,23 @@ from collections import Counter
 import colorsys
 
 def color_from_text(text):
-    """Tạo màu từ chuỗi"""
+    """
+    Sinh màu rực rỡ, tươi sáng, phong cách Tailwind / Material Design.
+    Mỗi text luôn ra cùng một màu ổn định.
+    """
+    # Hash chuỗi để lấy hue
     h = int(hashlib.md5(text.encode()).hexdigest(), 16)
-    hue = (h % 360) / 360.0     
-    saturation = 0.4            
-    lightness = 0.75         
+    hue = (h % 360) / 360.0   # vòng tròn màu 0–1
+
+    # Rực rỡ hơn: tăng saturation, giảm lightness nhẹ
+    saturation = 0.85         # rất đậm, gần full màu
+    lightness = 0.65           # trung bình sáng, cân đối
+
+    # Chuyển sang RGB
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
-    return '#{0:02x}{1:02x}{2:02x}'.format(int(r*255), int(g*255), int(b*255))
+
+    # RGB → hex
+    return '#{0:02x}{1:02x}{2:02x}'.format(int(r * 255), int(g * 255), int(b * 255))
 
 
 def normalize_dates(from_date, to_date):

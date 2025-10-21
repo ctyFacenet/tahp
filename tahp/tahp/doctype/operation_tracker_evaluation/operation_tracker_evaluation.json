@@ -6,13 +6,19 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "c\u00e0i_\u0111\u1eb7t_\u0111i\u1ec1u_ki\u1ec7n_section",
   "specification",
   "column_break_vcgl",
   "evaluation",
   "column_break_yrfw",
   "value",
-  "column_break_mvkw",
-  "feedback"
+  "c\u00e0i_\u0111\u1eb7t_h\u00e0nh_\u0111\u1ed9ng_section",
+  "feedback",
+  "column_break_rzer",
+  "operation",
+  "column_break_euxh",
+  "item_code",
+  "item_name"
  ],
  "fields": [
   {
@@ -55,14 +61,49 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_mvkw",
+   "fieldname": "c\u00e0i_\u0111\u1eb7t_\u0111i\u1ec1u_ki\u1ec7n_section",
+   "fieldtype": "Section Break",
+   "label": "C\u00e0i \u0111\u1eb7t \u0111i\u1ec1u ki\u1ec7n"
+  },
+  {
+   "fieldname": "c\u00e0i_\u0111\u1eb7t_h\u00e0nh_\u0111\u1ed9ng_section",
+   "fieldtype": "Section Break",
+   "label": "C\u00e0i \u0111\u1eb7t h\u00e0nh \u0111\u1ed9ng"
+  },
+  {
+   "fieldname": "column_break_rzer",
    "fieldtype": "Column Break"
+  },
+  {
+   "description": "Khi b\u1ecf tr\u1ed1ng tr\u01b0\u1eddng n\u00e0y, khuy\u1ebfn ngh\u1ecb s\u1ebd xu\u1ea5t hi\u1ec7n \u1edf phi\u1ebfu \u0111o t\u1ea1i m\u1ecdi c\u00f4ng \u0111o\u1ea1n",
+   "fieldname": "operation",
+   "fieldtype": "Link",
+   "label": "Khuy\u1ebfn ngh\u1ecb n\u00e0y \u00e1p d\u1ee5ng cho c\u00f4ng \u0111o\u1ea1n?",
+   "options": "Operation"
+  },
+  {
+   "fieldname": "column_break_euxh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Khi b\u1ecf tr\u1ed1ng tr\u01b0\u1eddng n\u00e0y, khuy\u1ebfn ngh\u1ecb s\u1ebd xu\u1ea5t hi\u1ec7n \u1edf phi\u1ebfu \u0111o kh\u00f4ng ph\u00e2n bi\u1ec7t th\u00e0nh ph\u1ea9m",
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Khuy\u1ebfn ngh\u1ecb n\u00e0y \u00e1p d\u1ee5ng cho th\u00e0nh ph\u1ea9m?",
+   "options": "Item"
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-25 16:37:36.424311",
+ "modified": "2025-10-17 00:02:51.741931",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Operation Tracker Evaluation",

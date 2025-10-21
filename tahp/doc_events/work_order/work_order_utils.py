@@ -1,147 +1,226 @@
 import frappe
-from frappe.utils import nowdate, now_datetime
-import datetime
+import json
+from frappe.utils import now_datetime, get_datetime, flt
 
 @frappe.whitelist()
-def create_qc_and_notify(job_card_name):
-    """
-    Creates Quality Inspection documents for a specific Job Card and sends a notification.
-    """
-    try:
-        job_card = frappe.get_doc("Job Card", job_card_name, ignore_permissions=True)
-        work_order = frappe.get_doc("Work Order", job_card.work_order, ignore_permissions=True)
-        
-        # Lấy Mẫu QC từ Operation Tracker
-        op_tracker = frappe.db.get_list(
-            "Operation Tracker",
-            filters={"operation": job_card.operation},
-            fields=["qc_template", "frequency"]
-        )
-        
-        if not op_tracker or not op_tracker[0].get("qc_template"):
-            frappe.throw(f"Không tìm thấy Mẫu QC cho Công đoạn: {job_card.operation}")
-        
-        inspection_template_name = op_tracker[0].get("qc_template")
+def get_consumed_produced_items(work_order):
+    doc = frappe.get_doc("Work Order", work_order)
+    result = {"required": [], "produced": []}
+    for item in doc.required_items:
+        result["required"].append({
+            "item_code": item.item_code,
+            "item_name": item.item_name,
+            "stock_uom": item.stock_uom,
+            "standard_qty": item.required_qty,
+            "actual_qty": item.required_qty,
+            "warehouse": item.source_warehouse,
+            "posting_date": now_datetime(),
+            "type_posting": "Nguyên liệu tiêu hao",
+            "flag": False,
+        })
 
-        # Create Quality Inspection document
-        qc_doc = frappe.new_doc("Quality Inspection")
-        qc_doc.reference_type = "Job Card"
-        
-        qc_doc.reference_name = job_card_name
-        qc_doc.quality_inspection_template = inspection_template_name
-        
-        qc_doc.item_code = work_order.production_item
-        qc_doc.inspection_type = "In Process"
-        qc_doc.work_order = job_card.work_order
-        qc_doc.operation = job_card.operation
-        qc_doc.inspected_by = frappe.session.user
-        qc_doc.sample_size = 1
+    job_cards = frappe.get_all("Job Card", filters={"docstatus": 1, "work_order": work_order}, fields=["name"])
+    for jc in job_cards:
+        jc_doc = frappe.get_doc("Job Card", jc.name)
+        for row in jc_doc.custom_input_table:
+            if row.qty and row.qty > 0:
+                for item in result["required"]:
+                    if item["item_code"] == row.item_code:
+                        if not item["flag"]:
+                            item["flag"] = True
+                            item["standard_qty"] = 0
+                            item["actual_qty"] = 0
+                        item["standard_qty"] += row.qty
+                        item["actual_qty"] += row.qty
+    
+    result["produced"].append({
+            "item_code": doc.production_item,
+            "item_name": doc.item_name,
+            "stock_uom": doc.stock_uom,
+            "standard_qty": doc.qty,
+            "actual_qty": doc.qty,
+            "warehouse": doc.fg_warehouse,
+            "posting_date": now_datetime(),
+            "type_posting": "Thành phẩm",
+    })
 
-        qc_doc.insert(ignore_permissions=True)
-        
-        # Gửi thông báo đến người quản lý QC
-        qc_users = frappe.db.get_list(
-            "Has Role",
-            filters={"role": "Quality Manager"},
-            pluck="parent"
-        )
-        frappe.publish_realtime(
-            "notification",
-            {
-                "subject": "Phiếu QC mới đã được tạo",
-                "message": f"Một phiếu QC mới đã được tạo cho Công đoạn: {job_card.operation} của Lệnh sản xuất: {job_card.work_order}. Vui lòng kiểm tra.",
-                "alert_icon": "fa fa-check-circle",
-                "alert_type": "info",
-                "link": f"/app/quality-inspection/{qc_doc.name}",
-                "for_user": qc_users
-            }
-        )
-        frappe.db.commit()
-        return f"Successfully created Quality Inspection document for Job Card {job_card_name}."
-
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Error in create_qc_and_notify")
-        frappe.db.rollback()
-        return f"An error occurred: {str(e)}"
-
-def check_and_create_qc_for_job_cards():
-    """
-    Kiểm tra tất cả các Job Card đang hoạt động để xác định có cần tạo một phiếu QC mới không.
-    """
-    try:
-        # Lấy tất cả các Job Card đang hoạt động (đã được gửi)
-        active_job_cards = frappe.get_list(
-            "Job Card",
-            filters={"docstatus": 1},
-            fields=["name", "creation", "operation"]
-        )
-
-        for job_card_data in active_job_cards:
-            job_card_name = job_card_data.get("name")
-            job_card_creation = frappe.utils.get_datetime(job_card_data.get("creation"))
-            
-            op_tracker_info = frappe.db.get_value(
-                "Operation Tracker",
-                filters={"operation": job_card_data.get("operation")},
-                fieldname=["frequency", "thời_gian_chờ_lần_đầu_phút"],
-                as_dict=True
+    bom_no = frappe.db.get_value("Work Order", work_order, "bom_no")
+    bom_doc = frappe.get_doc("BOM", bom_no)
+    if bom_doc.custom_sub_items:
+        for row in bom_doc.custom_sub_items:
+            item_group = frappe.db.get_value("Item", row.item_code, "item_group")
+            warehouse = frappe.db.get_value(
+                "Item Default",
+                {"parent": item_group},
+                "default_warehouse"
             )
-            
-            if not op_tracker_info or not op_tracker_info.get("frequency"):
-                continue
-            
-            frequence_minutes = op_tracker_info.get("frequency")
-            wait_time_minutes = op_tracker_info.get("thời_gian_chờ_lần_đầu_phút") or 0
+            if not warehouse:
+                wo_doc = frappe.get_doc("Work Order", work_order)
+                warehouse = wo_doc.fg_warehouse
 
-            # Kiểm tra xem có phiếu QC nào đã được tạo cho Job Card này chưa
-            last_qc_doc = frappe.get_list(
-                "Quality Inspection",
-                filters={"reference_name": job_card_name},
-                fields=["creation"],
-                order_by="creation desc",
-                limit=1
-            )
+            for item in result["produced"]:
+                if row.item_code != item["item_code"]:
+                    result["produced"].append({
+                        "item_code": row.item_code,
+                        "item_name": row.item_name,
+                        "stock_uom": row.stock_uom,
+                        "standard_qty": 0,
+                        "actual_qty": 0,
+                        "warehouse": doc.fg_warehouse,
+                        "posting_date": now_datetime(),
+                        "type_posting": "Phụ phẩm",
+                    })
 
-            current_time = now_datetime()
-            
-            # ĐIỀU KIỆN 1: TẠO PHIẾU QC LẦN ĐẦU TIÊN
-            # Nếu chưa có phiếu QC nào được tạo cho Job Card này
-            if not last_qc_doc:
-                # Kiểm tra xem đã đủ thời gian cho lần tạo đầu tiên chưa
-                first_possible_creation_time = job_card_creation + datetime.timedelta(minutes=wait_time_minutes)
-                
-                if current_time >= first_possible_creation_time:
-                    frappe.call(
-                        fn="tahp.doc_events.work_order.work_order_utils.create_qc_and_notify", 
-                        job_card_name=job_card_name
-                    )
-                    
-            # ĐIỀU KIỆN 2: TẠO CÁC PHIẾU QC TIẾP THEO
-            # Nếu đã có ít nhất một phiếu QC
+    return result
+
+@frappe.whitelist()
+def process_consumed_produced_items(work_order, required, produced, planned_start_date=None, actual_end_date=None, raise_qc=None):
+    if isinstance(required, str): required = json.loads(required)
+    if isinstance(produced, str): produced = json.loads(produced)
+    wo_doc = frappe.get_doc("Work Order", work_order)
+
+    for item_list in [required, produced]:
+        for item in item_list:
+            if flt(item.get("actual_qty")) == 0: continue
+            doc = frappe.new_doc("Work Order Finished Item")
+            doc.work_order = work_order
+            doc.item_code = item.get("item_code")
+            doc.item_name = item.get("item_name")
+            doc.standard_qty = flt(item.get("standard_qty"))
+            doc.actual_qty = flt(item.get("actual_qty"))
+            doc.warehouse = item.get("warehouse")
+            doc.posting_date = get_datetime(actual_end_date)
+            doc.type_posting = item.get("type_posting")
+            doc.save(ignore_permissions=True)
+            doc.submit()
+
+            if doc.item_code == wo_doc.production_item:
+                wo_doc.db_set("produced_qty", doc.actual_qty)
+                noti_qc(doc)
+
             else:
-                last_qc_creation = frappe.utils.get_datetime(last_qc_doc[0].get("creation"))
-                time_elapsed = current_time - last_qc_creation
-                required_interval = datetime.timedelta(minutes=frequence_minutes)
-                
-                if time_elapsed >= required_interval:
-                    frappe.call(
-                        fn="tahp.doc_events.work_order.work_order_utils.create_qc_and_notify",
-                        job_card_name=job_card_name
-                    )
-        frappe.db.commit()
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Error in check_and_create_qc_for_job_cards")
-        frappe.db.rollback()
+                for row in wo_doc.required_items:
+                    if row.item_code == doc.item_code:
+                        row.db_set("consumed_qty", doc.actual_qty, update_modified=False)
 
-def create_test_note():
-    """
-    Tạo một tài liệu Note mới để kiểm tra xem scheduler có hoạt động không.
-    """
-    try:
-        note_doc = frappe.new_doc("Note")
-        note_doc.title = "Test Scheduler: " + str(now_datetime())
-        note_doc.content = "Tác vụ tự động đã chạy thành công."
-        note_doc.insert(ignore_permissions=True)
-        frappe.db.commit()
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Lỗi khi tạo Ghi chú test")
+
+
+    wo_doc.db_set("status", "Completed")
+    if planned_start_date:
+        wo_doc.db_set("planned_start_date", get_datetime(planned_start_date))
+    if actual_end_date:
+        wo_doc.db_set("actual_end_date", get_datetime(actual_end_date) if actual_end_date else now_datetime())
+    wo_doc.save(ignore_permissions=True)
+
+    noti_shift_handover(wo_doc)
+    update_wwo(wo_doc)
+    return
+
+def update_wwo(wo_doc):
+    if not wo_doc.custom_plan and not wo_doc.custom_plan_code: return
+    wwo = frappe.get_doc("Week Work Order", wo_doc.custom_plan)
+    work_orders = frappe.get_all(
+        "Work Order",
+        filters={"custom_plan": wo_doc.custom_plan},
+        fields=["produced_qty", "custom_plan_code"]
+    )
+    produced_map = {}
+    for wo in work_orders:
+        if not wo.custom_plan_code:
+            continue
+        produced_map.setdefault(wo.custom_plan_code, 0)
+        produced_map[wo.custom_plan_code] += wo.produced_qty or 0 
+    
+    all_done = True
+    for item in wwo.items:
+        produced = produced_map.get(item.name, 0)
+        if produced < item.qty:
+            all_done = False
+            break
+
+    if all_done and wwo.wo_status != "Completed":
+        wwo.wo_status = "Completed"
+        wwo.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def noti_qc(doc):
+    role_profile_name = "Phát triển công nghệ"
+    users = frappe.get_all("User", filters={"role_profile_name": role_profile_name}, pluck="name")
+    message = (
+        "Cần đo đạc thông số thành phẩm {item_code} {item_name} tại {warehouse}, phục vụ LSX Ca {work_order}"
+    ).format(
+        item_code=doc.get("item_code"),
+        item_name=doc.get("item_name"),
+        warehouse=doc.get("warehouse"),
+        actual_qty=doc.get("actual_qty"),
+        work_order=doc.get("work_order")
+    )
+
+    for user in users:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "subject": message,
+            "for_user": user,
+            "type": "Alert",
+            "document_type": doc.get("doctype"),
+            "document_name": doc.get("name"),
+            "email_content": message
+        }).insert(ignore_permissions=True)
+    return
+
+@frappe.whitelist()
+def reject_work_order(name, comment):
+    doc = frappe.get_doc("Work Order", name)
+    shift_leader = doc.get("custom_shift_leader")
+    
+    if shift_leader:
+        user = frappe.db.get_value("Employee", shift_leader, "user_id")
+        
+        if user:
+            subject = f"LSX ca <b style='font-weight:bold'>{name}</b> đã bị từ chối bởi quản đốc: {comment}"
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "for_user": user,
+                "subject": subject,
+                "email_content": f"<p><strong>Lý do từ chối:</strong></p><p>{comment}</p>",
+                "type": "Alert",
+                "document_type": "Work Order",
+                "document_name": doc.name
+            }).insert(ignore_permissions=True)
+    
+    doc.add_comment(
+        comment_type="Comment",
+        text=f"<strong>Quản đốc từ chối. Lý do:</strong> {comment}",
+        comment_by=frappe.session.user
+    )
+
+    doc.workflow_state = "Draft"
+    doc.save(ignore_permissions=True)
+    
+@frappe.whitelist()
+def noti_shift_handover(doc):
+    latest_handover = frappe.db.get_all(
+        'Shift Handover',
+        filters={'work_order': doc.name},
+        fields=['name'],
+        order_by='creation desc',
+        limit=1
+    )
+
+    if latest_handover:
+        handover_name = latest_handover[0].name
+        shift_leader = doc.custom_shift_leader
+        if not shift_leader: return
+        user = frappe.db.get_value("Employee", shift_leader, "user_id")
+        if not user: return
+
+        # Tạo Notification Log
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "for_user": user,
+            "subject": f"Vui lòng kiểm tra nội dung BBGC ca {handover_name} và gửi bàn giao",
+            "email_content": "Vui lòng kiểm tra nội dung BBGC và gửi bàn giao",
+            "type": "Alert",
+            "document_type": "Shift Handover",
+            "document_name": handover_name
+        }).insert(ignore_permissions=True)

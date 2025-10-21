@@ -1,0 +1,74 @@
+<div class="planner-wrapper mb-5" data-post={{post_name}}>
+    <div class="planner-desktop d-none d-md-block">
+        <div class="d-flex justify-content-between align-items-center p-2" style="background: #ededed">
+            <div class="flex justify-content-center align-items-center" style="gap:10px;">
+                <h5 class="planner-title mb-0">{{title}}</h5>
+                {% if edit %} 
+                    <button class="btn btn-info btn-sm planner-flow">Thêm mặt hàng</button>
+                    <button class="btn btn-default btn-danger btn-sm planner-flow">Xóa phương án</button>
+                {% endif%}
+            </div>
+            <div>
+                {% for action in actions %}
+                    <button class="btn btn-default btn-primary btn-sm planner-flow ml-2">{{action}}</button>
+                {% endfor %}            
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="table table-bordered table-sm my-0">
+                <thead class="thead-light">
+                <tr class="text-nowrap">
+                    <th style="width:60px; text-align:center">Mã mặt hàng</th>
+                    <th style="min-width:100px;max-width:150px; text-align:center">Tên mặt hàng</th>
+                    <th style="min-width:70px;max-width:70px; text-align:center">DVT</th>
+                    <th style="min-width:80px;max-width:80px; text-align:center">SL</th>
+                    <th style="min-width:100px;max-width:100px; text-align:center">BOM</th>
+                    <th style="min-width:110px;max-width:110px; text-align:center">Bắt đầu</th>
+                    <th style="min-width:110px;max-width:110px; text-align:center">Kết thúc</th>
+                    <th style="width:600px; min-width:200px; max-width:800px; text-align:center">Ghi chú</th>
+                    {% if edit %}
+                        <th style="min-width:80px;">Thao tác</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr data-post="{{ row.post_name }}" data-item="{{ row.item_name }}">
+                            {% for field, value in row.items() %}
+                                {% if field != "materials" and field != "item_name" and field != "post_name" %}
+                                    <td>
+                                        {% if edit %}
+                                            {% if field in lock %}
+                                            <div contenteditable="false"
+                                                class="form-control"
+                                                style="cursor: not-allowed; min-height:1.8em;white-space:pre-wrap;word-break:break-word;resize:none;height:fit-content">{{ value }}</div>
+                                            {% else %}
+                                            <div contenteditable="true"
+                                                class="form-control"
+                                                style="min-height:1.8em;white-space:pre-wrap;word-break:break-word;resize:none;height:fit-content">{{ value }}</div>
+                                            {% endif %}
+                                        {% else %}
+                                            <div style="white-space: pre-wrap;">{{ value }}</div>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        {% if edit %} 
+                            <td class="text-center">
+                                <button class="btn btn-default btn-danger">Xóa</button>
+                            </td>
+                        {% endif %}                        
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+
+    <div class="planner-mobile d-block d-md-none">
+        Mobile view
+    </div>    
+</div>

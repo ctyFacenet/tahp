@@ -6,8 +6,60 @@ def before_submit(doc, method):
     check_workstation(doc)
     warn_workstation(doc)
     execute_shift_handover(doc)
+    update_wwo(doc)
     doc.status = "In Process"
 
+def update_wwo(doc):
+    if not doc.custom_plan: return
+    wwo = frappe.get_doc("Week Work Order", doc.custom_plan)
+    if wwo.wo_status != "In Process":
+        wwo.wo_status = "In Process"
+        wwo.save(ignore_permissions=True)
+
+def check_stock_qty(doc):
+    if not doc.required_items:
+        return
+
+    issues = []
+    for item in doc.required_items:
+        if item.required_qty > (item.available_qty_at_source_warehouse or 0):
+            issues.append({
+                "item_code": item.item_code,
+                "item_name": item.item_name or doc.item_name or "",
+                "required": item.required_qty,
+                "available": item.available_qty_at_source_warehouse,
+            })
+
+    if issues:
+        # tạo bảng HTML
+        table_rows = "".join(
+            f"<tr>"
+            f"<td>{i['item_code']}</td>"
+            f"<td>{i['item_name']}</td>"
+            f"<td>{i['required']}</td>"
+            f"<td>{i['available']}</td>"
+            f"</tr>"
+            for i in issues
+        )
+        msg = f"""
+        <div>
+            <table class="table table-bordered table-sm" style="margin:0px">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Mã hàng</th>
+                        <th>Tên mặt hàng</th>
+                        <th>SL yêu cầu</th>
+                        <th>SL có sẵn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {table_rows}
+                </tbody>
+            </table>
+        </div>
+        """
+        frappe.throw(msg=msg, title="Kho đang thiếu số lượng nguyên vật liệu")
+            
 def check_shift_leader(doc):
     if doc.custom_shift_leader:
         leader_user = frappe.db.get_value("Employee", doc.custom_shift_leader, "user_id")
@@ -247,3 +299,22 @@ def get_shift_progress():
         })
 
     return result
+
+@frappe.whitelist()
+def update_dates(work_order_name, actual_start_date=None, actual_end_date=None, planned_start_date=None, planned_end_date=None):
+    """Cho phép Administrator cập nhật lại các mốc thời gian của Work Order"""
+    if frappe.session.user != "Administrator":
+        frappe.throw("Chỉ Administrator mới được phép chỉnh sửa các trường này.")
+
+    wo = frappe.get_doc("Work Order", work_order_name)
+
+    if actual_start_date:
+        wo.actual_start_date = actual_start_date
+    if actual_end_date:
+        wo.actual_end_date = actual_end_date
+    if planned_start_date:
+        wo.planned_start_date = planned_start_date
+    if planned_end_date:
+        wo.planned_end_date = planned_end_date
+
+    wo.save(ignore_permissions=True)

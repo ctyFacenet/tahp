@@ -7,15 +7,14 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
+  "item_name",
   "bom",
   "uom",
   "qty",
   "pl_qty",
   "got_qty",
   "planned_start_time",
-  "planned_end_time",
-  "scrap",
-  "item_name"
+  "planned_end_time"
  ],
  "fields": [
   {
@@ -75,7 +74,7 @@
    "fieldname": "planned_start_time",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "D\u1ef1 ki\u1ebfn b\u1eaft \u0111\u1ea7u",
+   "label": "B\u1eaft \u0111\u1ea7u",
    "reqd": 1
   },
   {
@@ -83,28 +82,24 @@
    "fieldname": "planned_end_time",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "D\u1ef1 ki\u1ebfn k\u1ebft th\u00fac",
+   "label": "K\u1ebft th\u00fac",
    "reqd": 1
   },
   {
-   "default": "0",
-   "fetch_from": "item.custom_scrap",
-   "fieldname": "scrap",
-   "fieldtype": "Check",
-   "label": "Ph\u1ee5 ph\u1ea9m"
-  },
-  {
+   "columns": 2,
    "fetch_from": "item.item_name",
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "label": "T\u00ean m\u1eb7t h\u00e0ng"
+   "in_list_view": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-26 10:25:35.804118",
+ "modified": "2025-10-17 00:20:49.240082",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order Item",

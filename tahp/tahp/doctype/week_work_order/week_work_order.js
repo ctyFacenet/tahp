@@ -32,10 +32,11 @@ frappe.ui.form.on('Week Work Order', {
         
         frm.fields_dict['items'].grid.get_field('item').get_query = function (doc, cdt, cdn) {
             return {
-                filters: [
-                    ["Item", "item_group", "like", "%Sản phẩm%"],
-                    ["Item", "disabled", "=", 0]
-                ]
+                filters: {
+                    "item_group": ["like", "%Sản phẩm%"],
+                    "disabled": 0,
+                    "has_variants": 0   // Chỉ lấy item thường, không phải template
+                }
             };
         };
         
@@ -77,13 +78,14 @@ frappe.ui.form.on('Week Work Order', {
     },
     onload: function(frm) {
         show_duplicate(frm);
-        frm.set_query('bom', function(){
-             return {
-                 filters: {
-                    item :  from.doc.item 
+        frm.fields_dict["items"].grid.get_field("bom").get_query = function(doc, cdt, cdn) {
+            let row = locals[cdt][cdn];
+            return {
+                filters: {
+                    item: row.item
                 }
-            }
-        })
+            };
+        };
     },
     before_workflow_action: async function (frm) {
         if (!frm.doc.items.length) {
@@ -93,7 +95,7 @@ frappe.ui.form.on('Week Work Order', {
         }
 
         if (frm.doc.workflow_state === "Đợi PTCN Duyệt" && frm.selected_workflow_action !== "Trả về KHSX") {
-            let missing_bom = frm.doc.items.some(row => row.scrap != 1 && !row.bom);
+            let missing_bom = frm.doc.items.some(row => !row.bom);
             if (missing_bom) {
                 frappe.dom.unfreeze();
                 frappe.throw(__("Vui lòng điền đầy đủ BOM cho tất cả dòng trong bảng"));
@@ -107,20 +109,20 @@ frappe.ui.form.on('Week Work Order', {
         }
         
         if (frm.doc.workflow_state === "Đã được PTCN duyệt" && frm.selected_workflow_action === "Gửi GĐ") {
-            frappe.dom.unfreeze();
-            // const ok = true;
-            let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
-            const { ok, messages } = res;
-            if (!ok) {
-                const table = missing_material(messages);
-                frappe.msgprint({
-                    title: "Thiếu nguyên liệu",
-                    message: table,
-                    indicator: "red"
-                });
+            // frappe.dom.unfreeze();
+            // // const ok = true;
+            // let res = await frappe.call({ method: "tahp.api.check_wwo", args: { detail: frm.doc.items } });
+            // const { ok, messages } = res;
+            // if (!ok) {
+            //     const table = missing_material(messages);
+            //     frappe.msgprint({
+            //         title: "Thiếu nguyên liệu",
+            //         message: table,
+            //         indicator: "red"
+            //     });
         
-                // throw __("Không thể gửi Giám đốc duyệt khi LSX đang thiếu nguyên liệu");
-            }
+            //     // throw __("Không thể gửi Giám đốc duyệt khi LSX đang thiếu nguyên liệu");
+            // }
         }
         
         if (frm.doc.workflow_state === "Nháp" && !frm.doc.plan) {
@@ -180,19 +182,19 @@ frappe.ui.form.on('Week Work Order Item', {
         let row = locals[cdt][cdn];
         row.bom = null;
 
-        if (row.item) {
-            try {
-                let res = await frappe.db.get_value("Item", row.item, "custom_scrap");
-                if (res && res.message && res.message.custom_scrap == 1) {
-                    row.scrap = 1;
-                } else {
-                    row.scrap = 0;
-                }
-                frm.refresh_field('items');
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        // if (row.item) {
+        //     try {
+        //         let res = await frappe.db.get_value("Item", row.item, "custom_scrap");
+        //         if (res && res.message && res.message.custom_scrap == 1) {
+        //             row.scrap = 1;
+        //         } else {
+        //             row.scrap = 0;
+        //         }
+        //         frm.refresh_field('items');
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        // }
         frm.refresh_field('item');
         validate_roles(frm);
     },
@@ -208,7 +210,7 @@ frappe.ui.form.on('Week Work Order Item', {
     bom: async function(frm, cdt, cdn) {
         let row = locals[cdt][cdn];
         if (
-            row.scrap != 1 &&
+            // row.scrap != 1 &&
             frm.doc.workflow_state === "Đợi PTCN Duyệt" &&
             frm.selected_workflow_action !== "Trả về KHSX" &&
             row.bom
@@ -290,7 +292,7 @@ function validate_roles(frm) {
         });
     } else if (state === "Đợi PTCN Duyệt") {
         if (frappe.user_roles.includes('Phát triển công nghệ')) {
-            locked_fields = item_fields.filter(f => f !== 'bom');
+            locked_fields = item_fields.filter(r => r != "bom");
             $('.btn-open-row').each(function() {
                 const $btn = $(this);
             
@@ -392,31 +394,31 @@ function validate_roles(frm) {
 
 function validate_dates(cdt, cdn) {
     let row = locals[cdt][cdn];
-    if (row.scrap == 1) {
-        return;
-    }
+    // if (row.scrap == 1) {
+    //     return;
+    // }
     let today = frappe.datetime.get_today();
 
     let start = row.planned_start_time;
     let end = row.planned_end_time;
 
-    // Nếu có ngày bắt đầu
-    if (start) {
-        if (start < today) {
-            frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
-            frappe.model.set_value(cdt, cdn, 'planned_start_time', null);
-            return;
-        }
-    }
+    // // Nếu có ngày bắt đầu
+    // if (start) {
+    //     if (start < today) {
+    //         frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
+    //         frappe.model.set_value(cdt, cdn, 'planned_start_time', null);
+    //         return;
+    //     }
+    // }
 
-    // Nếu có ngày kết thúc
-    if (end) {
-        if (end < today) {
-            frappe.model.set_value(cdt, cdn, 'planned_end_time', null);
-            frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
-            return;
-        }
-    }
+    // // Nếu có ngày kết thúc
+    // if (end) {
+    //     if (end < today) {
+    //         frappe.model.set_value(cdt, cdn, 'planned_end_time', null);
+    //         frappe.msgprint(__('Không được chọn ngày trong quá khứ'));
+    //         return;
+    //     }
+    // }
 
     // Nếu cả hai đều có
     if (start && end) {
@@ -473,7 +475,6 @@ async function open_create_shift_dialog(frm) {
     }
 
     const options = detail_rows
-        .filter(row => row.scrap != 1) // bỏ qua scrap = 1
         .map((row, idx) => ({
             label: `Mặt hàng: ${idx + 1}: ${row.item || row.bom}`,
             value: row.name
@@ -501,30 +502,33 @@ async function open_create_shift_dialog(frm) {
                         dialog.set_value('bom', row.bom);
                         dialog.set_value('item', row.item);
                         dialog.set_value('qty', remaining_qty);
-                        dialog.set_value('note', row.note);
+                        dialog.set_value('note', '');
                         dialog.set_value('planned_start_time', row.planned_start_time);
                         dialog.set_value('produced_qty', row.got_qty || 0);
                         dialog.set_value('planned_qty', row.pl_qty || 0);
+                        dialog.set_value('uom', row.uom);
                     }
                 }
             },
 
             { fieldname: 'section1', fieldtype: 'Section Break', label: '' },
 
-            { fieldname: 'bom', label: 'Công thức sản xuất', fieldtype: 'Data' },
+            { fieldname: 'uom', label: 'Đơn vị đo', fieldtype: 'Link', options: "UOM", default: "Tấn"},
             { fieldname: 'item', label: 'Mã hàng', fieldtype: 'Data' },
             { fieldname: 'qty', label: 'Chọn số lượng thành phẩm', fieldtype: 'Float' },
             { fieldname: 'produced_qty', label: 'Tiến độ hiện tại: SL đã sản xuất xong', fieldtype: 'Float', read_only: 1 },
             { fieldname: 'planned_qty', label: 'Tiến độ hiện tại: SL đã lên lịch sản xuất', fieldtype: 'Float', read_only: 1 },
 
             { fieldname: 'col_break_1', fieldtype: 'Column Break' },
+            { fieldname: 'bom', label: 'Công thức sản xuất', fieldtype: 'Data' },
             { fieldname: 'worker_qty', label: 'Số lượng công nhân', fieldtype: 'Int' },
             { fieldname: 'planned_start_time', label: 'Ngày dự kiến thực hiện', fieldtype: 'Date' },
             { fieldname: 'shift', label: 'Ca', fieldtype: 'Link', options: 'Shift', reqd: 1 },
             { fieldname: 'shift_leader', label: 'Trưởng ca', fieldtype: 'Link', options: 'Employee', reqd: 1 },
             
             { fieldname: 'col_break_2', fieldtype: 'Column Break' },
-            { fieldname: 'note', label: 'Ghi chú', fieldtype: 'Text' },
+            { fieldname: 'default_note', label: 'Ghi chú từ LSX Tuần', fieldtype: 'Small Text', default: frm.doc.note, read_only: 1 },
+            { fieldname: 'note', label: 'Viết ghi chú cho công nhân', fieldtype: 'Text'},
         ],
         primary_action_label: 'Đồng ý',
         primary_action: async function(values) {
@@ -578,39 +582,23 @@ async function open_create_shift_dialog(frm) {
                     bom_doc.operations.map(async (op) => {
                         const operation_doc = await frappe.db.get_doc('Operation', op.operation);
                         let custom_employee = null;
-                        let tracker = null;
                         if (operation_doc.custom_team && operation_doc.custom_team.length === 1) custom_employee = operation_doc.custom_team[0].employee
-                        let trackers = await frappe.db.get_list('Operation Tracker', {
-                            filters: { operation: op.operation, docstatus: 1 },
-                            fields: ["name"],
-                            order_by: "creation desc",
-                            limit: 1
-                        });
-                        if (trackers.length > 0) tracker = 1
                         return {
                             operation: op.operation,
                             workstation: op.workstation,
                             time_in_mins: op.time_in_mins,
                             sequence_id: op.sequence_id,
                             custom_employee: custom_employee,
-                            custom_is_qc_tracked: tracker
                         };
                     })
                 );
 
-                for (let row of operations) {
-                    let op_doc = await frappe.db.get_doc("Operation", row.operation);
-                    if (op_doc.custom_team && op_doc.custom_team.length === 1) {
-                        frappe.model.set_value(row.doctype, row.name, 'custom_employee', op_doc.custom_team[0].employee);
-                    }
-
-                }
-        
                 const wo_doc = {
                     doctype: 'Work Order',
                     production_item: values.item,
                     bom_no: values.bom,
                     qty: values.qty,
+                    stock_uom: values.uom,
                     planned_start_date: values.planned_start_time,
                     planned_end_date: values.planned_start_time,
                     custom_note: values.note,
@@ -626,8 +614,6 @@ async function open_create_shift_dialog(frm) {
                     method: 'frappe.client.insert',
                     args: { doc: wo_doc }
                 });
-        
-                const wo_name = wo_res.message.name;
                 frm.reload_doc();
             } catch (err) {
                 console.log(err)
@@ -636,6 +622,7 @@ async function open_create_shift_dialog(frm) {
     });
 
     dialog.show();
+    dialog.fields_dict.note.$wrapper.find("textarea")[0].style.setProperty("height", "140px", "important");
 }
 
 async function update_quantity(frm) {

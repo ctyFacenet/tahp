@@ -42,7 +42,7 @@ Report:,Báo cáo:
 Remove column,Xóa cột
 Reset sorting,Đặt lại sắp xếp
 Add Group,Thêm nhóm
-Stock Ledger Custom,Sổ cái
+Stock Ledger Custom,Báo cáo nhập xuất kho
 Cannot cancel {0}.,Không thể hủy bỏ {0}
 Cancel {0} documents?,Hủy bỏ {0} bản ghi?
 Cancel 1 documents?,Hủy bỏ 1 bản ghi?
@@ -376,7 +376,7 @@ Purpose,Lý do
 "If your data is in HTML, please copy paste the exact HTML code with the tags.","Nếu dữ liệu của bạn được viết bằng HTML, chỉnh sửa và đính kèm toàn bộ thẻ HTML trong văn bản"
 Rate,Đơn giá
 Add field,Thêm trường
-Quality Inspection,Phiếu QC
+Quality Inspection,Phiếu kiểm tra QC
 Is Scrap Item,Là phụ phẩm
 Is Finished Item,Là thành phẩm
 Target Warehouse,Kho nhập
@@ -444,7 +444,7 @@ Open Item {0},Mở mặt hàng {0}
 Open BOM {0},Mở CTSX {0}
 Browse BOM,Duyệt cây CTSX
 Update Cost,Cập nhật giá
-Permanently Submit {0}?,Xác nhận hoàn thành {0}?
+Permanently Submit {0}?,Xác nhận duyệt {0}?
 Include Item In Manufacturing,Bao gồm mặt hàng trong sản xuất
 Is Fixed Asset,Là tài sản cố định
 Item UOM,Đơn vị mặt hàng
@@ -705,12 +705,12 @@ Cache Cleared,Đã dọn dẹp bộ đệm
 Maximum Value,Giá trị tối đa
 Minimum Value,Giá trị tối thiểu
 No.,STT
-Item Quality Inspection Parameter,Danh sách thông số QC
+Item Quality Inspection Parameter,Danh sách thông số kiểm tra QC
 Filters applied for {0},Lọc tìm kiếm theo: {0}
 {0} List,Danh sách {0}
 Advanced Search,Tìm kiếm nâng cao
 Create a new {0},Tạo mới {0}
-Quality,Phiếu QC
+Quality,Chất lượng
 Details,Chi tiết
 Disabled,Vô hiệu hóa
 Default Unit of Measure,Đơn vị đo chính
@@ -772,7 +772,7 @@ Workstation Name,Tên thiết bị/cụm thiết bị
 Description,Mô tả
 Parameter Group,Nhóm thông số
 Parameter,Thông số
-Quality Inspection Template Name,Tên mẫu QC
+Quality Inspection Template Name,Tên mẫu kiểm tra QC
 You haven't created a {0} yet,Bạn chưa tạo bản ghi {0} nào
 Is Group,Nhóm
 Parent Item Group,Theo nhóm cha
@@ -795,13 +795,13 @@ New,Mới
 Add,Thêm
 ERPNext,FaceNet
 Home,Trang chủ
-Quality Inspection Parameter,Thông số QC
+Quality Inspection Parameter,Thông số kiểm tra QC
 BOM,Công thức sản xuất (BOM)
 Routing,Quy trình sản xuất
 Operation,Công đoạn
 Workstation Type,Loại thiết bị
 Workstation,Thiết bị/Cụm thiết bị
-Quality Inspection Template,Mẫu QC
+Quality Inspection Template,Mẫu kiểm tra QC
 Item,Mặt hàng
 Item Group,Nhóm mặt hàng
 Warehouse,Nhà kho
@@ -2883,7 +2883,7 @@ Invalid Filter Value,Invalid Filter Value
 Invalid Home Page,Invalid Home Page
 Invalid Link,Invalid Link
 Invalid Login Token,Invalid Login Token
-Invalid Login. Try again.,Invalid Login. Try again.
+Invalid Login. Try again.,Sai thông tin đăng nhập. Vui lòng thử lại
 Invalid Mail Server. Please rectify and try again.,Invalid Mail Server. Please rectify and try again.
 Invalid Naming Series: {},Invalid Naming Series: {}
 Invalid Operation,Invalid Operation
@@ -5265,9 +5265,9 @@ Update from Frappe Cloud,Update from Frappe Cloud
 Updated,Updated
 Updated Successfully,Updated Successfully
 Updated To A New Version 🎉,Updated To A New Version 🎉
-Updated successfully,Updated successfully
+Updated successfully,Cập nhật thành công
 Updates,Updates
-Updating,Updating
+Updating,Đang cập nhật
 Updating Email Queue Statuses. The emails will be picked up in the next scheduled run.,Updating Email Queue Statuses. The emails will be picked up in the next scheduled run.
 Updating counter may lead to document name conflicts if not done properly,Updating counter may lead to document name conflicts if not done properly
 Updating global settings,Updating global settings
@@ -5401,7 +5401,7 @@ Verification code has been sent to your registered email address.,Verification c
 Verified,Verified
 Verify,Verify
 Verify Password,Verify Password
-Verifying...,Verifying...
+Verifying...,Đang xác thực...
 Version,Version
 Version Updated,Version Updated
 Video URL,Video URL
@@ -6102,7 +6102,7 @@ zoom-out,zoom-out
 {0} to stop receiving emails of this type,{0} to stop receiving emails of this type
 {0} to {1},{0} to {1}
 {0} un-shared this document with {1},{0} un-shared this document with {1}
-{0} values selected,{0} values selected
+{0} values selected,Đã chọn {0} giá trị 
 {0} viewed this,{0} viewed this
 {0} w,{0} w
 {0} y,{0} y
@@ -7876,7 +7876,7 @@ Create a Product,Create a Product
 Create a Quotation,Create a Quotation
 Create a Sales Item,Create a Sales Item
 Create a Sales Order,Create a Sales Order
-Create a Supplier,Create a Supplier
+Create a Supplier,Thêm nhà cung cấp
 Create a Warehouse,Create a Warehouse
 Create a new Item,Create a new Item
 Create a new composite asset,Create a new composite asset
@@ -9814,7 +9814,7 @@ Maintain Asset,Maintain Asset
 Maintain Same Rate Throughout Internal Transaction,Maintain Same Rate Throughout Internal Transaction
 Maintain Same Rate Throughout Sales Cycle,Maintain Same Rate Throughout Sales Cycle
 Maintain Same Rate Throughout the Purchase Cycle,Maintain Same Rate Throughout the Purchase Cycle
-Maintenance,Maintenance
+Maintenance,Bảo trì
 Maintenance Date,Maintenance Date
 Maintenance Details,Maintenance Details
 Maintenance Log,Maintenance Log
@@ -11123,7 +11123,7 @@ Priority is mandatory,Priority is mandatory
 Priority {0} has been repeated.,Priority {0} has been repeated.
 Probability,Probability
 Probability (%),Probability (%)
-Problem,Problem
+Problem,Hỏng
 Procedure,Procedure
 Procedures dropped,Procedures dropped
 Process Deferred Accounting,Process Deferred Accounting
@@ -12611,7 +12611,7 @@ Stock Closing,Stock Closing
 Stock Consumed During Repair,Stock Consumed During Repair
 Stock Consumption Details,Stock Consumption Details
 Stock Details,Stock Details
-Stock Entries already created for Work Order {0}: {1},Phiếu nhập thành phẩm cho LSX ca {0} đã tồn tại: {1}
+Stock Entries already created for Work Order {0}: {1},Phiếu nhập xuất cho LSX ca {0} đã tồn tại: {1}
 Stock Entry (Outward GIT),Stock Entry (Outward GIT)
 Stock Entry Child,Stock Entry Child
 Stock Entry Detail,Stock Entry Detail
@@ -12757,7 +12757,7 @@ Summary for this week and pending activities,Summary for this week and pending a
 Supplied Item,Supplied Item
 Supplied Items,Supplied Items
 Supplied Qty,Supplied Qty
-Supplier,Supplier
+Supplier,Nhà cung cấp
 Supplier Address,Supplier Address
 Supplier Address Details,Supplier Address Details
 Supplier Addresses And Contacts,Supplier Addresses And Contacts
@@ -12896,9 +12896,9 @@ Tax Assets,Tax Assets
 Tax Breakup,Tax Breakup
 Tax Category,Tax Category
 "Tax Category has been changed to \""Total\"" because all the Items are non-stock items","Tax Category has been changed to \""Total\"" because all the Items are non-stock items"
-Tax ID,Tax ID
-Tax Id,Tax Id
-Tax Id:,Tax Id:
+Tax ID,Mã số thuế
+Tax Id,Mã số thuế
+Tax Id:,Mã số thuế:
 Tax Masters,Tax Masters
 Tax Rate,Tax Rate
 Tax Rates,Tax Rates
@@ -14041,6 +14041,21 @@ Manufacturing Category Material, Gyps của hệ
 Workstation Inspection, Phiếu kiểm tra thiết bị
 Handed Over, Đã bàn giao
 Production Closing Report, Báo cáo chốt sản lượng
-Operation Tracker, Quản lí đo đạc
-Operation Tracker Inspection, Phiếu đo đạc
-Operation Tracker Evaluation, Tiêu chí đánh giá
+Operation Tracker, Cấu hình đo định kỳ
+Operation Tracker Inspection, Phiếu đo định kỳ
+Operation Tracker Evaluation, Khuyến nghị theo kết quả đo
+BOM Custom Search, Tìm kiếm BOM
+Downtime Report, Báo cáo dừng máy
+Production Order Weekly Report, Báo cáo tiến độ LSX
+Problem Reason, Lý do hỏng máy
+Production Report, Báo cáo sản lượng Thạch cao & P2O5
+Workstation Status Report, Báo cáo trạng thái thiết bị
+Material Consumption, Báo cáo tiêu hao nguyên liệu theo LSX Ca
+Production Schedule, Báo cáo tiến độ sản xuất theo LSX
+Manufacturing Dashboard, Báo cáo sản lượng theo phân loại
+Manufacturing dashboard, Báo cáo sản lượng theo phân loại
+Custom Invoice, Hóa đơn
+Custom Invoice Allocation, Phiếu nhập xuất có hóa đơn
+Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho
+Custom Invoice Summary, Phiếu tổng hợp nhập xuất có hóa đơn
+Work Order Finished Item, Kết quả LSX Ca

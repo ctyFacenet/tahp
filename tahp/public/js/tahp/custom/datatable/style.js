@@ -11,7 +11,7 @@ export default class Style {
 
         linkProperties(this, this.instance, [
             'options', 'datamanager', 'columnmanager',
-            'header', 'footer', 'bodyScrollable', 'datatableWrapper',
+            'header', 'spanHeader', 'footer', 'bodyScrollable', 'datatableWrapper',
             'getColumn', 'bodyRenderer'
         ]);
 
@@ -67,61 +67,74 @@ export default class Style {
     //     });
     // }
 
-bindScrollHeader() {
-    this._settingHeaderPosition = false;
+    bindScrollHeader() {
+        this._settingHeaderPosition = false;
 
-    $.on(this.bodyScrollable, 'scroll', (e) => {
-        if (this._settingHeaderPosition) return;
+        $.on(this.bodyScrollable, 'scroll', (e) => {
+            if (this._settingHeaderPosition) return;
 
-        this._settingHeaderPosition = true;
+            this._settingHeaderPosition = true;
 
-        requestAnimationFrame(() => {
-            const left = -e.target.scrollLeft;
+            requestAnimationFrame(() => {
+                const left = -e.target.scrollLeft;
 
-            // header
-            const headerCells = this.header.querySelectorAll('.dt-cell');
-            headerCells.forEach(cell => {
-                if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
-                    // không dịch cột cuối và cột sticky-left
-                    if (window.innerWidth >= 768) {
-                        cell.style.transform = '';
-                        cell.style.zIndex = 2;  
+                // header
+                const headerCells = this.header.querySelectorAll('.dt-cell');
+                const headerSpans = this.spanHeader.querySelectorAll('.dt-cell-span');
+                headerSpans.forEach(cell => {
+                    if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
+                        // không dịch cột cuối và cột sticky-left
+                        if (window.innerWidth >= 768) {
+                            cell.style.transform = '';
+                            cell.style.zIndex = 2;  
+                        } else {
+                            cell.style.transform = `translateX(${left}px)`;
+                        }
                     } else {
                         cell.style.transform = `translateX(${left}px)`;
                     }
-                } else {
-                    cell.style.transform = `translateX(${left}px)`;
-                }
-            });
-
-            // footer
-            const footerCells = this.footer?.querySelectorAll('.dt-cell') || [];
-            footerCells.forEach(cell => {
-                if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
-                    if (window.innerWidth >= 768) {
-                        cell.style.transform = '';
-                        cell.style.zIndex = 2;
-                    } else {
-                        cell.style.transform = `translateX(${left}px)`;
-                    }
-
-                } else {
-                    cell.style.transform = `translateX(${left}px)`;
-                }
-            });
-
-            if (this.instance.noData) {
-                $.style($('.no-data-message'), {
-                    left: `${this.instance.wrapper.clientWidth / 2 - left}px`
                 });
-            }
+                headerCells.forEach(cell => {
+                    if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
+                        // không dịch cột cuối và cột sticky-left
+                        if (window.innerWidth >= 768) {
+                            cell.style.transform = '';
+                            cell.style.zIndex = 2;  
+                        } else {
+                            cell.style.transform = `translateX(${left}px)`;
+                        }
+                    } else {
+                        cell.style.transform = `translateX(${left}px)`;
+                    }
+                });
 
-            this._settingHeaderPosition = false;
+
+                // footer
+                const footerCells = this.footer?.querySelectorAll('.dt-cell') || [];
+                footerCells.forEach(cell => {
+                    if (cell.classList.contains('sticky-right') || cell.classList.contains('sticky-left')) {
+                        if (window.innerWidth >= 768) {
+                            cell.style.transform = '';
+                            cell.style.zIndex = 2;
+                        } else {
+                            cell.style.transform = `translateX(${left}px)`;
+                        }
+
+                    } else {
+                        cell.style.transform = `translateX(${left}px)`;
+                    }
+                });
+
+                if (this.instance.noData) {
+                    $.style($('.no-data-message'), {
+                        left: `${this.instance.wrapper.clientWidth / 2 - left}px`
+                    });
+                }
+
+                this._settingHeaderPosition = false;
+            });
         });
-    });
-}
-
-
+    }
 
     onWindowResize() {
         this.distributeRemainingWidth();
