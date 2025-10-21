@@ -7,8 +7,9 @@ import "./components/hello_world.bundle.js";
 import "./components/list_view.bundle.js";
 import "./components/dash_board_grid.bundle.js";
 import "./components/counter.bundle.js";
-import "./components/custom_sale_order.js";
-import "./components/custom_sale_order_detail.js";
+import "./components/custom_sale_order.bundle.js";
+import "./components/custom_sale_order_detail.bundle.js";
+import "./components/custom_product_order.bundle.js";
 
 frappe.provide("tahp.vue");
 tahp.vue.mountVue = mountVue;
