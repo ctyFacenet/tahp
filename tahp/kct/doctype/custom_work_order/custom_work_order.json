@@ -5,18 +5,82 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_zhyg"
+  "workordercode",
+  "status",
+  "productcode",
+  "productname",
+  "workordercreationdate",
+  "plannedstartdate",
+  "plannedenddate",
+  "productionquantity",
+  "completedquantity",
+  "unitofmeasure",
+  "createdby"
  ],
  "fields": [
   {
-   "fieldname": "section_break_zhyg",
-   "fieldtype": "Section Break"
+   "fieldname": "workordercode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 l\u1ec7nh s\u1ea3n xu\u1ea5t"
+  },
+  {
+   "default": "B\u1ea3n nh\u00e1p",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "B\u1ea3n nh\u00e1p\n\u0110\u00e3 duy\u1ec7t\n\u0110\u00e3 ho\u00e0n th\u00e0nh\n\u0110ang s\u1ea3n xu\u1ea5t\nD\u1eebng s\u1ea3n xu\u1ea5t\n\u0110\u00e3 hu\u1ef7"
+  },
+  {
+   "fieldname": "productcode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 h\u00e0ng",
+   "options": "productCode"
+  },
+  {
+   "fieldname": "productname",
+   "fieldtype": "Small Text",
+   "label": "T\u00ean h\u00e0ng"
+  },
+  {
+   "fieldname": "workordercreationdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o l\u1ec7nh"
+  },
+  {
+   "fieldname": "plannedstartdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y b\u1eaft \u0111\u1ea7u d\u1ef1 ki\u1ebfn"
+  },
+  {
+   "fieldname": "plannedenddate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y k\u1ebft th\u00fac d\u1ef1 ki\u1ebfn"
+  },
+  {
+   "fieldname": "productionquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng s\u1ea3n xu\u1ea5t"
+  },
+  {
+   "fieldname": "completedquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng ho\u00e0n th\u00e0nh"
+  },
+  {
+   "fieldname": "unitofmeasure",
+   "fieldtype": "Small Text",
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
+  },
+  {
+   "fieldname": "createdby",
+   "fieldtype": "Small Text",
+   "label": "Ng\u01b0\u1eddi t\u1ea1o l\u1ec7nh"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-15 10:27:46.840713",
+ "modified": "2025-10-22 09:12:09.072388",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Work Order",
