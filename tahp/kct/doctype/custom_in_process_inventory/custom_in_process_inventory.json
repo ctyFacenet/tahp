@@ -5,18 +5,92 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_ffb5"
+  "materialgroup",
+  "warehousename",
+  "materialtype",
+  "materialcode",
+  "materialname",
+  "classification",
+  "openingbalance",
+  "quantityin",
+  "quantityout",
+  "closingbalance",
+  "stocktakingquantity",
+  "quantitydifference",
+  "unitofmeasure"
  ],
  "fields": [
   {
-   "fieldname": "section_break_ffb5",
-   "fieldtype": "Section Break"
+   "fieldname": "warehousename",
+   "fieldtype": "Small Text",
+   "label": "T\u00ean kho"
+  },
+  {
+   "fieldname": "materialgroup",
+   "fieldtype": "Small Text",
+   "label": "Nh\u00f3m v\u1eadt t\u01b0"
+  },
+  {
+   "fieldname": "materialtype",
+   "fieldtype": "Small Text",
+   "label": "Lo\u1ea1i v\u1eadt t\u01b0"
+  },
+  {
+   "fieldname": "materialcode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 v\u1eadt t\u01b0"
+  },
+  {
+   "fieldname": "materialname",
+   "fieldtype": "Small Text",
+   "label": "T\u00ean v\u1eadt t\u01b0"
+  },
+  {
+   "fieldname": "classification",
+   "fieldtype": "Small Text",
+   "label": "Ph\u00e2n lo\u1ea1i"
+  },
+  {
+   "fieldname": "openingbalance",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 k\u1ef3 \u0111\u1ea7u (1)"
+  },
+  {
+   "fieldname": "quantityin",
+   "fieldtype": "Float",
+   "label": "Nh\u1eadp (2)"
+  },
+  {
+   "fieldname": "quantityout",
+   "fieldtype": "Float",
+   "label": "Xu\u1ea5t (3)"
+  },
+  {
+   "fieldname": "closingbalance",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 cu\u1ed1i k\u1ef3 (4) = (1) + (2) - (3)"
+  },
+  {
+   "fieldname": "stocktakingquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 ki\u1ec3m k\u00ea (5)"
+  },
+  {
+   "fieldname": "quantitydifference",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 ch\u00eanh l\u1ec7ch (6) = (5) - (4)"
+  },
+  {
+   "default": "Kg",
+   "fieldname": "unitofmeasure",
+   "fieldtype": "Small Text",
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-15 10:33:19.290340",
+ "modified": "2025-10-22 15:12:53.853067",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom In Process Inventory",
