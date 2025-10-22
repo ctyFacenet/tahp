@@ -301,3 +301,41 @@ a:hover {
 .modal-content {
   top: 60px !important
 }
+
+input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 17px !important;
+  height: 17px !important;
+  border: 1px solid #2490ef !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+  background-color: #fff !important;
+  transition: all 0.2s ease-in-out !important;
+  box-sizing: border-box !important;
+}
+
+input[type="checkbox"]:hover {
+  border-color: #1677c8 !important;
+  box-shadow: 0 0 2px #2490ef80 !important;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #2490ef !important;
+  border-color: #2490ef !important;
+  background-size: 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M433.1 744.6L184.6 496.1a39.9 39.9 0 0 1 56.5-56.5l192 192 350-350a39.9 39.9 0 1 1 56.5 56.5L489.6 744.6a39.9 39.9 0 0 1-56.5 0z'/%3E%3C/svg%3E") !important;
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+input[type="checkbox"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
