@@ -6,13 +6,13 @@ frappe.listview_settings["Work Order Finished Item"] = {
             return ["Tiêu hao", "red", "type_posting,=,Nguyên liệu tiêu hao"];
         }
         if (doc.type_posting === "Thành phẩm") {
-            return ["Thành phẩm", "green"];
+            return ["Thành phẩm", "green", "type_posting,=,Thành phẩm"];
         }
         if (doc.type_posting === "Phụ phẩm") {
-            return ["Thành phẩm", "orange"];
+            return ["Phụ phẩm", "orange", "type_posting,=,Phụ phẩm"];
         }
         if (doc.type_posting === "Thành phẩm sau QC") {
-            return ["TP sau QC", "green"];
+            return ["TP sau QC", "green", "type_posting,=,Thành phẩm sau QC"];
         }
     }
 };

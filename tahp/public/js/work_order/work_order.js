@@ -252,6 +252,30 @@ async function finish_button(frm) {
 }
 
 async function complete_wo(frm) {
+    let res = await frappe.call({
+        method: "tahp.doc_events.work_order.work_order_utils.check_job_card",
+        args: { work_order: frm.doc.name }
+    });
+
+    if (res.message === false) {
+        const filters = { work_order: frm.doc.name, docstatus: 0 };
+
+        frappe.msgprint({
+            title: "Công đoạn chưa hoàn thành",
+            indicator: "red",
+            message: "Vui lòng hoàn thành toàn bộ LSX Công đoạn trên hệ thống.",
+            primary_action: {
+                label: "Xem danh sách LSX Công đoạn chưa hoàn thành",
+                action() {
+                    frappe.set_route("List", "Job Card", filters);
+                    cur_dialog.hide();
+                }
+            }
+        });
+
+        return;
+    }
+
     let d = new frappe.ui.Dialog({
         title: "Xác nhận sản lượng LSX Ca",
         size: "large",

@@ -6,7 +6,8 @@ import frappe
 
 class WorkOrder(ERPWorkOrder):
 	def autoname(self):
-		date_str = frappe.utils.formatdate(today(), "yy.MM.dd")
+		dt = self.planned_start_date if self.planned_start_date else today()
+		date_str = frappe.utils.formatdate(dt, "yy.MM.dd")
 		prefix = f"WO.{date_str}"
 		count = frappe.db.count("Work Order", filters={"name": ["like", f"{prefix}.%"]})
 		seq = str(count + 1).zfill(3)

@@ -100,8 +100,7 @@
   {
    "fieldname": "percent_gap",
    "fieldtype": "Int",
-   "label": "Kho \u0111\u00e3 \u0111\u1ea7y bao nhi\u00eau %?",
-   "reqd": 1
+   "label": "Kho \u0111\u00e3 \u0111\u1ea7y bao nhi\u00eau %?"
   },
   {
    "fieldname": "column_break_ocis",
@@ -119,7 +118,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-21 15:53:55.598637",
+ "modified": "2025-10-22 11:51:16.400909",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",
