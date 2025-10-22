@@ -218,3 +218,13 @@ def noti_shift_handover(doc):
             "document_type": "Shift Handover",
             "document_name": handover_name
         }).insert(ignore_permissions=True)
+
+@frappe.whitelist()
+def check_job_card(work_order):
+    doc = frappe.get_doc("Work Order", work_order)
+    flag = True
+    for item in doc.operations:
+        jc = frappe.db.get_all("Job Card", {"docstatus": 1, "work_order": work_order, "operation": item.operation})
+        if not jc: flag = False
+
+    return flag
