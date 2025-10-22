@@ -12,7 +12,7 @@ import "./components/custom_sale_order_detail.bundle.js";
 import "./components/custom_product_order.bundle.js";
 import "./components/custom_statistical_report.bundle.js";
 import "./components/custom_work_order.bundle.js";
-
+import "./components/custom_semi_finished_products.bundle.js";
 frappe.provide("tahp.vue");
 tahp.vue.mountVue = mountVue;
 tahp.vue.unmountVue = unmountVue;

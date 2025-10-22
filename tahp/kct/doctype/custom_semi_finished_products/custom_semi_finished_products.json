@@ -5,21 +5,127 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_xjj9"
+  "lotnumber",
+  "qrlabelcode",
+  "status",
+  "outputsfgcode",
+  "workordercode",
+  "processcode",
+  "machinename",
+  "linegroup",
+  "productionshift",
+  "operatorname",
+  "classification",
+  "actualoutputquantity",
+  "estimatedoutputquantity",
+  "grossweight",
+  "unitofmeasure",
+  "materiallotcode",
+  "labelcreationdate",
+  "labelcancellationdate"
  ],
  "fields": [
   {
-   "fieldname": "section_break_xjj9",
-   "fieldtype": "Section Break"
+   "fieldname": "lotnumber",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 lot"
+  },
+  {
+   "fieldname": "qrlabelcode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 tem Qr"
+  },
+  {
+   "default": "B\u00ecnh th\u01b0\u1eddng",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Tr\u1ea1ng th\u00e1i",
+   "options": "B\u00ecnh th\u01b0\u1eddng\nCh\u1edd h\u1ee7y\n\u0110\u00e3 h\u1ee7y\nH\u1ee7y do QC"
+  },
+  {
+   "fieldname": "outputsfgcode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 BTP \u0111\u1ea7u ra"
+  },
+  {
+   "fieldname": "workordercode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 l\u1ec7nh s\u1ea3n xu\u1ea5t"
+  },
+  {
+   "fieldname": "processcode",
+   "fieldtype": "Small Text",
+   "label": "M\u00e3 c\u00f4ng \u0111o\u1ea1n"
+  },
+  {
+   "fieldname": "linegroup",
+   "fieldtype": "Small Text",
+   "label": "Nh\u00f3m line"
+  },
+  {
+   "fieldname": "productionshift",
+   "fieldtype": "Small Text",
+   "label": "Ca s\u1ea3n xu\u1ea5t"
+  },
+  {
+   "fieldname": "operatorname",
+   "fieldtype": "Small Text",
+   "label": "Nh\u00e2n vi\u00ean th\u1ef1c hi\u1ec7n"
+  },
+  {
+   "fieldname": "actualoutputquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng \u0111\u1ea7u ra th\u1ef1c t\u1ebf"
+  },
+  {
+   "fieldname": "estimatedoutputquantity",
+   "fieldtype": "Float",
+   "label": "S\u1ed1 l\u01b0\u1ee3ng \u0111\u1ea7u ra \u01b0\u1edbc t\u00ednh"
+  },
+  {
+   "fieldname": "grossweight",
+   "fieldtype": "Float",
+   "label": "Tr\u1ecdng l\u01b0\u1ee3ng b\u00ec"
+  },
+  {
+   "default": "Kg",
+   "fieldname": "unitofmeasure",
+   "fieldtype": "Small Text",
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
+  },
+  {
+   "fieldname": "materiallotcode",
+   "fieldtype": "Small Text",
+   "label": "Lot NVL"
+  },
+  {
+   "fieldname": "labelcreationdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y t\u1ea1o tem"
+  },
+  {
+   "fieldname": "labelcancellationdate",
+   "fieldtype": "Date",
+   "label": "Ng\u00e0y h\u1ee7y tem"
+  },
+  {
+   "fieldname": "machinename",
+   "fieldtype": "Small Text",
+   "label": "M\u00e1y"
+  },
+  {
+   "fieldname": "classification",
+   "fieldtype": "Small Text",
+   "label": "Ph\u00e2n lo\u1ea1i"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-15 10:34:20.389492",
+ "modified": "2025-10-22 14:11:28.668621",
  "modified_by": "Administrator",
  "module": "KCT",
- "name": "Custom Semi-Finished Products",
+ "name": "Custom Semi Finished Products",
  "owner": "Administrator",
  "permissions": [
   {
