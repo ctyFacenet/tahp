@@ -297,3 +297,7 @@ a:hover {
   transform: none !important;
   z-index: 1050000 !important;
 }
+
+.modal-content {
+  top: 60px !important
+}
