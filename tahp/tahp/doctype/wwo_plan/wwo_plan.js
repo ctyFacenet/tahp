@@ -48,46 +48,49 @@ frappe.ui.form.on('WWO Plan Item', {
                 bomField.html(`<a href="/app/bom/${row.bom}" target="_blank">${row.bom}</a>`);
             }
         }, 100);
+        
+        if (!frappe.user_roles.includes("Giám đốc")) return;
+        // Phần hiển thị nút nếu "Đợi GĐ duyệt"
+        if (row.approved === "Đợi GĐ duyệt") {
+            setTimeout(() => {
+                    const rowWrapper = $(`[data-idx="${row.idx}"]`);
+                    const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
 
-//         if (!frappe.user_roles.includes("Giám đốc")) return;
-//         // Phần hiển thị nút nếu "Đợi GĐ duyệt"
-//         if (row.approved === "Đợi GĐ duyệt") {
-//             setTimeout(() => {
-//                 const rowWrapper = $(`[data-idx="${row.idx}"]`);
-//                 const approvedField = rowWrapper.find(`[data-fieldname="approved"] .control-value`);
+                    approvedField.html(`
+                        <div class="d-flex flex-column p-2">
+                            <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
+                            <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
+                            <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
+                        </div>
+                    `);
 
-//                 approvedField.html(`
-//                     <div class="d-flex flex-column p-2">
-//                         <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-khsx" value="${row.wwo}" style="background-color: white;">Từ chối KHSX</button>
-//                         <button class="btn btn-custom btn-sm w-100 mb-2" name="tu-choi-ptcn" value="${row.wwo}" style="background-color: white;">Từ chối PTCN</button>
-//                         <button class="btn btn-custom btn-primary btn-sm w-100" name="duyet" value="${row.wwo}">Duyệt</button>
-//                     </div>
-//                 `);
-//                 approvedField.css('pointer-events', 'none');
-//                 approvedField.find('.btn').css('pointer-events', 'auto');
-//                 // Gắn click handler
-//                 $('.btn-custom').off('click').on('click', function(e) {
-//                     e.preventDefault();
-//                     e.stopPropagation();
-//                     e.stopImmediatePropagation();
-//                     const action = $(this).attr('name');
-//                     const wwo = $(this).val();
+                    approvedField.css('pointer-events', 'none');
+                    approvedField.find('.btn').css('pointer-events', 'auto');
 
-//                     const actionHandlerMap = {
-//                         'tu-choi-khsx': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Nháp', 'Nhập lý do từ chối KHSX', 'Đã từ chối KHSX', 'KHSX', 'WWO bị từ chối KHSX', cdt, cdn),
-//                         'tu-choi-ptcn': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Đợi PTCN duyệt', 'Nhập lý do từ chối PTCN', 'Đã từ chối PTCN', 'PTCN', 'WWO bị từ chối PTCN', cdt, cdn),
-//                         'duyet': (frm, wwo) => approved_mobile(frm, wwo, cdt, cdn)
-//                     };
+                    // Gắn click handler
+                    $('.btn-custom').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
 
-//                     if (actionHandlerMap[action]) {
-//                         actionHandlerMap[action](frm, wwo);
-//                     }
-//                 });
-//             }, 100);
-//         }
-//     }
-// });
-    }})
+                    const action = $(this).attr('name');
+                    const wwo = $(this).val();
+
+                    const actionHandlerMap = {
+                        'tu-choi-khsx': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Nháp', 'Nhập lý do từ chối KHSX', 'Đã từ chối KHSX', 'KHSX', 'WWO bị từ chối KHSX', cdt, cdn),
+                        'tu-choi-ptcn': (frm, wwo) => process_wwo_mobile(frm, wwo, 'Đợi PTCN duyệt', 'Nhập lý do từ chối PTCN', 'Đã từ chối PTCN', 'PTCN', 'WWO bị từ chối PTCN', cdt, cdn),
+                        'duyet': (frm, wwo) => approved_mobile(frm, wwo, cdt, cdn)
+                    };
+
+                    if (actionHandlerMap[action]) {
+                        actionHandlerMap[action](frm, wwo);
+                    }
+                });
+            }, 100);
+        }
+    }
+});
+
 function setup_ui(frm) {
     $(frm.page.wrapper).find('.btn-open-row, .form-message-container').hide();
     frm.page.btn_primary.hide();
@@ -98,9 +101,6 @@ function setup_ui(frm) {
     frm.set_df_property('items', 'read_only', true);
 }
 
-function add_wwo(frm) {
-
-}
 function hook_css_cleanup() {
     if (window._wwo_css_hooked) return;
     window._wwo_css_hooked = true;
@@ -116,18 +116,13 @@ function hook_css_cleanup() {
 
 function setup_css() {
     if ($('#wwo-css').length) return;
-
+    
     $('<style>')
         .prop('type', 'text/css')
         .prop('id', 'wwo-css')
         .html(`
-            .col.grid-static-col.d-flex.justify-content-center {display:none!important;}
-            .rows .grid-row { padding-bottom: 20px;padding-top: 20px;}
-            .form-grid {border:1px solid #101010ff; border-radius:4px; box-shadow:none; margin-bottom:20px;}
-
             .rows .btn { pointer-events: auto; }
-            .row-check, div:has(>div[data-original-title="Sửa"]) { display: none !important; }
-
+        
             .btn-custom {
                 padding: 4px 10px;
                 margin-right: 8px;
@@ -154,7 +149,7 @@ function setup_css() {
                 white-space: pre-line;
                 display: none;
             }
-
+        
             .rows [data-fieldname="bom"],
             .rows [data-fieldname="item"],
             .rows [data-fieldname="wwo"],
@@ -162,7 +157,7 @@ function setup_css() {
                 pointer-events: auto;
                 cursor: pointer;
             }
-            [data-fieldname="item_name"], [data-fieldname="bom"], [data-fieldname="item"]{flex: 0 0 23.666% !important; max-width: 21.666% !important;}
+        
             @media (min-width: 768px) {
                 .rows [data-fieldname="bom"],
                 .rows [data-fieldname="item"],
@@ -204,7 +199,8 @@ function setup_hook(frm) {
     }
 }
 
-async function generate_data(frm, week) {
+function generate_data(frm, week) {
+    
     if (frm.doc.docstatus !== 0) {
         setup_hook(frm);
         return;
@@ -212,14 +208,11 @@ async function generate_data(frm, week) {
     else {
         frappe.model.clear_table(frm.doc, 'items');
         week.forEach(week => {
-            week.items.forEach(async function(row, index) {
-                console.log(row);
-                //const item = await frappe.db.get_doc('Item', row.item);
-                return frm.add_child('items', {
+            week.items.forEach((row, index) => {
+                frm.add_child('items', {
                     wwo: index === 0 ? week.name : "",
                     approved: index === 0 ? week.workflow_state : "",
                     item: row.item,
-                    item_name: row.item_name,
                     qty: row.qty,
                     bom: row.bom,
                     planned_start_time: row.planned_start_time,
@@ -237,30 +230,22 @@ async function setup_button(frm) {
     if (window.innerWidth <= 768) return;
     if (!frappe.user_roles.includes("Giám đốc")) {
         return};
-    const wrapper = frm.fields_dict.items.grid.wrapper;
+    const $wrapper = frm.fields_dict.items.grid.wrapper;
+
     $('[data-fieldname="approved"]').addClass('d-flex justify-content-center align-items-center p-0');
-    wrapper.find('.grid-body [data-fieldname="approved"]').each(function () {
+
+    $wrapper.find('[data-fieldname="approved"]').each(function () {
         const $cell = $(this);
         const cellValue = $cell.find('.static-area').text().trim();
         const rowIndex = parseInt($cell.closest('.grid-row').attr('data-idx'), 10);
         const rowData = frm.doc.items[rowIndex - 1];
-        html = cellValue === "Đợi PT duyệt"
-        ?
-        `<button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
-        <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
-        <button class="btn btn-primary btn-sm btn-custom" name="duyet2" value="${rowData.wwo}">Duyệt</button>`
-        : ` `
-        const row = $cell.closest('.grid-row');
-        row.prepend(`<div class = "data-row row d-flex justify-content-between align-items-center pb-4 font-weight-bold">
-            <div> ${rowData.wwo} </div>
-            <div>
-                ${html}
-            </div>
-            </div>`)
-        row.append(`<div class = "data-row row d-flex justify-content-between align-items-center pt-5">
-            <div> ${rowData.note?rowData.note: "Không có ghi chú"} </div>
-            </div>`)
-        $cell.find('.static-area').hide();
+        if (cellValue === "Đợi GĐ duyệt") {
+            $cell.find('.static-area').html(`
+                <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-khsx2" value="${rowData.wwo}">Từ chối KHSX</button>
+                <button class="btn btn-secondary btn-sm btn-custom" name="tu-choi-ptcn2" value="${rowData.wwo}">Từ chối PTCN</button>
+                <button class="btn btn-primary btn-sm btn-custom" name="duyet2" value="${rowData.wwo}">Duyệt</button>
+            `);
+        }
     });
 
     // Gắn sự kiện xử lý click cho các nút
@@ -411,6 +396,7 @@ async function process_wwo_mobile(frm, wwo, state, message, alert_message, role,
                 frm.refresh_field('items');
                 frm.fields_dict["items"].refresh();
                 frappe.show_alert(alert_message);
+
                 $('.modal').off('hide.bs.modal');
                 dialog.hide();
             } catch (error) {
@@ -520,7 +506,7 @@ async function approved_mobile(frm, wwo, cdt, cdn) {
                         document_name: wwo
                     }
                 });
-
+                
                 const approved_dialog = new frappe.ui.Dialog({
                     title: "Duyệt thành công!",
                     fields: [
@@ -589,8 +575,8 @@ async function handle_approve(frm, wwo) {
                 () => { frm.reload_doc(); }
             );
             return;
-        }
-
+        } 
+        
         if (response.error_html) {
             const error_dialog = new frappe.ui.Dialog({
                 title: "Phát hiện trùng lịch",
@@ -607,12 +593,12 @@ async function handle_approve(frm, wwo) {
                     error_dialog.hide();
                 }
             });
-
+        
             error_dialog.show();
             return;
         }
 
-
+        
         await frappe.call({ method: "tahp.api.wwo_notify", args: { role: 'Kế hoạch sản xuất', subject: `LSX Tuần ${wwo} đã được duyệt`, document_type: "Week Work Order", document_name: wwo}});
         frappe.show_alert({
             message:__('Duyệt phương án thành công!'),
@@ -645,6 +631,7 @@ function setup_bom_tooltip_events() {
     $bomLinks.on('mouseenter', async function () {
         const bomName = $(this).text().trim();
         if (!bomName || bomName === "CTSX") return;
+
         const tooltipContent = $(this).attr('data-tooltip-content');
         if (tooltipContent) {
             $('#custom-tooltip').text(tooltipContent).show();
@@ -693,8 +680,9 @@ function setup_bom_tooltip_events() {
     }
 }
 
-async function setup_item_tooltip_events() {
-    const $itemLinks = $('.rows [data-fieldname="item"]');
+function setup_item_tooltip_events() {
+    const $itemLinks = $('[data-fieldname="item"]');
+
     $itemLinks.off('mouseenter mouseleave mousemove click');
 
     $itemLinks.on('click', function (e) {
@@ -710,6 +698,7 @@ async function setup_item_tooltip_events() {
     $itemLinks.on('mouseenter', async function () {
         const itemCode = $(this).text().trim();
         if (!itemCode || itemCode === "Mặt hàng") return;
+
         const tooltipContent = $(this).attr('data-tooltip-content');
         if (tooltipContent) {
             $('#custom-tooltip').text(tooltipContent).show();
