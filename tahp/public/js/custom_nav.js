@@ -5,10 +5,11 @@ function slugify(str) {
 }
 
 function getItemIcon(item) {
-  if ((item.link_type || item.type) === "Report") return "📊";
-  if ((item.link_type || item.type) === "DocType") return "🗂️";
-  if ((item.link_type || item.type) === "Page") return "📄";
-  if ((item.link_type || item.type) === "Dashboard") return "📈";
+  const type = item.link_type || item.type;
+  if (type === "Report") return "📊";
+  if (type === "DocType") return "🗂️";
+  if (type === "Page") return "📄";
+  if (type === "Dashboard") return "📈";
   return "📁";
 }
 
