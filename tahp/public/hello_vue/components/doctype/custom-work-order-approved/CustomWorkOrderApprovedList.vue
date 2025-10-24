@@ -1,99 +1,123 @@
 <template>
-  <div class="tw-flex tw-gap-4 tw-p-4 tw-bg-gray-50 tw-min-h-screen">
-    <div class="tw-w-[260px] tw-bg-white tw-rounded-xl tw-shadow tw-p-3">
-      <TreeFilter :showDateFilter="false" />
-    </div>
-
-    <div class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-overflow-hidden">
-      <div class="tw-relative tw-mb-3 tw-pb-2 tw-border-b tw-border-gray-100">
-        <h2 class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center">
-          DANH SÁCH LỆNH SẢN XUẤT ĐÃ DUYỆT
-        </h2>
-
-        <div class="tw-absolute tw-top-0 tw-right-0 tw-flex tw-items-center tw-gap-1 tw-text-xs tw-text-gray-500">
-          <span class="tw-font-semibold">Cập nhật: {{ currentTime }}</span>
-          <a-tooltip title="Làm mới">
-            <ReloadOutlined
-              class="tw-text-[#2490ef] tw-cursor-pointer hover:tw-text-[#1677c8] tw-text-[13px]"
-              @click="refreshData"
-            />
-          </a-tooltip>
-        </div>
+  <div class="tw-w-full tw-h-full tw-p-4 tw-overflow-auto tw-bg-gray-50 tw-px-2 sm:tw-px-4 tw-pb-6">
+    <div class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-4 tw-min-h-screen tw-w-full">
+      <div
+        class="tw-w-full lg:tw-w-[260px] tw-bg-white tw-rounded-xl tw-shadow tw-p-3 tw-flex-shrink-0"
+      >
+        <TreeFilter :showDateFilter="false" />
       </div>
 
-      <div class="tw-flex tw-items-center tw-justify-between tw-mb-3">
+      <div
+        class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-3 sm:tw-p-4 tw-overflow-hidden"
+      >
         <div
-          class="tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-space-x-8 tw-gap-y-2"
+          class="tw-relative tw-mb-3 tw-border-gray-100 tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-justify-between tw-gap-1"
         >
-          <div
-            v-for="s in statusList"
-            :key="s.text"
-            class="tw-flex tw-items-center tw-gap-2"
+          <h2
+            class="tw-text-[14px] sm:tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center sm:tw-text-center tw-leading-snug"
           >
-            <span
-              class="tw-inline-block tw-w-3 tw-h-3 tw-rounded-sm tw-border tw-border-gray-200"
-              :style="{ backgroundColor: s.color }"
-            ></span>
-            <span class="tw-text-[13px] tw-text-gray-700">{{ s.text }}</span>
+            DANH SÁCH LỆNH SẢN XUẤT ĐÃ DUYỆT
+          </h2>
+
+          <div
+            class="tw-flex tw-items-center tw-justify-center sm:tw-justify-end tw-gap-1 tw-text-[11px] sm:tw-text-xs tw-text-gray-500"
+          >
+            <span class="tw-font-semibold">Cập nhật: {{ currentTime }}</span>
+            <a-tooltip title="Làm mới">
+              <ReloadOutlined
+                class="tw-text-[#2490ef] tw-cursor-pointer hover:tw-text-[#1677c8]"
+                @click="refreshData"
+              />
+            </a-tooltip>
           </div>
         </div>
 
-        <div class="tw-flex tw-items-center tw-gap-2">
-          <a-dropdown trigger="click" placement="bottomRight">
-            <template #overlay>
-              <a-menu>
-                <a-menu-item
-                  v-for="col in allColumns"
-                  :key="col.key"
-                  class="tw-text-[13px]"
-                >
-                  <a-checkbox
-                    v-model:checked="visibleColumns[col.key]"
-                    @change="updateVisibleColumns"
-                  >
-                    {{ col.title }}
-                  </a-checkbox>
-                </a-menu-item>
-              </a-menu>
-            </template>
-            <a-button
-              type="text"
-              class="tw-flex tw-items-center tw-justify-center tw-p-0"
-              title="Chọn cột hiển thị"
-            >
-              <CopyOutlined
-                class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]"
-              />
-            </a-button>
-          </a-dropdown>
-
-          <a-input
-            v-model:value="searchKeyword"
-            placeholder="Nhập thông tin để tìm kiếm"
-            class="tw-w-[300px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none"
-            size="small"
-            allowClear
+        <div
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-start sm:tw-items-center tw-justify-between tw-gap-3 tw-mb-3"
+        >
+          <div
+            class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-x-3 tw-gap-y-2 tw-w-full sm:tw-w-auto"
           >
-            <template #prefix>
-              <SearchOutlined class="tw-text-gray-400" />
-            </template>
-          </a-input>
-        </div>
-      </div>
+            <div
+              v-for="s in statusList"
+              :key="s.text"
+              class="tw-flex tw-items-center tw-gap-1"
+            >
+              <span
+                class="tw-inline-block tw-w-3 tw-h-3 tw-rounded-sm tw-border tw-border-gray-200"
+                :style="{ backgroundColor: s.color }"
+              ></span>
+              <span class="tw-text-[12px] sm:tw-text-[13px] tw-text-gray-700">
+                {{ s.text }}
+              </span>
+            </div>
+          </div>
 
-      <div class="tw-flex-1 tw-w-full tw-h-full tw-overflow-hidden">
-        <BaseTable
-          :columns="displayedColumns"
-          :rows="filteredRows"
-          @view="onView"
-          @edit="onEdit"
-          @delete="onDelete"
-        />
+          <div
+            class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-end tw-gap-2 tw-w-full sm:tw-w-auto"
+          >
+            <a-dropdown trigger="click" placement="bottomRight">
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item
+                    v-for="col in allColumns"
+                    :key="col.key"
+                    class="tw-text-[13px]"
+                  >
+                    <a-checkbox
+                      v-model:checked="visibleColumns[col.key]"
+                      @change="updateVisibleColumns"
+                    >
+                      {{ col.title }}
+                    </a-checkbox>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+              <a-button
+                type="text"
+                class="tw-flex tw-items-center tw-justify-center tw-p-0"
+                title="Chọn cột hiển thị"
+              >
+                <CopyOutlined
+                  class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]"
+                />
+              </a-button>
+            </a-dropdown>
+
+            <a-input
+              v-model:value="searchKeyword"
+              placeholder="Nhập thông tin để tìm kiếm"
+              class="tw-w-full sm:tw-w-[240px] md:tw-w-[300px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none"
+              size="small"
+              allowClear
+            >
+              <template #prefix>
+                <SearchOutlined class="tw-text-gray-400" />
+              </template>
+            </a-input>
+          </div>
+        </div>
+
+        <div
+          class="tw-relative tw-w-full tw-h-full tw-overflow-x-auto tw-overflow-y-hidden tw-rounded-md tw-border tw-border-gray-100 tw-bg-white"
+        >
+          <BaseTable
+            :columns="displayedColumns"
+            :rows="filteredRows"
+            @view="onView"
+            @edit="onEdit"
+            @delete="onDelete"
+          />
+          <div
+            class="tw-absolute tw-bottom-0 tw-left-0 tw-right-0 tw-text-[11px] tw-text-gray-400 tw-bg-white/70 tw-text-center tw-py-1 sm:tw-hidden"
+          >
+            👉 Kéo ngang để xem thêm cột
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, reactive, onMounted } from "vue";
@@ -101,7 +125,7 @@ import dayjs from "dayjs";
 import {
   ReloadOutlined,
   SearchOutlined,
-  CopyOutlined
+  CopyOutlined,
 } from "@ant-design/icons-vue";
 import BaseTable from "../../BaseTable.vue";
 import TreeFilter from "../../TreeFilter.vue";
@@ -115,7 +139,6 @@ const refreshData = () => {
   if (frappe?.listview?.refresh) frappe.listview.refresh();
   currentTime.value = dayjs().format("HH:mm:ss DD/MM/YYYY");
 };
-
 onMounted(() => refreshData());
 
 const searchKeyword = ref("");
@@ -149,10 +172,10 @@ const allColumns = [
 const visibleColumns = reactive({});
 allColumns.forEach((col) => (visibleColumns[col.key] = true));
 
+const displayedColumns = ref([...allColumns]);
 const updateVisibleColumns = () => {
   displayedColumns.value = allColumns.filter((c) => visibleColumns[c.key]);
 };
-const displayedColumns = ref([...allColumns]);
 
 const filteredRows = computed(() => {
   if (!searchKeyword.value.trim()) return props.rows;
@@ -170,9 +193,11 @@ const statusList = [
   { text: "Đã huỷ", color: "#ef4444" },
 ];
 
-const onView = (row) => frappe.show_alert({ message: `Đã xem ${row.workOrderCode}`, indicator: "green" });
-const onEdit = (row) => frappe.show_alert({ message: `Đã chỉnh sửa ${row.workOrderCode}`, indicator: "blue" });
-const onDelete = (row) => {
+const onView = (row) =>
+  frappe.show_alert({ message: `Đã xem ${row.workOrderCode}`, indicator: "green" });
+const onEdit = (row) =>
+  frappe.show_alert({ message: `Đã chỉnh sửa ${row.workOrderCode}`, indicator: "blue" });
+const onDelete = (row) =>
   customConfirmModal({
     title: "Xác nhận xoá",
     message: `Bạn có chắc muốn xoá <b>${row.workOrderCode}</b>?`,
@@ -182,21 +207,32 @@ const onDelete = (row) => {
       {
         text: "Huỷ",
         class: "btn-secondary",
-        onClick: () => frappe.show_alert({ message: "Đã huỷ thao tác", indicator: "orange" }),
+        onClick: () =>
+          frappe.show_alert({ message: "Đã huỷ thao tác", indicator: "orange" }),
       },
       {
         text: "Xoá",
         class: "btn-danger",
-        onClick: () => frappe.show_alert({ message: `Đã xoá ${row.workOrderCode}`, indicator: "red" }),
+        onClick: () =>
+          frappe.show_alert({ message: `Đã xoá ${row.workOrderCode}`, indicator: "red" }),
       },
     ],
   });
-};
 </script>
 
 <style scoped>
 :deep(.ant-input-affix-wrapper) {
   height: 32px !important;
   font-size: 13px !important;
+}
+
+:deep(table) {
+  min-width: 800px;
+  table-layout: auto !important;
+}
+
+:deep(th),
+:deep(td) {
+  white-space: nowrap;
 }
 </style>
