@@ -21,13 +21,18 @@
 
             <th v-for="col in columns || []" :key="col.key"
               class="tw-relative tw-border tw-border-gray-200 tw-font-semibold tw-text-center tw-px-3 tw-py-2 tw-group"
-              :class="{
-                'tw-sticky tw-right-0 tw-z-40 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
-                  col.key === 'actions',
-              }" :style="{
+              :class="[
+                {
+                  'tw-sticky tw-right-0 tw-z-40 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
+                    col.key === 'actions',
+                  'tw-bg-pink-100 tw-text-pink-800':
+                    ['canCode', 'kdaiCode', 'ktrungCode', 'ktieuCode', 'mahzCode', 'malhCode', 'mavtCode'].includes(col.key)
+                }
+              ]" :style="{
                 width: colWidths[col.key] + 'px',
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }">
+
               <div class="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 <a-tooltip :title="col.title">
                   <span class="tw-truncate tw-font-semibold">{{ col.title }}</span>
@@ -465,6 +470,7 @@ tbody td {
 }
 
 @media (max-width: 768px) {
+
   th.tw-sticky,
   td.tw-sticky {
     position: static !important;
@@ -480,5 +486,4 @@ tbody td {
     display: none !important;
   }
 }
-
 </style>
