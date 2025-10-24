@@ -96,6 +96,7 @@
   {
    "fieldname": "grossweight",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Tr\u1ecdng l\u01b0\u1ee3ng b\u00ec"
   },
   {
@@ -139,7 +140,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-23 10:39:29.558392",
+ "modified": "2025-10-24 16:22:22.648127",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Semi Finished Products",
