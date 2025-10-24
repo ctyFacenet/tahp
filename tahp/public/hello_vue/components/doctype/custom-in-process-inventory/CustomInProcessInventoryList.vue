@@ -5,13 +5,13 @@
     </div>
 
     <div class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-overflow-hidden">
-      <div class="tw-flex tw-flex-col tw-mb-3 md:tw-items-start">
+      <div class="tw-flex tw-flex-col tw-mb-3 md:tw-items-center">
         <h2 class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center tw-w-full">
           Xuất - Nhập - Tồn kho công đoạn
         </h2>
 
         <div
-          class="tw-flex tw-items-center tw-gap-3 tw-flex-wrap tw-justify-end md:tw-justify-start tw-mt-2 tw-text-[13px]">
+          class="tw-flex tw-items-center tw-gap-3 tw-flex-wrap tw-justify-end md:tw-justify-center tw-mt-2 tw-text-[13px]">
           <a-dropdown trigger="click" placement="bottomRight">
             <template #overlay>
               <a-menu>

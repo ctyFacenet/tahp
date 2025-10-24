@@ -5,13 +5,13 @@
     </div>
 
     <div class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-overflow-hidden">
-      <div class="tw-flex tw-flex-col tw-mb-3 md:tw-items-start">
-        <h2 class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center md:tw-text-left">
+      <div class="tw-flex tw-flex-col tw-mb-3 md:tw-items-center">
+        <h2 class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center md:tw-text-center">
           DANH SÁCH TEM BÁN THÀNH PHẨM
         </h2>
 
         <div
-          class="tw-flex tw-items-center tw-gap-3 tw-flex-wrap tw-justify-end md:tw-justify-start tw-mt-2 tw-text-[13px]">
+          class="tw-flex tw-items-center tw-gap-3 tw-flex-wrap tw-justify-end md:tw-justify-center tw-mt-2 tw-text-[13px]">
           <a-button type="link"
             class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
             <template #icon>
@@ -28,7 +28,7 @@
             Xuất Excel
           </a-button>
 
-             <a-button type="link"
+          <a-button type="link"
             class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
             <template #icon>
               <DeleteOutlined class="tw-text-[#2490ef]" />
@@ -47,8 +47,7 @@
               </a-menu>
             </template>
 
-            <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0"
-              title="Chọn cột hiển thị">
+            <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
               <CopyOutlined class="tw-text-[#2490ef] tw-text-[13px] hover:tw-text-[#1677c8]" />
             </a-button>
           </a-dropdown>

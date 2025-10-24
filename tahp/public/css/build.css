@@ -1671,20 +1671,20 @@ video {
     flex-direction: row !important;
   }
 
-  .md\:tw-items-start {
-    align-items: flex-start !important;
+  .md\:tw-items-center {
+    align-items: center !important;
   }
 
-  .md\:tw-justify-start {
-    justify-content: flex-start !important;
+  .md\:tw-justify-center {
+    justify-content: center !important;
   }
 
   .md\:tw-p-4 {
     padding: 1rem !important;
   }
 
-  .md\:tw-text-left {
-    text-align: left !important;
+  .md\:tw-text-center {
+    text-align: center !important;
   }
 }
 

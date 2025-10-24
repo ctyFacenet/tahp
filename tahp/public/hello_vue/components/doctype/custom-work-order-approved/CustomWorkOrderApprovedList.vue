@@ -23,7 +23,7 @@
 
       <div class="tw-flex tw-items-center tw-justify-between tw-mb-3">
         <div
-          class="tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-space-x-8 tw-gap-y-2 tw-pb-1 tw-pl-2"
+          class="tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-space-x-8 tw-gap-y-2"
         >
           <div
             v-for="s in statusList"
@@ -70,7 +70,7 @@
           <a-input
             v-model:value="searchKeyword"
             placeholder="Nhập thông tin để tìm kiếm"
-            class="tw-w-[260px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef]"
+            class="tw-w-[300px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none"
             size="small"
             allowClear
           >
@@ -93,8 +93,6 @@
     </div>
   </div>
 </template>
-
-
 
 
 <script setup>
