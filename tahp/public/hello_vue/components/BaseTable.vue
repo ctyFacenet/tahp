@@ -191,10 +191,17 @@
     <div
       class="tw-text-center tw-py-3 tw-border-t tw-border-gray-200 tw-bg-white tw-text-[13px] sm:tw-text-[14px] tw-font-[500] tw-tracking-wide tw-text-gray-600">
       © Copyright
-      <span class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">FaceNet</span>.
+      <a href="https://facenet.vn" target="_blank" rel="noopener noreferrer"
+        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">
+        FaceNet
+      </a>.
       All Rights Reserved,&nbsp;Designed by
-      <span class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">FaceNet</span>
+      <a href="https://facenet.vn" target="_blank" rel="noopener noreferrer"
+        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">
+        FaceNet
+      </a>
     </div>
+
   </div>
 </template>
 
