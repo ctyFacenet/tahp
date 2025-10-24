@@ -2,11 +2,14 @@
   <div
     class="tw-flex tw-flex-col lg:tw-flex-row tw-gap-4 tw-p-3 sm:tw-p-4 tw-bg-gray-50 tw-min-h-screen tw-overflow-auto"
   >
-    <div
-      class="tw-w-full lg:tw-w-[260px] tw-bg-white tw-rounded-xl tw-shadow tw-p-3 tw-flex-shrink-0"
-    >
-      <TreeFilter :showDateFilter="true" />
-    </div>
+    <transition name="slide-left">
+      <div
+        v-if="showFilter"
+        class="tw-w-full lg:tw-w-[260px] tw-bg-white tw-rounded-xl tw-shadow tw-p-3 tw-flex-shrink-0"
+      >
+        <TreeFilter :showDateFilter="true" />
+      </div>
+    </transition>
 
     <div
       class="tw-flex-1 tw-flex tw-flex-col tw-bg-white tw-rounded-xl tw-shadow tw-p-3 sm:tw-p-4 tw-overflow-hidden"
@@ -14,15 +17,30 @@
       <div
         class="tw-flex-col md:tw-flex-row tw-items-start md:tw-items-center tw-justify-between tw-mb-3 tw-gap-3"
       >
-        <h2
-          class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center md:tw-text-center tw-w-full"
+        <div
+          class="tw-flex tw-items-center tw-justify-between tw-w-full md:tw-w-auto"
         >
-          Xuất - Nhập - Tồn kho công đoạn
-        </h2>
+          <h2
+            class="tw-text-[15px] tw-font-semibold tw-text-gray-800 tw-uppercase tw-text-center md:tw-text-center tw-w-full"
+          >
+            Xuất - Nhập - Tồn kho công đoạn
+          </h2>
+
+        
+        </div>
 
         <div
           class="tw-flex tw-flex-wrap tw-items-center tw-justify-center md:tw-justify-end tw-gap-2 tw-w-full md:tw-w-auto"
         >
+
+           <a-button
+            class="lg:tw-hidden tw-ml-2 tw-flex tw-items-center tw-justify-center tw-gap-1 tw-border tw-border-[#2490ef] tw-text-[#2490ef] hover:tw-bg-[#2490ef] hover:tw-text-white tw-text-[13px] tw-rounded-md tw-h-[28px] tw-px-2 tw-font-medium"
+            size="small"
+            @click="showFilter = !showFilter"
+          >
+            <SearchOutlined class="tw-text-[14px]" />
+            <span>Bộ lọc</span>
+          </a-button>
           <a-dropdown trigger="click" placement="bottomRight">
             <template #overlay>
               <a-menu>
@@ -40,7 +58,7 @@
                 </a-menu-item>
               </a-menu>
             </template>
-
+       
             <a-button
               type="text"
               class="tw-flex tw-items-center tw-justify-center tw-p-0"
@@ -81,7 +99,7 @@
                   class="tw-text-blue-500 hover:tw-text-blue-600 tw-cursor-pointer"
                 />
               </a-tooltip>
-              <a-tooltip title="Xoá">
+              <a-tooltip title="Xóa">
                 <DeleteOutlined
                   class="tw-text-red-500 hover:tw-text-red-600 tw-cursor-pointer"
                 />
@@ -115,6 +133,7 @@ const props = defineProps({
   rows: { type: Array, default: () => [] },
 });
 
+const showFilter = ref(true);
 const searchKeyword = ref("");
 
 const allColumns = [
@@ -145,7 +164,6 @@ const updateVisibleColumns = () => {
 const filteredRows = computed(() => {
   const key = searchKeyword.value.trim().toLowerCase();
   if (!key) return props.rows;
-
   return props.rows.filter((row) =>
     Object.values(row).some((val) => val?.toString().toLowerCase().includes(key))
   );
@@ -161,6 +179,27 @@ const filteredRows = computed(() => {
 :deep(th),
 :deep(td) {
   white-space: nowrap;
+}
+
+:deep(.ant-input-affix-wrapper) {
+  height: 32px !important;
+  font-size: 13px !important;
+}
+
+:deep(.ant-btn) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all 0.25s ease;
+}
+.slide-left-enter-from,
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-15px);
 }
 
 @media (max-width: 640px) {
