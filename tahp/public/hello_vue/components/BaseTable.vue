@@ -463,4 +463,22 @@ tbody td {
 :deep(.ant-input-number-input) {
   font-size: 12px !important;
 }
+
+@media (max-width: 768px) {
+  th.tw-sticky,
+  td.tw-sticky {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  .fade-left,
+  .fade-right {
+    display: none !important;
+  }
+}
+
 </style>
