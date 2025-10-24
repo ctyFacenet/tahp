@@ -566,6 +566,10 @@ video {
   position: sticky !important;
 }
 
+.tw-bottom-0 {
+  bottom: 0px !important;
+}
+
 .tw-left-0 {
   left: 0px !important;
 }
@@ -600,6 +604,18 @@ video {
 
 .tw-z-40 {
   z-index: 40 !important;
+}
+
+.tw-z-\[0\] {
+  z-index: 0 !important;
+}
+
+.tw-z-\[10\] {
+  z-index: 10 !important;
+}
+
+.tw-z-\[20\] {
+  z-index: 20 !important;
 }
 
 .tw-mb-1 {
@@ -686,6 +702,10 @@ video {
   height: 1.25rem !important;
 }
 
+.tw-h-\[22px\] {
+  height: 22px !important;
+}
+
 .tw-h-\[250px\] {
   height: 250px !important;
 }
@@ -696,6 +716,10 @@ video {
 
 .tw-h-\[300px\] {
   height: 300px !important;
+}
+
+.tw-h-\[3px\] {
+  height: 3px !important;
 }
 
 .tw-h-full {
@@ -855,6 +879,10 @@ video {
 
 .tw-gap-6 {
   gap: 1.5rem !important;
+}
+
+.tw-gap-y-2 {
+  row-gap: 0.5rem !important;
 }
 
 .tw-space-x-4 > :not([hidden]) ~ :not([hidden]) {
@@ -1106,6 +1134,11 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
 }
 
+.tw-bg-yellow-400 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(250 204 21 / var(--tw-bg-opacity, 1)) !important;
+}
+
 .tw-p-0 {
   padding: 0px !important;
 }
@@ -1185,8 +1218,16 @@ video {
   padding-bottom: 2px !important;
 }
 
+.tw-pb-1 {
+  padding-bottom: 0.25rem !important;
+}
+
 .tw-pb-2 {
   padding-bottom: 0.5rem !important;
+}
+
+.tw-pl-2 {
+  padding-left: 0.5rem !important;
 }
 
 .tw-text-left {
@@ -1384,6 +1425,10 @@ video {
 
 .tw-opacity-70 {
   opacity: 0.7 !important;
+}
+
+.tw-opacity-85 {
+  opacity: 0.85 !important;
 }
 
 .tw-shadow {
@@ -1610,6 +1655,10 @@ video {
     margin-top: 1rem !important;
   }
 
+  .md\:tw-w-\[300px\] {
+    width: 300px !important;
+  }
+
   .md\:tw-w-\[35\%\] {
     width: 35% !important;
   }
@@ -1622,8 +1671,20 @@ video {
     flex-direction: row !important;
   }
 
+  .md\:tw-items-start {
+    align-items: flex-start !important;
+  }
+
+  .md\:tw-justify-start {
+    justify-content: flex-start !important;
+  }
+
   .md\:tw-p-4 {
     padding: 1rem !important;
+  }
+
+  .md\:tw-text-left {
+    text-align: left !important;
   }
 }
 
