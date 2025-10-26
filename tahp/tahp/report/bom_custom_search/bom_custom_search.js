@@ -1,6 +1,8 @@
 frappe.query_reports["BOM Custom Search"] = {
     filters: [
         {"fieldname": "week_work_order", "label": "Week Work Order", "fieldtype": "Data","hidden": 1},
+        {"fieldname": "custom_plan", "label": "Custom Planner", "fieldtype": "Data", "hidden": 1},
+        {"fieldname": "row_name", "label": "Row Name", "fieldtype": "Data", "hidden": 1 },
         {"fieldname": "item_code", "label": "Item", "fieldtype": "Data"},
     ],
     onload: async function(report) {
@@ -52,8 +54,13 @@ frappe.query_reports["BOM Custom Search"] = {
 
     formatter: function(value, row, column, data, default_formatter) {
         if (column.fieldname !== "bom_name") return default_formatter(value, row, column, data);
+        // Lấy giá trị filter hiện tại
 
         const base = default_formatter(value, row, column, data);
+        const customPlan = frappe.query_report.get_filter_value("custom_plan");
+        const weekWorkOrder = frappe.query_report.get_filter_value("week_work_order");
+        if (!customPlan && !weekWorkOrder) return base;
+
         return `<div class="d-flex justify-content-between align-items-center w-100 px-2">
                     ${base}
                     <button class="btn btn-light btn-xs select-bom" data-bom="${data.bom_name}" data-item="${data.item_code}" style="font-size: 15px;white-space:nowrap;">Chọn</button>
@@ -167,18 +174,37 @@ function selectBOM(report) {
     report.page.wrapper.off('click', '.select-bom').on('click', '.select-bom', async e => {
         const bomName = e.currentTarget.dataset.bom;
         const itemCode = e.currentTarget.dataset.item;
-        try {
-            const docname = report.get_filter_value('week_work_order');
-            if (!docname) return frappe.show_alert({ message: 'Không xác định được LSX', indicator: 'red' });
-            const weekDoc = await frappe.db.get_doc('Week Work Order', docname);
-            const row = (weekDoc.items || []).find(r => r.item === itemCode);
-            if (!row) return frappe.show_alert({ message: `Không tìm thấy dòng mặt hàng ${itemCode} trong LSX`, indicator: 'orange' });
 
+        const customPlan = report.get_filter_value('custom_plan');
+        const weekWorkOrder = report.get_filter_value('week_work_order');
+        const rowName = report.get_filter_value('row_name');
+
+        // --- Nếu là Custom Plan ---
+        if (customPlan) {
+            const doc = await frappe.db.get_doc('Custom Planner', customPlan);
+            const row = (doc.items || []).find(r => r.name === rowName);
+            if (row) {
+                await frappe.db.set_value(row.doctype, row.name, 'bom', bomName);
+                frappe.show_alert({
+                    message: `Đã chọn BOM <b>${bomName}</b>`,
+                    indicator: 'green'
+                });
+                frappe.set_route('Form', 'Custom Planner', customPlan);
+            }
+            return;
+        }
+
+        // --- Nếu là Week Work Order ---
+        const doc = await frappe.db.get_doc('Week Work Order', weekWorkOrder);
+        const row = (doc.items || []).find(r => r.item === itemCode);
+        if (row) {
             await frappe.db.set_value(row.doctype, row.name, 'bom', bomName);
-            frappe.set_route('Form', 'Week Work Order', docname);
-        } catch (err) {
-            frappe.show_alert({ message: 'Không thể tải LSX', indicator: 'red' });
-            console.error(err);
+            frappe.show_alert({
+                message: `Đã chọn BOM <b>${bomName}</b>`,
+                indicator: 'green'
+            });
+            frappe.set_route('Form', 'Week Work Order', weekWorkOrder);
         }
     });
 }
+

@@ -1,0 +1,56 @@
+.planner-control-section {
+    margin-bottom: 10px;
+}
+
+.planner-btn {
+    padding: 5px 10px !important;
+    font-size: 1.25rem;
+}
+
+.right-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.planner-workflows {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.planner-content-title-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.planner-content-title-left .first-title {
+    font-size: 1.25rem;
+    padding: 0;
+    min-width: 170px;
+}
+
+.planner-content-title-left .second-title {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;        
+}
+
+.planner-desktop {
+    border: 1px solid var(--table-border-color);
+    border-radius: 10px;
+}
+
+.planner-content-title {
+    background: rgb(237, 237, 237);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.planner-bg-mobile-basic {
+    background: #e1e1e1;
+}

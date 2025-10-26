@@ -24,14 +24,14 @@ def after_insert(doc, method):
         for op in wo_doc.operations:
             if op.operation and op.operation == doc.operation and op.custom_employee:
                 user = frappe.db.get_value("Employee", op.custom_employee, "user_id")
-                if not user: continue
-                frappe.get_doc({
-                    "doctype": "Notification Log",
-                    "for_user": user,
-                    "subject": f"Bạn có LSX công đoạn mới: <b style='font-weight:bold'>{doc.operation} - {doc.name}</b> cần thực hiện",
-                    "email_content": f"Bạn có LSX công đoạn mới: {doc.operation} - {doc.name} cần thực hiện",
-                    "type": "Alert",
-                    "document_type": "Job Card",
-                    "document_name": doc.name
-                }).insert(ignore_permissions=True)
-                return
+                if user != "":
+                    frappe.get_doc({
+                        "doctype": "Notification Log",
+                        "for_user": user,
+                        "subject": f"Bạn có LSX công đoạn mới: <b style='font-weight:bold'>{doc.operation} - {doc.name}</b> cần thực hiện",
+                        "email_content": f"Bạn có LSX công đoạn mới: {doc.operation} - {doc.name} cần thực hiện",
+                        "type": "Alert",
+                        "document_type": "Job Card",
+                        "document_name": doc.name
+                    }).insert(ignore_permissions=True)
+                    return

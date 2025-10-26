@@ -51,44 +51,9 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:32:43.517625",
-  "name": "Gửi PTCN",
-  "workflow_action_name": "Gửi PTCN"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:33:06.529842",
-  "name": "Hủy trình",
-  "workflow_action_name": "Hủy trình"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:33:16.313543",
-  "name": "Trả về PTCN",
-  "workflow_action_name": "Trả về PTCN"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-07 17:32:48.039604",
   "name": "Gửi KHSX",
   "workflow_action_name": "Gửi KHSX"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:32:54.383149",
-  "name": "Trả về KHSX",
-  "workflow_action_name": "Trả về KHSX"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:33:01.412193",
-  "name": "Gửi GĐ",
-  "workflow_action_name": "Gửi GĐ"
  },
  {
   "docstatus": 0,
@@ -159,5 +124,40 @@
   "modified": "2025-10-13 16:25:28.850258",
   "name": "Bắt đầu",
   "workflow_action_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:43.517625",
+  "name": "Gửi PTCN",
+  "workflow_action_name": "Gửi PTCN"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:06.529842",
+  "name": "Hủy trình",
+  "workflow_action_name": "Hủy trình"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:01.412193",
+  "name": "Gửi GĐ",
+  "workflow_action_name": "Gửi GĐ"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:54.383149",
+  "name": "Trả về KHSX",
+  "workflow_action_name": "Trả về KHSX"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:16.313543",
+  "name": "Trả về PTCN",
+  "workflow_action_name": "Trả về PTCN"
  }
 ]

@@ -1,74 +1,256 @@
-<div class="planner-wrapper mb-5" data-post={{post_name}}>
+<div class="py-3 mb-4 planner-post" data-idx="{{idx}}">
+    {# Desktop View #}
     <div class="planner-desktop d-none d-md-block">
-        <div class="d-flex justify-content-between align-items-center p-2" style="background: #ededed">
-            <div class="flex justify-content-center align-items-center" style="gap:10px;">
-                <h5 class="planner-title mb-0">{{title}}</h5>
-                {% if edit %} 
-                    <button class="btn btn-info btn-sm planner-flow">Thêm mặt hàng</button>
-                    <button class="btn btn-default btn-danger btn-sm planner-flow">Xóa phương án</button>
-                {% endif%}
+        {# Title Section #}
+        <div class="planner-content-title d-flex justify-content-between align-items-center p-2 {% if approved %} bg-success text-white {% endif %}"">
+            <div class="planner-content-title-left">
+                {% if approved %}
+                    <div class="first-title" style="font-weight:bold;">
+                        <i class="fa fa-check-circle mx-2"></i>
+                        Phương án #{{idx}} đã được duyệt
+                    </div>
+                {% else %}
+                    <div class="first-title">Phương án #{{idx}}</div>
+                {% endif %}
+                <div class="second-title">
+                {% if edit_post %}
+                    <button class="btn btn-info planner-add-item">
+                        Thêm mặt hàng
+                    </button>
+                    <button class="btn btn-warning planner-copy-post">
+                       Sao chép phương án
+                    </button>
+                    <button class="btn btn-default btn-danger planner-delete-post">
+                        <i class="fa fa-trash"></i> Xóa phương án
+                    </button>
+                {% endif %}
+                </div>
             </div>
             <div>
                 {% for action in actions %}
-                    <button class="btn btn-default btn-primary btn-sm planner-flow ml-2">{{action}}</button>
-                {% endfor %}            
+                    <button class="btn btn-default btn-primary planner-action" title='{{ action }}'>{{action}}</button>
+                {% endfor %}
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
-            <table class="table table-bordered table-sm my-0">
+        {# Content Section #}
+        <div style="overflow:visible;" class="{% if approved %}border border-success{% endif %}">
+            <table class="table table-bordered my-0">
                 <thead class="thead-light">
-                <tr class="text-nowrap">
-                    <th style="width:60px; text-align:center">Mã mặt hàng</th>
-                    <th style="min-width:100px;max-width:150px; text-align:center">Tên mặt hàng</th>
-                    <th style="min-width:70px;max-width:70px; text-align:center">DVT</th>
-                    <th style="min-width:80px;max-width:80px; text-align:center">SL</th>
-                    <th style="min-width:100px;max-width:100px; text-align:center">BOM</th>
-                    <th style="min-width:110px;max-width:110px; text-align:center">Bắt đầu</th>
-                    <th style="min-width:110px;max-width:110px; text-align:center">Kết thúc</th>
-                    <th style="width:600px; min-width:200px; max-width:800px; text-align:center">Ghi chú</th>
-                    {% if edit %}
-                        <th style="min-width:80px;">Thao tác</th>
-                    {% endif %}
-                </tr>
+                    <tr class="text-nowrap">
+                        <th style="width:30px; text-align:center">Mã mặt hàng</th>
+                        <th style="width:100px; text-align:center">Tên mặt hàng</th>
+                        <th style="width:50px; text-align:center">DVT</th>
+                        <th style="width:60px; text-align:center">SL</th>
+                        <th style="width:110px; text-align:center">BOM</th>
+                        <th style="width:50px; text-align:center">Bắt đầu</th>
+                        <th style="width:50px; text-align:center">Kết thúc</th>
+                        <th style="width:200px; text-align:center">Ghi chú</th>
+                        {% if edit_post %}
+                            <th style="width:50px; text-align:center">Thao tác</th>
+                        {% endif %}
+                    </tr>                    
                 </thead>
+
                 <tbody>
                     {% for row in data %}
-                        <tr data-post="{{ row.post_name }}" data-item="{{ row.item_name }}">
+                        <tr data-idx={{ row.idx - 1 }} data-role="desktop-row">
                             {% for field, value in row.items() %}
-                                {% if field != "materials" and field != "item_name" and field != "post_name" %}
-                                    <td>
-                                        {% if edit %}
-                                            {% if field in lock %}
-                                            <div contenteditable="false"
-                                                class="form-control"
-                                                style="cursor: not-allowed; min-height:1.8em;white-space:pre-wrap;word-break:break-word;resize:none;height:fit-content">{{ value }}</div>
+                                {% if field not in ["materials", "idx"] %}
+                                    {% if field in lock %}
+                                        <td class="text-center align-middle" disabled title={{field}}>
+                                            {% if field == "bom" %}
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    {{value}}
+                                                    {% if value %}
+                                                        <span class="fa fa-eye mx-2 planner-bom-eye" style="cursor: pointer; color: #666;" title="Chi tiết BOM"></span>
+                                                    {% endif%}
+                                                </div>
+                                                <div class="planner-bom-materials d-none d-md-block mt-2" style="color: grey; font-size: 10px;"></div>
                                             {% else %}
-                                            <div contenteditable="true"
-                                                class="form-control"
-                                                style="min-height:1.8em;white-space:pre-wrap;word-break:break-word;resize:none;height:fit-content">{{ value }}</div>
+                                                {{value}}
                                             {% endif %}
+                                        </td>
+                                    {% elif field in edit_fields %}
+                                        {% if field == "bom" %}
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    <div data-fieldname="{{ field }}" class="align-middle" title={{field}} class="w-100"></div>
+                                                    <span class="fa fa-search mx-2 bom-icon" style="cursor: pointer; color: #666;" title="Tìm kiếm BOM"></span>
+                                                    <span class="fa fa-eye-slash mx-2 planner-bom-eye" style="cursor: pointer; color: #666;" title="Chi tiết BOM"></span>
+                                                </div>
+                                                <div class="planner-bom-materials d-none d-md-block mt-2" style="color: grey; font-size: 10px;"></div>                                                
+                                            </td>
                                         {% else %}
-                                            <div style="white-space: pre-wrap;">{{ value }}</div>
+                                            <td data-fieldname="{{ field }}" class="align-middle" title={{field}}></td>
                                         {% endif %}
-                                    </td>
+                                    {% else %}
+                                        <td class="text-center align-middle" disabled title={{field}}>
+                                            {% if field == "bom" %}
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    {{value}}
+                                                    {% if value %}
+                                                        <span class="fa fa-eye mx-2 planner-bom-eye" style="cursor: pointer; color: #666;" title="Chi tiết BOM"></span>
+                                                    {% endif%}
+                                                </div>
+                                                <div class="planner-bom-materials d-none d-md-block mt-2" style="color: grey; font-size: 10px;"></div>
+                                            {% else %}
+                                                {{value}}
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
-                        {% if edit %} 
-                            <td class="text-center">
-                                <button class="btn btn-default btn-danger">Xóa</button>
+                        {% if edit_post %} 
+                            <td class="text-center align-middle">
+                                <button class="btn btn-default btn-danger planner-delete-item">Xóa</button>
                             </td>
                         {% endif %}                        
                         </tr>
                     {% endfor %}
                 </tbody>
-
             </table>
         </div>
     </div>
 
-
+    {# Mobile View #}
     <div class="planner-mobile d-block d-md-none">
-        Mobile view
-    </div>    
+        <div class="{% if approved %}border border-success{% endif %}" style="border-radius:10px; overflow:hidden;">
+            {# Title Section #}
+            <div class="planner-content-title d-flex justify-content-between align-items-center p-2 {% if approved %} bg-success text-white {% else %} planner-bg-mobile-basic {% endif %}">
+                {% if approved %}
+                    <div class="first-title" style="font-weight:bold;font-size: 1.1rem;">
+                        <i class="fa fa-check-circle mx-2"></i>
+                        Phương án #{{idx}} đã được duyệt
+                    </div>
+                {% else %}
+                    <div class="first-title pl-2" style="font-weight:bold;font-size: 1.1rem;">Phương án #{{idx}}</div>
+                {% endif %}
+                <div>
+                    {% for action in actions %}
+                        <button class="btn btn-default btn-primary planner-action" title='{{ action }}'>{{action}}</button>
+                    {% endfor %}
+                </div>
+                {% if edit_post %}
+                    <div>
+                        <button class="btn btn-warning planner-copy-post mr-2">
+                            Sao chép PA
+                        </button>
+                        <button class="btn btn-default btn-danger planner-delete-post">
+                            <i class="fa fa-trash"></i> Xóa PA
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Content Section #}
+            <div style="background: {% if approved %} rgba(219, 255, 235, 1) {% else %} rgba(241, 241, 241, 1) {% endif %}; padding: 12px;">
+                {% for row in data %}
+                    <div data-idx="{{row.idx - 1}}" data-role="mobile-row" class="mb-3 rounded" style="background: white; overflow: hidden;">
+                        <div class="p-3" style="background:{% if approved %} rgb(120, 255, 180) {% else %} rgba(226, 226, 226, 1);{% endif %}">
+                            {% if 'item_code' in edit_fields %}
+                                <div class="mb-2">
+                                    <span>Tên mặt hàng:</span>
+                                    <span title="item_name">{{row.item_name}}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center" style="font-weight: bold; font-size: 1.1rem;gap: 10px;">
+                                    <div data-fieldname="item_code" class="align-middle w-50 h-100" title="item_code"></div>
+                                        <div style="white-space: nowrap">
+                                            {% if 'qty' in edit_fields %}
+                                                <div title="qty" data-fieldname="qty"
+                                                    class="h-100 d-inline-block"
+                                                    style="width: 100px; vertical-align: middle;"></div>
+                                            {% else %}
+                                                <span title="qty" class="mb-2">{{row.qty}}</span>
+                                            {% endif %}
+                                            <span title="stock_uom" class="ml-2">{{row.stock_uom}}</span>
+                                        </div>       
+                                </div>
+                            {% else %}
+                                <div title="item_code">{{row.item_code}}</div>
+                                <div class="d-flex justify-content-between align-items-center" style="font-weight: bold; font-size: 1.1rem;gap: 10px;">
+                                    <span title="item_name">{{row.item_name}}</span>
+                                    <div style="white-space: nowrap">
+                                        <span title="qty">{{row.qty}}</span>
+                                        <span title="stock_uom">{{row.stock_uom}}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <div class="mb-4">
+                                <div style="font-weight: 500" class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Công thức sản xuất</span>
+                                    {% if 'bom' in edit_fields %}
+                                        <div data-fieldname="bom" class="align-middle w-50 h-100" title="bom"></div>
+                                    {% else %}
+                                        <span title="bom">{{row.bom}}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="planner-bom-materials planner-bom-materials-mobile" data-bom="{{row.bom}}">
+    
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div style="font-weight: 500">Thời gian dự kiến</div>
+                                <div class="d-flex justify-content-between align-items-center my-2" style="gap:10px">
+                                    {% if 'start_date' in edit_fields %}
+                                        <div>
+                                            <div style="color:grey;font-size:10px;">Dự kiến bắt đầu</div>
+                                            <div class="w-100 text-center rounded mt-1" title="start_date" data-fieldname="start_date"></div>
+                                        </div>
+                                    {% else %}
+                                        <div class="w-100">
+                                            <div style="color:grey;font-size:10px;">Dự kiến bắt đầu</div>
+                                            <div style="background: #CDF4D3" class="w-100 text-center p-2 rounded mt-1" title="start_date">{{row.start_date}}</div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if 'end_date' in edit_fields %}
+                                        <div>
+                                            <div style="color:grey;font-size:10px;">Dự kiến kết thúc</div>
+                                            <div class="w-100 text-center rounded mt-1" title="end_date" data-fieldname="end_date"></div>
+                                        </div>
+                                    {% else %}
+                                        <div class="w-100">
+                                            <div style="color:grey;font-size:10px;">Dự kiến kết thúc</div>
+                                            <div style="background: #C6FAF6" class="w-100 text-center p-2 rounded mt-1" title="end_date">{{row.end_date}}</div>                                        
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <div style="font-weight: 500">Ghi chú</div>
+                                <div class="d-flex justify-content-between align-items-end mt-2" style="gap: 15px;">
+                                    <div class="w-100">
+                                        {% if 'note' in edit_fields %}
+                                            <div style="color: grey" title="note" data-fieldname="note"></div>
+                                        {% else %}
+                                            <div style="color: grey" title="note">{{row.note if row.note else "Không có"}}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% if edit_post %} 
+                                        <button class="btn btn-default btn-danger planner-delete-item h-100 text-center">
+                                            <div style="display: block;">
+                                                <i class="fa fa-trash" style="font-size: 12px;"></i>
+                                            </div>
+                                            <div>Xóa</div>
+                                        </button>
+                                    {% endif %}   
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}  
+
+                {% if edit_post %}
+                    <div class="btn btn-info planner-add-item w-100 text-center p-2">
+                        Thêm mặt hàng
+                    </div>
+                {% endif %}                          
+            </div>
+        </div>
+    </div>
 </div>

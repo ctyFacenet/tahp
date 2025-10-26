@@ -1,189 +1,211 @@
-# Copyright (c) 2025, FaceNet and contributors
-# For license information, please see license.txt
+# # Copyright (c) 2025, FaceNet and contributors
+# # For license information, please see license.txt
 
-import frappe
 import json
-from frappe import _
-from frappe.utils import now_datetime
+import frappe
 from frappe.model.document import Document
+from frappe.utils import now_datetime, add_days, nowdate, getdate, formatdate
 
+STEPS = {
+    "Nháp": {
+        "lock_fields": ["bom", "item_name", "stock_uom"],
+        "edit_fields": ["item_code", "qty", "start_date", "end_date", "note"],
+        "edit_fields_by": ["Kế hoạch sản xuất"],
+        "edit_post": True,
+        "edit_post_by": ["Kế hoạch sản xuất"],
+        "edit_workflow_by": ["Kế hoạch sản xuất"],
+    },
+    "Đợi PTCN Duyệt": {
+        "lock_fields": ["item_name", "stock_uom", "item_code", "qty", "start_date", "end_date"],
+        "edit_fields": ["bom", "note"],
+        "edit_fields_by": ["Phát triển công nghệ"],
+        "edit_workflow_by": ["Phát triển công nghệ"],
+    },
+    "Đã được PTCN duyệt": {
+        "lock_fields": ["bom", "item_name", "stock_uom", "item_code"],
+        "edit_fields": ["qty", "start_date", "end_date", "note"],
+        "edit_fields_by": ["Kế hoạch sản xuất"],
+        "edit_workflow_by": ["Kế hoạch sản xuất"],
+    },
+    "Đợi GĐ duyệt": {
+        "lock_fields": ["item_code", "item_name", "stock_uom", "qty", "start_date", "end_date", "bom"],
+        "edit_fields": ["note"],
+        "edit_fields_by": ["Giám đốc"],
+        "actions": ["Phê duyệt"],
+        "actions_by": ["Giám đốc"],
+        "edit_workflow_by": ["Kế hoạch sản xuất", "Giám đốc"],
+    },
+    "Duyệt xong": {
+        "lock_fields": ["item_code", "item_name", "stock_uom", "qty", "start_date", "end_date", "bom", "note"],
+    },
+    "Đã hủy bỏ": {
+        "lock_fields": ["item_code", "item_name", "stock_uom", "qty", "start_date", "end_date", "bom", "note"],
+    }
+}
 
 class CustomPlanner(Document):
-    pass
+    def autoname(self):
+        clean_code = self.code_name.replace("LSX.", "").replace(".LSX", "").replace("LSX", "")
+        clean_code = clean_code.strip(".")
+        new_name = f"KHSX.{clean_code}"
+        self.name = new_name
+
+    def before_save(self):
+        for item in self.items:
+            if isinstance(item.parent_name, int):
+                for post in self.posts:
+                    if item.parent_name == post.routing:
+                        item.parent_name = post.name
+                        break
+
+    def on_cancel(self):
+        self.workflow_state = "Đã hủy bỏ"
+        wwo_list = frappe.get_all("Week Work Order", filters={"new_plan": self.name}, pluck="name")
+        for wwo_name in wwo_list:
+            frappe.delete_doc("Week Work Order", wwo_name, force=True)
 
 @frappe.whitelist()
-def add_post(planner):
-    doc = frappe.get_doc("Custom Planner", planner)
-    post = doc.append("posts", {})
-    doc.save(ignore_permissions=True)
-    doc.append("items", {"parent_name": post.name})
-    doc.save(ignore_permissions=True)
-    return {"post_name": post.name}
+def check_permission(workflow_state):
+    roles = frappe.get_roles(frappe.session.user)
+    step_config = STEPS.get(workflow_state, {})
 
+    edit_post = any(r in roles for r in step_config.get("edit_post_by", [])) if step_config.get("edit_post_by") else False
+    edit_workflow = any(r in roles for r in step_config.get("edit_workflow_by", [])) if step_config.get("edit_workflow_by") else False
+
+    return {"edit_post": edit_post, "edit_workflow": edit_workflow}
+    
 @frappe.whitelist()
-def delete_post(planner, post_name):
-    doc = frappe.get_doc("Custom Planner", planner)
-    for post in list(doc.posts):
-        if post.name == post_name:
-            doc.remove(post)
-            for item in doc.items:
-                if item.parent_name == post_name:
-                    doc.remove(item)
-            break
+def render_content(planner, post, items={}):
+    if isinstance(post, str): post = json.loads(post)
+    if isinstance(items, str): items = json.loads(items)
 
-    doc.save(ignore_permissions=True)
-    return
-
-@frappe.whitelist()
-def delete_item(planner, item_name):
-    doc = frappe.get_doc("Custom Planner", planner)
-    for item in list(doc.items):
-        if item.name == item_name:
-            doc.remove(item)
-            break
-
-    doc.save(ignore_permissions=True)
-    return
-
-@frappe.whitelist()
-def add_item(planner, post_name):
-    doc = frappe.get_doc("Custom Planner", planner)
-    doc.append("items", {"parent_name": post_name})
-    doc.save(ignore_permissions=True)
-    return
-
-@frappe.whitelist()
-def save_planner_data(planner, data):
-    data = json.loads(data) if isinstance(data, str) else data
-    print(data)
-
-    doc = frappe.get_doc("Custom Planner", planner)
-
-    existing_posts = {p.name for p in doc.posts}
-    new_post_names = {p["post_name"] for p in data}
-    mapping_posts = dict()
-
-    # Xóa các post bị loại bỏ
-    for post in list(doc.posts):
-        if post.name not in new_post_names:
-            doc.remove(post)
-
-    # Xử lý từng post
-    for post_block in data:
-        post_name = post_block["post_name"]
-        if post_name not in existing_posts:
-            new_post = doc.append("posts", {})
-            doc.save(ignore_permissions=True)
-            mapping_posts[post_name] = new_post.name
-            print('Added posts', new_post.name)
-
-        # Lấy items cũ của post này
-        existing_items = {i.name: i for i in doc.items if i.parent_name == post_name}
-        new_item_names = {r["item_name"] for r in post_block["rows"]}
-
-        # Xóa item bị loại bỏ
-        for name in list(existing_items.keys()):
-            if name not in new_item_names:
-                doc.remove(existing_items[name])
-
-        # Cập nhật / thêm item
-        for row in post_block["rows"]:
-            if row["item_name"] in existing_items:
-                item = existing_items[row["item_name"]]
-            else:
-                if post_name in mapping_posts:
-                    item = doc.append("items", {"parent_name": mapping_posts[post_name]})
-                else:
-                    item = doc.append("items", {"parent_name": post_name})
-
-            for f in ['item_code','item_name_display','uom','qty','bom','start_date','end_date','note']:
-                item.set(f, row.get(f))
-            print(item.parent_name)
-            
-    doc.save(ignore_permissions=True)
-    return True
-
-@frappe.whitelist()
-def render_template(planner, post_name=None):
-    planner = frappe.get_doc("Custom Planner", planner)
-
-    agents = {
-        "Kế hoạch sản xuất": {
-            "lock": ["bom"],
-            "actions": [],
-            "edit": True
-        },
-        "Phát triển công nghệ": {
-            "lock": ["item_code", "item_name", "uom", "qty", "start_date", "end_date"],
-            "actions": [],
-            "edit": True
-        },
-        "Giám đốc": {
-            "lock": [],
-            "actions": ["Phê duyệt"],
-            "edit": False
-        }
-    }
-
-    user_roles = frappe.get_roles(frappe.session.user)
-    matched_roles = [r for r in user_roles if r in agents]
-
-    final_lock, final_actions, final_edit = [], [], False
-    if matched_roles:
-        all_locks = [set(agents[r]["lock"]) for r in matched_roles]
-        final_lock = list(set.intersection(*all_locks)) if all_locks else []
-        all_actions = sum([agents[r]["actions"] for r in matched_roles], [])
-        final_actions = list(set(all_actions))
-        final_edit = any(agents[r].get("edit", False) for r in matched_roles)
-
-    # Nếu truyền post_name: chỉ render post đó
-    posts_to_render = []
-    if post_name:
-        post = frappe.get_doc({
-            "doctype": "Custom Planner Post",
-            "name": post_name,
-            "parent": planner.name,
-            "parenttype": "Custom Planner",
-            "parentfield": "posts",
-            "title": f"Phương án #{len(planner.posts) + 1}"
-        })
-        posts_to_render = [post]
+    doc = None
+    workflow_state = None
+    if not planner.startswith("new-custom-planner"):
+        doc = frappe.get_doc("Custom Planner", planner)
+        workflow_state = doc.workflow_state
     else:
-        posts_to_render = planner.posts
+        workflow_state = "Nháp"
 
-    result = []
-    index = 1
-    for post in posts_to_render:
-        related_items = [i for i in planner.items if i.parent_name == post.name]
+    roles = frappe.get_roles(frappe.session.user)
+    step_config = STEPS.get(workflow_state, {})
 
-        items_data = [{
-            "item_name": i.name,
-            "post_name": post.name,
-            "item_code": i.item_code or "",
-            "item_name_display": i.item_name or "",
-            "stock_uom": _(i.stock_uom) or "",
-            "qty": i.qty or 0,
-            "bom": i.bom or "",
-            "start_date": i.start_date or "",
-            "end_date": i.end_date or "",
-            "note": i.note or "",
-            "materials": getattr(i, "materials", []) or [],
-        } for i in related_items]
+    lock_fields = step_config.get("lock_fields", []).copy()
 
-        html = frappe.render_template(
-            "/tahp/doctype/custom_planner/custom_planner.html",
-            {
-                "title": f"Phương án #{index}",
-                "edit": final_edit,
-                "lock": final_lock,
-                "actions": final_actions,
-                "data": items_data,
-                "post_name": post.name
-            }
-        )
-        result.append(html)
-        index += 1
+    edit_fields = []
+    edit_fields_by_roles = step_config.get("edit_fields_by", [])
+    if any(r in roles for r in edit_fields_by_roles):
+        edit_fields = step_config.get("edit_fields", [])
 
-    return result
+    lock_fields += [f for f in step_config.get("edit_fields", []) if f not in edit_fields]
+    edit_post = any(r in roles for r in step_config.get("edit_post_by", [])) if step_config.get("edit_post_by") else False
+    actions = []
+    if step_config.get("actions") and any(r in roles for r in step_config.get("actions_by", [])):
+        actions = step_config.get("actions", [])
 
+    post["lock"] = lock_fields
+    post["edit_fields"] = edit_fields
+    post["edit_post"] = edit_post
+    post["actions"] = actions
 
+    keys = ["item_code", "item_name", "stock_uom", "qty", "bom", "start_date", "end_date", "note", "materials", "idx"]
+    post["data"] = []
+    for item in items:
+        for k in keys:
+            if k not in item or item[k] is None:
+                item[k] = 0 if k == "qty" else ""
+
+        item_dict = {k: frappe._(item[k]) for k in keys}
+        post["data"].append(item_dict)
+
+    html = frappe.render_template("/tahp/doctype/custom_planner/custom_planner.html", post)
+    return html
+
+@frappe.whitelist()
+def handle_approve(planner, post, comment=None):
+    doc = frappe.get_doc("Custom Planner", planner)
+    ready = False
+    routing = None
+    for p in doc.posts:
+        if p.name == post:
+            p.approved = True
+            routing = p.routing
+            ready = True
+            break
+
+    if ready:
+        plan = frappe.new_doc("Week Work Order")
+        plan.name = doc.code_name
+        plan.code_name = doc.code_name
+        plan.new_plan = doc.name
+        plan.creation_time = now_datetime()
+
+        notes = []
+        for item in doc.items:
+            if item.parent_name == routing or item.parent_name == post:
+                plan.append("items", {
+                    "item": item.item_code,
+                    "item_name": item.item_name,
+                    "qty": item.qty,
+                    "uom": item.stock_uom,
+                    "bom": item.bom,
+                    "planned_start_time": item.start_date,
+                    "planned_end_time": item.end_date,
+                })
+                if item.note: notes.append(f"- Ghi chú {item.item_name}: {item.note}")
+
+        plan.note = "\n".join(notes) if notes else None
+        plan.insert(ignore_permissions=True)
+        plan.db_set("workflow_state", "Duyệt xong")
+        plan.submit()
+
+    doc.db_set("workflow_state", "Duyệt xong")
+    doc.submit()
+
+    subject= f"LSX Tuần {plan.name} đã được Giám đốc duyệt"
+    if comment:
+        plan.add_comment("Comment", f"<b>Giám đốc để lại lưu ý</b>: {comment}")
+        subject = f"LSX Tuần {plan.name} đã được Giám đốc duyệt kèm theo lưu ý: {comment}"
+
+    wwo_notify(
+        role = "Kế hoạch sản xuất",
+        subject = subject,
+        document_type="Week Work Order",
+        document_name=plan.name,
+    )
+
+@frappe.whitelist()
+def wwo_notify(role, subject, document_type, document_name, comment=None):
+    user_ids = frappe.db.get_all("Has Role", filters={"role": role}, pluck="parent", distinct=True)
+    active_users = frappe.db.get_all("User", filters={"name": ["in", user_ids], "enabled": 1}, pluck="name")
+    if not active_users: return
+    for user in active_users:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "for_user": user,
+            "subject": subject,
+            "email_content": subject,
+            "type": "Alert",
+            "document_type": document_type,
+            "document_name": document_name
+        }).insert(ignore_permissions=True)
+
+    if comment:
+        print('here')
+        doc = frappe.get_doc(document_type, document_name)
+        doc.add_comment("Comment", f"{role}: {comment}")
+
+    return {"ok": True}
+
+@frappe.whitelist()
+def recommend_code_name():
+    today = getdate(nowdate())
+    next_day = add_days(today, 1)
+    code_date = formatdate(next_day, "dd.MM.yy")
+    base_code = f"LSX.{code_date}"
+    code_name = base_code
+    counter = 1
+    while frappe.db.exists("Week Work Order", code_name):
+        code_name = f"{base_code}.{counter}"
+        counter += 1
+    return code_name
