@@ -14,4 +14,4 @@ def on_submit(doc, method):
                 "type": "Alert",
                 "document_type": "Job Card",
                 "document_name": doc.name
-            }).insert(ignore_permissions=True)        
+            }).insert(ignore_permissions=True)

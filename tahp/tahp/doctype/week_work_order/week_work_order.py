@@ -6,7 +6,7 @@ from frappe.model.document import Document
 
 class WeekWorkOrder(Document):
 	def before_save(self):
-		if not self.plan and self.get("__islocal"):
+		if not self.plan and self.get("__islocal") and not self.new_plan:
 			# Tạo mới WWO Plan rỗng
 			plan = frappe.new_doc('WWO Plan')
 			plan.insert(ignore_permissions=True)

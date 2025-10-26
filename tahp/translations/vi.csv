@@ -2079,7 +2079,7 @@ Due Date,Due Date
 Due Date Based On,Due Date Based On
 Duplicate Entry,Duplicate Entry
 Duplicate Filter Name,Duplicate Filter Name
-Duplicate Name,Duplicate Name
+Duplicate Name,Tên bị trùng
 Duplicate Workspace,Duplicate Workspace
 Duplicate current row,Duplicate current row
 Duplicate field,Duplicate field
@@ -6109,7 +6109,7 @@ zoom-out,zoom-out
 {0} years ago,{0} years ago
 {0} {1} added,{0} {1} added
 {0} {1} added to Dashboard {2},{0} {1} added to Dashboard {2}
-{0} {1} already exists,{0} {1} already exists
+{0} {1} already exists,Đối tượng {0} {1} đã tồn tại
 "{0} {1} cannot be \""{2}\"". It should be one of \""{3}\","{0} {1} cannot be \""{2}\"". It should be one of \""{3}\"
 {0} {1} cannot be a leaf node as it has children,{0} {1} cannot be a leaf node as it has children
 "{0} {1} does not exist, select a new target to merge","{0} {1} does not exist, select a new target to merge"
@@ -14059,3 +14059,4 @@ Custom Invoice Allocation, Phiếu nhập xuất có hóa đơn
 Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho
 Custom Invoice Summary, Phiếu tổng hợp nhập xuất có hóa đơn
 Work Order Finished Item, Kết quả LSX Ca
+Custom Planner, Kế hoạch sản xuất

@@ -14,6 +14,7 @@
   "note",
   "section_break_jnld",
   "plan",
+  "new_plan",
   "wo_status",
   "item_list",
   "column_break_djft",
@@ -88,7 +89,6 @@
    "fieldname": "code_name",
    "fieldtype": "Data",
    "label": "M\u00e3 l\u1ec7nh s\u1ea3n xu\u1ea5t",
-   "reqd": 1,
    "unique": 1
   },
   {
@@ -124,13 +124,21 @@
    "in_list_view": 1,
    "label": "Ng\u00e0y k\u1ebft th\u00fac",
    "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "new_plan",
+   "fieldtype": "Link",
+   "label": "K\u1ebf ho\u1ea1ch s\u1ea3n xu\u1ea5t m\u1edbi",
+   "options": "Custom Planner",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-21 16:48:41.208620",
+ "modified": "2025-10-23 14:56:32.722456",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order",
