@@ -63,6 +63,8 @@
       @view="onView"
       @edit="onEdit"
       @delete="onDelete"
+      :doctype="'Custom Sale Order'"
+      :nameKey="'name'"
     />
   </BaseLayout>
 </template>

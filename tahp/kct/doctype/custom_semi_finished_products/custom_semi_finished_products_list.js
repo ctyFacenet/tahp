@@ -18,6 +18,7 @@ frappe.listview_settings["Custom Semi Finished Products"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        name: row.name,
         lotNumber: row.lotnumber,
         qrLabelCode: row.qrlabelcode,
         status: row.status,

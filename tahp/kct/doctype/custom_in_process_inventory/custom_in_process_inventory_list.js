@@ -21,6 +21,7 @@ frappe.listview_settings["Custom In Process Inventory"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        name: row.name,
         warehouseName: row.warehousename,
         materialGroup: row.materialgroup,
         materialType: row.materialtype,

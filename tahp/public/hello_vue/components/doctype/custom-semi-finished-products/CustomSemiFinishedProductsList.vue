@@ -45,7 +45,7 @@
       </div>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="lotNumber">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="lotNumber" :doctype="'Custom Semi Finished Products'" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Duyệt huỷ tem">

@@ -30,7 +30,7 @@
       </a-input>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="materialGroup">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="materialGroup" :doctype="'Custom In Process Inventory'" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Chi tiết">

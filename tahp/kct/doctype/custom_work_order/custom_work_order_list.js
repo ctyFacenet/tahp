@@ -18,6 +18,7 @@ frappe.listview_settings["Custom Work Order"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        name: row.name,
         workOrderCode: row.workordercode,
         status: row.status,
         itemCode: row.productcode,

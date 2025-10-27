@@ -66,7 +66,7 @@
       </div>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="productCode">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="productCode" :doctype="'Custom Production Order'" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Chỉnh sửa BOM">
