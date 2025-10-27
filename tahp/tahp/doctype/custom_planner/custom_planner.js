@@ -373,9 +373,10 @@ frappe.ui.form.on("Custom Planner", {
                 frm.events.display_save_button(frm, true);
             });
 
-            container.closest('td').find('.bom-icon').on('click', async function () {
-                frm.dirty()
-                await frm.save()
+            container.parent().find('.bom-icon').on('click', async function () {
+                if (frm.is_dirty()) {
+                    await frm.save();
+                }
                 frappe.set_route('query-report', 'BOM Custom Search', {
                     custom_plan: frm.doc.name,
                     row_name: item.name,
@@ -718,8 +719,10 @@ frappe.ui.form.on("Custom Planner", {
     },
 
     apply_delete_item: async function(frm, wrapper) {
-        const item_idx = $(wrapper).closest('tr').data('idx')
+        const $row = $(wrapper).closest('[data-idx]');
+        const item_idx = parseInt($row.attr('data-idx'), 10);
         const item = frm.doc.items[item_idx]
+        console.log(item)
         let post = frm.doc.posts.find(p => p.routing === item.parent_name || p.name === item.parent_name)
         if (!item) return;
 
