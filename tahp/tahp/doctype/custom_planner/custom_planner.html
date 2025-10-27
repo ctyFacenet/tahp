@@ -182,7 +182,10 @@
                                 <div style="font-weight: 500" class="d-flex justify-content-between align-items-center mb-2">
                                     <span>Công thức sản xuất</span>
                                     {% if 'bom' in edit_fields %}
-                                        <div data-fieldname="bom" class="align-middle w-50 h-100" title="bom"></div>
+                                        <div class="d-flex justify-content-between align-items-center w-50">
+                                            <div data-fieldname="bom" class="align-middle w-100 h-100" title="bom"></div>
+                                            <span class="fa fa-search ml-3 bom-icon" style="cursor: pointer; color: #666;" title="Tìm kiếm BOM"></span>
+                                        </div>
                                     {% else %}
                                         <span title="bom">{{row.bom}}</span>
                                     {% endif %}
