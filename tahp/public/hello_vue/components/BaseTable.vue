@@ -61,8 +61,8 @@
               </template>
 
               <template v-else-if="col.key === 'status'">
-                <a-select v-model:value="statusFilter" show-search allowClear placeholder="Chọn trạng thái" style="width: 200px"
-                  :options="statusOptions" :filter-option="filterOption" />
+                <a-select v-model:value="statusFilter" show-search allowClear placeholder="Chọn trạng thái"
+                  style="width: 200px" :options="statusOptions" :filter-option="filterOption" />
               </template>
 
               <template v-else-if="col.key !== 'actions'">
@@ -177,18 +177,26 @@
 
     <div
       class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-py-2 tw-px-3 tw-border-gray-200 tw-bg-gray-50 tw-text-xs sm:tw-text-sm">
-      <a-select v-model:value="pageSize" :options="pageSizeOptions" class="tw-w-[110px]" @change="onPageSizeChange" />
-      <div class="tw-flex tw-items-center tw-gap-2">
-        <span>Trang số {{ currentPage }} / {{ totalPages }} ({{ filteredRows?.length || 0 }} bản ghi)</span>
+      <a-select v-model:value="pageSize" :options="pageSizeOptions" class="tw-hidden sm:tw-block tw-w-[110px]"
+        @change="onPageSizeChange" />
+
+      <div
+        class="tw-flex tw-flex-col sm:tw-flex-row  tw-items-center tw-justify-center tw-gap-2 sm:tw-gap-3 tw-w-full sm:tw-w-auto tw-justify-center">
+        <span class="tw-hidden sm:tw-inline tw-text-gray-600 tw-font-medium">
+          Trang số {{ currentPage }} / {{ totalPages }} ({{ filteredRows?.length || 0 }} bản ghi)
+        </span>
+
         <a-pagination v-model:current="currentPage" :total="filteredRows?.length || 0" :pageSize="pageSize"
-          @change="onPageChange" :showSizeChanger="false" size="small" />
+          @change="onPageChange" :showSizeChanger="false" size="small" class="tw-my-1 sm:tw-my-0" />
       </div>
-      <div class="tw-flex tw-items-center tw-gap-2">
+
+      <div class="tw-hidden sm:tw-flex tw-items-center tw-gap-2">
         <span>Đi đến</span>
         <a-input-number v-model:value="goToPage" :min="1" :max="totalPages" @pressEnter="jumpToPage" style="width: 70px"
           size="small" />
       </div>
     </div>
+
 
     <div
       class="tw-text-center tw-py-3 tw-border-t tw-border-gray-200 tw-bg-white tw-text-[13px] sm:tw-text-[14px] tw-font-[500] tw-tracking-wide tw-text-gray-600">
@@ -220,8 +228,6 @@ const props = defineProps({
   nameKey: { type: String, default: "name" },
 });
 
-
-
 const emit = defineEmits(["rowClick", "view", "edit", "delete"]);
 
 const openForm = (row) => {
@@ -241,7 +247,6 @@ const handleRowClick = (event, row) => {
   if (inActionCell) return;
   openForm(row);
 };
-
 
 const isProductionCell = (key) => {
   if (!key) return false;
@@ -287,8 +292,6 @@ const getStatusColor = (value) => {
 
   return "#9ca3af";
 };
-
-
 
 const groupedRows = computed(() => {
   if (!props.groupBy) return [{ key: "Tất cả", rows: props.rows || [] }];
@@ -469,6 +472,84 @@ thead th,
 tbody td {
   white-space: nowrap;
   background-clip: padding-box;
+}
+
+:deep(.ant-pagination) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+:deep(.ant-pagination-item) {
+  border-radius: 6px !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease;
+  min-width: 28px !important;
+  height: 28px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:deep(.ant-pagination-item a) {
+  color: #374151 !important;
+  font-size: 13px;
+  line-height: 1;
+}
+
+:deep(.ant-pagination-item-active) {
+  border-color: #2490ef !important;
+  background-color: #2490ef !important;
+}
+
+:deep(.ant-pagination-item-active a) {
+  color: #fff !important;
+}
+
+:deep(.ant-pagination-item:hover) {
+  border-color: #2490ef !important;
+  color: #2490ef !important;
+}
+
+:deep(.ant-pagination-prev),
+:deep(.ant-pagination-next) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+:deep(.ant-pagination-prev:hover),
+:deep(.ant-pagination-next:hover) {
+  background-color: #f3f4f6 !important;
+}
+
+:deep(.ant-pagination-prev .ant-pagination-item-link),
+:deep(.ant-pagination-next .ant-pagination-item-link) {
+  color: #374151 !important;
+  font-size: 13px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  height: 28px !important;
+  width: 28px !important;
+}
+
+:deep(.ant-pagination-prev:hover .ant-pagination-item-link),
+:deep(.ant-pagination-next:hover .ant-pagination-item-link) {
+  color: #2490ef !important;
+  border-color: #2490ef !important;
+}
+
+:deep(.ant-pagination-item-ellipsis) {
+  color: #9ca3af !important;
 }
 
 .fade-left,
