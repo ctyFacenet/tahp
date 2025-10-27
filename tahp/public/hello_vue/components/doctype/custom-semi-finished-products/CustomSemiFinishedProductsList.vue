@@ -2,8 +2,7 @@
   <BaseLayout title="Danh sách tem bán thành phẩm" :showDateFilter="true">
     <template #actions>
       <div
-        class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-2 tw-w-full sm:tw-w-auto"
-      >
+        class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-2 tw-w-full sm:tw-w-auto">
         <a-button type="link" class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef]">
           <FileDoneOutlined /> Duyệt huỷ tem
         </a-button>
@@ -18,38 +17,26 @@
 
         <a-dropdown trigger="click" placement="bottomRight">
           <template #overlay>
-            <a-menu>
-              <a-menu-item
-                v-for="col in allColumns"
-                :key="col.key"
-                class="tw-text-[13px]"
-              >
-                <a-checkbox
-                  v-model:checked="visibleColumns[col.key]"
-                  @change="updateVisibleColumns"
-                >
-                  {{ col.title }}
-                </a-checkbox>
-              </a-menu-item>
-            </a-menu>
+            <div
+              class="tw-max-h-[300px] tw-max-w-[250px] tw-overflow-y-auto tw-overflow-x-auto tw-bg-white tw-rounded-md tw-shadow-lg tw-border tw-border-gray-200">
+              <a-menu>
+                <a-menu-item v-for="col in allColumns" :key="col.key"
+                  class="tw-text-[13px] tw-whitespace-nowrap tw-flex tw-items-center">
+                  <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
+                    {{ col.title }}
+                  </a-checkbox>
+                </a-menu-item>
+              </a-menu>
+            </div>
           </template>
-          <a-button
-            type="text"
-            class="tw-flex tw-items-center tw-justify-center tw-p-0"
-            title="Chọn cột hiển thị"
-          >
+          <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
             <CopyOutlined class="tw-text-[#2490ef]" />
           </a-button>
         </a-dropdown>
 
         <div class="tw-w-full sm:tw-w-[220px] md:tw-w-[300px]">
-          <a-input
-            v-model:value="searchKeyword"
-            placeholder="Nhập thông tin để tìm kiếm"
-            class="tw-h-[30px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] tw-w-full"
-            size="small"
-            allowClear
-          >
+          <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
+            class="tw-h-[30px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] tw-w-full" size="small" allowClear>
             <template #prefix>
               <SearchOutlined class="tw-text-gray-400" />
             </template>

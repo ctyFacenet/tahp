@@ -734,6 +734,10 @@ video {
   height: 100% !important;
 }
 
+.tw-max-h-\[300px\] {
+  max-height: 300px !important;
+}
+
 .tw-max-h-\[70vh\] {
   max-height: 70vh !important;
 }
@@ -801,6 +805,10 @@ video {
 .tw-min-w-max {
   min-width: -moz-max-content !important;
   min-width: max-content !important;
+}
+
+.tw-max-w-\[250px\] {
+  max-width: 250px !important;
 }
 
 .tw-flex-1 {
@@ -1493,6 +1501,12 @@ video {
 .tw-shadow-\[3px_0_6px_rgba\(0\,0\,0\,0\.12\)\] {
   --tw-shadow: 3px 0 6px rgba(0,0,0,0.12) !important;
   --tw-shadow-colored: 3px 0 6px var(--tw-shadow-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.tw-shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color) !important;
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 

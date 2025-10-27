@@ -51,14 +51,19 @@
             </a-button>
             <a-dropdown trigger="click" placement="bottomRight">
               <template #overlay>
-                <a-menu>
-                  <a-menu-item v-for="col in allColumns" :key="col.key" class="tw-text-[13px]">
-                    <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
-                      {{ col.title }}
-                    </a-checkbox>
-                  </a-menu-item>
-                </a-menu>
+                <div
+                  class="tw-max-h-[300px] tw-max-w-[250px] tw-overflow-y-auto tw-overflow-x-auto tw-bg-white tw-rounded-md tw-shadow-lg tw-border tw-border-gray-200">
+                  <a-menu>
+                    <a-menu-item v-for="col in allColumns" :key="col.key"
+                      class="tw-text-[13px] tw-whitespace-nowrap tw-flex tw-items-center">
+                      <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
+                        {{ col.title }}
+                      </a-checkbox>
+                    </a-menu-item>
+                  </a-menu>
+                </div>
               </template>
+
 
               <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
                 <CopyOutlined class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]" />

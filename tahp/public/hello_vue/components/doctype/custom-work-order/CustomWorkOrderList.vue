@@ -3,81 +3,51 @@
     <template #actions>
       <a-dropdown trigger="click" placement="bottomRight">
         <template #overlay>
-          <a-menu>
-            <a-menu-item
-              v-for="col in allColumns"
-              :key="col.key"
-              class="tw-text-[13px]"
-            >
-              <a-checkbox
-                v-model:checked="visibleColumns[col.key]"
-                @change="updateVisibleColumns"
-              >
-                {{ col.title }}
-              </a-checkbox>
-            </a-menu-item>
-          </a-menu>
+          <div
+            class="tw-max-h-[300px] tw-max-w-[250px] tw-overflow-y-auto tw-overflow-x-auto tw-bg-white tw-rounded-md tw-shadow-lg tw-border tw-border-gray-200">
+            <a-menu>
+              <a-menu-item v-for="col in allColumns" :key="col.key"
+                class="tw-text-[13px] tw-whitespace-nowrap tw-flex tw-items-center">
+                <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
+                  {{ col.title }}
+                </a-checkbox>
+              </a-menu-item>
+            </a-menu>
+          </div>
         </template>
 
-        <a-button
-          type="text"
-          class="tw-flex tw-items-center tw-justify-center tw-p-0"
-          title="Chọn cột hiển thị"
-        >
-          <CopyOutlined
-            class="tw-text-[#2490ef] tw-text-[13px] hover:tw-text-[#1677c8]"
-          />
+        <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
+          <CopyOutlined class="tw-text-[#2490ef] tw-text-[13px] hover:tw-text-[#1677c8]" />
         </a-button>
       </a-dropdown>
 
-      <a-input
-        v-model:value="searchKeyword"
-        placeholder="Nhập thông tin để tìm kiếm"
+      <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
         class="tw-w-[200px] sm:tw-w-[300px] tw-h-[28px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none"
-        size="small"
-        allowClear
-      >
+        size="small" allowClear>
         <template #prefix>
           <SearchOutlined class="tw-text-gray-400" />
         </template>
       </a-input>
     </template>
 
-    <BaseTable
-      :columns="displayedColumns"
-      :rows="filteredRows"
-      @view="onView"
-      @edit="onApproved"
-      @delete="onDelete"
-    >
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" @view="onView" @edit="onApproved" @delete="onDelete">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Xem chi tiết">
-            <EyeOutlined
-              class="tw-text-blue-600 hover:tw-text-blue-800 tw-cursor-pointer"
-              @click="onView(row)"
-            />
+            <EyeOutlined class="tw-text-blue-600 hover:tw-text-blue-800 tw-cursor-pointer" @click="onView(row)" />
           </a-tooltip>
 
           <a-tooltip title="Phê duyệt">
-            <FileDoneOutlined
-              class="tw-text-green-600 hover:tw-text-green-800 tw-cursor-pointer"
-              @click="onApproved(row)"
-            />
+            <FileDoneOutlined class="tw-text-green-600 hover:tw-text-green-800 tw-cursor-pointer"
+              @click="onApproved(row)" />
           </a-tooltip>
 
           <a-tooltip title="Lập kế hoạch sản xuất">
-            <CalendarOutlined
-              class="tw-text-teal-600 hover:tw-text-teal-800 tw-cursor-pointer"
-              @click="onPlan(row)"
-            />
+            <CalendarOutlined class="tw-text-teal-600 hover:tw-text-teal-800 tw-cursor-pointer" @click="onPlan(row)" />
           </a-tooltip>
 
           <a-tooltip title="Xóa">
-            <DeleteOutlined
-              class="tw-text-red-600 hover:tw-text-red-800 tw-cursor-pointer"
-              @click="onDelete(row)"
-            />
+            <DeleteOutlined class="tw-text-red-600 hover:tw-text-red-800 tw-cursor-pointer" @click="onDelete(row)" />
           </a-tooltip>
         </div>
       </template>
