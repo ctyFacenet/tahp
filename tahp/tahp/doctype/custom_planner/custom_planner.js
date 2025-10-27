@@ -394,6 +394,24 @@ frappe.ui.form.on("Custom Planner", {
             {fieldname: 'note', fieldtype: 'Small Text'},
         ];
 
+        function adjustTextareaHeight(el) {
+            if (!el) return;
+            const isMobile = el.closest('div[data-role="mobile-row"]');
+            const minHeight = isMobile ? 50 : 30;
+            el.style.setProperty('height', `${minHeight}px`, 'important');
+
+            requestAnimationFrame(() => {
+                const targetHeight = Math.max(el.scrollHeight, minHeight);
+                el.style.setProperty('height', `${targetHeight}px`, 'important');
+            });
+        }
+
+        if (window._allTextareaResizeHandlers) {
+            window._allTextareaResizeHandlers.forEach(h => window.removeEventListener('resize', h));
+        }
+        window._allTextareaResizeHandlers = [];
+        let createdTextareas = [];
+
         for (let f of fields) {
             let containers = $wrapper.find(`td[data-fieldname="${f.fieldname}"], div[data-role="mobile-row"] div[data-fieldname="${f.fieldname}"]`);
             for (const el of containers.toArray()) {
@@ -430,34 +448,26 @@ frappe.ui.form.on("Custom Planner", {
                     let inMobileRow = container.closest('div[data-role="mobile-row"]').length > 0;
                     let inputHeight = inMobileRow ? 50 : 30;
 
-                    temp.$input.attr(
-                        "style",
-                        `
-                        min-height: ${inputHeight}px !important;
-                        height: ${inputHeight}px !important;
-                        overflow: hidden !important;
-                        resize: none !important;
-                        box-sizing: border-box !important;
-                        line-height: 1.2 !important;
-                        `
-                    );
+                    if (temp.df.fieldtype === "Small Text") {
+                        temp.$input.attr("style", `
+                            overflow: hidden !important;
+                            resize: none !important;
+                            box-sizing: border-box !important;
+                            line-height: 1.2 !important;
+                            min-height: 30px !important;
+                            height: 30px !important;
+                        `);
 
-                    let adjustHeight = function () {
-                        // Lấy chiều cao tối thiểu dựa trên loại row (mobile hay desktop)
-                        let $currentContainer = $(this).closest('[data-fieldname]');
-                        let isMobile = $currentContainer.closest('div[data-role="mobile-row"]').length > 0;
-                        let minHeight = isMobile ? 50 : 30;
-                        
-                        this.style.setProperty("height", `${minHeight}px`, "important");
-                        if (this.scrollHeight > this.clientHeight + 2) {
-                            this.style.setProperty("height", `${this.scrollHeight}px`, "important");
-                        }
-                    };
+                        temp.$input.on("input", function () {
+                            adjustTextareaHeight(this);
+                        });
 
-                    temp.$input.on("input", adjustHeight);
-                    adjustHeight.call(temp.$input[0]);
-
+                        // khởi tạo chiều cao ban đầu
+                        adjustTextareaHeight(temp.$input[0]);
+                    }
                 }
+
+                createdTextareas.push(temp.$input[0]); 
                 if (f.class) temp.$input.addClass(f.class);
                 temp.$input.on('change', async function(e) {
                     let value = temp.get_value();
@@ -484,7 +494,7 @@ frappe.ui.form.on("Custom Planner", {
                             let $textarea = $field.find('textarea');
                             if ($textarea.length && $textarea[0] !== temp.$input[0]) {
                                 $textarea.val(value);
-                                $textarea.trigger('input');
+                                requestAnimationFrame(() => adjustTextareaHeight($textarea[0]));
                             }
                         } else {
                             $field.text(value);
@@ -496,8 +506,14 @@ frappe.ui.form.on("Custom Planner", {
 
                 container.data('link-initialized', true);
             }
-            
         }
+
+        const resizeHandler = () => {
+            createdTextareas.forEach(el => adjustTextareaHeight(el));
+        };
+
+        window._allTextareaResizeHandlers.push(resizeHandler);
+        window.addEventListener('resize', resizeHandler);
     },
 
     define_trigger: async function(frm) {
