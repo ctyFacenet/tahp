@@ -93,15 +93,18 @@
               </tr>
 
               <tr v-for="(row, i) in group.rows || []" :key="group.key + '-' + i" :class="[
-                'tw-text-[13px]',
+                'tw-text-[13px] tw-cursor-pointer',
                 selectedRows.has(row)
                   ? 'tw-bg-blue-50 tw-border-l-[3px] tw-border-blue-400'
                   : 'hover:tw-bg-gray-50',
-              ]">
-                <td class="tw-sticky tw-left-0 tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
+              ]" @click="handleRowClick($event, row)">
+                <td
+                  class="checkbox-cell tw-sticky tw-left-0 tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
                   <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(group.key, row, $event)" />
                 </td>
-                <td class="tw-sticky tw-left-[45px] tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
+
+                <td
+                  class="index-cell tw-sticky tw-left-[45px] tw-top-0 tw-bg-[#f8faff] tw-z-20 tw-text-center tw-border tw-py-1">
                   {{ i + 1 + totalPreviousRows(gIndex) }}
                 </td>
 
@@ -132,13 +135,11 @@
                         {{ row[col.key] }}
                       </span>
                     </div>
-
                   </template>
-
 
                   <template v-else-if="col.key === 'actions'">
                     <slot name="actions" :row="row">
-                      <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
+                      <div class="actions-cell tw-flex tw-items-center tw-justify-center tw-gap-2">
                         <a-tooltip title="Xem chi tiết">
                           <EyeOutlined class="hover:tw-text-gray-600 tw-text-blue-600 tw-cursor-pointer"
                             @click="$emit('view', row)" />
@@ -160,6 +161,7 @@
                   </template>
                 </td>
               </tr>
+
             </template>
           </template>
 
@@ -214,7 +216,31 @@ const props = defineProps({
   rows: { type: Array, default: () => [] },
   columns: { type: Array, default: () => [] },
   groupBy: { type: String, default: null },
+  doctype: { type: String, default: "" },
+  nameKey: { type: String, default: "name" },
 });
+
+
+
+const emit = defineEmits(["rowClick", "view", "edit", "delete"]);
+
+const openForm = (row) => {
+  emit("rowClick", row);
+  if (!props.doctype || !row) return;
+  const docName = row[props.nameKey] || row.name || row.id || null;
+  if (!docName) return;
+
+  frappe.set_route("Form", props.doctype, docName);
+};
+
+const handleRowClick = (event, row) => {
+  const inActionCell =
+    event.target.closest(".actions-cell") ||
+    event.target.closest(".checkbox-cell") ||
+    event.target.closest(".index-cell");
+  if (inActionCell) return;
+  openForm(row);
+};
 
 
 const isProductionCell = (key) => {

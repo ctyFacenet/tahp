@@ -21,6 +21,7 @@ frappe.listview_settings["Custom Work Order Approved"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        name: row.name,
         workOrderCode: row.workordercode, // Mã lệnh sản xuất
         status: row.status, // Trạng thái
         itemCode: row.productcode, // Mã hàng
