@@ -122,7 +122,7 @@ frappe.ui.form.on("Custom Planner", {
         let $action_button = $wrapper.find('.planner-action')
         $action_button.off("click").on("click", async function () {
             const action = $(this).attr('title');
-            frm.events.apply_primary_action(frm, $action_button, action)
+            frm.events.apply_primary_action(frm, this, action)
         })
 
         // Bấm nút Thêm mặt hàng
@@ -218,24 +218,23 @@ frappe.ui.form.on("Custom Planner", {
             const $eye = $(this);
             const $materials = $eye.closest('td').find('.planner-bom-materials');
 
-            // Kiểm tra trạng thái ban đầu
             if ($eye.hasClass('fa-eye')) {
-                $materials.attr('style', 'display:none !important');
-            } else if ($eye.hasClass('fa-eye-slash')) {
                 $materials.attr('style', 'display:block !important; color: grey; font-size: 10px; margin-top: 0.5rem;');
+            } else if ($eye.hasClass('fa-eye-slash')) {
+                $materials.attr('style', 'display:none !important');
             }
 
-            // Gán sự kiện click toggle
             $eye.off('click').on('click', function() {
-                const isHidden = $eye.hasClass('fa-eye');
-                if (isHidden) {
+                const isVisible = $eye.hasClass('fa-eye');
+                if (isVisible) {
                     $eye.removeClass('fa-eye').addClass('fa-eye-slash');
-                    $materials.attr('style', 'display:block !important; color: grey; font-size: 10px; margin-top: 0.5rem;');
+                    $materials.attr('style', 'display:none !important');
                 } else {
                     $eye.removeClass('fa-eye-slash').addClass('fa-eye');
-                    $materials.attr('style', 'display:none !important');
+                    $materials.attr('style', 'display:block !important; color: grey; font-size: 10px; margin-top: 0.5rem;');
                 }
             });
+
         });
 
     },
@@ -639,7 +638,11 @@ frappe.ui.form.on("Custom Planner", {
         const post = frm.doc.posts.find(p => p.idx === post_idx);
 
         let new_item = frm.add_child("items")
+        let now = frappe.datetime.now_datetime();
+        let tomorrow = frappe.datetime.add_days(now, 1);
         new_item.parent_name = post.routing || post.name
+        new_item.start_date = tomorrow 
+        new_item.end_date = tomorrow
         frm.refresh_field("items")
 
         let items = frm.doc.items.filter(i => i.parent_name === post.routing || i.parent_name == post.name)
@@ -742,16 +745,16 @@ frappe.ui.form.on("Custom Planner", {
         );
     },
 
-    apply_primary_action: async function(frm, $wrapper, action) {
+    apply_primary_action: async function(frm, wrapper, action) {
         switch (action) {
             case "Phê duyệt":
-                const $post = $wrapper.closest('.planner-post');
-                const post_idx = $post.data('idx');
-                const post = frm.doc.posts.find(p => p.idx === post_idx)
+                const $post = $(wrapper).closest('.planner-post');
+                let post_idx = parseInt($post.attr('data-idx'))
+                let post = frm.doc.posts[post_idx - 1]
                 if (!post) return
 
                 let d = new frappe.ui.Dialog({
-                    title: `Xác nhận phê duyệt phương án #${$wrapper.closest('.planner-post').data('idx')}?`,
+                    title: `Xác nhận phê duyệt phương án #${post_idx}?`,
                     fields: [
 {
                             fieldname: "comment",

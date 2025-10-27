@@ -208,4 +208,9 @@ def recommend_code_name():
     while frappe.db.exists("Week Work Order", code_name):
         code_name = f"{base_code}.{counter}"
         counter += 1
+
+    if frappe.db.exists("Custom Planner", f"KHSX.{code_date}"):
+        counter += 1
+        code_name = f"{base_code}.{counter}"
+    
     return code_name
