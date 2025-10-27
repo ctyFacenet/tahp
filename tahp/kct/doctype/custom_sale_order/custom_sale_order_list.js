@@ -19,6 +19,7 @@ frappe.listview_settings["Custom Sale Order"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name,
         masterordercode: row.masterordercode,
         ordercreationdate: frappe.format(row.ordercreationdate, { fieldtype: "Date" }),

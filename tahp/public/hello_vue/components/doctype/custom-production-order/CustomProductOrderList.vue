@@ -5,7 +5,8 @@
         class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-2 tw-w-full sm:tw-w-auto">
 
         <a-button type="link"
-          class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
+          class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0"
+          @click="createNewDoc">
           <PlusOutlined />
           Tạo đơn sản xuất nội bộ
         </a-button>
@@ -23,7 +24,8 @@
         </a-button>
 
         <a-button type="link"
-          class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
+          class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0"
+          @click="createNewDoc">
           <PlusOutlined />
           Tạo lệnh sản xuất
         </a-button>
@@ -66,7 +68,8 @@
       </div>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="productCode" :doctype="'Custom Production Order'" :nameKey="'name'">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="productCode"
+      :doctype="docType" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Chỉnh sửa BOM">
@@ -109,6 +112,11 @@ const props = defineProps({
 });
 
 const searchKeyword = ref("");
+
+const docType = computed(() => props.rows?.[0]?.docType || "");
+const createNewDoc = () => {
+  frappe.new_doc(docType);
+};
 
 const allColumns = [
   { title: "Mã hàng", key: "productCode" },

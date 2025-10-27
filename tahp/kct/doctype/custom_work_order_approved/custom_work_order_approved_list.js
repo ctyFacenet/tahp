@@ -21,6 +21,7 @@ frappe.listview_settings["Custom Work Order Approved"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name,//ID random -> route row click
         workOrderCode: row.workordercode, // Mã lệnh sản xuất
         status: row.status, // Trạng thái

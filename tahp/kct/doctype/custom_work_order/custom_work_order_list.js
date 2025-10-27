@@ -18,6 +18,7 @@ frappe.listview_settings["Custom Work Order"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name,//ID random -> route row click
         workOrderCode: row.workordercode,
         status: row.status,

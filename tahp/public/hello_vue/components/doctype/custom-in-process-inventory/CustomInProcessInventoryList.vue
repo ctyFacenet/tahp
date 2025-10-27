@@ -30,7 +30,7 @@
       </a-input>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="materialGroup" :doctype="'Custom In Process Inventory'" :nameKey="'name'">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="materialGroup" :doctype="docType" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Chi tiết">
@@ -61,6 +61,8 @@ const props = defineProps({
 });
 
 const searchKeyword = ref("");
+
+const docType = computed(() => props.rows?.[0]?.docType || "");
 
 const allColumns = [
   { title: "Tên kho", key: "warehouseName" },

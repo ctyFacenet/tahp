@@ -18,6 +18,7 @@ frappe.listview_settings["Custom Semi Finished Products"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name, //ID random -> route row click
         lotNumber: row.lotnumber,
         qrLabelCode: row.qrlabelcode,

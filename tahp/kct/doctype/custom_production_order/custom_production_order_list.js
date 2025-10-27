@@ -19,6 +19,7 @@ frappe.listview_settings["Custom Production Order"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name, //ID random -> route row click
         productCode: row.productcode,
         status: row.status,

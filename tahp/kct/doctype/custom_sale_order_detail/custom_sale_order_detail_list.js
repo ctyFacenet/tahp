@@ -18,6 +18,7 @@ frappe.listview_settings["Custom Sale Order Detail"] = {
 
     const mapRows = (data = []) =>
       data.map((row) => ({
+        docType: listview.doctype,
         name: row.name,
         detailOrderCode: row.detailordercode,
         status: row.status,

@@ -47,7 +47,7 @@
       </div>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="detailOrderCode" :doctype="'Custom Sale Order Detail'" :nameKey="'name'">
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="detailOrderCode" :doctype="docType" :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Phê duyệt">
@@ -82,6 +82,8 @@ const props = defineProps({
 });
 
 const searchKeyword = ref("");
+
+const docType = computed(() => props.rows?.[0]?.docType || "");
 
 const allColumns = [
   { title: "Mã đơn hàng chi tiết", key: "detailOrderCode" },

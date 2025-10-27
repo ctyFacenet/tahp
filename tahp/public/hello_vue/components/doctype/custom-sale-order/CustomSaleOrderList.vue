@@ -2,12 +2,10 @@
   <BaseLayout title="Danh sách đơn hàng tổng" :showDateFilter="false">
     <template #actions>
       <div
-        class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-2 tw-w-full sm:tw-w-auto"
-      >
-        <a-button
-          type="link"
+        class="tw-flex tw-flex-wrap tw-items-center tw-justify-center sm:tw-justify-start tw-gap-2 tw-w-full sm:tw-w-auto">
+        <a-button type="link"
           class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0"
-        >
+          @click="createNewDoc">
           <PlusOutlined />
           Thêm mới
         </a-button>
@@ -15,41 +13,24 @@
         <a-dropdown trigger="click" placement="bottomRight">
           <template #overlay>
             <a-menu>
-              <a-menu-item
-                v-for="col in allColumns"
-                :key="col.key"
-                class="tw-text-[13px]"
-              >
-                <a-checkbox
-                  v-model:checked="visibleColumns[col.key]"
-                  @change="updateVisibleColumns"
-                >
+              <a-menu-item v-for="col in allColumns" :key="col.key" class="tw-text-[13px]">
+                <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
                   {{ col.title }}
                 </a-checkbox>
               </a-menu-item>
             </a-menu>
           </template>
 
-          <a-button
-            type="text"
-            class="tw-flex tw-items-center tw-justify-center tw-p-0"
-            title="Chọn cột hiển thị"
-          >
-            <CopyOutlined
-              class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]"
-            />
+          <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
+            <CopyOutlined class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]" />
           </a-button>
         </a-dropdown>
       </div>
 
       <div class="tw-w-full sm:tw-w-[240px] md:tw-w-[300px]">
-        <a-input
-          v-model:value="searchKeyword"
-          placeholder="Nhập thông tin để tìm kiếm"
+        <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
           class="tw-h-[30px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] focus:tw-shadow-none tw-w-full"
-          size="small"
-          allowClear
-        >
+          size="small" allowClear>
           <template #prefix>
             <SearchOutlined class="tw-text-gray-400" />
           </template>
@@ -57,15 +38,8 @@
       </div>
     </template>
 
-    <BaseTable
-      :columns="displayedColumns"
-      :rows="filteredRows"
-      @view="onView"
-      @edit="onEdit"
-      @delete="onDelete"
-      :doctype="'Custom Sale Order'"
-      :nameKey="'name'"
-    />
+    <BaseTable :columns="displayedColumns" :rows="filteredRows" @view="onView" @edit="onEdit" @delete="onDelete"
+      :doctype="docType" :nameKey="'name'" />
   </BaseLayout>
 </template>
 
@@ -84,6 +58,7 @@ const props = defineProps({
 });
 
 const searchKeyword = ref("");
+const docType = computed(() => props.rows?.[0]?.docType || "");
 
 const allColumns = [
   { title: "Mã đơn hàng tổng", key: "masterordercode" },
@@ -113,6 +88,10 @@ const filteredRows = computed(() => {
     )
   );
 });
+
+const createNewDoc = () => {  
+  frappe.new_doc(docType);
+};
 
 const onView = (row) =>
   frappe.show_alert({

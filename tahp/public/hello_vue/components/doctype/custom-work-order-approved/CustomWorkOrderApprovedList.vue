@@ -83,7 +83,7 @@
         <div
           class="tw-relative tw-w-full tw-h-full tw-overflow-x-auto tw-overflow-y-hidden tw-rounded-md tw-border tw-border-gray-100 tw-bg-white">
           <BaseTable :columns="displayedColumns" :rows="filteredRows" @view="onView" @edit="onEdit" @delete="onDelete"
-            :doctype="'Custom Work Order Approved'" :nameKey="'name'" />
+            :doctype="docType" :nameKey="'name'" />
 
           <div
             class="tw-absolute tw-bottom-0 tw-left-0 tw-right-0 tw-text-[11px] tw-text-gray-400 tw-bg-white/70 tw-text-center tw-py-1 sm:tw-hidden">
@@ -109,6 +109,7 @@ import TreeFilter from "../../TreeFilter.vue";
 const props = defineProps({
   rows: { type: Array, default: () => [] },
 });
+const docType = computed(() => props.rows?.[0]?.docType || "");
 
 const showFilter = ref(true);
 const onFilterChange = () => {
