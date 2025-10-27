@@ -719,14 +719,12 @@ frappe.ui.form.on("Custom Planner", {
 
     apply_delete_item: async function(frm, wrapper) {
         const item_idx = $(wrapper).closest('tr').data('idx')
-        const post_idx = $(wrapper).closest('tr').closest('.planner-post').data('idx')
-        const post = frm.doc.posts.find(p => p.idx === post_idx)
-
-        const item = frm.doc.items.find(i => i.idx === item_idx && (i.parent_name === post.routing || i.parent_name === post.name))
+        const item = frm.doc.items[item_idx]
+        let post = frm.doc.posts.find(p => p.routing === item.parent_name || p.name === item.parent_name)
         if (!item) return;
 
         frappe.confirm(
-            `Bạn có chắc chắn muốn xóa mặt hàng ${item.item_name} trong phương án #${post_idx} không?`,
+            `Bạn có chắc chắn muốn xóa mặt hàng ${item.item_name} trong phương án #${post.idx} không?`,
             async () => {
                 frappe.model.clear_doc(item.doctype, item.name);
                 frm.refresh_field("items");
