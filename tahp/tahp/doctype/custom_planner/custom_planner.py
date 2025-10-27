@@ -204,13 +204,36 @@ def recommend_code_name():
     code_date = formatdate(next_day, "dd.MM.yy")
     base_code = f"LSX.{code_date}"
     code_name = base_code
-    counter = 1
-    while frappe.db.exists("Week Work Order", code_name):
-        code_name = f"{base_code}.{counter}"
-        counter += 1
 
-    if frappe.db.exists("Custom Planner", f"KHSX.{code_date}"):
-        counter += 1
-        code_name = f"{base_code}.{counter}"
+    existing_wo = frappe.get_all(
+        "Week Work Order",
+        filters={"name": ["like", f"LSX.{code_date}%"]},
+        pluck="name"
+    )
+
+    existing_cp = frappe.get_all(
+        "Custom Planner",
+        filters={"name": ["like", f"KHSX.{code_date}%"]},
+        pluck="name"
+    )
+
+    all_existing = existing_wo + existing_cp
+
+    counters = []
+    for name in all_existing:
+        if name == base_code or name == f"KHSX.{code_date}":
+            counters.append(0)
+        else:
+            try:
+                counters.append(int(name.split(".")[-1]))
+            except ValueError:
+                pass
+
+    next_counter = max(counters, default=-1) + 1
+
+    if next_counter == 0:
+        code_name = base_code
+    else:
+        code_name = f"{base_code}.{next_counter}"
     
     return code_name
