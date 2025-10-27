@@ -61,7 +61,7 @@
               </template>
 
               <template v-else-if="col.key === 'status'">
-                <a-select v-model:value="statusFilter" show-search placeholder="Chọn trạng thái" style="width: 200px"
+                <a-select v-model:value="statusFilter" show-search allowClear placeholder="Chọn trạng thái" style="width: 200px"
                   :options="statusOptions" :filter-option="filterOption" />
               </template>
 
