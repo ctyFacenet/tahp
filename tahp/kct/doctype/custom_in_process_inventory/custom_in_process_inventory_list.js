@@ -33,8 +33,6 @@ frappe.listview_settings["Custom In Process Inventory"] = {
           fieldtype: f.fieldtype,
         }));
 
-      cols.push({ title: "Thao tác", key: "actions", fieldtype: "Actions" });
-
       return cols;
     };
 
