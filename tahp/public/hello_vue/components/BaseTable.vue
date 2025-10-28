@@ -47,7 +47,7 @@
               </div>
 
               <div
-                class="tw-absolute tw-top-0 tw-right-0 tw-w-[6px] tw-h-full tw-cursor-col-resize tw-bg-transparent hover:tw-bg-blue-300 tw-opacity-0 group-hover:tw-opacity-100"
+                class="resizer tw-absolute tw-top-0 tw-right-0 tw-w-[6px] tw-h-full tw-cursor-col-resize tw-bg-transparent hover:tw-bg-blue-300 tw-opacity-0 group-hover:tw-opacity-100"
                 @mousedown="startResize($event, col.key)">
               </div>
             </th>
@@ -428,24 +428,35 @@ watch(() => props.columns, (cols) => {
   cols?.forEach((c) => {
     if (!colWidths.value[c.key]) colWidths.value[c.key] = 160;
   });
-});
-const resizing = ref({});
+}, { immediate: true });
+
+const resizing = ref({ active: false, k: null, x: 0, w: 0 });
 const startResize = (e, k) => {
   resizing.value = { active: true, k, x: e.pageX, w: colWidths.value[k] };
   document.addEventListener("mousemove", handleResize);
   document.addEventListener("mouseup", stopResize);
 };
+const startResize = (e, k) => {
+  e.preventDefault();
+  resizing.value = { active: true, k, x: e.pageX, w: colWidths.value[k] };
+  document.addEventListener("mousemove", handleResize);
+  document.addEventListener("mouseup", stopResize);
+  document.body.style.userSelect = "none";
+};
+
 const handleResize = (e) => {
   if (!resizing.value.active) return;
   const d = e.pageX - resizing.value.x;
   colWidths.value[resizing.value.k] = Math.max(80, resizing.value.w + d);
 };
+
 const stopResize = () => {
+  if (!resizing.value.active) return;
   resizing.value.active = false;
+  document.body.style.userSelect = "";
   document.removeEventListener("mousemove", handleResize);
   document.removeEventListener("mouseup", stopResize);
 };
-
 const scrollWrapper = ref(null);
 const scrollLeft = ref(0);
 const scrollRight = ref(0);
