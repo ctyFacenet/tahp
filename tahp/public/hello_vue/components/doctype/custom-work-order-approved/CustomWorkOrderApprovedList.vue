@@ -49,12 +49,13 @@
               <SearchOutlined class="tw-text-[14px]" />
               <span>Bộ lọc</span>
             </a-button>
+
             <a-dropdown trigger="click" placement="bottomRight">
               <template #overlay>
                 <div
                   class="tw-max-h-[300px] tw-max-w-[250px] tw-overflow-y-auto tw-overflow-x-auto tw-bg-white tw-rounded-md tw-shadow-lg tw-border tw-border-gray-200">
                   <a-menu>
-                    <a-menu-item v-for="col in allColumns" :key="col.key"
+                    <a-menu-item v-for="col in selectableColumns" :key="col.key"
                       class="tw-text-[13px] tw-whitespace-nowrap tw-flex tw-items-center">
                       <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
                         {{ col.title }}
@@ -63,7 +64,6 @@
                   </a-menu>
                 </div>
               </template>
-
 
               <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
                 <CopyOutlined class="tw-text-[#2490ef] tw-text-[15px] hover:tw-text-[#1677c8]" />
@@ -82,9 +82,7 @@
 
         <div
           class="tw-relative tw-w-full tw-h-full tw-overflow-x-auto tw-overflow-y-hidden tw-rounded-md tw-border tw-border-gray-100 tw-bg-white">
-          <BaseTable :columns="displayedColumns" :rows="filteredRows" @view="onView" @edit="onEdit" @delete="onDelete"
-            :doctype="docType" :nameKey="'name'" />
-
+          <BaseTable :columns="displayedColumns" :rows="filteredRows" :doctype="docType" :nameKey="'name'" />
           <div
             class="tw-absolute tw-bottom-0 tw-left-0 tw-right-0 tw-text-[11px] tw-text-gray-400 tw-bg-white/70 tw-text-center tw-py-1 sm:tw-hidden">
             👉 Kéo ngang để xem thêm cột
@@ -96,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted } from "vue";
+import { ref, computed, reactive, onMounted, watch } from "vue";
 import dayjs from "dayjs";
 import {
   ReloadOutlined,
@@ -108,8 +106,8 @@ import TreeFilter from "../../TreeFilter.vue";
 
 const props = defineProps({
   rows: { type: Array, default: () => [] },
+  columns: { type: Array, default: () => [] },
 });
-const docType = computed(() => props.rows?.[0]?.docType || "");
 
 const showFilter = ref(true);
 const onFilterChange = () => {
@@ -123,41 +121,29 @@ const refreshData = () => {
 };
 onMounted(() => refreshData());
 
+const docType = computed(() => props.rows?.[0]?.docType || "Custom Work Order Approved");
 const searchKeyword = ref("");
 
-const allColumns = [
-  { title: "Mã lệnh sản xuất", key: "workOrderCode" },
-  { title: "Trạng thái", key: "status" },
-  { title: "Mã hàng", key: "itemCode" },
-  { title: "Tên hàng", key: "itemName" },
-  { title: "CAN", key: "canCode" },
-  { title: "KDAI", key: "kdaiCode" },
-  { title: "KTRUNG", key: "ktrungCode" },
-  { title: "KTIEU", key: "ktieuCode" },
-  { title: "MAHZ", key: "mahzCode" },
-  { title: "MALH", key: "malhCode" },
-  { title: "MAVT", key: "mavtCode" },
-  { title: "Thời gian bắt đầu sản xuất thực tế", key: "actualStartTime", fieldtype: "Date" },
-  { title: "Thời gian kết thúc sản xuất thực tế", key: "actualEndTime", fieldtype: "Date" },
-  { title: "Số lượng sản xuất", key: "productionQuantity" },
-  { title: "Số lượng đầu ra ước tính", key: "estimatedOutputQuantity" },
-  { title: "Số lượng OK ước tính", key: "estimatedOkQuantity" },
-  { title: "Số lượng NG ước tính", key: "estimatedNgQuantity" },
-  { title: "Số lượng đầu ra thực tế", key: "actualOutputQuantity" },
-  { title: "Số lượng OK thực tế", key: "actualOkQuantity" },
-  { title: "Số lượng NG thực tế", key: "actualNgQuantity" },
-  { title: "Đơn vị tính", key: "unitOfMeasure" },
-  { title: "Người tạo lệnh", key: "createdBy" },
-  { title: "Thao tác", key: "actions" },
-];
-
 const visibleColumns = reactive({});
-allColumns.forEach((col) => (visibleColumns[col.key] = true));
+watch(
+  () => props.columns,
+  (cols) => {
+    cols?.forEach((c) => {
+      if (visibleColumns[c.key] === undefined) visibleColumns[c.key] = true;
+    });
+  },
+  { immediate: true, deep: true }
+);
 
-const displayedColumns = ref([...allColumns]);
-const updateVisibleColumns = () => {
-  displayedColumns.value = allColumns.filter((c) => visibleColumns[c.key]);
-};
+const selectableColumns = computed(() =>
+  props.columns.filter((c) => !["actions"].includes(c.key))
+);
+
+const displayedColumns = computed(() =>
+  props.columns.filter((c) => c.key === "actions" || visibleColumns[c.key])
+);
+
+const updateVisibleColumns = () => { };
 
 const filteredRows = computed(() => {
   if (!searchKeyword.value.trim()) return props.rows;
@@ -174,32 +160,6 @@ const statusList = [
   { text: "Kết thúc sản xuất", color: "#22c55e" },
   { text: "Đã huỷ", color: "#ef4444" },
 ];
-
-const onView = (row) =>
-  frappe.show_alert({ message: `Đã xem ${row.workOrderCode}`, indicator: "green" });
-const onEdit = (row) =>
-  frappe.show_alert({ message: `Đã chỉnh sửa ${row.workOrderCode}`, indicator: "blue" });
-const onDelete = (row) =>
-  customConfirmModal({
-    title: "Xác nhận xoá",
-    message: `Bạn có chắc muốn xoá <b>${row.workOrderCode}</b>?`,
-    note: "Hành động này sẽ xoá vĩnh viễn dữ liệu khỏi hệ thống.",
-    type: "danger",
-    buttons: [
-      {
-        text: "Huỷ",
-        class: "btn-secondary",
-        onClick: () =>
-          frappe.show_alert({ message: "Đã huỷ thao tác", indicator: "orange" }),
-      },
-      {
-        text: "Xoá",
-        class: "btn-danger",
-        onClick: () =>
-          frappe.show_alert({ message: `Đã xoá ${row.workOrderCode}`, indicator: "red" }),
-      },
-    ],
-  });
 </script>
 
 <style scoped>

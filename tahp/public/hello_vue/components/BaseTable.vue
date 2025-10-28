@@ -1,12 +1,14 @@
 <template>
   <div
     class="tw-relative tw-border tw-border-gray-100 tw-bg-white tw-rounded-lg tw-shadow-sm tw-p-4 sm:tw-p-6 tw-text-sm tw-flex tw-flex-col tw-h-full">
+
     <div class="fade-left" v-show="scrollLeft > 5"></div>
     <div class="fade-right" v-show="scrollRight > 5"></div>
 
     <div ref="scrollWrapper"
       class="tw-flex-1 tw-overflow-x-auto tw-overflow-y-auto tw-max-h-[70vh] tw-border tw-border-gray-100 tw-relative"
       @scroll="handleScroll">
+
       <table class="tw-min-w-max tw-border-collapse tw-w-full" ref="tableRef">
         <thead class="tw-sticky tw-top-0 tw-z-20">
           <tr class="tw-bg-blue-50 tw-border-b tw-border-gray-300 tw-text-gray-700 tw-text-[13px]">
@@ -14,6 +16,7 @@
               class="tw-sticky tw-left-0 tw-top-0 tw-z-40 tw-bg-[#f8faff] tw-w-[45px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
               <input type="checkbox" ref="selectAllRef" v-model="selectAll" @change="toggleSelectAll" />
             </th>
+
             <th
               class="tw-sticky tw-left-[45px] tw-top-0 tw-z-40 tw-bg-[#f8faff] tw-w-[50px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
               STT
@@ -26,9 +29,11 @@
                   'tw-sticky tw-right-0 tw-z-40 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                     col.key === 'actions',
                   'tw-bg-pink-100 tw-text-pink-800':
-                    ['canCode', 'kdaiCode', 'ktrungCode', 'ktieuCode', 'mahzCode', 'malhCode', 'mavtCode'].includes(col.key)
+                    /(can|kdai|ktrung|ktieu|mahz|malh|mavt)/i.test(col.key)
+
                 }
-              ]" :style="{
+              ]"
+              :style="{
                 width: colWidths[col.key] + 'px',
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }">
@@ -43,7 +48,8 @@
 
               <div
                 class="tw-absolute tw-top-0 tw-right-0 tw-w-[6px] tw-h-full tw-cursor-col-resize tw-bg-transparent hover:tw-bg-blue-300 tw-opacity-0 group-hover:tw-opacity-100"
-                @mousedown="startResize($event, col.key)"></div>
+                @mousedown="startResize($event, col.key)">
+              </div>
             </th>
           </tr>
 
@@ -51,10 +57,13 @@
             <th class="tw-sticky tw-left-0 tw-top-[33px] tw-z-30 tw-bg-[#f8faff] tw-border"></th>
             <th class="tw-sticky tw-left-[45px] tw-top-[33px] tw-z-30 tw-bg-[#f8faff] tw-border"></th>
 
-            <th v-for="col in columns || []" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white" :class="{
-              'tw-sticky tw-right-0 tw-z-30 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
-                col.key === 'actions',
-            }" :style="{ width: colWidths[col.key] + 'px' }">
+            <th v-for="col in columns || []" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white"
+              :class="{
+                'tw-sticky tw-right-0 tw-z-30 tw-bg-[#f8faff] tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
+                  col.key === 'actions',
+              }"
+              :style="{ width: colWidths[col.key] + 'px' }">
+
               <template v-if="col.fieldtype === 'Date'">
                 <a-range-picker v-model:value="dateFilters[col.key]" format="DD/MM/YYYY" size="small"
                   :placeholder="['Từ ngày', 'Đến ngày']" class="tw-w-full tw-text-xs" />
@@ -112,7 +121,9 @@
                   class="tw-border tw-px-2 tw-py-1 tw-text-center tw-relative" :class="{
                     'tw-sticky tw-right-0 tw-z-20 tw-bg-[#f8faff] tw-text-center tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                       col.key === 'actions',
-                  }" :style="{ width: colWidths[col.key] + 'px' }">
+                  }"
+                  :style="{ width: colWidths[col.key] + 'px' }">
+
                   <template v-if="col.key === 'status'">
                     <span :class="[
                       'tw-inline-block tw-rounded-md tw-px-2 tw-py-[2px] tw-text-[12px] tw-font-medium',
@@ -161,7 +172,6 @@
                   </template>
                 </td>
               </tr>
-
             </template>
           </template>
 
@@ -197,7 +207,6 @@
       </div>
     </div>
 
-
     <div
       class="tw-text-center tw-py-3 tw-border-t tw-border-gray-200 tw-bg-white tw-text-[13px] sm:tw-text-[14px] tw-font-[500] tw-tracking-wide tw-text-gray-600">
       © Copyright
@@ -211,12 +220,11 @@
         FaceNet
       </a>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, shallowRef } from "vue";
 import dayjs from "dayjs";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 
@@ -228,15 +236,16 @@ const props = defineProps({
   nameKey: { type: String, default: "name" },
 });
 
-const emit = defineEmits(["rowClick", "view", "edit", "delete"]);
+const emit = defineEmits(["rowClick", "view", "edit", "delete", "selection-change"]);
+
+const allRows = shallowRef(props.rows || []);
+watch(() => props.rows, (val) => (allRows.value = val || []));
 
 const openForm = (row) => {
   emit("rowClick", row);
   if (!props.doctype || !row) return;
   const docName = row[props.nameKey] || row.name || row.id || null;
-  if (!docName) return;
-
-  frappe.set_route("Form", props.doctype, docName);
+  if (docName) frappe.set_route("Form", props.doctype, docName);
 };
 
 const handleRowClick = (event, row) => {
@@ -244,62 +253,43 @@ const handleRowClick = (event, row) => {
     event.target.closest(".actions-cell") ||
     event.target.closest(".checkbox-cell") ||
     event.target.closest(".index-cell");
-  if (inActionCell) return;
-  openForm(row);
+  if (!inActionCell) openForm(row);
 };
 
-const isProductionCell = (key) => {
-  if (!key) return false;
-  const normalized = key.toString().toLowerCase().trim();
-  const result = [
-    "cancode",
-    "kdaicode",
-    "ktrungcode",
-    "ktieucode",
-    "mahzcode",
-    "malhcode",
-    "mavtcode",
-  ].includes(normalized);
-  return result;
+const isProductionCell = (key) => !!key && /(can|kdai|ktrung|ktieu|mahz|malh|mavt)/i.test(key);
+
+const getProgressWidth = (v) => {
+  if (!v || typeof v !== "string" || !v.includes("/")) return 0;
+  const [done, total] = v.split("/").map(Number);
+  return total ? Math.min(100, (done / total) * 100) : 0;
 };
 
-const getProgressWidth = (value) => {
-  if (!value || typeof value !== "string" || !value.includes("/")) return 0;
-  const [done, total] = value.split("/").map((n) => parseFloat(n) || 0);
-  if (total === 0) return 0;
-  const result = Math.min(100, (done / total) * 100);
-  return result;
-};
-
-const getStatusColor = (value) => {
-  if (!value) return "#9ca3af";
-  const s = value.toString().toLowerCase();
-
-  if (s.includes("chờ")) return "#a07855"; // nâu
-  if (s.includes("đang")) return "#3b82f6"; // xanh dương
-  if (s.includes("tạm")) return "#fbbf24"; // vàng
-  if (s.includes("kết")) return "#22c55e"; // xanh lá
-  if (s.includes("huỷ") || s.includes("hủy")) return "#ef4444"; // đỏ
-
-  if (value.includes("/")) {
-    const [done, total] = value.split("/").map(Number);
-    const percent = total ? (done / total) * 100 : 0;
-    if (percent === 0) return "#a07855";
-    if (percent < 50) return "#3b82f6";
-    if (percent < 99) return "#fbbf24";
+const getStatusColor = (v) => {
+  if (!v) return "#9ca3af";
+  const s = v.toString().toLowerCase();
+  if (s.includes("chờ")) return "#a07855";
+  if (s.includes("đang")) return "#3b82f6";
+  if (s.includes("tạm")) return "#fbbf24";
+  if (s.includes("kết")) return "#22c55e";
+  if (s.includes("huỷ") || s.includes("hủy")) return "#ef4444";
+  if (v.includes("/")) {
+    const [done, total] = v.split("/").map(Number);
+    const p = total ? (done / total) * 100 : 0;
+    if (p === 0) return "#a07855";
+    if (p < 50) return "#3b82f6";
+    if (p < 99) return "#fbbf24";
     return "#22c55e";
   }
-
   return "#9ca3af";
 };
 
 const groupedRows = computed(() => {
-  if (!props.groupBy) return [{ key: "Tất cả", rows: props.rows || [] }];
+  if (!props.groupBy) return [{ key: "Tất cả", rows: allRows.value }];
   const map = new Map();
-  (props.rows || []).forEach((r) => {
-    const key = r[props.groupBy] || "Không xác định";
-    if (!map.has(key)) map.set(key, []);
-    map.get(key).push(r);
+  (allRows.value || []).forEach((r) => {
+    const k = r[props.groupBy] || "Không xác định";
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(r);
   });
   return [...map].map(([key, rows]) => ({ key, rows }));
 });
@@ -311,6 +301,8 @@ const selectedGroups = ref([]);
 const selectedRows = ref(new Set());
 const selectAll = ref(false);
 const selectAllRef = ref(null);
+
+watch(selectedRows, (v) => emit("selection-change", Array.from(v)));
 
 const toggleGroup = (key, e) => {
   const g = groupedRows.value.find((x) => x.key === key);
@@ -349,8 +341,7 @@ watch(selectedRows, () => {
   const total = groupedRows.value.reduce((a, g) => a + (g.rows?.length || 0), 0);
   const count = selectedRows.value.size;
   selectAll.value = count > 0 && count === total;
-  if (selectAllRef.value)
-    selectAllRef.value.indeterminate = count > 0 && count < total;
+  if (selectAllRef.value) selectAllRef.value.indeterminate = count > 0 && count < total;
 });
 
 const filters = ref({});
@@ -375,7 +366,7 @@ const filterOption = (input, option) =>
   option.label.toLowerCase().includes(input.toLowerCase());
 
 const filteredRows = computed(() =>
-  (props.rows || []).filter((r) =>
+  (allRows.value || []).filter((r) =>
     (props.columns || []).every((c) => {
       if (c.key === "actions") return true;
       if (c.key === "status" && statusFilter.value)
@@ -384,10 +375,8 @@ const filteredRows = computed(() =>
         const range = dateFilters.value[c.key];
         if (!range || range?.length !== 2) return true;
         const d = dayjs(r[c.key], "DD-MM-YYYY");
-        return (
-          d.isAfter(dayjs(range[0]).startOf("day")) &&
-          d.isBefore(dayjs(range[1]).endOf("day"))
-        );
+        return d.isAfter(dayjs(range[0]).startOf("day")) &&
+          d.isBefore(dayjs(range[1]).endOf("day"));
       }
       const val = (r[c.key] || "").toString().toLowerCase();
       const f = (filters.value[c.key] || "").toString().toLowerCase();
@@ -395,6 +384,8 @@ const filteredRows = computed(() =>
     })
   )
 );
+
+watch(filteredRows, () => (currentPage.value = 1)); // reset page when filter
 
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -433,7 +424,11 @@ const pagedGroups = computed(() => {
 });
 
 const colWidths = ref({});
-(props.columns || []).forEach((c) => (colWidths.value[c.key] = 160));
+watch(() => props.columns, (cols) => {
+  cols?.forEach((c) => {
+    if (!colWidths.value[c.key]) colWidths.value[c.key] = 160;
+  });
+});
 const resizing = ref({});
 const startResize = (e, k) => {
   resizing.value = { active: true, k, x: e.pageX, w: colWidths.value[k] };
@@ -572,9 +567,12 @@ tbody td {
   background: linear-gradient(to left, white, transparent);
 }
 
-:deep(.ant-picker) {
-  height: 26px !important;
-  font-size: 12px !important;
+:deep(.ant-pagination) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 0;
 }
 
 :deep(.ant-pagination-item),
@@ -584,7 +582,6 @@ tbody td {
 }
 
 @media (max-width: 768px) {
-
   th.tw-sticky,
   td.tw-sticky {
     position: static !important;

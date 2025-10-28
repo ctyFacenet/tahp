@@ -20,7 +20,9 @@
             <div
               class="tw-max-h-[300px] tw-max-w-[250px] tw-overflow-y-auto tw-overflow-x-auto tw-bg-white tw-rounded-md tw-shadow-lg tw-border tw-border-gray-200">
               <a-menu>
-                <a-menu-item v-for="col in allColumns" :key="col.key"
+                <a-menu-item
+                  v-for="col in selectableColumns"
+                  :key="col.key"
                   class="tw-text-[13px] tw-whitespace-nowrap tw-flex tw-items-center">
                   <a-checkbox v-model:checked="visibleColumns[col.key]" @change="updateVisibleColumns">
                     {{ col.title }}
@@ -29,14 +31,21 @@
               </a-menu>
             </div>
           </template>
-          <a-button type="text" class="tw-flex tw-items-center tw-justify-center tw-p-0" title="Chọn cột hiển thị">
+          <a-button
+            type="text"
+            class="tw-flex tw-items-center tw-justify-center tw-p-0"
+            title="Chọn cột hiển thị">
             <CopyOutlined class="tw-text-[#2490ef]" />
           </a-button>
         </a-dropdown>
 
         <div class="tw-w-full sm:tw-w-[220px] md:tw-w-[300px]">
-          <a-input v-model:value="searchKeyword" placeholder="Nhập thông tin để tìm kiếm"
-            class="tw-h-[30px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] tw-w-full" size="small" allowClear>
+          <a-input
+            v-model:value="searchKeyword"
+            placeholder="Nhập thông tin để tìm kiếm"
+            class="tw-h-[30px] tw-text-[13px] tw-rounded-sm tw-border-[#2490ef] tw-w-full"
+            size="small"
+            allowClear>
             <template #prefix>
               <SearchOutlined class="tw-text-gray-400" />
             </template>
@@ -45,7 +54,12 @@
       </div>
     </template>
 
-    <BaseTable :columns="displayedColumns" :rows="filteredRows" group-by="lotNumber" :doctype="docType" :nameKey="'name'">
+    <BaseTable
+      :columns="displayedColumns"
+      :rows="filteredRows"
+      group-by="lotnumber"
+      :doctype="docType"
+      :nameKey="'name'">
       <template #actions="{ row }">
         <div class="tw-flex tw-items-center tw-justify-center tw-gap-2">
           <a-tooltip title="Duyệt huỷ tem">
@@ -61,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import {
   FileExcelOutlined,
   CopyOutlined,
@@ -74,33 +88,32 @@ import BaseTable from "../../BaseTable.vue";
 
 const props = defineProps({
   rows: { type: Array, default: () => [] },
+  columns: { type: Array, default: () => [] },
 });
 
 const searchKeyword = ref("");
-
-const docType = computed(() => props.rows?.[0]?.docType || "");
-
-const allColumns = [
-  { title: "Mã lot", key: "lotNumber" },
-  { title: "Mã tem QR", key: "qrLabelCode" },
-  { title: "Trạng thái", key: "status" },
-  { title: "Mã BTP đầu ra", key: "outputSfgCode" },
-  { title: "Mã lệnh sản xuất", key: "workOrderCode" },
-  { title: "Máy", key: "machineName" },
-  { title: "Ca sản xuất", key: "productionShift" },
-  { title: "Nhân viên thực hiện", key: "operatorName" },
-  { title: "Số lượng đầu ra thực tế", key: "actualOutputQuantity" },
-  { title: "Trọng lượng bì", key: "grossWeight" },
-  { title: "Ngày tạo tem", key: "labelCreationDate", fieldtype: "Date" },
-  { title: "Ngày huỷ tem", key: "labelCancellationDate", fieldtype: "Date" },
-  { title: "Thao tác", key: "actions" },
-];
+const docType = computed(() => props.rows?.[0]?.docType || "Custom Semi Finished Products");
 
 const visibleColumns = reactive({});
-allColumns.forEach((col) => (visibleColumns[col.key] = true));
-const displayedColumns = ref([...allColumns]);
-const updateVisibleColumns = () =>
-  (displayedColumns.value = allColumns.filter((c) => visibleColumns[c.key]));
+watch(
+  () => props.columns,
+  (cols) => {
+    cols?.forEach((c) => {
+      if (visibleColumns[c.key] === undefined) visibleColumns[c.key] = true;
+    });
+  },
+  { immediate: true, deep: true }
+);
+
+const selectableColumns = computed(() =>
+  props.columns.filter((c) => !["stt", "actions"].includes(c.key))
+);
+
+const displayedColumns = computed(() =>
+  props.columns.filter((c) => c.key === "stt" || c.key === "actions" || visibleColumns[c.key])
+);
+
+const updateVisibleColumns = () => {};
 
 const filteredRows = computed(() => {
   const key = searchKeyword.value.trim().toLowerCase();
@@ -111,5 +124,11 @@ const filteredRows = computed(() => {
     )
   );
 });
-
 </script>
+
+<style scoped>
+:deep(.ant-input-affix-wrapper) {
+  height: 32px !important;
+  font-size: 13px !important;
+}
+</style>
