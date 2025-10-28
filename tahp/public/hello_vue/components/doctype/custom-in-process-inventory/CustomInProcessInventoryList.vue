@@ -9,11 +9,11 @@
           class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
           <FileTextOutlined /> Thống kê NVL thừa
         </a-button>
-            <a-button type="link"
+        <a-button type="link"
           class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
           <SearchOutlined /> Kiểm kê tồn kho
         </a-button>
-            <a-button type="link"
+        <a-button type="link"
           class="tw-flex tw-items-center tw-gap-1 tw-text-[#2490ef] hover:tw-text-[#1677c8] tw-font-medium tw-p-0">
           <CalendarOutlined /> Chôt số cuối ký
         </a-button>

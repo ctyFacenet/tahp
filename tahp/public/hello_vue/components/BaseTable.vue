@@ -186,14 +186,14 @@
     </div>
 
     <div
-      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-py-2 tw-px-3 tw-border-gray-200 tw-bg-gray-50 tw-text-xs sm:tw-text-sm">
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-py-2 tw-px-3 tw-border-gray-200 tw-bg-gray-50 tw-text-xs">
       <a-select v-model:value="pageSize" :options="pageSizeOptions" class="tw-hidden sm:tw-block tw-w-[110px]"
         @change="onPageSizeChange" />
 
       <div
         class="tw-flex tw-flex-col sm:tw-flex-row  tw-items-center tw-justify-center tw-gap-2 sm:tw-gap-3 tw-w-full sm:tw-w-auto tw-justify-center">
         <span class="tw-hidden sm:tw-inline tw-text-gray-600 tw-font-medium">
-          Trang số {{ currentPage }} / {{ totalPages }} ({{ filteredRows?.length || 0 }} bản ghi)
+          Trang số {{ currentPage }} của {{ totalPages }} ({{ filteredRows?.length || 0 }} bản ghi)
         </span>
 
         <a-pagination v-model:current="currentPage" :total="filteredRows?.length || 0" :pageSize="pageSize"
@@ -431,11 +431,7 @@ watch(() => props.columns, (cols) => {
 }, { immediate: true });
 
 const resizing = ref({ active: false, k: null, x: 0, w: 0 });
-const startResize = (e, k) => {
-  resizing.value = { active: true, k, x: e.pageX, w: colWidths.value[k] };
-  document.addEventListener("mousemove", handleResize);
-  document.addEventListener("mouseup", stopResize);
-};
+
 const startResize = (e, k) => {
   e.preventDefault();
   resizing.value = { active: true, k, x: e.pageX, w: colWidths.value[k] };
