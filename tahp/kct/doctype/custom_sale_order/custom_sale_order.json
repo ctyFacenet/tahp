@@ -13,7 +13,8 @@
   "deliveredquantity",
   "remainingquantity",
   "deliverydate",
-  "salesperson"
+  "salesperson",
+  "roles"
  ],
  "fields": [
   {
@@ -69,12 +70,20 @@
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Nh\u00e2n vi\u00ean b\u00e1n h\u00e0ng"
+  },
+  {
+   "default": "Admin",
+   "fieldname": "roles",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Quy\u1ec1n ng\u01b0\u1eddi d\u00f9ng",
+   "options": "Admin\nOwner\nMember"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-23 10:42:31.390827",
+ "modified": "2025-10-28 16:51:07.126845",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Sale Order",
