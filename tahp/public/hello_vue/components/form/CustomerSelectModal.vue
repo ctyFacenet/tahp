@@ -7,7 +7,7 @@
 
     <div class="tw-overflow-x-auto tw-w-full">
       <a-table :columns="columns" :data-source="paginatedData" bordered size="small" row-key="id" :pagination="false"
-        class="tw-min-w-[700px] tw-cursor-pointer tw-mb-2" @rowClick="handleSelect">
+        class="tw-min-w-[700px] tw-cursor-pointer tw-mb-2 zebra-table" @rowClick="handleSelect">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'action'">
             <a-button type="link" size="small" @click="handleSelect(record)">Chọn</a-button>
@@ -29,7 +29,8 @@
         </span>
 
         <a-pagination v-model:current="currentPage" :total="filteredData.length" :page-size="pageSize"
-          @change="handlePageChange" :show-less-items="true" :show-size-changer="false" size="small" class="tw-flex tw-items-center" />
+          @change="handlePageChange" :show-less-items="true" :show-size-changer="false" size="small"
+          class="tw-flex tw-items-center" />
 
         <div class="tw-flex tw-items-center tw-gap-1">
           <span>Đến trang</span>
@@ -260,4 +261,17 @@ onBeforeUnmount(() => window.removeEventListener("keydown", handleShortcut));
   gap: 6px;
   padding: 4px 0;
 }
+
+:deep(.zebra-table .ant-table-tbody > tr:nth-child(odd) > td) {
+  background-color: #fafafa !important;
+}
+
+:deep(.zebra-table .ant-table-tbody > tr:nth-child(even) > td) {
+  background-color: #ffffff !important;
+}
+
+:deep(.zebra-table .ant-table-tbody > tr:hover > td) {
+  background-color: #e6f4ff !important;
+}
+
 </style>

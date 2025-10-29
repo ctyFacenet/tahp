@@ -24,7 +24,7 @@
           <a-date-picker v-else-if="field.fieldtype === 'Date'"
             :value="doc[field.fieldname] ? dayjs(doc[field.fieldname]) : null"
             @update:value="val => (doc[field.fieldname] = val ? val.format('YYYY-MM-DD') : null)" format="DD/MM/YYYY"
-            class="tw-w-full" :disabled="!!field.read_only" placeholder="Chọn thời điểm"/>
+            class="tw-w-full" :disabled="!!field.read_only" placeholder="Chọn thời điểm" />
 
           <a-select v-else-if="field.options && field.options.split('\n').length > 1"
             v-model:value="doc[field.fieldname]" :options="field.options
@@ -60,7 +60,7 @@
 
       <div class="tw-overflow-x-auto">
         <a-table :columns="columns" :data-source="rows" bordered size="small" row-key="id" :pagination="false"
-          class="tw-min-w-[800px] tw-mb-4">
+          class="tw-min-w-[800px] tw-mb-4 zebra-table" :scroll="{ x: 1800}">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
               <a-space>
@@ -131,29 +131,33 @@ watch(
   { deep: true }
 );
 
-const rows = ref([
-  {
-    id: 1,
-    order_detail_code: "MANH_QUAN_251001",
-    item_code: "EIAIW050_A_25",
-    item_name: "Dây đồng điện tử 1EI/AIW - 0.50mm - Cu/PET",
-    status: "Đã tạo lệnh sản xuất",
-    qty_required: 500,
-    stock_available: 20,
-    stock_pending: 20,
-    stock_pending_hold: 5,
-    stock_hold_1: 10,
-    internal_prod_qty: 15,
-    internal_hold_qty: 3,
-    total_hold: 13,
-    uom: "Cuộn",
-    created_date: "09/10/2025",
-    delivery_date: "18/10/2025",
-  },
-]);
+const rows = ref(
+  Array.from({ length: 5 }, (_, i) => ({
+    id: i + 1,
+    order_detail_code: `ORDER_${String(i + 1).padStart(4, "0")}`,
+    item_code: `ITEM_${String(i + 1).padStart(5, "0")}`,
+    item_name: `Sản phẩm thử nghiệm ${i + 1}`,
+    status: ["Mới", "Đang xử lý", "Đã tạo lệnh sản xuất", "Hoàn tất"][i % 4],
+    qty_required: Math.floor(50 + Math.random() * 950),
+    stock_available: Math.floor(Math.random() * 200),
+    stock_pending: Math.floor(Math.random() * 100),
+    stock_pending_hold: Math.floor(Math.random() * 50),
+    stock_hold_1: Math.floor(Math.random() * 50),
+    internal_prod_qty: Math.floor(Math.random() * 100),
+    internal_hold_qty: Math.floor(Math.random() * 20),
+    total_hold: 0,
+    uom: ["Cuộn", "Thùng", "Kg", "Cái"][i % 4],
+    created_date: dayjs().subtract(i, "day").format("DD/MM/YYYY"),
+    delivery_date: dayjs().add(i % 10, "day").format("DD/MM/YYYY"),
+  }))
+);
+
+rows.value.forEach(r => {
+  r.total_hold = r.stock_hold_1 + r.internal_hold_qty;
+});
 
 const columns = [
-  { title: "STT", dataIndex: "id", key: "id", width: 60, align: "center" },
+  { title: "STT", dataIndex: "id", key: "id", width: 60, align: "center", fixed: "left" },
   { title: "Mã đơn chi tiết", dataIndex: "order_detail_code", key: "order_detail_code" },
   { title: "Mã hàng", dataIndex: "item_code", key: "item_code" },
   { title: "Tên hàng", dataIndex: "item_name", key: "item_name" },
@@ -179,8 +183,9 @@ const columns = [
   { title: "Đơn vị tính", dataIndex: "uom", key: "uom", align: "center" },
   { title: "Ngày tạo", dataIndex: "created_date", key: "created_date", align: "center" },
   { title: "Ngày giao hàng", dataIndex: "delivery_date", key: "delivery_date", align: "center" },
-  { title: "Thao tác", key: "actions", align: "center", width: 90 },
+  { title: "Thao tác", key: "actions", align: "center", width: 90, fixed: "right" },
 ];
+
 
 const showCustomerModal = ref(false);
 
@@ -285,4 +290,34 @@ function deleteRow(record) {
   background-color: #f0f0f0 !important;
   color: #555 !important;
 }
+
+:deep(.ant-table-cell-fix-left),
+:deep(.ant-table-cell-fix-right) {
+  background-color: #fff !important;
+  z-index: 2;
+}
+
+:deep(.ant-table-thead > tr > th) {
+  background-color: #e6f4ff !important;
+  color: #003a8c;
+  font-weight: 600;
+  text-align: center;
+  white-space: normal !important;
+  line-height: 1.2;
+  vertical-align: middle;
+  padding: 6px 8px !important;
+}
+
+:deep(.zebra-table .ant-table-tbody > tr:nth-child(odd) > td) {
+  background-color: #fafafa !important;
+}
+
+:deep(.zebra-table .ant-table-tbody > tr:nth-child(even) > td) {
+  background-color: #ffffff !important;
+}
+
+:deep(.zebra-table .ant-table-tbody > tr:hover > td) {
+  background-color: #e6f4ff !important;
+}
+
 </style>
