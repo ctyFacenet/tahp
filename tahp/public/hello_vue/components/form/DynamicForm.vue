@@ -9,8 +9,11 @@
       <template v-for="field in visibleFields" :key="field.fieldname">
         <a-form-item :label="field.label" :required="!!field.reqd"
           :class="field.fullWidth ? 'sm:tw-col-span-2 lg:tw-col-span-4' : ''">
-          <a-input v-if="['Data', 'Link'].includes(field.fieldtype)" v-model:value="doc[field.fieldname]"
-            :placeholder="field.label" :disabled="!!field.read_only" />
+          <a-input v-if="['Data', 'Link'].includes(field.fieldtype) && field.fieldname !== 'customer'"
+            v-model:value="doc[field.fieldname]" :placeholder="field.label" :disabled="!!field.read_only" />
+
+          <a-input v-else-if="field.fieldname === 'customername'" v-model:value="doc.customername"
+            placeholder="Chọn khách hàng" @click="showCustomerModal = true" />
 
           <a-textarea v-else-if="['Small Text', 'Long Text', 'Text'].includes(field.fieldtype)"
             v-model:value="doc[field.fieldname]" :rows="3" :placeholder="field.label" :disabled="!!field.read_only" />
@@ -21,7 +24,7 @@
           <a-date-picker v-else-if="field.fieldtype === 'Date'"
             :value="doc[field.fieldname] ? dayjs(doc[field.fieldname]) : null"
             @update:value="val => (doc[field.fieldname] = val ? val.format('YYYY-MM-DD') : null)" format="DD/MM/YYYY"
-            class="tw-w-full" :disabled="!!field.read_only" />
+            class="tw-w-full" :disabled="!!field.read_only" placeholder="Chọn thời điểm"/>
 
           <a-select v-else-if="field.options && field.options.split('\n').length > 1"
             v-model:value="doc[field.fieldname]" :options="field.options
@@ -83,6 +86,9 @@
         <SaveOutlined /> <span>Lưu</span>
       </a-button>
     </div>
+
+    <CustomerSelectModal v-model:open="showCustomerModal" :data="customers" @select="selectCustomer"
+      @addnew="handleAddNewCustomer" />
   </div>
 </template>
 
@@ -97,6 +103,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons-vue";
+import CustomerSelectModal from "./CustomerSelectModal.vue";
 
 const props = defineProps({
   frm: { type: Object, required: true },
@@ -110,7 +117,9 @@ const visibleFields = computed(() =>
     (f) =>
       f.label &&
       !["Section Break", "Column Break", "HTML", "Table"].includes(f.fieldtype) &&
-      !["owner", "creation", "modified", "modified_by", "_assign", "_comments"].includes(f.fieldname)
+      !["owner", "creation", "modified", "modified_by", "_assign", "_comments"].includes(
+        f.fieldname
+      )
   )
 );
 
@@ -173,6 +182,29 @@ const columns = [
   { title: "Thao tác", key: "actions", align: "center", width: 90 },
 ];
 
+const showCustomerModal = ref(false);
+
+const customers = ref(
+  Array.from({ length: 500 }, (_, i) => ({
+    id: i + 1,
+    code: `CUS${String(i + 1).padStart(4, "0")}`,
+    name: `CÔNG TY TNHH KHÁCH HÀNG ${i + 1}`,
+    phone: `09${Math.floor(10000000 + Math.random() * 89999999)}`,
+    email: `khachhang${i + 1}@example.com`,
+    address: `Số ${i + 1} Đường ${["A", "B", "C", "D"][i % 4]} - KCN ${["VSIP", "Yên Phong", "Tràng Duệ", "Bắc Thăng Long"][i % 4]}`,
+  }))
+);
+
+function selectCustomer(record) {
+  doc.value.customer = record.name;
+  showCustomerModal.value = false;
+  frappe.msgprint(`Đã chọn khách hàng: ${record.name}`);
+}
+
+function handleAddNewCustomer() {
+  frappe.msgprint("Thêm mới khách hàng (Alt + N)");
+}
+
 function handleAddRow() {
   const next = rows.value.length + 1;
   rows.value.push({
@@ -196,7 +228,7 @@ function handleAddRow() {
 }
 
 function handleStockCheck() {
-  frappe.msgprint("📦 Kiểm tra tồn kho sản xuất");
+  frappe.msgprint("Kiểm tra tồn kho sản xuất");
 }
 
 function handleBack() {
@@ -204,7 +236,7 @@ function handleBack() {
 }
 
 function handleSave() {
-  frappe.msgprint("💾 Dữ liệu đã được lưu");
+  frappe.msgprint("Dữ liệu đã được lưu");
 }
 
 function editRow(record) {
@@ -215,7 +247,6 @@ function deleteRow(record) {
   rows.value = rows.value.filter((r) => r.id !== record.id);
 }
 </script>
-
 
 <style scoped>
 .ant-form-item {
@@ -228,19 +259,15 @@ function deleteRow(record) {
 
 :deep(.ant-table-thead > tr > th) {
   background-color: #e6f4ff !important;
-  color: #003a8c; 
+  color: #003a8c;
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
 }
 
-:deep(.ant-table-cell) {
-  border-color: #d9e8ff !important;
-}
-
-.ant-btn-link {
-  padding: 0 !important;
-  height: auto !important;
+:deep(.ant-table-row:hover > td) {
+  background-color: #f5faff !important;
+  transition: background-color 0.2s ease;
 }
 
 :deep(.ant-input),
@@ -259,4 +286,3 @@ function deleteRow(record) {
   color: #555 !important;
 }
 </style>
-
