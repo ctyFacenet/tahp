@@ -32,8 +32,7 @@
                     /(can|kdai|ktrung|ktieu|mahz|malh|mavt)/i.test(col.key)
 
                 }
-              ]"
-              :style="{
+              ]" :style="{
                 width: colWidths[col.key] + 'px',
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }">
@@ -57,12 +56,10 @@
             <th class="tw-sticky tw-left-0 tw-top-[33px] tw-z-30 tw-bg-pink-100 tw-border"></th>
             <th class="tw-sticky tw-left-[45px] tw-top-[33px] tw-z-30 tw-bg-pink-100 tw-border"></th>
 
-            <th v-for="col in columns || []" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white"
-              :class="{
-                'tw-sticky tw-right-0 tw-z-30 tw-bg-pink-100 tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
-                  col.key === 'actions',
-              }"
-              :style="{ width: colWidths[col.key] + 'px' }">
+            <th v-for="col in columns || []" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white" :class="{
+              'tw-sticky tw-right-0 tw-z-30 tw-bg-pink-100 tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
+                col.key === 'actions',
+            }" :style="{ width: colWidths[col.key] + 'px' }">
 
               <template v-if="col.fieldtype === 'Date'">
                 <a-range-picker v-model:value="dateFilters[col.key]" format="DD/MM/YYYY" size="small"
@@ -121,8 +118,7 @@
                   class="tw-border tw-px-2 tw-py-1 tw-text-center tw-relative" :class="{
                     'tw-sticky tw-right-0 tw-z-20 tw-bg-pink-100 tw-text-center tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                       col.key === 'actions',
-                  }"
-                  :style="{ width: colWidths[col.key] + 'px' }">
+                  }" :style="{ width: colWidths[col.key] + 'px' }">
 
                   <template v-if="col.key === 'status'">
                     <span :class="[
@@ -589,6 +585,7 @@ tbody td {
 }
 
 @media (max-width: 768px) {
+
   th.tw-sticky,
   td.tw-sticky {
     position: static !important;

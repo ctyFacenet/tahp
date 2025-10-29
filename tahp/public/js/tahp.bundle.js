@@ -15,6 +15,7 @@ import "./components/custom_work_order.bundle.js";
 import "./components/custom_semi_finished_products.bundle.js";
 import "./components/custom_in_process_inventory.bundle.js";
 import "./components/custom_work_order_approved.bundle.js";
+import "./components/form/custom_sale_order_form.bundle.js";
 
 frappe.provide("tahp.vue");
 tahp.vue.mountVue = mountVue;
