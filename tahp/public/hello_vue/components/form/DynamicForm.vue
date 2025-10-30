@@ -1,323 +1,55 @@
 <template>
-  <div class="tw-border tw-border-blue-300 tw-rounded-md tw-bg-white tw-shadow-sm tw-p-4 tw-space-y-6">
-    <h3 v-if="title"
-      class="tw-text-base tw-font-semibold tw-text-blue-700 tw-border-b tw-border-blue-200 tw-pb-2 tw-uppercase">
-      {{ title }}
-    </h3>
-
-    <a-form layout="vertical" class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-4">
-      <template v-for="field in visibleFields" :key="field.fieldname">
-        <a-form-item :label="field.label" :required="!!field.reqd"
-          :class="field.fullWidth ? 'sm:tw-col-span-2 lg:tw-col-span-4' : ''">
-          <a-input v-if="['Data', 'Link'].includes(field.fieldtype) && field.fieldname !== 'customer'"
-            v-model:value="doc[field.fieldname]" :placeholder="field.label" :disabled="!!field.read_only" />
-
-          <a-input v-else-if="field.fieldname === 'customername'" v-model:value="doc.customername"
-            placeholder="Chọn khách hàng" @click="showCustomerModal = true" />
-
-          <a-textarea v-else-if="['Small Text', 'Long Text', 'Text'].includes(field.fieldtype)"
-            v-model:value="doc[field.fieldname]" :rows="3" :placeholder="field.label" :disabled="!!field.read_only" />
-
-          <a-input-number v-else-if="['Int', 'Float', 'Currency'].includes(field.fieldtype)"
-            v-model:value="doc[field.fieldname]" class="tw-w-full" :min="0" :disabled="!!field.read_only" />
-
-          <a-date-picker v-else-if="field.fieldtype === 'Date'"
-            :value="doc[field.fieldname] ? dayjs(doc[field.fieldname]) : null"
-            @update:value="val => (doc[field.fieldname] = val ? val.format('YYYY-MM-DD') : null)" format="DD/MM/YYYY"
-            class="tw-w-full" :disabled="!!field.read_only" placeholder="Chọn thời điểm" />
-
-          <a-select v-else-if="field.options && field.options.split('\n').length > 1"
-            v-model:value="doc[field.fieldname]" :options="field.options
-              .split('\n')
-              .filter(o => o.trim() !== '')
-              .map(o => ({ label: o, value: o }))" :disabled="!!field.read_only" show-search
-            option-filter-prop="label" />
-
-          <a-checkbox v-else-if="field.fieldtype === 'Check'" v-model:checked="doc[field.fieldname]"
-            :disabled="!!field.read_only">
-            {{ field.label }}
-          </a-checkbox>
-        </a-form-item>
-      </template>
-    </a-form>
-
-    <div class="tw-border-t tw-border-blue-200 tw-pt-4">
-      <h3 class="tw-text-base tw-font-semibold tw-text-blue-700 tw-border-b tw-border-blue-200 tw-pb-2 tw-mb-3">
-        Danh sách đơn hàng chi tiết
-      </h3>
-
-      <div class="tw-flex tw-flex-wrap tw-gap-2 tw-items-center tw-mb-2 tw-justify-end">
-        <a-button type="link" size="small" class="tw-text-blue-600 tw-flex tw-items-center tw-gap-1"
-          @click="handleAddRow">
-          <PlusCircleOutlined /> <span>Thêm mới</span>
-        </a-button>
-
-        <a-button type="link" size="small" class="tw-text-blue-600 tw-flex tw-items-center tw-gap-1"
-          @click="handleStockCheck">
-          <BarsOutlined /> <span>Tồn kho sản xuất</span>
-        </a-button>
-      </div>
-
-      <div class="tw-overflow-x-auto">
-        <a-table :columns="columns" :data-source="rows" bordered size="small" row-key="id" :pagination="false"
-          class="tw-min-w-[800px] tw-mb-4 zebra-table" :scroll="{ x: 1800}">
-          <template #bodyCell="{ column, record }">
-            <template v-if="column.key === 'actions'">
-              <a-space>
-                <a-button type="link" size="small" class="tw-px-1" @click="editRow(record)">
-                  <EditOutlined />
-                </a-button>
-                <a-button type="link" size="small" danger class="tw-px-1" @click="deleteRow(record)">
-                  <DeleteOutlined />
-                </a-button>
-              </a-space>
-            </template>
-          </template>
-        </a-table>
-      </div>
+  <div class="tw-p-4 tw-bg-gray-50 tw-min-h-screen">
+    <div class="tw-flex tw-items-center tw-justify-between tw-mb-4">
+      <h2 class="tw-text-lg tw-font-semibold tw-text-blue-700">
+        {{ title || 'THÔNG TIN CHUNG' }}
+      </h2>
+      <span
+        class="tw-text-xs tw-text-gray-500 tw-bg-gray-100 tw-px-2 tw-py-1 tw-rounded-md tw-font-mono"
+      >
+        {{ doctype }}
+      </span>
     </div>
 
-    <div class="tw-flex tw-flex-col sm:tw-flex-row tw-justify-end tw-items-center tw-gap-2 tw-mt-4">
-      <a-button type="default" class="tw-flex tw-items-center tw-gap-1 tw-w-full sm:tw-w-auto" @click="handleBack">
-        <RollbackOutlined /> <span>Quay lại</span>
-      </a-button>
+    <component
+      :is="currentFormComponent"
+      v-if="currentFormComponent"
+      :frm="frm"
+    />
 
-      <a-button type="primary" class="tw-flex tw-items-center tw-gap-1 tw-w-full sm:tw-w-auto" @click="handleSave">
-        <SaveOutlined /> <span>Lưu</span>
-      </a-button>
+    <div v-else class="tw-text-gray-600 tw-italic">
+      Không tìm thấy form phù hợp cho doctype: {{ doctype }}
     </div>
-
-    <CustomerSelectModal v-model:open="showCustomerModal" :data="customers" @select="selectCustomer"
-      @addnew="handleAddNewCustomer" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import dayjs from "dayjs";
-import {
-  SaveOutlined,
-  RollbackOutlined,
-  PlusCircleOutlined,
-  BarsOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons-vue";
-import CustomerSelectModal from "./CustomerSelectModal.vue";
+import { computed } from "vue";
+
+import SaleOrderForm from "../../pages/SaleOrderForm.vue";
+import WorkOrderForm from "../../pages/WorkOrderForm.vue";
 
 const props = defineProps({
   frm: { type: Object, required: true },
-  title: { type: String, default: "THÔNG TIN ĐƠN HÀNG" },
+  title: { type: String, default: "THÔNG TIN CHUNG" },
 });
 
-const doc = ref({ ...props.frm.doc });
+const doctype = computed(() => props.frm.doctype || "");
 
-const visibleFields = computed(() =>
-  props.frm.meta.fields.filter(
-    (f) =>
-      f.label &&
-      !["Section Break", "Column Break", "HTML", "Table"].includes(f.fieldtype) &&
-      !["owner", "creation", "modified", "modified_by", "_assign", "_comments"].includes(
-        f.fieldname
-      )
-  )
-);
-
-watch(
-  doc,
-  (val) => {
-    Object.assign(props.frm.doc, val);
-  },
-  { deep: true }
-);
-
-const rows = ref(
-  Array.from({ length: 5 }, (_, i) => ({
-    id: i + 1,
-    order_detail_code: `ORDER_${String(i + 1).padStart(4, "0")}`,
-    item_code: `ITEM_${String(i + 1).padStart(5, "0")}`,
-    item_name: `Sản phẩm thử nghiệm ${i + 1}`,
-    status: ["Mới", "Đang xử lý", "Đã tạo lệnh sản xuất", "Hoàn tất"][i % 4],
-    qty_required: Math.floor(50 + Math.random() * 950),
-    stock_available: Math.floor(Math.random() * 200),
-    stock_pending: Math.floor(Math.random() * 100),
-    stock_pending_hold: Math.floor(Math.random() * 50),
-    stock_hold_1: Math.floor(Math.random() * 50),
-    internal_prod_qty: Math.floor(Math.random() * 100),
-    internal_hold_qty: Math.floor(Math.random() * 20),
-    total_hold: 0,
-    uom: ["Cuộn", "Thùng", "Kg", "Cái"][i % 4],
-    created_date: dayjs().subtract(i, "day").format("DD/MM/YYYY"),
-    delivery_date: dayjs().add(i % 10, "day").format("DD/MM/YYYY"),
-  }))
-);
-
-rows.value.forEach(r => {
-  r.total_hold = r.stock_hold_1 + r.internal_hold_qty;
+const currentFormComponent = computed(() => {
+  switch (doctype.value) {
+    case "Custom Sale Order":
+      return SaleOrderForm;
+    case "Custom Work Order":
+      return WorkOrderForm;
+    default:
+      return null;
+  }
 });
-
-const columns = [
-  { title: "STT", dataIndex: "id", key: "id", width: 60, align: "center", fixed: "left" },
-  { title: "Mã đơn chi tiết", dataIndex: "order_detail_code", key: "order_detail_code" },
-  { title: "Mã hàng", dataIndex: "item_code", key: "item_code" },
-  { title: "Tên hàng", dataIndex: "item_name", key: "item_name" },
-  { title: "Trạng thái", dataIndex: "status", key: "status" },
-  { title: "Số lượng yêu cầu", dataIndex: "qty_required", key: "qty_required", align: "right" },
-  { title: "Tồn kho khả dụng", dataIndex: "stock_available", key: "stock_available", align: "right" },
-  { title: "Tồn kho lô nhỡ cân", dataIndex: "stock_pending", key: "stock_pending", align: "right" },
-  { title: "Tồn kho lô nhỡ cân sẽ giữ", dataIndex: "stock_pending_hold", key: "stock_pending_hold", align: "right" },
-  { title: "Tồn kho sẽ giữ (1)", dataIndex: "stock_hold_1", key: "stock_hold_1", align: "right" },
-  {
-    title: "Số lượng khả dụng ở LSX nội bộ (chưa nhập kho)",
-    dataIndex: "internal_prod_qty",
-    key: "internal_prod_qty",
-    align: "right",
-  },
-  {
-    title: "Số lượng sẽ giữ ở LSX nội bộ (chưa nhập kho) (2)",
-    dataIndex: "internal_hold_qty",
-    key: "internal_hold_qty",
-    align: "right",
-  },
-  { title: "Số lượng giữ (3) = (1) + (2)", dataIndex: "total_hold", key: "total_hold", align: "right" },
-  { title: "Đơn vị tính", dataIndex: "uom", key: "uom", align: "center" },
-  { title: "Ngày tạo", dataIndex: "created_date", key: "created_date", align: "center" },
-  { title: "Ngày giao hàng", dataIndex: "delivery_date", key: "delivery_date", align: "center" },
-  { title: "Thao tác", key: "actions", align: "center", width: 90, fixed: "right" },
-];
-
-
-const showCustomerModal = ref(false);
-
-const customers = ref(
-  Array.from({ length: 500 }, (_, i) => ({
-    id: i + 1,
-    code: `CUS${String(i + 1).padStart(4, "0")}`,
-    name: `CÔNG TY TNHH KHÁCH HÀNG ${i + 1}`,
-    phone: `09${Math.floor(10000000 + Math.random() * 89999999)}`,
-    email: `khachhang${i + 1}@example.com`,
-    address: `Số ${i + 1} Đường ${["A", "B", "C", "D"][i % 4]} - KCN ${["VSIP", "Yên Phong", "Tràng Duệ", "Bắc Thăng Long"][i % 4]}`,
-  }))
-);
-
-function selectCustomer(record) {
-  doc.value.customer = record.name;
-  showCustomerModal.value = false;
-  frappe.msgprint(`Đã chọn khách hàng: ${record.name}`);
-}
-
-function handleAddNewCustomer() {
-  frappe.msgprint("Thêm mới khách hàng (Alt + N)");
-}
-
-function handleAddRow() {
-  const next = rows.value.length + 1;
-  rows.value.push({
-    id: next,
-    order_detail_code: "",
-    item_code: "",
-    item_name: "",
-    status: "Mới",
-    qty_required: 0,
-    stock_available: 0,
-    stock_pending: 0,
-    stock_pending_hold: 0,
-    stock_hold_1: 0,
-    internal_prod_qty: 0,
-    internal_hold_qty: 0,
-    total_hold: 0,
-    uom: "",
-    created_date: dayjs().format("DD/MM/YYYY"),
-    delivery_date: "",
-  });
-}
-
-function handleStockCheck() {
-  frappe.msgprint("Kiểm tra tồn kho sản xuất");
-}
-
-function handleBack() {
-  frappe.set_route("List", props.frm.doctype);
-}
-
-function handleSave() {
-  frappe.msgprint("Dữ liệu đã được lưu");
-}
-
-function editRow(record) {
-  frappe.msgprint(`Chỉnh sửa: ${record.item_code}`);
-}
-
-function deleteRow(record) {
-  rows.value = rows.value.filter((r) => r.id !== record.id);
-}
 </script>
 
 <style scoped>
-.ant-form-item {
-  margin-bottom: 12px;
+:deep(.ant-table) {
+  font-size: 13px !important;
 }
-
-.ant-table {
-  font-size: 13px;
-}
-
-:deep(.ant-table-thead > tr > th) {
-  background-color: #e6f4ff !important;
-  color: #003a8c;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-}
-
-:deep(.ant-table-row:hover > td) {
-  background-color: #f5faff !important;
-  transition: background-color 0.2s ease;
-}
-
-:deep(.ant-input),
-:deep(.ant-input-number-input),
-:deep(.ant-select-selector),
-:deep(textarea.ant-input) {
-  background-color: #f5f5f5 !important;
-  border-color: #d9d9d9 !important;
-  border-radius: 6px;
-  color: #000;
-}
-
-:deep(.ant-input[disabled]),
-:deep(.ant-input[readonly]) {
-  background-color: #f0f0f0 !important;
-  color: #555 !important;
-}
-
-:deep(.ant-table-cell-fix-left),
-:deep(.ant-table-cell-fix-right) {
-  background-color: #fff !important;
-  z-index: 2;
-}
-
-:deep(.ant-table-thead > tr > th) {
-  background-color: #e6f4ff !important;
-  color: #003a8c;
-  font-weight: 600;
-  text-align: center;
-  white-space: normal !important;
-  line-height: 1.2;
-  vertical-align: middle;
-  padding: 6px 8px !important;
-}
-
-:deep(.zebra-table .ant-table-tbody > tr:nth-child(odd) > td) {
-  background-color: #fafafa !important;
-}
-
-:deep(.zebra-table .ant-table-tbody > tr:nth-child(even) > td) {
-  background-color: #ffffff !important;
-}
-
-:deep(.zebra-table .ant-table-tbody > tr:hover > td) {
-  background-color: #e6f4ff !important;
-}
-
 </style>

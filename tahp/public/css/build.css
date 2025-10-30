@@ -1231,11 +1231,6 @@ video {
   padding-right: 0px !important;
 }
 
-.tw-px-1 {
-  padding-left: 0.25rem !important;
-  padding-right: 0.25rem !important;
-}
-
 .tw-px-2 {
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
@@ -1291,6 +1286,11 @@ video {
   padding-bottom: 2px !important;
 }
 
+.tw-px-1 {
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
+}
+
 .tw-pb-2 {
   padding-bottom: 0.5rem !important;
 }
@@ -1321,6 +1321,10 @@ video {
 
 .tw-font-sans {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}
+
+.tw-font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
 .tw-text-2xl {
