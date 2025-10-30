@@ -46,7 +46,7 @@ import BaseFormWithTable from "../components/common/BaseFormWithTable.vue";
 import BaseDataTable from "../components/common/BaseDataTable.vue";
 import BaseTabsCard from "../components/common/BaseTabsCard.vue";
 import { PlusCircleOutlined } from "@ant-design/icons-vue";
-
+import { workOrders, workProcesses, workMaterials } from "../mock/workOrders";
 const frm = ref({
   doctype: "Custom Work Order",
   doc: {
@@ -75,18 +75,7 @@ const frm = ref({
   },
 });
 
-const rowsOrders = ref([
-  {
-    id: 1,
-    work_order_code: "MO_KCT_251026",
-    priority: 1,
-    end_date: "02/11/2025",
-    qty_unassigned: 300,
-    qty_production: 300,
-    qty_done: 300,
-    uom: "Kg",
-  },
-]);
+const rowsOrders = ref(workOrders);
 
 const columnsOrders = [
   { title: "STT", dataIndex: "id", key: "id", align: "center", width: 60 },
@@ -113,23 +102,7 @@ function addOrderRow() {
   });
 }
 
-const rowsProcesses = ref([
-  {
-    id: 1,
-    process_code: "MALH",
-    process_name: "Mạ Liên hoàn",
-    machine: "LH1",
-    line: "LH1.4",
-    bobbin: 14,
-    time_standard: 1.23,
-    time_replace_enamel: 120,
-    time_replace_core: 110,
-    time_production: 599,
-    time_start: "08:27:53 30/10/2025",
-    time_end: "18:26:53 30/10/2025",
-    qty_output: 300,
-  },
-]);
+const rowsProcesses = ref(workProcesses);
 
 const columnsProcesses = [
   { title: "STT", dataIndex: "id", key: "id", align: "center", width: 60 },
@@ -166,30 +139,7 @@ function addProcessRow() {
   });
 }
 
-const rowsMaterials = ref(
-  Array.from({ length: 20 }, (_, i) => {
-    const id = i + 1;
-    const materialList = [
-      { code: "EIAIW120_A_25", name: "Dây đồng điện tử 1EI/AIW - 1.2mm - A - PT25", uom: "Kg" },
-      { code: "M.E.7340AX", name: "Voltatex 7340AX (EIW)", uom: "Kg" },
-      { code: "DB.CR107", name: "Dầu bóng CR - 107", uom: "Kg" },
-      { code: "TUIBONGPT25", name: "Túi bóng trùm bobbin PT25", uom: "Cái" },
-      { code: "HOPPT25", name: "Hộp carton loại PT25", uom: "Cái" },
-    ];
-    const m = materialList[i % materialList.length];
-    const baseQty = [300, 250, 150, 600, 300][i % 5];
-
-    return {
-      id,
-      material_code: `${m.code}_${String(id).padStart(2, "0")}`,
-      material_name: `${m.name} - Lô ${String(id).padStart(3, "0")}`,
-      input_rate: 0.5 + Math.random() * 1.5,
-      qty_required: baseQty + Math.floor(Math.random() * 200),
-      uom: m.uom,
-    };
-  })
-);
-
+const rowsMaterials = ref(workMaterials);
 
 const columnsMaterials = [
   { title: "STT", dataIndex: "id", key: "id", align: "center", width: 60 },

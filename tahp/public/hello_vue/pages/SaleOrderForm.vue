@@ -40,6 +40,7 @@ import { ref } from "vue";
 import dayjs from "dayjs";
 import BaseFormWithTable from "../components/common/BaseFormWithTable.vue";
 import BaseDataTable from "../components/common/BaseDataTable.vue";
+import { orderDetails } from "../mock/orderDetails";
 import {
   PlusCircleOutlined,
   BarsOutlined,
@@ -75,26 +76,7 @@ const frm = ref({
   },
 });
 
-const rows = ref([
-  {
-    id: 1,
-    order_detail_code: "JOHNSON25104.1",
-    item_code: "EIAIW050_A_25",
-    item_name: "Dây đồng điện tử 1EI/AIW - 0.50mm - Cu/PET",
-    status: "Đã tạo lệnh sản xuất",
-    qty_required: 350,
-    stock_available: 20,
-    stock_pending: 20,
-    stock_pending_hold: 0,
-    stock_hold_1: 0,
-    internal_prod_qty: 250,
-    internal_hold_qty: 250,
-    total_hold: 250,
-    uom: "Kg",
-    created_date: "22/10/2025",
-    delivery_date: "25/10/2025",
-  },
-]);
+const rows = ref(orderDetails);
 
 const columns = [
   { title: "STT", dataIndex: "id", key: "id", align: "center", width: 60, fixed: "left" },
