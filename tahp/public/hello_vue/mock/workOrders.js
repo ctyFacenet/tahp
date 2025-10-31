@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export const workOrders = Array.from({ length: 5 }, (_, i) => ({
+export const workOrders = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
   work_order_code: `WO_EIAIW050_A_25_2510${30 + i}.1`,
   item_code: `EIAIW050_A_25`,
@@ -13,7 +13,7 @@ export const workOrders = Array.from({ length: 5 }, (_, i) => ({
   created_date: dayjs("2025-10-30").add(i, "day").format("YYYY-MM-DD"),
 }));
 
-export const workProcesses = Array.from({ length: 5 }, (_, i) => {
+export const workProcesses = Array.from({ length: 10 }, (_, i) => {
   const id = i + 1;
   const processCodes = ["MALH", "CHINH", "KEO", "CAT", "DONGGOI"];
   const processNames = ["Mạ Liên hoàn", "Chỉnh dây đầu", "Kéo sợi", "Cắt đoạn", "Đóng gói"];
@@ -41,7 +41,7 @@ export const workProcesses = Array.from({ length: 5 }, (_, i) => {
   };
 });
 
-export const workMaterials = Array.from({ length: 5 }, (_, i) => {
+export const workMaterials = Array.from({ length: 10 }, (_, i) => {
   const id = i + 1;
   const materialList = [
     { code: "EIAIW120_A_25", name: "Dây đồng điện tử 1EI/AIW - 1.2mm - A - PT25", uom: "Kg" },
