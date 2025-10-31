@@ -127,22 +127,21 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
         material_map[material][planned_key] = material_map[material].get(planned_key, 0) + item.required_qty
         material_map[material]['total_planned_qty'] += item.required_qty
 
-    # Get actual data
+    # Get actual data from Work Order Item (consumed_qty)
     actual_items = frappe.db.sql("""
-        SELECT se_detail.item_code, se_detail.qty, se.work_order
-        FROM `tabStock Entry Detail` se_detail
-        JOIN `tabStock Entry` se ON se.name = se_detail.parent
-        WHERE se.work_order IN %(work_orders)s AND se.docstatus = 1 
-        AND se.purpose IN ('Manufacture', 'Material Consumption for Manufacture')
+        SELECT item_code, consumed_qty, parent as work_order
+        FROM `tabWork Order Item`
+        WHERE parent IN %(work_orders)s
     """, {"work_orders": wo_list}, as_dict=1)
     
     for item in actual_items:
         material = item.item_code
         prod_item = wo_to_prod_item.get(item.work_order)
         if material in material_map:
-            material_map[material]["total_actual_qty"] += item.qty
+            consumed_qty = item.consumed_qty or 0
+            material_map[material]["total_actual_qty"] += consumed_qty
             actual_key = frappe.scrub(prod_item) + "_actual"
-            material_map[material][actual_key] = material_map[material].get(actual_key, 0) + item.qty
+            material_map[material][actual_key] = material_map[material].get(actual_key, 0) + consumed_qty
 
     # Prepare output data
     material_codes = list(material_map.keys())
@@ -197,19 +196,10 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
     """
     wo_to_info = {wo.name: wo for wo in work_orders}
 
-    # Get planned data for work orders
+    # Get planned data and consumed_qty for work orders
     bom_items = frappe.db.sql("""
-        SELECT parent, item_code, required_qty, stock_uom
+        SELECT parent, item_code, required_qty, stock_uom, consumed_qty
         FROM `tabWork Order Item` WHERE parent IN %(work_orders)s
-    """, {"work_orders": wo_list}, as_dict=1)
-
-    # Get actual data
-    actual_items = frappe.db.sql("""
-        SELECT se_detail.item_code, se_detail.qty, se.work_order
-        FROM `tabStock Entry Detail` se_detail
-        JOIN `tabStock Entry` se ON se.name = se_detail.parent
-        WHERE se.work_order IN %(work_orders)s AND se.docstatus = 1 
-        AND se.purpose IN ('Manufacture', 'Material Consumption for Manufacture')
     """, {"work_orders": wo_list}, as_dict=1)
 
     # Prepare detailed data by work order and date
@@ -233,10 +223,8 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
         if completion_date:
             completion_date = completion_date.date() if hasattr(completion_date, 'date') else completion_date
         
-        actual_material_qty = sum(
-            actual.qty for actual in actual_items 
-            if actual.work_order == wo_name and actual.item_code == material_code
-        )
+        # Get actual quantity from consumed_qty field
+        actual_material_qty = item.consumed_qty or 0
         planned_material_qty = item.required_qty
         
         produced_qty = wo_data.get("produced_qty", 0)
@@ -399,4 +387,3 @@ def get_work_orders(filters):
     work_orders = frappe.db.sql(sql_query, filters, as_dict=1)
 
     return work_orders
-
