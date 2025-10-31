@@ -84,7 +84,7 @@
         </thead>
 
         <tbody>
-          <template v-if="pagedGroups && pagedGroups.length">
+          <template v-if="props.groupBy && pagedGroups.length">
             <template v-for="(group, gIndex) in pagedGroups" :key="group.key">
               <tr class="tw-bg-gray-100 tw-border-b tw-border-gray-300">
                 <td class="tw-sticky tw-left-0 tw-bg-pink-100 tw-z-30 tw-text-center tw-border">
@@ -119,7 +119,6 @@
                     'tw-sticky tw-right-0 tw-z-20 tw-bg-pink-100 tw-text-center tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                       col.key === 'actions',
                   }" :style="{ width: colWidths[col.key] + 'px' }">
-
                   <template v-if="col.key === 'status'">
                     <span :class="[
                       'tw-inline-block tw-rounded-md tw-px-2 tw-py-[2px] tw-text-[12px] tw-font-medium',
@@ -133,10 +132,8 @@
                     <div class="tw-relative tw-h-[22px] tw-rounded-sm tw-overflow-hidden tw-border tw-border-gray-300">
                       <div class="tw-absolute tw-top-0 tw-left-0 tw-h-full tw-w-full tw-opacity-85 tw-z-[0]"
                         :style="{ backgroundColor: getStatusColor(row.status || row.state || row[col.key]) }"></div>
-
                       <div class="tw-absolute tw-bottom-0 tw-left-0 tw-h-[3px] tw-bg-red-500 tw-z-[10]"
                         :style="{ width: getProgressWidth(row[col.key]) + '%' }"></div>
-
                       <span
                         class="tw-relative tw-flex tw-items-center tw-justify-center tw-h-full tw-text-[12px] tw-font-medium tw-text-white tw-z-[20]">
                         {{ row[col.key] }}
@@ -171,6 +168,64 @@
             </template>
           </template>
 
+          <template v-else-if="filteredRows.length">
+            <tr v-for="(row, i) in filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)" :key="i"
+              :class="[
+                'tw-text-[13px] tw-cursor-pointer',
+                selectedRows.has(row)
+                  ? 'tw-bg-blue-50'
+                  : 'hover:tw-bg-gray-50',
+              ]" @click="handleRowClick($event, row)">
+              <td
+                class="checkbox-cell tw-sticky tw-left-0 tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(null, row, $event)" />
+              </td>
+
+              <td
+                class="index-cell tw-sticky tw-left-[45px] tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                {{ i + 1 + (currentPage - 1) * pageSize }}
+              </td>
+
+              <td v-for="col in columns || []" :key="col.key"
+                class="tw-border tw-px-2 tw-py-1 tw-text-center tw-relative" :class="{
+                  'tw-sticky tw-right-0 tw-z-20 tw-bg-pink-100 tw-text-center tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
+                    col.key === 'actions',
+                }" :style="{ width: colWidths[col.key] + 'px' }">
+                <template v-if="col.key === 'status'">
+                  <span :class="[
+                    'tw-inline-block tw-rounded-md tw-px-2 tw-py-[2px] tw-text-[12px] tw-font-medium',
+                    statusColors[row[col.key]] || 'tw-bg-gray-200 tw-text-gray-700',
+                  ]">
+                    {{ row[col.key] }}
+                  </span>
+                </template>
+
+                <template v-else-if="col.key === 'actions'">
+                  <slot name="actions" :row="row">
+                    <div class="actions-cell tw-flex tw-items-center tw-justify-center tw-gap-2">
+                      <a-tooltip title="Xem chi tiết">
+                        <EyeOutlined class="hover:tw-text-gray-600 tw-text-blue-600 tw-cursor-pointer"
+                          @click="$emit('view', row)" />
+                      </a-tooltip>
+                      <a-tooltip title="Chỉnh sửa">
+                        <EditOutlined class="hover:tw-text-gray-600 tw-text-green-600 tw-cursor-pointer"
+                          @click="$emit('edit', row)" />
+                      </a-tooltip>
+                      <a-tooltip title="Xóa">
+                        <DeleteOutlined class="hover:tw-text-gray-600 tw-text-red-600 tw-cursor-pointer"
+                          @click="$emit('delete', row)" />
+                      </a-tooltip>
+                    </div>
+                  </slot>
+                </template>
+
+                <template v-else>
+                  {{ row[col.key] || '' }}
+                </template>
+              </td>
+            </tr>
+          </template>
+
           <tr v-else>
             <td :colspan="(columns?.length || 0) + 2"
               class="tw-text-center tw-py-6 tw-text-gray-500 tw-italic tw-border">
@@ -178,6 +233,7 @@
             </td>
           </tr>
         </tbody>
+
       </table>
     </div>
 
@@ -280,7 +336,7 @@ const getStatusColor = (v) => {
 };
 
 const groupedRows = computed(() => {
-  if (!props.groupBy) return [{ key: "Tất cả", rows: allRows.value }];
+  if (!props.groupBy) return [];
   const map = new Map();
   (allRows.value || []).forEach((r) => {
     const k = r[props.groupBy] || "Không xác định";
@@ -289,6 +345,7 @@ const groupedRows = computed(() => {
   });
   return [...map].map(([key, rows]) => ({ key, rows }));
 });
+
 
 const totalPreviousRows = (idx) =>
   groupedRows.value.slice(0, idx).reduce((a, g) => a + (g.rows?.length || 0), 0);
@@ -315,30 +372,46 @@ const toggleGroup = (key, e) => {
 const toggleRow = (gk, row, e) => {
   if (e.target.checked) selectedRows.value.add(row);
   else selectedRows.value.delete(row);
+
+  if (!props.groupBy) return;
+
   const g = groupedRows.value.find((x) => x.key === gk);
+  if (!g) return;
+
   const all = g.rows.every((r) => selectedRows.value.has(r));
   if (all && !selectedGroups.value.includes(gk)) selectedGroups.value.push(gk);
   if (!all) selectedGroups.value = selectedGroups.value.filter((x) => x !== gk);
 };
 
+
 const toggleSelectAll = () => {
   if (selectAll.value) {
-    groupedRows.value.forEach((g) => {
-      if (!selectedGroups.value.includes(g.key)) selectedGroups.value.push(g.key);
-      g.rows.forEach((r) => selectedRows.value.add(r));
-    });
+    if (props.groupBy) {
+      groupedRows.value.forEach((g) => {
+        if (!selectedGroups.value.includes(g.key))
+          selectedGroups.value.push(g.key);
+        g.rows.forEach((r) => selectedRows.value.add(r));
+      });
+    } else {
+      (filteredRows.value || []).forEach((r) => selectedRows.value.add(r));
+    }
   } else {
     selectedGroups.value = [];
     selectedRows.value.clear();
   }
 };
 
+
 watch(selectedRows, () => {
-  const total = groupedRows.value.reduce((a, g) => a + (g.rows?.length || 0), 0);
+  const total = props.groupBy
+    ? groupedRows.value.reduce((a, g) => a + (g.rows?.length || 0), 0)
+    : filteredRows.value.length;
   const count = selectedRows.value.size;
   selectAll.value = count > 0 && count === total;
-  if (selectAllRef.value) selectAllRef.value.indeterminate = count > 0 && count < total;
+  if (selectAllRef.value)
+    selectAllRef.value.indeterminate = count > 0 && count < total;
 });
+
 
 const filters = ref({});
 const dateFilters = ref({});
@@ -409,7 +482,9 @@ const pagedGroups = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
   const flat = filteredRows.value.slice(start, end);
-  if (!props.groupBy) return [{ key: "Tất cả", rows: flat }];
+
+  if (!props.groupBy) return [];
+
   const map = new Map();
   flat.forEach((r) => {
     const k = r[props.groupBy] || "Không xác định";
@@ -418,6 +493,7 @@ const pagedGroups = computed(() => {
   });
   return [...map].map(([key, rows]) => ({ key, rows }));
 });
+
 
 const colWidths = ref({});
 watch(() => props.columns, (cols) => {
@@ -601,4 +677,4 @@ tbody td {
     display: none !important;
   }
 }
-</style>
+</style> 
