@@ -96,6 +96,7 @@ def process_consumed_produced_items(work_order, required, produced, planned_star
 
             if doc.item_code == wo_doc.production_item:
                 wo_doc.db_set("produced_qty", doc.actual_qty)
+                wo_doc.db_set("fg_warehouse", doc.warehouse)
                 noti_qc(doc)
 
             else:
