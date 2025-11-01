@@ -8,18 +8,18 @@
     <div ref="scrollWrapper"
       class="tw-flex-1 tw-overflow-x-auto tw-overflow-y-auto tw-max-h-[70vh] tw-border tw-border-gray-100 tw-relative"
       @scroll="handleScroll">
-
       <table class="tw-min-w-max tw-border-collapse tw-w-full" ref="tableRef">
         <thead class="tw-sticky tw-top-0 tw-z-20">
+
           <tr class="tw-bg-blue-50 tw-border-b tw-border-gray-300 tw-text-gray-700 tw-text-[13px]">
             <th
-              class="tw-sticky tw-left-0 tw-top-0 tw-z-40 tw-bg-pink-100 tw-w-[45px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
-              <input type="checkbox" ref="selectAllRef" v-model="selectAll" @change="toggleSelectAll" />
+              class="tw-sticky tw-left-0 tw-top-0 tw-z-40 tw-bg-pink-100 tw-w-[50px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
+              STT
             </th>
 
             <th
-              class="tw-sticky tw-left-[45px] tw-top-0 tw-z-40 tw-bg-pink-100 tw-w-[50px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
-              STT
+              class="tw-sticky tw-left-[50px] tw-top-0 tw-z-40 tw-bg-pink-100 tw-w-[45px] tw-text-center tw-border tw-shadow-[3px_0_6px_rgba(0,0,0,0.12)]">
+              <input type="checkbox" ref="selectAllRef" v-model="selectAll" @change="toggleSelectAll" />
             </th>
 
             <th v-for="col in columns || []" :key="col.key"
@@ -30,13 +30,11 @@
                     col.key === 'actions',
                   'tw-bg-pink-100 tw-text-pink-800':
                     /(can|kdai|ktrung|ktieu|mahz|malh|mavt)/i.test(col.key)
-
                 }
               ]" :style="{
                 width: colWidths[col.key] + 'px',
                 minWidth: col.key === 'actions' ? '130px' : '150px',
               }">
-
               <div class="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 <a-tooltip :title="col.title">
                   <span class="tw-truncate tw-font-semibold">{{ col.title }}</span>
@@ -47,20 +45,18 @@
 
               <div
                 class="resizer tw-absolute tw-top-0 tw-right-0 tw-w-[6px] tw-h-full tw-cursor-col-resize tw-bg-transparent hover:tw-bg-blue-300 tw-opacity-0 group-hover:tw-opacity-100"
-                @mousedown="startResize($event, col.key)">
-              </div>
+                @mousedown="startResize($event, col.key)"></div>
             </th>
           </tr>
 
           <tr class="tw-bg-white tw-border-b tw-border-gray-200">
             <th class="tw-sticky tw-left-0 tw-top-[33px] tw-z-30 tw-bg-pink-100 tw-border"></th>
-            <th class="tw-sticky tw-left-[45px] tw-top-[33px] tw-z-30 tw-bg-pink-100 tw-border"></th>
+            <th class="tw-sticky tw-left-[50px] tw-top-[33px] tw-z-30 tw-bg-pink-100 tw-border"></th>
 
             <th v-for="col in columns || []" :key="col.key" class="tw-px-2 tw-py-1 tw-border tw-bg-white" :class="{
               'tw-sticky tw-right-0 tw-z-30 tw-bg-pink-100 tw-shadow-[-4px_0_6px_rgba(0,0,0,0.15)]':
                 col.key === 'actions',
             }" :style="{ width: colWidths[col.key] + 'px' }">
-
               <template v-if="col.fieldtype === 'Date'">
                 <a-range-picker v-model:value="dateFilters[col.key]" format="DD/MM/YYYY" size="small"
                   :placeholder="['Từ ngày', 'Đến ngày']" class="tw-w-full tw-text-xs" />
@@ -84,14 +80,15 @@
         </thead>
 
         <tbody>
+
           <template v-if="props.groupBy && pagedGroups.length">
             <template v-for="(group, gIndex) in pagedGroups" :key="group.key">
               <tr class="tw-bg-gray-100 tw-border-b tw-border-gray-300">
-                <td class="tw-sticky tw-left-0 tw-bg-pink-100 tw-z-30 tw-text-center tw-border">
+                <td class="tw-sticky tw-left-0 tw-bg-pink-100 tw-z-30 tw-text-center tw-border"></td>
+                <td class="tw-sticky tw-left-[50px] tw-bg-pink-100 tw-z-30 tw-text-center tw-border">
                   <input type="checkbox" :checked="selectedGroups.includes(group.key)"
                     @change="toggleGroup(group.key, $event)" />
                 </td>
-                <td class="tw-sticky tw-left-[45px] tw-bg-pink-100 tw-z-30 tw-text-center tw-border"></td>
                 <td :colspan="columns?.length || 0"
                   class="tw-font-semibold tw-text-red-600 tw-uppercase tw-border tw-px-2">
                   {{ group.key }}
@@ -100,18 +97,16 @@
 
               <tr v-for="(row, i) in group.rows || []" :key="group.key + '-' + i" :class="[
                 'tw-text-[13px] tw-cursor-pointer',
-                selectedRows.has(row)
-                  ? 'tw-bg-blue-50'
-                  : 'hover:tw-bg-gray-50',
+                selectedRows.has(row) ? 'tw-bg-blue-50' : 'hover:tw-bg-gray-50',
               ]" @click="handleRowClick($event, row)">
                 <td
-                  class="checkbox-cell tw-sticky tw-left-0 tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
-                  <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(group.key, row, $event)" />
+                  class="index-cell tw-sticky tw-left-0 tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                  {{ i + 1 + totalPreviousRows(gIndex) }}
                 </td>
 
                 <td
-                  class="index-cell tw-sticky tw-left-[45px] tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
-                  {{ i + 1 + totalPreviousRows(gIndex) }}
+                  class="checkbox-cell tw-sticky tw-left-[50px] tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                  <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(group.key, row, $event)" />
                 </td>
 
                 <td v-for="col in columns || []" :key="col.key"
@@ -172,18 +167,16 @@
             <tr v-for="(row, i) in filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)" :key="i"
               :class="[
                 'tw-text-[13px] tw-cursor-pointer',
-                selectedRows.has(row)
-                  ? 'tw-bg-blue-50'
-                  : 'hover:tw-bg-gray-50',
+                selectedRows.has(row) ? 'tw-bg-blue-50' : 'hover:tw-bg-gray-50',
               ]" @click="handleRowClick($event, row)">
               <td
-                class="checkbox-cell tw-sticky tw-left-0 tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
-                <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(null, row, $event)" />
+                class="index-cell tw-sticky tw-left-0 tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                {{ i + 1 + (currentPage - 1) * pageSize }}
               </td>
 
               <td
-                class="index-cell tw-sticky tw-left-[45px] tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
-                {{ i + 1 + (currentPage - 1) * pageSize }}
+                class="checkbox-cell tw-sticky tw-left-[50px] tw-top-0 tw-bg-pink-100 tw-z-20 tw-text-center tw-border tw-py-1">
+                <input type="checkbox" :checked="selectedRows.has(row)" @change="toggleRow(null, row, $event)" />
               </td>
 
               <td v-for="col in columns || []" :key="col.key"
@@ -233,7 +226,6 @@
             </td>
           </tr>
         </tbody>
-
       </table>
     </div>
 
@@ -241,17 +233,14 @@
       class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-py-2 tw-px-3 tw-border-gray-200 tw-bg-gray-50 tw-text-xs">
       <a-select v-model:value="pageSize" :options="pageSizeOptions" class="tw-hidden sm:tw-block tw-w-[110px]"
         @change="onPageSizeChange" />
-
       <div
-        class="tw-flex tw-flex-col sm:tw-flex-row  tw-items-center tw-justify-center tw-gap-2 sm:tw-gap-3 tw-w-full sm:tw-w-auto tw-justify-center">
+        class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2 sm:tw-gap-3 tw-w-full sm:tw-w-auto">
         <span class="tw-hidden sm:tw-inline tw-text-gray-600 tw-font-medium">
           Trang số {{ currentPage }} của {{ totalPages }} ({{ filteredRows?.length || 0 }} bản ghi)
         </span>
-
         <a-pagination v-model:current="currentPage" :total="filteredRows?.length || 0" :pageSize="pageSize"
           @change="onPageChange" :showSizeChanger="false" size="small" class="tw-my-1 sm:tw-my-0" />
       </div>
-
       <div class="tw-hidden sm:tw-flex tw-items-center tw-gap-2">
         <span>Đi đến</span>
         <a-input-number v-model:value="goToPage" :min="1" :max="totalPages" @pressEnter="jumpToPage" style="width: 70px"
@@ -263,17 +252,14 @@
       class="tw-text-center tw-py-3 tw-border-t tw-border-gray-200 tw-bg-white tw-text-[13px] sm:tw-text-[14px] tw-font-[500] tw-tracking-wide tw-text-gray-600">
       © Copyright
       <a href="https://facenet.vn" target="_blank" rel="noopener noreferrer"
-        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">
-        FaceNet
-      </a>.
+        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">FaceNet</a>.
       All Rights Reserved,&nbsp;Designed by
       <a href="https://facenet.vn" target="_blank" rel="noopener noreferrer"
-        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">
-        FaceNet
-      </a>
+        class="tw-text-[#0066cc] tw-font-semibold tw-cursor-pointer hover:tw-underline">FaceNet</a>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, watch, shallowRef } from "vue";
@@ -677,4 +663,4 @@ tbody td {
     display: none !important;
   }
 }
-</style> 
+</style>
