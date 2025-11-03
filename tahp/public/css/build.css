@@ -1,0 +1,121 @@
+.tw-relative {
+  position: relative !important
+}
+
+.tw-mb-2 {
+  margin-bottom: 0.5rem !important
+}
+
+.tw-flex {
+  display: flex !important
+}
+
+.tw-grid {
+  display: grid !important
+}
+
+.tw-h-full {
+  height: 100% !important
+}
+
+.tw-h-\[calc\(100vh-200px\)\] {
+  height: calc(100vh - 200px) !important
+}
+
+.tw-min-h-0 {
+  min-height: 0px !important
+}
+
+.tw-min-h-\[100px\] {
+  min-height: 100px !important
+}
+
+.tw-w-full {
+  width: 100% !important
+}
+
+.tw-flex-1 {
+  flex: 1 1 0% !important
+}
+
+.tw-flex-shrink-0 {
+  flex-shrink: 0 !important
+}
+
+.tw-flex-col {
+  flex-direction: column !important
+}
+
+.tw-justify-end {
+  justify-content: flex-end !important
+}
+
+.tw-justify-center {
+  justify-content: center !important
+}
+
+.tw-gap-4 {
+  gap: 1rem !important
+}
+
+.tw-gap-2 {
+  gap: 0.5rem !important
+}
+
+.tw-overflow-auto {
+  overflow: auto !important
+}
+
+.tw-overflow-hidden {
+  overflow: hidden !important
+}
+
+.tw-overflow-visible {
+  overflow: visible !important
+}
+
+.tw-overflow-x-hidden {
+  overflow-x: hidden !important
+}
+
+.tw-rounded-lg {
+  border-radius: 0.5rem !important
+}
+
+.tw-bg-red-400 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(248 113 113 / var(--tw-bg-opacity, 1)) !important
+}
+
+.tw-bg-blue-100 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(219 234 254 / var(--tw-bg-opacity, 1)) !important
+}
+
+.tw-bg-\[\#e8f3ff\] {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(232 243 255 / var(--tw-bg-opacity, 1)) !important
+}
+
+.tw-p-3 {
+  padding: 0.75rem !important
+}
+
+.tw-text-center {
+  text-align: center !important
+}
+
+.tw-text-xs {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important
+}
+
+@media (min-width: 1024px) {
+  .lg\:tw-w-\[220px\] {
+    width: 220px !important
+  }
+
+  .lg\:tw-flex-row {
+    flex-direction: row !important
+  }
+}
