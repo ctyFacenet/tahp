@@ -58,105 +58,105 @@ frappe.query_reports["Material Consumption"] = {
     },
 
     get_report_title(filters) {
-        // Tạo tiêu đề ngắn gọn để tránh bị cắt ngắn
-        let title = "Tiêu thụ NVL";
+        // // Tạo tiêu đề ngắn gọn để tránh bị cắt ngắn
+        // let title = "Tiêu thụ NVL";
         
-        if (filters.manufacturing_category) {
-            title += ` - ${filters.manufacturing_category}`;
-        }
+        // if (filters.manufacturing_category) {
+        //     title += ` - ${filters.manufacturing_category}`;
+        // }
         
-        // Ưu tiên hiển thị thông tin thời gian quan trọng nhất
-        if (filters.is_month_filter && filters.month && filters.year) {
-            // Rút gọn tên tháng để tiết kiệm không gian
-            const monthShort = filters.month.replace('Tháng ', 'T');
-            title += ` (${monthShort}/${filters.year})`;
-        } else if (filters.week) {
-            const weekDate = new Date(filters.week);
-            const weekStart = this.getMonday(weekDate);
-            const weekEnd = this.getSunday(weekStart);
-            title += ` (${weekStart.toLocaleDateString('vi-VN')} - ${weekEnd.toLocaleDateString('vi-VN')})`;
-        } else if (filters.from_date && filters.to_date) {
-            const fromDate = new Date(filters.from_date);
-            const toDate = new Date(filters.to_date);
-            title += ` (${fromDate.toLocaleDateString('vi-VN')} - ${toDate.toLocaleDateString('vi-VN')})`;
-        } else if (filters.year) {
-            title += ` (${filters.year})`;
-        }
+        // // Ưu tiên hiển thị thông tin thời gian quan trọng nhất
+        // if (filters.is_month_filter && filters.month && filters.year) {
+        //     // Rút gọn tên tháng để tiết kiệm không gian
+        //     const monthShort = filters.month.replace('Tháng ', 'T');
+        //     title += ` (${monthShort}/${filters.year})`;
+        // } else if (filters.week) {
+        //     const weekDate = new Date(filters.week);
+        //     const weekStart = this.getMonday(weekDate);
+        //     const weekEnd = this.getSunday(weekStart);
+        //     title += ` (${weekStart.toLocaleDateString('vi-VN')} - ${weekEnd.toLocaleDateString('vi-VN')})`;
+        // } else if (filters.from_date && filters.to_date) {
+        //     const fromDate = new Date(filters.from_date);
+        //     const toDate = new Date(filters.to_date);
+        //     title += ` (${fromDate.toLocaleDateString('vi-VN')} - ${toDate.toLocaleDateString('vi-VN')})`;
+        // } else if (filters.year) {
+        //     title += ` (${filters.year})`;
+        // }
         
-        // Đảm bảo tiêu đề không vượt quá 140 ký tự
-        if (title.length > 140) {
-            // Nếu vẫn quá dài, cắt bớt thông tin
-            if (filters.manufacturing_category) {
-                title = `Tiêu thụ NVL - ${filters.manufacturing_category}`;
-                if (filters.is_month_filter && filters.month && filters.year) {
-                    const monthShort = filters.month.replace('Tháng ', 'T');
-                    title += ` (${monthShort}/${filters.year})`;
-                }
-            } else {
-                title = "Tiêu thụ NVL";
-                if (filters.is_month_filter && filters.month && filters.year) {
-                    const monthShort = filters.month.replace('Tháng ', 'T');
-                    title += ` (${monthShort}/${filters.year})`;
-                }
-            }
-        }
+        // // Đảm bảo tiêu đề không vượt quá 140 ký tự
+        // if (title.length > 140) {
+        //     // Nếu vẫn quá dài, cắt bớt thông tin
+        //     if (filters.manufacturing_category) {
+        //         title = `Tiêu thụ NVL - ${filters.manufacturing_category}`;
+        //         if (filters.is_month_filter && filters.month && filters.year) {
+        //             const monthShort = filters.month.replace('Tháng ', 'T');
+        //             title += ` (${monthShort}/${filters.year})`;
+        //         }
+        //     } else {
+        //         title = "Tiêu thụ NVL";
+        //         if (filters.is_month_filter && filters.month && filters.year) {
+        //             const monthShort = filters.month.replace('Tháng ', 'T');
+        //             title += ` (${monthShort}/${filters.year})`;
+        //         }
+        //     }
+        // }
         
-        return title;
+        // return title;
     },
 
-    "override_report_title": function(report) {
-        // Tạo tiêu đề ngắn gọn
-        const filters = report.get_filter_values();
-        let title = "Tiêu thụ NVL";
+    // "override_report_title": function(report) {
+    //     // Tạo tiêu đề ngắn gọn
+    //     const filters = report.get_filter_values();
+    //     let title = "Tiêu thụ NVL";
         
-        if (filters.manufacturing_category) {
-            title += ` - ${filters.manufacturing_category}`;
-        }
+    //     if (filters.manufacturing_category) {
+    //         title += ` - ${filters.manufacturing_category}`;
+    //     }
         
-        // Ưu tiên hiển thị thông tin thời gian quan trọng nhất
-        if (filters.is_month_filter && filters.month && filters.year) {
-            // Rút gọn tên tháng để tiết kiệm không gian
-            const monthShort = filters.month.replace('Tháng ', 'T');
-            title += ` (${monthShort}/${filters.year})`;
-        } else if (filters.week) {
-            const weekDate = new Date(filters.week);
-            const weekStart = this.getMonday(weekDate);
-            const weekEnd = this.getSunday(weekStart);
-            title += ` (${weekStart.toLocaleDateString('vi-VN')} - ${weekEnd.toLocaleDateString('vi-VN')})`;
-        } else if (filters.from_date && filters.to_date) {
-            const fromDate = new Date(filters.from_date);
-            const toDate = new Date(filters.to_date);
-            title += ` (${fromDate.toLocaleDateString('vi-VN')} - ${toDate.toLocaleDateString('vi-VN')})`;
-        } else if (filters.year) {
-            title += ` (${filters.year})`;
-        }
+    //     // Ưu tiên hiển thị thông tin thời gian quan trọng nhất
+    //     if (filters.is_month_filter && filters.month && filters.year) {
+    //         // Rút gọn tên tháng để tiết kiệm không gian
+    //         const monthShort = filters.month.replace('Tháng ', 'T');
+    //         title += ` (${monthShort}/${filters.year})`;
+    //     } else if (filters.week) {
+    //         const weekDate = new Date(filters.week);
+    //         const weekStart = this.getMonday(weekDate);
+    //         const weekEnd = this.getSunday(weekStart);
+    //         title += ` (${weekStart.toLocaleDateString('vi-VN')} - ${weekEnd.toLocaleDateString('vi-VN')})`;
+    //     } else if (filters.from_date && filters.to_date) {
+    //         const fromDate = new Date(filters.from_date);
+    //         const toDate = new Date(filters.to_date);
+    //         title += ` (${fromDate.toLocaleDateString('vi-VN')} - ${toDate.toLocaleDateString('vi-VN')})`;
+    //     } else if (filters.year) {
+    //         title += ` (${filters.year})`;
+    //     }
         
-        // Đảm bảo tiêu đề không vượt quá 140 ký tự
-        if (title.length > 140) {
-            // Nếu vẫn quá dài, cắt bớt thông tin
-            if (filters.manufacturing_category) {
-                title = `Tiêu thụ NVL - ${filters.manufacturing_category}`;
-                if (filters.is_month_filter && filters.month && filters.year) {
-                    const monthShort = filters.month.replace('Tháng ', 'T');
-                    title += ` (${monthShort}/${filters.year})`;
-                }
-            } else {
-                title = "Tiêu thụ NVL";
-                if (filters.is_month_filter && filters.month && filters.year) {
-                    const monthShort = filters.month.replace('Tháng ', 'T');
-                    title += ` (${monthShort}/${filters.year})`;
-                }
-            }
-        }
+    //     // Đảm bảo tiêu đề không vượt quá 140 ký tự
+    //     if (title.length > 140) {
+    //         // Nếu vẫn quá dài, cắt bớt thông tin
+    //         if (filters.manufacturing_category) {
+    //             title = `Tiêu thụ NVL - ${filters.manufacturing_category}`;
+    //             if (filters.is_month_filter && filters.month && filters.year) {
+    //                 const monthShort = filters.month.replace('Tháng ', 'T');
+    //                 title += ` (${monthShort}/${filters.year})`;
+    //             }
+    //         } else {
+    //             title = "Tiêu thụ NVL";
+    //             if (filters.is_month_filter && filters.month && filters.year) {
+    //                 const monthShort = filters.month.replace('Tháng ', 'T');
+    //                 title += ` (${monthShort}/${filters.year})`;
+    //             }
+    //         }
+    //     }
         
-        // Override title trong DOM
-        setTimeout(() => {
-            const titleElement = $('.page-title, .report-title, h1').first();
-            if (titleElement.length) {
-                titleElement.text(title);
-            }
-        }, 100);
-    },
+    //     // Override title trong DOM
+    //     setTimeout(() => {
+    //         const titleElement = $('.page-title, .report-title, h1').first();
+    //         if (titleElement.length) {
+    //             titleElement.text(title);
+    //         }
+    //     }, 100);
+    // },
     
     "onload": function(report) {
         // Override title để tránh bị cắt ngắn
