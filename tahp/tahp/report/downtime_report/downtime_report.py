@@ -106,10 +106,11 @@ def execute(filters=None):
             
     
     columns = [
+        {"label": "LSX công đoạn ", "fieldname": "job_card", "fieldtype": "Link", "options": "Job Card", 'dropdown': False, 'sortable': False, "width": 180},
         {"label": "Tên thiết bị", "fieldname": "equipment_name", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 200},
         {"label": "Cụm máy", "fieldname": "machine_group", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 180},
         {"label": "Hệ", "fieldname": "category", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 150},
-        {"label": "Mã ca", "fieldname": "shift_code", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 120},
+        {"label": "Ca", "fieldname": "shift_code", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 190},
         {"label": "Ngày", "fieldname": "date", "fieldtype": "Date", 'dropdown': False, 'sortable': False, "width": 120},
         {"label": "Bắt đầu dừng", "fieldname": "start_time", "fieldtype": "Time", 'dropdown': False, 'sortable': False, "width": 120},
         {"label": "Kết thúc dừng", "fieldname": "end_time", "fieldtype": "Time", 'dropdown': False, 'sortable': False, "width": 120},
@@ -173,6 +174,7 @@ def execute(filters=None):
             
             
             data.append({
+                'job_card': jc.name,
                 'equipment_name': equipment_name,
                 'machine_group': parent,
                 'shift_code': getattr(doc_wo_order, 'custom_shift', None),

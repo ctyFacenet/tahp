@@ -36,7 +36,7 @@ def execute(filters=None):
         {"label": "Chênh lệch", "fieldname": "variance", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "%Thực tế/Kế hoạch", "fieldname": "percent_actual", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
         {"label": "Lũy kế thực tế", "fieldname": "cumulative_actual", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
-        {"label": "kế hoạch tuần", "fieldname": "cumulative_planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "Kế hoạch tuần", "fieldname": "cumulative_planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "%Hoàn thành", "fieldname": "percent_cumulative", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
     ]
     data = []
@@ -158,7 +158,6 @@ def get_actual_vs_planned(filters=None):
 
     start_date = min_start.date() if hasattr(min_start, "date") else getdate(min_start)
     end_date = max_end.date() if hasattr(max_end, "date") else getdate(max_end)
-
    
     labels = []
     d = start_date
@@ -193,22 +192,39 @@ def get_actual_vs_planned(filters=None):
     #             items_data[item]["actual_map"].get(wo_final_day, 0) + float(wo.produced_qty or 0)
     
     # Thay đổi từ ngày cuối cùng sang ngày bắt đầu
+    # for wo in work_orders:
+    #     item = wo.production_item
+        
+    #     if item not in items_data:
+    #         continue
+        
+    #     # Lấy ngày bắt đầu thực tế
+    #     if wo.actual_start_date:
+    #         wo_start_day = str(wo.actual_start_date.date() if hasattr(wo.actual_start_date, "date") else getdate(wo.actual_start_date))
+            
+    #         items_data[item]["planned_map"][wo_start_day] = \
+    #             items_data[item]["planned_map"].get(wo_start_day, 0) + float(wo.qty or 0)
+            
+    #         items_data[item]["actual_map"][wo_start_day] = \
+    #             items_data[item]["actual_map"].get(wo_start_day, 0) + float(wo.produced_qty or 0)
+
+    # - Tính vào ngày kế hoạch bắt đầu (planned_start_date)
     for wo in work_orders:
         item = wo.production_item
         
         if item not in items_data:
             continue
         
-        # Lấy ngày bắt đầu thực tế
-        if wo.actual_start_date:
-            wo_start_day = str(wo.actual_start_date.date() if hasattr(wo.actual_start_date, "date") else getdate(wo.actual_start_date))
-            
+        # Kiểm tra có planned_start_date không
+        if wo.planned_start_date:
+            start_day = wo.planned_start_date.date() if hasattr(wo.planned_start_date, "date") else getdate(wo.planned_start_date)
+            wo_start_day = str(start_day)
+
             items_data[item]["planned_map"][wo_start_day] = \
                 items_data[item]["planned_map"].get(wo_start_day, 0) + float(wo.qty or 0)
             
             items_data[item]["actual_map"][wo_start_day] = \
                 items_data[item]["actual_map"].get(wo_start_day, 0) + float(wo.produced_qty or 0)
-
    
     result_items = {}
     for item in items_list:
