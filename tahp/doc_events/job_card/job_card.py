@@ -436,7 +436,7 @@ def update_workstations(job_card, workstations):
     if all_stopped:
         doc.status = "On Hold"
     else:
-        doc.status = "In Progress"
+        doc.status = "Work In Progress"
     doc.save()
 
 @frappe.whitelist()

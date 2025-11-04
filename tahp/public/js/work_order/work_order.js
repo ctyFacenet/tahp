@@ -294,10 +294,10 @@ async function complete_wo(frm) {
                 fieldtype: "Section Break"
             },
             {
-                fieldname: "planned_start_date",
-                label: "Ngày bắt đầu kế hoạch",
+                fieldname: "actual_start_date",
+                label: "Ngày bắt đầu thực tế",
                 fieldtype: "Datetime",
-                default: frm.doc.planned_start_date,
+                default: frm.doc.actual_start_date? frm.doc.actual_start_date : frappe.datetime.now_datetime(),
                 reqd: 1
             },
             {
@@ -313,7 +313,7 @@ async function complete_wo(frm) {
             // ✅ Lấy dữ liệu từ cả 2 bảng
             const requireds_data = covertAllData(requiredsRawData, $firstWrapper.find('.wo-value-input, .wo-select-middle'));
             const finisheds_data = covertAllData(finishedsRawData, $secondWrapper.find('.wo-value-input, .wo-select-middle'));
-            let planned_start_date = d.get_value("planned_start_date");
+            let actual_start_date = d.get_value("actual_start_date");
             let actual_end_date = d.get_value("actual_end_date");
             let raise_qc = d.get_value("raise_qc");
 
@@ -323,7 +323,7 @@ async function complete_wo(frm) {
                     work_order: frm.doc.name, 
                     required: requireds_data, 
                     produced: finisheds_data,
-                    planned_start_date,
+                    actual_start_date,
                     actual_end_date,
                     raise_qc
                 }
@@ -687,3 +687,16 @@ function covertAllData(data, inputs) {
     });
     return newData;
 }
+
+frappe.ui.form.on('Work Order Item', {
+    item_code: async function (frm, cdt, cdn) {
+        let row = locals[cdt][cdn]
+        if (row.item_code && (!row.source_warehouse || row.source_warehouse === null)) {
+            let item_group = await frappe.db.get_value('Item', row.item_code, 'item_group')
+            let group_doc = await frappe.db.get_doc("Item Group", item_group.message.item_group)
+            row.source_warehouse = group_doc.item_group_defaults[0].default_warehouse
+            row.required_qty = 0
+            frm.refresh_field("required_items")
+        }
+    }
+})
