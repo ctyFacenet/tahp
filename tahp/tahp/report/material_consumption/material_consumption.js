@@ -58,6 +58,16 @@ frappe.query_reports["Material Consumption"] = {
     },
     
     "onload": function(report) {
+        // if (window.ChartDataLabels) {
+        //     try {
+        //         // Đăng ký toàn cục cho tất cả các chart
+        //         Chart.register(window.ChartDataLabels);
+        //     } catch (e) {
+        //         // Có thể plugin đã được đăng ký, bỏ qua lỗi
+        //         console.warn("ChartDataLabels đã được đăng ký.", e);
+        //     }
+        // }
+
         setTimeout(() => {
             if (!this.isDrawing) {
                 this.draw_chart();
@@ -510,25 +520,64 @@ frappe.query_reports["Material Consumption"] = {
                         align: window.innerWidth < 768 ? 'start' : 'center'
                     },
                     tooltip: {
+                        enabled: true,
                         callbacks: {
                             label: function(context) {
                                 const datasetIndex = context.datasetIndex;
                                 const dataIndex = context.dataIndex;
                                 const dataset = context.dataset;
                                 
-                                if (!dataset.original_data) {
-                                    return '';
+                                // Hiển thị giá trị đã scale
+                                if (dataset.data && dataset.data[dataIndex] !== null && dataset.data[dataIndex] !== undefined) {
+                                    const scaled_value = dataset.data[dataIndex];
+                                    return `${dataset.label}: ${scaled_value.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}`;
                                 }
                                 
-                                const material = material_summary[dataIndex];
-                                if (material && material.original_actual_qty !== undefined) {
-                                    return `${dataset.label}: ${material.original_actual_qty.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}`;
-                                }
+                                return '';
+                                // if (!dataset.original_data) {
+                                //     return '';
+                                // }
                                 
-                                return `${dataset.label}: ${dataset.original_data.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}`;
+                                // const material = material_summary[dataIndex];
+                                // if (material && material.original_actual_qty !== undefined) {
+                                //     return `${dataset.label}: ${material.original_actual_qty.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}`;
+                                // }
+                                
+                                // return `${dataset.label}: ${dataset.original_data.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1})}`;
                             }
                         }
-                    }
+                    },
+                    // datalabels: {
+                    //     display: function(context) {
+                    //         return context.dataset.stack === 'actual' && context.dataset.data[context.dataIndex] > 0;
+                    //     },
+                    //     // --- THAY ĐỔI TẠI ĐÂY ---
+                    //     anchor: 'end',      // Neo ở cuối cột (phía bên phải)
+                    //     align: 'start',     // Căn lề 'start' (vẽ chữ BÊN NGOÀI, về phía bên phải)
+                    //     offset: 4,          // Khoảng cách 4px từ cuối cột
+                    //     clamp: true,        // Đảm bảo nhãn không bị vẽ ra ngoài khung chart
+                    //     // --- KẾT THÚC THAY ĐỔI ---
+                    //     color: '#333', 
+                    //     font: {
+                    //         weight: 'bold',
+                    //         size: window.innerWidth < 768 ? 9 : 10
+                    //     },
+                    //     formatter: function(value, context) {
+                    //         const material = material_summary[context.dataIndex];
+                    //         let original_val = 0;
+
+                    //         if (material && material.original_actual_qty !== undefined) {
+                    //             original_val = material.original_actual_qty;
+                    //         } else if (context.dataset.original_data) {
+                    //             original_val = context.dataset.original_data;
+                    //         }
+
+                    //         if (original_val > 0) {
+                    //             return original_val.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1});
+                    //         }
+                    //         return '';
+                    //     }
+                    // }
                 },
                 scales: { 
                     x: { 
@@ -850,6 +899,7 @@ frappe.query_reports["Material Consumption"] = {
                         } 
                     },
                     tooltip: { 
+                        enabled: true,
                         mode: 'index', 
                         intersect: false,
                         titleFont: {
@@ -871,8 +921,33 @@ frappe.query_reports["Material Consumption"] = {
                                 
                                 return '';
                             }
-                        }
-                    }
+                        },
+                    },
+                    // datalabels: {
+                    //     display: function(context) {
+                    //         return context.dataset.type !== 'line' && context.dataset.data[context.dataIndex] !== null;
+                    //     },
+                    //     // --- THAY ĐỔI TẠI ĐÂY ---
+                    //     anchor: 'end',      // Neo ở đỉnh cột (phía trên)
+                    //     align: 'bottom',    // Căn lề 'bottom' (vẽ chữ BÊN TRÊN, ở phía trên)
+                    //     offset: 4,          // Khoảng cách 4px phía trên cột
+                    //     clamp: true,        // Đảm bảo nhãn không bị vẽ ra ngoài khung chart
+                    //     // --- KẾT THÚC THAY ĐỔI ---
+                    //     color: '#333',
+                    //     font: {
+                    //         weight: 'bold',
+                    //         size: window.innerWidth < 768 ? 9 : 10
+                    //     },
+                    //     formatter: function(value, context) {
+                    //         if (context.dataset.originalActualData) {
+                    //             const originalValue = context.dataset.originalActualData[context.dataIndex];
+                    //             if (originalValue !== undefined && originalValue > 0) {
+                    //                 return originalValue.toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 1});
+                    //             }
+                    //         }
+                    //         return '';
+                    //     }
+                    // }
                 }
             },
             plugins: [plannedLinePlugin2]
