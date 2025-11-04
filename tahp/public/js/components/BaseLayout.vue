@@ -34,7 +34,6 @@
         class="tw-flex-1 tw-min-h-0 tw-rounded-lg tw-overflow-auto tw-bg-[#e8f3ff]"
       >
         <slot name="records">
-          <BaseTable :doctype="props.doctype" />
         </slot>
       </div>
     </div>
@@ -45,7 +44,6 @@
 
 <script setup>
 import { reactive } from 'vue'
-import BaseTable from "./BaseTable.vue"
 
 const props = defineProps({
   hide_tree: Boolean,
