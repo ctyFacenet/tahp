@@ -50,37 +50,37 @@ def execute(filters=None, summary=False):
 		},
 		{
 			"fieldname": "active_time",
-			"label": "Thời gian hoạt động",
+			"label": "Thời gian hoạt động ca gần nhất",
 			"fieldtype": "Data",
-			"width": 120,
+			"width": 150,
 			"align": "center"
 		},
 		{
 			"fieldname": "stop_time_overall",
-			"label": "Tổng thời gian dừng",
+			"label": "Tổng thời gian dừng ca gần nhất",
 			"fieldtype": "Data",
-			"width": 110,
+			"width": 150,
 			"align": "center"
 		},
 		{
 			"fieldname": "stop_time",
-			"label": "Thời gian đang dừng",
+			"label": "Thời gian đang dừng ca gần nhất",
 			"fieldtype": "Data",
-			"width": 120,
+			"width": 160,
 			"align": "center"
 		},
 		{
 			"fieldname": "group_name",
-			"label": "Phân loại lý do dừng",
+			"label": "Phân loại lý do dừng gần nhất",
 			"fieldtype": "Data",
-			"width": 200,
+			"width": 180,
 			"align": "center"
 		},
 		{
 			"fieldname": "reason",
-			"label": "Lý do dừng chi tiết",
+			"label": "Chi tiết lý do dừng gần nhất",
 			"fieldtype": "Data",
-			"width": 250
+			"width": 300
 		},
 		{
 			"fieldname": "employee",
@@ -198,7 +198,13 @@ def execute(filters=None, summary=False):
 			order_by="creation desc"
 		)
 	}
+	job_cards = frappe.db.get_all(
+		"Job Card",
+		fields=["name", "work_order", "docstatus"],
+		order_by="creation desc"
+	)
 
+	job_docstatus = {j.name: j.docstatus for j in job_cards}
 	latest = {}
 	for a in actives:
 		ws = a.workstation
@@ -210,7 +216,8 @@ def execute(filters=None, summary=False):
 				downtime=next((d for d in downtimes if d.workstation == ws), None),
 				downtime_overall = sum(int(d.duration or 0) for d in related_downtimes),
 				team=next((t for t in teams if t.parent == a.parent), None),
-				work_order=work_orders.get(a.parent)
+				work_order=work_orders.get(a.parent),
+				docstatus=job_docstatus.get(a.parent, 0)
 			)
 
 	for ws, data in latest.items():
@@ -221,17 +228,20 @@ def execute(filters=None, summary=False):
 		downtime = data.downtime
 		downtime_overall = data.downtime_overall
 		team = data.team
+		docstatus = data.docstatus
 
 		if active.status == "Dừng":
 			item["status"] = "Tạm dừng"
 
 		item["work_order"] = data.work_order
 		item["active_time"] = format_duration(active.time)
-		item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
 		item["stop_time_overall"] = format_duration(downtime_overall, mili=False)
 		item["group_name"] = downtime.group_name if downtime else None
 		item["reason"] = downtime.reason if downtime else None
 		item["employee"] = team.employee if team else None
+		if docstatus == 0:
+			item["stop_time"] = format_duration(int(downtime.duration) if downtime and downtime.duration else 0, mili=False)
+
 
 	for parent in parents:
 		children = [row for row in result if row.get("indent") == 1 and row["parent"] == parent.name]
