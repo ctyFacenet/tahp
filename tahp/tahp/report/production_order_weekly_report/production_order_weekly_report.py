@@ -174,23 +174,40 @@ def get_actual_vs_planned(filters=None):
             "actual_map": {}
         }
 
+    # Tính cho ngày cuối cùng
+    # for wo in work_orders:
+    #     item = wo.production_item
+        
+    #     if item not in items_data:
+    #         continue
+            
+    #     a_dates = [d for d in [wo.actual_start_date, wo.actual_end_date] if d]
+    #     if a_dates:
+    #         final_day = max(a_dates)
+    #         wo_final_day = str(final_day.date() if hasattr(final_day, "date") else getdate(final_day))
+
+    #         items_data[item]["planned_map"][wo_final_day] = \
+    #             items_data[item]["planned_map"].get(wo_final_day, 0) + float(wo.qty or 0)
+            
+    #         items_data[item]["actual_map"][wo_final_day] = \
+    #             items_data[item]["actual_map"].get(wo_final_day, 0) + float(wo.produced_qty or 0)
     
+    # Thay đổi từ ngày cuối cùng sang ngày bắt đầu
     for wo in work_orders:
         item = wo.production_item
         
         if item not in items_data:
             continue
+        
+        # Lấy ngày bắt đầu thực tế
+        if wo.actual_start_date:
+            wo_start_day = str(wo.actual_start_date.date() if hasattr(wo.actual_start_date, "date") else getdate(wo.actual_start_date))
             
-        a_dates = [d for d in [wo.actual_start_date, wo.actual_end_date] if d]
-        if a_dates:
-            final_day = max(a_dates)
-            wo_final_day = str(final_day.date() if hasattr(final_day, "date") else getdate(final_day))
-
-            items_data[item]["planned_map"][wo_final_day] = \
-                items_data[item]["planned_map"].get(wo_final_day, 0) + float(wo.qty or 0)
+            items_data[item]["planned_map"][wo_start_day] = \
+                items_data[item]["planned_map"].get(wo_start_day, 0) + float(wo.qty or 0)
             
-            items_data[item]["actual_map"][wo_final_day] = \
-                items_data[item]["actual_map"].get(wo_final_day, 0) + float(wo.produced_qty or 0)
+            items_data[item]["actual_map"][wo_start_day] = \
+                items_data[item]["actual_map"].get(wo_start_day, 0) + float(wo.produced_qty or 0)
 
    
     result_items = {}
