@@ -51,13 +51,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:32:48.039604",
-  "name": "Gửi KHSX",
-  "workflow_action_name": "Gửi KHSX"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-15 08:47:40.251211",
   "name": "Gửi TPBT",
   "workflow_action_name": "Gửi TPBT"
@@ -166,5 +159,12 @@
   "modified": "2025-09-07 17:33:16.313543",
   "name": "Trả về PTCN",
   "workflow_action_name": "Trả về PTCN"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:32:48.039604",
+  "name": "Gửi KHSX",
+  "workflow_action_name": "Gửi KHSX"
  }
 ]

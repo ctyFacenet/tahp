@@ -74,7 +74,7 @@ def get_consumed_produced_items(work_order):
     return result
 
 @frappe.whitelist()
-def process_consumed_produced_items(work_order, required, produced, planned_start_date=None, actual_end_date=None, raise_qc=None):
+def process_consumed_produced_items(work_order, required, produced, actual_start_date=None, actual_end_date=None, raise_qc=None):
     if isinstance(required, str): required = json.loads(required)
     if isinstance(produced, str): produced = json.loads(produced)
     wo_doc = frappe.get_doc("Work Order", work_order)
@@ -108,8 +108,8 @@ def process_consumed_produced_items(work_order, required, produced, planned_star
 
 
     wo_doc.db_set("status", "Completed")
-    if planned_start_date:
-        wo_doc.db_set("planned_start_date", get_datetime(planned_start_date))
+    if actual_start_date:
+        wo_doc.db_set("actual_start_date", get_datetime(actual_start_date))
     if actual_end_date:
         wo_doc.db_set("actual_end_date", get_datetime(actual_end_date) if actual_end_date else now_datetime())
     wo_doc.save(ignore_permissions=True)

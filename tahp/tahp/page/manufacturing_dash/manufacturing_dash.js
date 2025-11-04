@@ -1,4 +1,3 @@
-
 frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
     const page = frappe.ui.make_app_page({
         parent: wrapper,
@@ -39,19 +38,6 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                 attribute: page.fields_dict.attribute.get_value()
             };
 
-            // if (filters.to_date < filters.from_date) {
-            //     frappe.msgprint('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu');
-            //     return;
-            // }
-
-            // const diff_days = frappe.datetime.get_diff(filters.to_date, filters.from_date);
-            // if (diff_days > 7) {
-            //     frappe.msgprint('Khoảng ngày không được vượt quá 7 ngày');
-            //     return;
-            // }
-
-            console.log("Refreshing with filters:", filters);
-
             let response = await frappe.xcall(
                 "tahp.tahp.page.manufacturing_dash.manufacturing_dash.execute", 
                 { filters }
@@ -76,7 +62,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         fieldname: 'from_date',
         label: 'Từ ngày',
         fieldtype: 'Date',
-        default: frappe.datetime.add_days(frappe.datetime.get_today(), -7),
+        default: frappe.datetime.month_start(frappe.datetime.get_today()),
         change: () => this.refresh_dashboard()
     });
     page.add_field({
@@ -180,8 +166,8 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         const subUnit = response.overall?.sub?.unit || "Tấn";
 
         if (response.overall) {
-            document.querySelector(`.category-title`).textContent = `Sản lượng ${response.overall.main.label} theo hệ`;
-            document.querySelector(`.attribute-title`).textContent = `Sản lượng ${response.overall.main.label} hoàn thành theo kế hoạch`;
+            document.querySelector(`.category-title`).textContent = `Sản lượng các thành phẩm theo hệ`;
+            document.querySelector(`.attribute-title`).textContent = `Sản lượng nhóm theo ${page.fields_dict.attribute.get_value()} so với theo kế hoạch`;
             if (response.overall.main.unit) document.querySelector(`.bom-title`).textContent = `Báo cáo tiêu hao NVL / 1 ${response.overall.main.unit} thành phẩm`;
         }
 
@@ -251,63 +237,142 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         // Gọi hàm
         updateCard("main", response.overall && response.overall.main);
         updateCard("sub", response.overall && response.overall.sub);
-
+        
         if (response.category_overall) {
-            let cat = response.category_overall;
-            let catLabels = Object.keys(cat);
-            let subKeys = Object.keys(cat[catLabels[0]]).filter(k => k !== "label");
+            console.log(response.category_overall)
+            const cat = response.category_overall;
+            const catLabels = Object.keys(cat); // các hệ
+            const allItems = new Set();
 
-            // Chuẩn bị datasets
+            // gom tất cả item
+            catLabels.forEach(catName => {
+                Object.keys(cat[catName]).forEach(itemCode => {
+                    allItems.add(itemCode);
+                });
+            });
+
+            const itemKeys = Array.from(allItems);
+
+            // Tạo dữ liệu mới: mỗi category-item là 1 row riêng
+            const chartLabels = [];
+            const chartData = [];
+            const chartColors = [];
+            const chartBorders = [];
+            const workOrdersMap = [];
+            const itemNamesMap = [];
+
+            catLabels.forEach(catName => {
+                const itemsInCat = Object.keys(cat[catName]);
+                
+                itemsInCat.forEach((itemKey, idx) => {
+                    const colorIndex = itemKeys.indexOf(itemKey);
+                    const itemData = cat[catName][itemKey];
+                    
+                    chartLabels.push(catName); // Chỉ lấy tên category
+                    chartData.push(itemData?.qty || 0);
+                    chartColors.push(modernColors[colorIndex % modernColors.length].bg);
+                    chartBorders.push(modernColors[colorIndex % modernColors.length].border);
+                    itemNamesMap.push(itemData?.item_name || itemKey);
+                    workOrdersMap.push({
+                        category: catName,
+                        item: itemKey,
+                        workOrders: itemData?.work_orders || []
+                    });
+                });
+            });
+
+            if (this.charts.category) {
+                this.charts.category.destroy();
+            }
+
             this.charts.category = new Chart(document.getElementById("chart-category"), {
                 type: 'bar',
                 data: {
-                    labels: catLabels.map(k => cat[k].label || k),
-                    datasets: subKeys.map((sub, i) => ({
-                        label: sub,
-                        data: catLabels.map(k => cat[k][sub].qty),
-                        backgroundColor: modernColors[i % modernColors.length].bg,
-                        borderColor: modernColors[i % modernColors.length].border,
-                        borderWidth: 2
-                    }))
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: chartData,
+                        backgroundColor: chartColors,
+                        borderColor: chartBorders,
+                        borderWidth: 2,
+                    }]
                 },
                 options: {
-                    indexAxis: 'y',
+                    indexAxis: 'y', // trục ngang
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false // ẩn legend
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return itemNamesMap[index];
+                                },
+                                label: function(context) {
+                                    const value = context.parsed.x || 0;
+                                    return `Số lượng: ${value.toFixed(2)} ${mainUnit}`;
+                                }
+                            }
+                        },
+                    },
                     scales: {
-                        x: { 
-                            stacked: true,
+                        x: {
                             title: {
                                 display: true,
                                 text: `Số lượng (${mainUnit})`
                             }
                         },
-                        y: { stacked: true }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    let value = context.parsed.x || 0;
-                                    return `${label}: ${value.toFixed(2)} ${mainUnit}`;
+                        y: {
+                            ticks: {
+                                autoSkip: false,
+                                callback: function(value, index) {
+                                    const categoryName = chartLabels[index];
+                                    const itemName = itemNamesMap[index];
+                                    
+                                    // Wrap text cho itemName
+                                    const maxLength = 40;
+                                    const lines = [categoryName]; // Dòng đầu: tên category
+                                    
+                                    if (itemName) {
+                                        if (itemName.length > maxLength) {
+                                            const words = itemName.split(' ');
+                                            let currentLine = '';
+                                            
+                                            words.forEach(word => {
+                                                if ((currentLine + word).length > maxLength) {
+                                                    if (currentLine) lines.push('  ' + currentLine.trim());
+                                                    currentLine = word + ' ';
+                                                } else {
+                                                    currentLine += word + ' ';
+                                                }
+                                            });
+                                            if (currentLine) lines.push('  ' + currentLine.trim());
+                                        } else {
+                                            lines.push('  ' + itemName); // Thụt lề 2 space
+                                        }
+                                    }
+                                    
+                                    return lines;
+                                },
+                                font: {
+                                    size: 14
                                 }
                             }
                         }
                     },
                     onClick: (evt, elements) => {
                         if (elements.length > 0) {
-                            let chart = elements[0];
-                            let catName = catLabels[chart.index];
-                            let subKey = subKeys[chart.datasetIndex];
-                            let workOrders = cat[catName][subKey].work_orders;
-
+                            const index = elements[0].index;
+                            const workOrders = workOrdersMap[index].workOrders;
                             if (workOrders.length > 0) {
                                 frappe.set_route("List", "Work Order", { "name": ["in", workOrders] });
                             }
                         }
                     }
-                }
+                },
             });
         }
 
@@ -316,7 +381,10 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
             const systemSelect = document.getElementById('attribute-system-select');
             
             // Render dropdown categories
-            systemSelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            systemSelect.innerHTML = [
+                `<option value="Tất cả" selected>Tất cả</option>`,
+                ...categories.map(c => `<option value="${c}">${c}</option>`)
+            ].join('');
 
             // Sự kiện khi chọn category khác
             systemSelect.onchange = async () => {
@@ -362,7 +430,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                         borderWidth: 2,
                         rotation: 0,
                         circumference: 270,
-                        cutout: `${60 - i * 15}%`
+                        cutout: `${50 - i * 15}%`
                     };
                 });
 
@@ -396,7 +464,31 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                         id: 'doughnutLabel',
                         afterDatasetsDraw: function(chart) {
                             const ctx = chart.ctx;
+
+                            // Hàm tự wrap text
+                            function wrapText(context, text, x, y, maxWidth, lineHeight) {
+                                const words = text.split(' ');
+                                let line = '';
+                                let lines = [];
+                                for (let n = 0; n < words.length; n++) {
+                                    const testLine = line + words[n] + ' ';
+                                    const metrics = context.measureText(testLine);
+                                    const testWidth = metrics.width;
+                                    if (testWidth > maxWidth && n > 0) {
+                                        lines.push(line.trim());
+                                        line = words[n] + ' ';
+                                    } else {
+                                        line = testLine;
+                                    }
+                                }
+                                lines.push(line.trim());
+                                lines.forEach((l, i) => {
+                                    context.fillText(l, x, y + i * lineHeight);
+                                });
+                            }
+
                             const fixedAngle = 0 * Math.PI / 180;
+
                             chart.data.datasets.forEach((dataset, i) => {
                                 const meta = chart.getDatasetMeta(i);
                                 if (!meta.hidden) {
@@ -408,9 +500,15 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                     ctx.save();
                                     ctx.textAlign = 'right';
                                     ctx.textBaseline = 'middle';
+                                    ctx.font = '12px sans-serif';
+                                    ctx.fillStyle = '#111';
 
                                     const percent_real = dataset.percent_raw.toFixed(1);
-                                    ctx.fillText(`${dataset.label} ${percent_real}% (${dataset.produced_qty}/${dataset.qty})`, centerX, centerY - 10);
+                                    const text = `${dataset.label} ${percent_real}% (${dataset.produced_qty}/${dataset.qty})`;
+
+                                    // Vẽ text có tự xuống dòng nếu dài
+                                    wrapText(ctx, text, centerX, centerY - 10, 190, 15);
+
                                     ctx.restore();
                                 }
                             });
@@ -595,7 +693,6 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         }
 
         if (response.bom_overall) {
-            console.log(response.bom_overall);
             let bom = response.bom_overall;
             let bomDates = Object.keys(bom).sort(); // sắp xếp ngày
             let items = [...new Set(bomDates.flatMap(d => Object.keys(bom[d])))]; // tất cả item xuất hiện bất kỳ ngày nào
@@ -648,13 +745,22 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                     }
                 ];
 
-                new Chart(canvas.getContext("2d"), {
+                const chart = new Chart(canvas.getContext("2d"), {
                     type: 'bar',
                     data: { labels: bomDates, datasets },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
+                            title: {
+                                display: true,
+                                text: `Tiêu hao ${itemLabel} / 1 ${response.overall.main.unit} thành phẩm`,
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                padding: { top: 10, bottom: 20 }
+                            },
                             legend: {
                                 labels: {
                                     generateLabels: function(chart) {
@@ -667,22 +773,6 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                         });
                                     }
                                 },
-                                onClick: function(e, legendItem, legend) {
-                                    const index = legendItem.datasetIndex;
-                                    const chart = legend.chart;
-                                    const label = legendItem.text;
-                                    if (label === "Vượt định mức") {
-                                        const isVisible = chart.isDatasetVisible(index);
-                                        chart.data.datasets.forEach((dataset, i) => {
-                                            if (dataset.label === "Vượt định mức") {
-                                                chart.setDatasetVisibility(i, !isVisible);
-                                            }
-                                        });
-                                    } else {
-                                        Chart.defaults.plugins.legend.onClick(e, legendItem, legend);
-                                    }
-                                    chart.update();
-                                }
                             },
                             tooltip: {
                                 callbacks: {
@@ -690,6 +780,33 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                         let value = context.formattedValue || 0;
                                         return `${context.dataset.label}: ${value} ${itemUnit}`;
                                     }
+                                }
+                            }
+                        },
+                        onHover: (event, elements) => {
+                            event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+                        },
+                        onClick: (evt, elements) => {
+                            if (elements.length > 0) {
+                                const elem = elements[0];
+                                const day = bomDates[elem.index];
+                                const datasetLabel = datasets[elem.datasetIndex].label;
+                                const isProduced = datasetLabel.includes("Vượt");
+
+                                const dayData = bom[day]?.[item];
+                                if (!dayData) {
+                                    frappe.msgprint("Không tìm thấy dữ liệu cho ngày này.");
+                                    return;
+                                }
+
+                                const wo_list = isProduced
+                                    ? (dayData.work_order || [])
+                                    : (dayData.work_order_norm || []);
+
+                                if (wo_list.length > 0) {
+                                    frappe.set_route("List", "Work Order", { name: ["in", wo_list] });
+                                } else {
+                                    frappe.msgprint("Không có LSX nào trong danh sách này.");
                                 }
                             }
                         },
@@ -703,36 +820,12 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                     text: `Số lượng (${itemUnit})`
                                 }
                             }
-                        },
-                        onClick: (evt, elements) => {
-                            if (elements.length === 0) return;
-
-                            let elem = elements[0];
-                            let chart = elem.chart;
-                            let day = chart.data.labels[elem.index];
-                            let dataset = chart.data.datasets[elem.datasetIndex];
-                            let itemCode = item; // mỗi chart 1 mặt hàng
-
-                            let dayData = bom?.[day]?.[itemCode];
-                            if (!dayData) {
-                                frappe.msgprint("Không tìm thấy dữ liệu cho nguyên liệu này.");
-                                return;
-                            }
-
-                            let woList = dataset.label === "Vượt định mức"
-                                ? dayData.work_order || []
-                                : dayData.work_order_norm || [];
-
-                            if (woList.length > 0) {
-                                frappe.set_route("List", "Work Order", { name: ["in", woList] });
-                            } else {
-                                frappe.msgprint("Không có LSX ca nào trong danh sách này.");
-                            }
                         }
                     }
                 });
             });
         }
+        
     };
 
     this.refresh_dashboard();
