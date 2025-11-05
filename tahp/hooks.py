@@ -266,6 +266,9 @@ doc_events = {
         ],
         "after_insert": [
             "tahp.doc_events.work_order.after_insert.after_insert"
+        ],
+        "on_trash": [
+            "tahp.doc_events.work_order.on_trash.on_trash"
         ]
     },
     "Workstation": {

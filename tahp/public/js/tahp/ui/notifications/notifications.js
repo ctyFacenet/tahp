@@ -460,14 +460,14 @@ class NotificationsView extends BaseNotificationsView {
 			}
 		});
 
-		this.parent.on("hide.bs.dropdown", () => {
-			let notificationsView = this;
-			this.container.find(".notification-item.unread").each((idx, el) => {
-				const $el = $(el);
-				const docname = $el.data("name");
-				notificationsView.mark_as_read(docname, $el);
-			});
-		});
+		// this.parent.on("hide.bs.dropdown", () => {
+		// 	let notificationsView = this;
+		// 	this.container.find(".notification-item.unread").each((idx, el) => {
+		// 		const $el = $(el);
+		// 		const docname = $el.data("name");
+		// 		notificationsView.mark_as_read(docname, $el);
+		// 	});
+		// });
 	}
 }
 
