@@ -266,6 +266,7 @@ def get_workstations(job_card):
             frappe.throw("Tất cả các máy trong cụm đều đang bận")
     else:
         if workstation.status == "Production":
+            print("hello")
             wip_count = frappe.db.count(
                 "Job Card",
                 filters={
@@ -276,6 +277,11 @@ def get_workstations(job_card):
             )
             if wip_count >= workstation.production_capacity:
                 frappe.throw(f"Thiết bị {workstation.name} đã đạt tối đa công suất")
+            else:
+                result.append({
+                    "workstation": workstation.name,
+                    "status": "Sẵn sàng"
+                })
         elif workstation.status == "Hỏng":
             frappe.throw(f"Thiết bị {workstation.name} đang bị hỏng")
         elif workstation.status == "Off":
