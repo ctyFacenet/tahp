@@ -53,25 +53,72 @@ frappe.query_reports["Material Consumption"] = {
         },
     ],
 
+    selected_material: null,
+    isDrawing: false,
+    chartTimeout: null,
+    original_columns: null,
+
     get_datatable_options(options) {
         return { ...options, freezeIndex: 4, headerBackground: "rgb(205, 222, 238)"};
     },
     
     "onload": function(report) {
-        // if (window.ChartDataLabels) {
-        //     try {
-        //         // Đăng ký toàn cục cho tất cả các chart
-        //         Chart.register(window.ChartDataLabels);
-        //     } catch (e) {
-        //         // Có thể plugin đã được đăng ký, bỏ qua lỗi
-        //         console.warn("ChartDataLabels đã được đăng ký.", e);
-        //     }
-        // }
-
+        // Reset selected material khi load report
+        this.selected_material = null;
+        
+        // Lưu columns gốc từ report sau khi datatable được render
+        const self = this;
+        this.original_columns = null;
+        
+        // Hook để lưu columns sau khi datatable render
+        frappe.query_reports["Material Consumption"].after_datatable_render = function(datatable) {
+            // Lưu columns từ frappe.query_report.columns (columns gốc từ Python)
+            // và filter bỏ hidden columns (giống như render_datatable)
+            if (frappe.query_report && frappe.query_report.columns) {
+                self.original_columns = frappe.query_report.columns.filter((col) => !col.hidden);
+            }
+            
+            // Thêm CSS để đảm bảo labels header không bị nghiêng
+            setTimeout(() => {
+                // Thêm CSS để header labels hiển thị ngang, không nghiêng
+                const styleId = 'material-consumption-header-style';
+                if (!$(`#${styleId}`).length) {
+                    $('<style>', {
+                        id: styleId,
+                        text: `
+                            .report-wrapper .dt-header th,
+                            .report-wrapper .dt-header .dt-cell,
+                            .report-wrapper .dt-header .dt-cell__content,
+                            .report-wrapper .dt-header .dt-cell__content-text,
+                            .report-wrapper .dt-header .dt-cell__content span,
+                            .report-wrapper .dt-header .dt-cell__content div {
+                                transform: none !important;
+                                writing-mode: horizontal-tb !important;
+                                text-orientation: upright !important;
+                                white-space: normal !important;
+                                word-wrap: break-word !important;
+                                overflow-wrap: break-word !important;
+                            }
+                        `
+                    }).appendTo('head');
+                }
+                
+                // Apply trực tiếp vào các header cells
+                if (datatable && datatable.$wrapper) {
+                    datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
+                        $(this).css({
+                            'transform': 'none',
+                            'writing-mode': 'horizontal-tb',
+                            'text-orientation': 'upright',
+                            'white-space': 'normal'
+                        });
+                    });
+                }
+            }, 100);
+        };
+        
         setTimeout(() => {
-            // if (!this.isDrawing) {
-                this.draw_chart();
-            //}
+            this.draw_chart();
         }, 500);
 
         let previous_values = {
@@ -86,6 +133,7 @@ frappe.query_reports["Material Consumption"] = {
             const new_value = report.page.fields_dict[fieldname].get_value();
             const old_value = previous_values[fieldname];
             if (old_value && !new_value) {
+                this.selected_material = null; // Reset filter
                 report.refresh();
                 setTimeout(() => {
                     if (!this.isDrawing) {
@@ -106,15 +154,16 @@ frappe.query_reports["Material Consumption"] = {
         $(window).on('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                    this.draw_chart();
+                this.draw_chart();
             }, 300);
         });
     },
 
     "handle_filter_change": function() {
+        this.selected_material = null; // Reset filter khi đổi filter
         frappe.query_report.refresh();
         setTimeout(() => {
-                this.draw_chart();
+            this.draw_chart();
             this.override_report_title(frappe.query_report);
         }, 500);
     },
@@ -128,6 +177,7 @@ frappe.query_reports["Material Consumption"] = {
             frappe.query_report.set_filter_value("month", "", false);
         }
         
+        this.selected_material = null; // Reset filter
         frappe.query_report.refresh();
         setTimeout(() => {
             if (!this.isDrawing) {
@@ -154,6 +204,7 @@ frappe.query_reports["Material Consumption"] = {
                 indicator: 'blue'
             }, 5);
             
+            this.selected_material = null; // Reset filter
             frappe.query_report.refresh();
             setTimeout(() => {
                 if (!this.isDrawing) {
@@ -178,6 +229,7 @@ frappe.query_reports["Material Consumption"] = {
                 indicator: 'green'
             }, 5);
             
+            this.selected_material = null; // Reset filter
             frappe.query_report.refresh();
             setTimeout(() => {
                 if (!this.isDrawing) {
@@ -202,19 +254,30 @@ frappe.query_reports["Material Consumption"] = {
     },
 
     "override_report_title": function(report) {
-        // Thêm logic override title nếu cần
     },
 
-    "draw_chart": function() {
-        // if (this.isDrawing) return;
-        // this.isDrawing = true;
+    "draw_chart": function() { 
+        // Nếu đang vẽ chart, bỏ qua
+        if (this.isDrawing) return;
         
+        // Clear timeout cũ nếu có
+        if (this.chartTimeout) {
+            clearTimeout(this.chartTimeout);
+            this.chartTimeout = null;
+        }
+        
+        // Set flag để tránh vẽ nhiều lần
+        this.isDrawing = true;
+        
+        // Destroy charts cũ trước
         let existing_chart1 = Chart.getChart("myCustomChart");
         if (existing_chart1) existing_chart1.destroy();
         let existing_chart2 = Chart.getChart("mySecondChart");
         if (existing_chart2) existing_chart2.destroy();
         let existing_chart3 = Chart.getChart("percentageChart");
         if (existing_chart3) existing_chart3.destroy();
+        
+        // Xóa container cũ
         $('.report-wrapper .chart-container').remove();
         
         const data_rows = frappe.query_report.data;
@@ -225,26 +288,32 @@ frappe.query_reports["Material Consumption"] = {
 
         let material_summary = this.aggregate_data_for_charts(data_rows);
 
-        const material_summary_for_percent_chart = material_summary
+        let material_summary_for_percent_chart = material_summary
             .map(m => {
                 let percent = 0;
-                // Chỉ tính % nếu có định mức
                 if (m.total_planned_qty > 0) {
                     percent = (m.total_actual_qty / m.total_planned_qty) * 100;
-                } 
-                // Nếu không có định mức mà có tiêu hao, coi như 0% (hoặc bạn có thể lọc bỏ)
-                
+                }
                 return {
-                    ...m, // Giữ nguyên (material_name, uom, total_actual_qty, total_planned_qty)
+                    ...m,
                     percent_vs_planned: percent
                 };
             })
-            // Lọc ra những NVL có tiêu hao hoặc có định mức
             .filter(m => m.total_actual_qty > 0)
-            // Sắp xếp: NVL nào vượt định mức nhiều nhất sẽ lên đầu
             .sort((a, b) => b.percent_vs_planned - a.percent_vs_planned);
 
-        this.draw_percentage_chart(material_summary_for_percent_chart);
+        // Nếu có filter, chỉ hiển thị material đó
+        if (this.selected_material) {
+            material_summary_for_percent_chart = material_summary_for_percent_chart.filter(
+                m => m.material_name === this.selected_material
+            );
+        }
+
+        // Delay để đảm bảo DOM đã cleanup
+        const self = this;
+        setTimeout(() => {
+            self.draw_percentage_chart(material_summary_for_percent_chart);
+        }, 100);
 
         material_summary = material_summary.filter(material => material.total_actual_qty > 0);
     },
@@ -274,11 +343,35 @@ frappe.query_reports["Material Consumption"] = {
     },
 
     "draw_percentage_chart": function(material_summary_data) {
-        if (!material_summary_data || material_summary_data.length === 0) return;
+        if (!material_summary_data || material_summary_data.length === 0) {
+            this.isDrawing = false;
+            return;
+        }
 
-        // Tạo 1 thẻ div để chứa biểu đồ
-        const chartContainer = $(`<div class="chart-container chart-3" style="position: relative; height: 400px; width: 100%; margin-bottom: 40px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-            <div style="min-width: 600px; width: 100%; height: 100%;">
+        // Đảm bảo container cũ đã được xóa
+        $('.report-wrapper .chart-container').remove();
+        
+        // Destroy chart cũ nếu có
+        let existing_chart = Chart.getChart("percentageChart");
+        if (existing_chart) {
+            existing_chart.destroy();
+        }
+
+        // Tính toán chiều rộng dựa vào số lượng cột
+        const numBars = material_summary_data.length;
+        let chartHeight = 400;
+        let minWidth = 600;
+        
+        // Nếu chỉ có 1 cột, giảm chiều rộng tối thiểu
+        if (numBars === 1) {
+            minWidth = 300;
+            chartHeight = 350;
+        } else if (numBars <= 3) {
+            minWidth = 400;
+        }
+
+        const chartContainer = $(`<div class="chart-container chart-3" style="position: relative; height: ${chartHeight}px; width: 100%; margin-bottom: 40px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <div style="min-width: ${minWidth}px; width: 100%; height: 100%;">
                 <canvas id="percentageChart" style="width: 100%; height: 100%;"></canvas>
             </div>
         </div>`);
@@ -286,7 +379,6 @@ frappe.query_reports["Material Consumption"] = {
 
         const labels = material_summary_data.map(d => `${d.material_name} (${d.uom})`);
         
-        // === BẢNG MÀU CỦA BẠN ===
         const material_colors = [
             { bg: 'rgba(99, 102, 241, 0.5)', border: 'rgba(99, 102, 241, 1)' }, 
             { bg: 'rgba(14, 165, 233, 0.5)', border: 'rgba(14, 165, 233, 1)' }, 
@@ -302,7 +394,6 @@ frappe.query_reports["Material Consumption"] = {
             { bg: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 1)' },
         ];
 
-        // Gán màu cho từng NVL
         const background_colors = material_summary_data.map((_, index) => {
             return material_colors[index % material_colors.length].bg;
         });
@@ -310,11 +401,9 @@ frappe.query_reports["Material Consumption"] = {
             return material_colors[index % material_colors.length].border;
         });
 
-        // Plugin để vẽ đường 100% (Định mức)
         const referenceLinePlugin = {
             id: 'referenceLinePlugin',
             afterDraw(chart) {
-                // ... (code plugin này giữ nguyên như cũ) ...
                 const { ctx, scales: { y }, chartArea } = chart;
                 const yValue = y.getPixelForValue(100);
                 if (yValue >= chartArea.top && yValue <= chartArea.bottom) {
@@ -329,23 +418,22 @@ frappe.query_reports["Material Consumption"] = {
                     ctx.fillStyle = 'rgba(244, 63, 94, 1)';
                     ctx.font = '12px Arial';
                     ctx.textAlign = 'right';
-                    ctx.fillText('Định mức (100%)', chartArea.right - 10, yValue - 8);
-                    ctx.restore();
+                    // ctx.fillText('Định mức (100%)', chartArea.right - 10, yValue - 8);
+                    ctx.restore();                                                                                                                                                                                                                                                                                                  
                 }
             }
         };
 
-        // Thêm plugin này vào code của bạn
         const dataLabelsPlugin = {
             id: 'dataLabelsPlugin',
             afterDatasetsDraw(chart) {
-                const { ctx, data, scales: { x, y } } = chart;
+                const { ctx, data } = chart;
                 
                 ctx.save();
                 ctx.font = 'bold 12px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
-                ctx.fillStyle = '#374151'; // Màu chữ
+                ctx.fillStyle = '#374151';
                 
                 data.datasets.forEach((dataset, datasetIndex) => {
                     const meta = chart.getDatasetMeta(datasetIndex);
@@ -354,9 +442,8 @@ frappe.query_reports["Material Consumption"] = {
                         const value = dataset.data[index];
                         const label = `${value.toFixed(1)}%`;
                         
-                        // Vị trí x, y để vẽ text
                         const xPos = bar.x;
-                        const yPos = bar.y - 5; // Cách đỉnh cột 5px
+                        const yPos = bar.y - 5;
                         
                         ctx.fillText(label, xPos, yPos);
                     });
@@ -366,26 +453,87 @@ frappe.query_reports["Material Consumption"] = {
             }
         };
 
-        const ctx = document.getElementById('percentageChart').getContext('2d');
+        // Kiểm tra canvas có tồn tại không
+        const canvas = document.getElementById('percentageChart');
+        if (!canvas) {
+            this.isDrawing = false;
+            return;
+        }
         
-        new Chart(ctx, {
+        const ctx = canvas.getContext('2d');
+        const self = this;
+        
+        // Tính toán barPercentage dựa vào số lượng cột
+        let barPercentage = 0.8;
+        let categoryPercentage = 0.8;
+        
+        if (numBars === 1) {
+            barPercentage = 0.3;
+            categoryPercentage = 0.5;
+        } else if (numBars <= 3) {
+            barPercentage = 0.5;
+            categoryPercentage = 0.7;
+        }
+        
+        try {
+            new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    // Label này sẽ không còn hiển thị ở chú thích nữa
                     label: 'Tỷ lệ tiêu hao', 
                     data: material_summary_data.map(d => d.percent_vs_planned),
                     backgroundColor: background_colors,
                     borderColor: border_colors,
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barPercentage: barPercentage,
+                    categoryPercentage: categoryPercentage
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: function(event, activeElements) {
+                    if (activeElements.length > 0 && !self.isDrawing) {
+                        const index = activeElements[0].index;
+                        const clicked_material = material_summary_data[index].material_name;
+                        
+                        if (self.selected_material === clicked_material) {
+                            self.selected_material = null;
+                            frappe.show_alert({
+                                message: __('Đã bỏ lọc nguyên liệu'),
+                                indicator: 'orange'
+                            }, 3);
+                        } else {
+                            self.selected_material = clicked_material;
+                            frappe.show_alert({
+                                message: __(`Đang lọc: ${clicked_material}`),
+                                indicator: 'blue'
+                            }, 3);
+                        }
+                        
+                        // Refresh datatable trước
+                        self.refresh_datatable();
+                        
+                        // Clear timeout cũ nếu có
+                        if (self.chartTimeout) {
+                            clearTimeout(self.chartTimeout);
+                        }
+                        
+                        // Sau đó refresh chart với delay
+                        self.chartTimeout = setTimeout(() => {
+                            self.draw_chart();
+                        }, 200);
+                    }
+                },
                 scales: {
-                    x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 0 } },
+                    x: { 
+                        ticks: { 
+                            autoSkip: false, 
+                            maxRotation: numBars === 1 ? 0 : 45,
+                            minRotation: 0 
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         ticks: { callback: function(value) { return value + '%'; } },
@@ -394,15 +542,15 @@ frappe.query_reports["Material Consumption"] = {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Biểu đồ Tỷ lệ Tiêu hao Thực tế / Định mức (%)',
+                        text: self.selected_material 
+                            ? `Tỷ lệ Tiêu hao: ${self.selected_material} - Click để bỏ lọc`
+                            : 'Biểu đồ Tỷ lệ Tiêu hao Thực tế / Định mức (%) - Click để lọc',
                         font: { size: 18 }
                     },
-                    // === ⭐️ SỬA LỖI CHÚ THÍCH TẠI ĐÂY ⭐️ ===
                     legend: {
                         display: true,
                         position: 'bottom',
                         labels: {
-                            // Hàm này sẽ tạo chú thích dựa trên TÊN và MÀU của từng NVL
                             generateLabels: function(chart) {
                                 const data = chart.data;
                                 if (data.labels.length && data.datasets.length) {
@@ -412,9 +560,9 @@ frappe.query_reports["Material Consumption"] = {
                                     
                                     return labels.map((label, index) => {
                                         return {
-                                            text: label, // Tên NVL (ví dụ: Gyps (Tấn))
-                                            fillStyle: bgColors[index], // Màu nền của NVL đó
-                                            strokeStyle: borderColors[index], // Màu viền của NVL đó
+                                            text: label,
+                                            fillStyle: bgColors[index],
+                                            strokeStyle: borderColors[index],
                                             lineWidth: 1,
                                             hidden: false,
                                             index: index
@@ -425,9 +573,7 @@ frappe.query_reports["Material Consumption"] = {
                             }
                         }
                     },
-                    // === KẾT THÚC SỬA LỖI ===
                     tooltip: {
-                        // Tooltip vẫn hoạt động như cũ
                         callbacks: {
                             title: function(tooltipItems) {
                                 return tooltipItems[0].label;
@@ -442,7 +588,9 @@ frappe.query_reports["Material Consumption"] = {
                                 return [
                                     `Tỷ lệ: ${percent.toLocaleString('vi-VN', {maximumFractionDigits: 1})}%`,
                                     `Thực tế: ${actual.toLocaleString('vi-VN', {maximumFractionDigits: 1})} ${uom}`,
-                                    `Định mức: ${planned.toLocaleString('vi-VN', {maximumFractionDigits: 1})} ${uom}`
+                                    `Định mức: ${planned.toLocaleString('vi-VN', {maximumFractionDigits: 1})} ${uom}`,
+                                    '',
+                                    self.selected_material ? 'Click để bỏ lọc' : 'Click để lọc nguyên liệu này'
                                 ];
                             }
                         }
@@ -451,5 +599,81 @@ frappe.query_reports["Material Consumption"] = {
             },
             plugins: [referenceLinePlugin, dataLabelsPlugin]
         });
+        
+        // Reset flag sau khi chart được tạo thành công
+        this.isDrawing = false;
+        } catch (error) {
+            console.error("Lỗi khi vẽ chart:", error);
+            this.isDrawing = false;
+        }
     },
+
+    // === HÀM REFRESH DATATABLE ===
+    "refresh_datatable": function() {
+        if (!frappe.query_report || !frappe.query_report.datatable) return;
+        
+        const filtered_data = this.get_filtered_data();
+        
+        // Ưu tiên dùng original_columns đã lưu (columns đã được filter đúng)
+        let columns = this.original_columns;
+        
+        // Nếu không có original_columns, lấy từ report và filter
+        if (!columns || columns.length === 0) {
+            columns = frappe.query_report.columns || [];
+            if (columns.length === 0) {
+                // Fallback: lấy từ datatable nếu không có trong report
+                columns = frappe.query_report.datatable.datamanager.columns || [];
+            }
+            // Filter bỏ hidden columns (giống như Frappe làm trong render_datatable)
+            columns = columns.filter((col) => !col.hidden);
+        }
+        
+        if (columns.length === 0) {
+            console.warn("Columns không tồn tại, không thể refresh datatable");
+            return;
+        }
+        
+        // Clone columns để tránh reference issues
+        const columns_copy = columns.map(col => ({ ...col }));
+        
+        // Refresh datatable với filtered data và columns đã filter
+        if (frappe.query_report.datatable && typeof frappe.query_report.datatable.refresh === 'function') {
+            try {
+                frappe.query_report.datatable.refresh(filtered_data, columns_copy);
+                
+                // Apply CSS để đảm bảo header labels không bị nghiêng sau khi refresh
+                setTimeout(() => {
+                    if (frappe.query_report.datatable && frappe.query_report.datatable.$wrapper) {
+                        frappe.query_report.datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
+                            $(this).css({
+                                'transform': 'none',
+                                'writing-mode': 'horizontal-tb',
+                                'text-orientation': 'upright',
+                                'white-space': 'normal'
+                            });
+                        });
+                    }
+                }, 50);
+            } catch (error) {
+                console.error("Lỗi khi refresh datatable:", error);
+                // Fallback: reload toàn bộ report nếu refresh thất bại
+                frappe.query_report.refresh();
+            }
+        } else {
+            // Fallback: reload toàn bộ report nếu method refresh không tồn tại
+            frappe.query_report.refresh();
+        }
+    },
+
+    // === HÀM LỌC DATA ===
+    "get_filtered_data": function() {
+        let data = frappe.query_report.data || [];
+        
+        // Nếu có filter material, chỉ hiển thị material đó
+        if (this.selected_material) {
+            data = data.filter(row => row.material_name === this.selected_material);
+        }
+        
+        return data;
+    }
 };
