@@ -291,8 +291,8 @@ frappe.query_reports["Production Schedule"] = {
 		});
 
 		return [
+			{ name: 'Thạch cao', ...others },
 			{ name: 'P2O5', ...p2o5 },
-			{ name: 'Thạch cao', ...others }
 		];
 	},
 
@@ -490,12 +490,23 @@ frappe.query_reports["Production Schedule"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
 
-        const datasets = [
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
-            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
-        ];
+		const datasets = [
+			{ label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+			{ 
+				label: 'Kế hoạch (Thạch cao)', 
+				data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
+				backgroundColor: 'rgba(14, 165, 233, 0.2)', 
+				borderColor: 'rgba(14, 165, 233, 0.6)', 
+				borderWidth: 2, 
+				stack: 'Others', 
+				type: 'bar', 
+				order: 1,
+				// Lưu giá trị kế hoạch gốc để hiển thị trong tooltip
+				originalPlanned: othersPlanned
+			},
+			{ label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
+			{ label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+		];
 
         const ctx = document.getElementById('week-plan-chart').getContext('2d');
         new Chart(ctx, {
@@ -505,6 +516,30 @@ frappe.query_reports["Production Schedule"] = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+					tooltip: {
+						callbacks: {
+							label: function(context) {
+								let label = context.dataset.label || '';
+								
+								if (label) {
+									label += ': ';
+								}
+								
+								// Nếu là dataset "Kế hoạch (Thạch cao)", hiển thị giá trị gốc
+								if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
+									const originalValue = context.dataset.originalPlanned[context.dataIndex];
+									label += originalValue.toLocaleString('en-US') + ' Tấn';
+								} else {
+									// Các dataset khác hiển thị bình thường
+									if (context.parsed.y !== null) {
+										label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
+									}
+								}
+								
+								return label;
+							}
+                    	}
+					},
                     legend: { 
                         position: 'top',
                         labels: {
