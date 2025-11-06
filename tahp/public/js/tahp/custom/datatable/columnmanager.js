@@ -28,8 +28,8 @@ export default class ColumnManager {
 
     renderHeader() {
         this.header.innerHTML = '<div></div>';
-        this.spanHeader.innerHTML = this.getSpanHeaderHTML(this.datamanager.getColumns());
         this.refreshHeader();
+        this.spanHeader.innerHTML = this.getSpanHeaderHTML(this.datamanager.getColumns());
     }
 
     refreshHeader() {
@@ -58,32 +58,50 @@ export default class ColumnManager {
         } else {
             styleHeader = `background-color: var(--subtle-fg);`; 
         }
+
         while (i < columns.length) {
             const col = columns[i];
             let freezeLeft = '';
             if (this.options.freezeIndex !== null && i <= this.options.freezeIndex) {
                 freezeLeft = "sticky-left";
             }
+
+            // Thêm class đặc biệt nếu là phần tử đầu tiên
+            const extraClass = (i === 0) ? 'dt-instance-1 dt-cell__edit--col-0' : '';
+
             if (col.parent) {
                 // Tìm hết các column liên tiếp có cùng parent
                 let spanCount = 1;
                 while (i + spanCount < columns.length && columns[i + spanCount].parent === col.parent) {
                     spanCount++;
                 }
-                const totalWidth = columns.slice(i, i + spanCount).reduce((w, c) => w + c.width, 0) + (spanCount - 1);
+                const totalWidth = columns.slice(i, i + spanCount)
+                    .reduce((w, c) => w + c.width, 0) + (spanCount - 1);
+
+                // Nếu i === 0 thì không gán width
+                const styleAttr = (i === 0)
+                    ? `${styleHeader};border-bottom: 1px solid var(--dt-border-color);`
+                    : `width:${totalWidth}px;${styleHeader};border-bottom: 1px solid var(--dt-border-color);`;
+
                 cells.push(`<div 
-                    class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft}"
+                    class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft} ${extraClass}"
                     data-parent="${col.parent}"
-                    style="width:${totalWidth}px;${styleHeader};border-bottom: 1px solid var(--dt-border-color);">
+                    style="${styleAttr}">
                     ${col.parent}</div>`);
                 i += spanCount;
             } else {
-                cells.push(`<div class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft}" 
+                const width = col.width || 40;
+                const styleAttr = (i === 0)
+                    ? `${styleHeader}`
+                    : `width:${width}px;${styleHeader}`;
+                
+                cells.push(`<div class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft} ${extraClass}" 
                     data-col-index="${i}"
-                    style="width:${col.width || 40}px;${styleHeader}"></div>`);
+                    style="${styleAttr}"></div>`);
                 i++;
             }
         }
+
         return `<div class="dt-row dt-row-spanheader">${cells.join('')}</div>`;
     }
 
