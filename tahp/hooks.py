@@ -116,6 +116,7 @@ doctype_js = {
 doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
+    "Work Order": ["public/js/work_order/work_order_list.js"]
 }
 
 # doctype_js = {
@@ -265,6 +266,9 @@ doc_events = {
         ],
         "after_insert": [
             "tahp.doc_events.work_order.after_insert.after_insert"
+        ],
+        "on_trash": [
+            "tahp.doc_events.work_order.on_trash.on_trash"
         ]
     },
     "Workstation": {

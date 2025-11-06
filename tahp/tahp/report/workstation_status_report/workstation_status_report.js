@@ -19,6 +19,9 @@ frappe.query_reports["Workstation Status Report"] = {
 				htmlRender: () => execute_summary(report)
 			}
 		];
+        setTimeout(() => {
+            report.$report.find('.dt-dropdown').hide();
+        }, 300);
 	},
 
     formatter: function (value, row, column, data, default_formatter) {
