@@ -86,15 +86,18 @@ frappe.query_reports["Material Consumption"] = {
                     $('<style>', {
                         id: styleId,
                         text: `
+                            /* Chỉ target header cells, không ảnh hưởng đến body rows */
                             .report-wrapper .dt-header th,
                             .report-wrapper .dt-header .dt-cell,
-                            .report-wrapper .dt-header .dt-cell__content,
-                            .report-wrapper .dt-header .dt-cell__content-text,
-                            .report-wrapper .dt-header .dt-cell__content span,
-                            .report-wrapper .dt-header .dt-cell__content div {
+                            .report-wrapper .dt-header .dt-cell__content {
                                 transform: none !important;
                                 writing-mode: horizontal-tb !important;
                                 text-orientation: upright !important;
+                            }
+                            
+                            /* Cho phép text wrap trong header */
+                            .report-wrapper .dt-header .dt-cell__content,
+                            .report-wrapper .dt-header .dt-cell__content-text {
                                 white-space: normal !important;
                                 word-wrap: break-word !important;
                                 overflow-wrap: break-word !important;
@@ -103,14 +106,29 @@ frappe.query_reports["Material Consumption"] = {
                     }).appendTo('head');
                 }
                 
-                // Apply trực tiếp vào các header cells
+                // Apply trực tiếp vào các header cells - chỉ remove transform
                 if (datatable && datatable.$wrapper) {
                     datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
-                        $(this).css({
+                        const $cell = $(this);
+                        // Chỉ remove transform, không thay đổi layout
+                        $cell.css({
                             'transform': 'none',
                             'writing-mode': 'horizontal-tb',
-                            'text-orientation': 'upright',
-                            'white-space': 'normal'
+                            'text-orientation': 'upright'
+                        });
+                        
+                        // Cho phép text wrap trong content
+                        $cell.find('.dt-cell__content, .dt-cell__content-text').css({
+                            'white-space': 'normal',
+                            'word-wrap': 'break-word',
+                            'overflow-wrap': 'break-word'
+                        });
+                        
+                        // Loại bỏ transform từ các phần tử con
+                        $cell.find('.dt-cell__content *, .dt-cell__content-text *').css({
+                            'transform': 'none',
+                            'writing-mode': 'horizontal-tb',
+                            'text-orientation': 'upright'
                         });
                     });
                 }
@@ -645,11 +663,26 @@ frappe.query_reports["Material Consumption"] = {
                 setTimeout(() => {
                     if (frappe.query_report.datatable && frappe.query_report.datatable.$wrapper) {
                         frappe.query_report.datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
-                            $(this).css({
+                            const $cell = $(this);
+                            // Chỉ remove transform, không thay đổi layout
+                            $cell.css({
                                 'transform': 'none',
                                 'writing-mode': 'horizontal-tb',
-                                'text-orientation': 'upright',
-                                'white-space': 'normal'
+                                'text-orientation': 'upright'
+                            });
+                            
+                            // Cho phép text wrap trong content
+                            $cell.find('.dt-cell__content, .dt-cell__content-text').css({
+                                'white-space': 'normal',
+                                'word-wrap': 'break-word',
+                                'overflow-wrap': 'break-word'
+                            });
+                            
+                            // Loại bỏ transform từ các phần tử con
+                            $cell.find('.dt-cell__content *, .dt-cell__content-text *').css({
+                                'transform': 'none',
+                                'writing-mode': 'horizontal-tb',
+                                'text-orientation': 'upright'
                             });
                         });
                     }
