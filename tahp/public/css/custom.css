@@ -59,3 +59,13 @@ textarea {
     flex: 4;
     min-width: 90%;
 }
+
+@media (max-width: 768px) {
+  .list-row .level-left, .list-row-head .level-left {
+    min-width: 60%;
+  }
+
+  .list-count {
+    white-space: nowrap;
+  }
+}
