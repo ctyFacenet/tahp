@@ -6,6 +6,10 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "section_break_vweo",
+  "column_break_ensx",
+  "wrapper",
+  "section_break_mxpy",
   "creation_date",
   "work_order",
   "column_break_ocis",
@@ -112,13 +116,30 @@
    "fieldtype": "Data",
    "label": "Kho nh\u1eadp th\u00e0nh ph\u1ea9m",
    "read_only": 1
+  },
+  {
+   "fieldname": "wrapper",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "section_break_mxpy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ensx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_vweo",
+   "fieldtype": "Section Break",
+   "hide_border": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-22 11:51:16.400909",
+ "modified": "2025-11-11 16:09:14.648204",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",

@@ -631,35 +631,7 @@ def submit(job_card):
 
     # 6. Đổi trạng thái job card
     doc.status = "Completed"
-
-    # 7. Thông báo cho trưởng ca
-    wo_name = doc.work_order
-    wo_doc = frappe.get_doc("Work Order", wo_name)
-    shift_leader = wo_doc.custom_shift_leader
-    user = frappe.db.get_value("Employee", shift_leader, "user_id")
-
-    job_card_count = frappe.db.count(
-        "Job Card",
-        filters={
-            "work_order": wo_name,
-            "docstatus": 1  # chỉ lấy job card đã submit
-        }
-    )
-
-    operation_count = len(wo_doc.operations)
-
-    if job_card_count + 1 == operation_count:  # tức là không còn job card nào chưa hoàn thành
-        subject = f"Đã hoàn thành toàn bộ công đoạn của LSX Ca: <b style='font-weight:bold'>{wo_name}</b>"
-        frappe.get_doc({
-            "doctype": "Notification Log",
-            "for_user": user,
-            "subject": subject,
-            "email_content": "",
-            "type": "Alert",
-            "document_type": "Work Order",
-            "document_name": wo_name
-        }).insert(ignore_permissions=True)
-
+    
     # 8. Submit
     doc.submit()
 

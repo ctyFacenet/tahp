@@ -47,6 +47,14 @@ frappe.ui.form.on('Week Work Order', {
 				}
 			};
 		});
+
+        if (frm.is_new()) {
+            if (!frm.code_name) {
+                let response = await frappe.xcall("tahp.tahp.doctype.custom_planner.custom_planner.recommend_code_name")
+                frm.set_value("code_name", response)
+                frm.refresh_field("code_name")
+            }
+        }
 	},
     validate: function(frm) {
         if (!frm.doc.items.length) {

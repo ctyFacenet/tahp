@@ -213,22 +213,6 @@ frappe.ui.form.on('Work Order Operation', {
 async function finish_button(frm) {
     if (frm.is_new() || frm.doc.docstatus != 1 || frm.doc.status == "Completed" ) return;
     frm.remove_custom_button("Finish");
-    // const response = await frappe.call({method: "tahp.doc_events.work_order.before_submit.check_status", args: {work_order: frm.doc.name}})
-    // if (response.message) {
-    //     frm.add_custom_button(__('Hoàn thành'), async function () {
-    //         if (typeof response.message === "string") frappe.set_route("Form", "Stock Entry", response.message)
-    //         else {
-    //             const stock_entry = await frappe.xcall("erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry", {
-    //                 work_order_id: frm.doc.name,
-    //                 purpose: "Manufacture",
-    //                 qty: frm.doc.qty
-    //             });
-    //             console.log(stock_entry)
-    //             frappe.model.sync(stock_entry);
-    //             frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
-    //         }
-    //     }).addClass('btn-primary')
-    // }
     frm.add_custom_button(__('Hoàn thành'), async function () {
         await complete_wo(frm);
     }).addClass('btn-primary')
