@@ -104,7 +104,7 @@ def get_data(work_orders, columns):
     data_by_date = defaultdict(lambda: defaultdict(lambda: {"planned": 0, "actual": 0, "system": None}))
     
     for wo in work_orders:
-        date_str = wo.actual_end_date.strftime('%Y-%m-%d')
+        date_str = wo.planned_start_date.strftime('%Y-%m-%d')
         scrubbed_name = frappe.scrub(wo.production_item)
         system_category = (getattr(wo, 'manufacturing_category', None) or '').strip()
         data_by_date[date_str][scrubbed_name]["planned"] += wo.qty
@@ -154,11 +154,11 @@ def get_completed_work_orders(filters):
     
     # Handle date filters (inclusive by date, ignore time component)
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += " AND DATE(wo.actual_end_date) BETWEEN %(from_date)s AND %(to_date)s"
+        conditions += " AND DATE(wo.planned_start_date) BETWEEN %(from_date)s AND %(to_date)s"
     elif filters.get("from_date"):
-        conditions += " AND DATE(wo.actual_end_date) >= %(from_date)s"
+        conditions += " AND DATE(wo.planned_start_date) >= %(from_date)s"
     elif filters.get("to_date"):
-        conditions += " AND DATE(wo.actual_end_date) <= %(to_date)s"
+        conditions += " AND DATE(wo.planned_start_date) <= %(to_date)s"
     
     if filters.get("company"):
         conditions += " AND wo.company = %(company)s"
@@ -170,7 +170,7 @@ def get_completed_work_orders(filters):
     # Get work orders with manufacturing category from BOM
     work_orders = frappe.db.sql("""
         SELECT
-            wo.actual_end_date,
+            wo.planned_start_date,
             wo.production_item,
             item.item_name,
             item.item_group,
