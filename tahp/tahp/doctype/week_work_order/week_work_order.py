@@ -2,9 +2,11 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe.model.base_document import cached_property
 from frappe.model.document import Document
 
 class WeekWorkOrder(Document):
+
 	def before_save(self):
 		if not self.plan and self.get("__islocal") and not self.new_plan:
 			# Tạo mới WWO Plan rỗng

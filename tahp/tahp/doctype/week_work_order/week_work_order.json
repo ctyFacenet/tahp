@@ -23,6 +23,7 @@
   "end_date",
   "amended_from",
   "section_break_ohpc",
+  "wrapper",
   "wo_detail"
  ],
  "fields": [
@@ -134,13 +135,18 @@
    "label": "K\u1ebf ho\u1ea1ch s\u1ea3n xu\u1ea5t m\u1edbi",
    "options": "Custom Planner",
    "read_only": 1
+  },
+  {
+   "fieldname": "wrapper",
+   "fieldtype": "HTML",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-11 16:52:00.682909",
+ "modified": "2025-11-12 09:21:40.908640",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Week Work Order",
