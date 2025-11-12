@@ -46,40 +46,42 @@ def process_week_filter(filters):
     return filters
 
 def get_week_work_orders(filters):
-    """Get Week Work Orders based on filters - only submitted ones"""
-    conditions = ""
-    
+    """Get Week Work Orders based on filters - only submitted ones (ORM only)"""
+    parent_names = None
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += """ AND EXISTS (
-            SELECT 1 FROM `tabWeek Work Order Item` wwoi 
-            WHERE wwoi.parent = wwo.name 
-            AND wwoi.planned_start_time BETWEEN %(from_date)s AND %(to_date)s
-        )"""
+        rows = frappe.get_all(
+            "Week Work Order Item",
+            filters={"planned_start_time": ["between", [filters["from_date"], filters["to_date"]]]},
+            pluck="parent"
+        )
+        parent_names = list(set(rows))
     elif filters.get("from_date"):
-        conditions += """ AND EXISTS (
-            SELECT 1 FROM `tabWeek Work Order Item` wwoi 
-            WHERE wwoi.parent = wwo.name 
-            AND wwoi.planned_start_time >= %(from_date)s
-        )"""
+        rows = frappe.get_all(
+            "Week Work Order Item",
+            filters={"planned_start_time": [">=", filters["from_date"]]},
+            pluck="parent"
+        )
+        parent_names = list(set(rows))
     elif filters.get("to_date"):
-        conditions += """ AND EXISTS (
-            SELECT 1 FROM `tabWeek Work Order Item` wwoi 
-            WHERE wwoi.parent = wwo.name 
-            AND wwoi.planned_start_time <= %(to_date)s
-        )"""
-    
-    conditions += " AND wwo.docstatus = 1"
+        rows = frappe.get_all(
+            "Week Work Order Item",
+            filters={"planned_start_time": ["<=", filters["to_date"]]},
+            pluck="parent"
+        )
+        parent_names = list(set(rows))
 
-    week_work_orders = frappe.db.sql("""
-        SELECT
-            wwo.name,
-            wwo.creation_time
-        FROM
-            `tabWeek Work Order` wwo
-        WHERE 1=1 {conditions}
-        ORDER BY wwo.creation_time
-    """.format(conditions=conditions), filters, as_dict=1)
+    base_filters = {"docstatus": 1}
+    if parent_names is not None:
+        if not parent_names:
+            return []
+        base_filters["name"] = ["in", parent_names]
 
+    week_work_orders = frappe.get_all(
+        "Week Work Order",
+        filters=base_filters,
+        fields=["name", "creation_time"],
+        order_by="creation_time asc"
+    )
     return week_work_orders
 
 def get_planned_data(week_work_orders, filters):
@@ -89,76 +91,102 @@ def get_planned_data(week_work_orders, filters):
     
     wwo_names = [wwo.name for wwo in week_work_orders]
     
-    # Get planned quantities from Week Work Order Items
-    planned_items = frappe.db.sql("""
-        SELECT
-            wwo.name as wwo_name,
-            wwoi.item,
-            item.item_name,
-            item.item_group,
-            bom.custom_category AS manufacturing_category,
-            wwoi.qty,
-            wwoi.planned_start_time,
-            wwoi.planned_end_time
-        FROM
-            `tabWeek Work Order` wwo
-        JOIN `tabWeek Work Order Item` wwoi ON wwo.name = wwoi.parent
-        JOIN `tabItem` item ON wwoi.item = item.name
-        LEFT JOIN `tabBOM` bom ON wwoi.bom = bom.name
-        WHERE wwo.name IN %(wwo_names)s
-        AND wwo.docstatus = 1
-        ORDER BY wwoi.planned_start_time, item.item_name
-    """, {"wwo_names": wwo_names}, as_dict=1)
+    # Get planned quantities from Week Work Order Items (ORM)
+    wwoi_rows = frappe.get_all(
+        "Week Work Order Item",
+        filters={"parent": ["in", wwo_names]},
+        fields=["parent as wwo_name", "item", "qty", "planned_start_time", "planned_end_time", "bom"]
+    )
+    item_codes = list({r["item"] for r in wwoi_rows}) if wwoi_rows else []
+    bom_names = list({r["bom"] for r in wwoi_rows if r.get("bom")} ) if wwoi_rows else []
+
+    item_info = {}
+    if item_codes:
+        for it in frappe.get_all("Item", filters={"name": ["in", item_codes]}, fields=["name", "item_name", "item_group"]):
+            item_info[it["name"]] = it
+    bom_info = {}
+    if bom_names:
+        for b in frappe.get_all("BOM", filters={"name": ["in", bom_names]}, fields=["name", "custom_category"]):
+            bom_info[b["name"]] = b.get("custom_category")
+
+    # Start dates map
+    date_mapping = {}
+    for r in wwoi_rows:
+        start = r.get("planned_start_time")
+        nm = r["wwo_name"]
+        if nm not in date_mapping or (start and date_mapping[nm] and start < date_mapping[nm]) or (start and not date_mapping[nm]):
+            date_mapping[nm] = start
     
-    # Get start dates for each Week Work Order
-    wwo_dates = frappe.db.sql("""
-        SELECT
-            wwo.name as wwo_name,
-            MIN(wwoi.planned_start_time) as start_date
-        FROM
-            `tabWeek Work Order` wwo
-        JOIN `tabWeek Work Order Item` wwoi ON wwo.name = wwoi.parent
-        WHERE wwo.name IN %(wwo_names)s
-        AND wwo.docstatus = 1
-        GROUP BY wwo.name
-    """, {"wwo_names": wwo_names}, as_dict=1)
-    
-    # Create date mapping
-    date_mapping = {item.wwo_name: item.start_date for item in wwo_dates}
-    
-    # Get actual quantities from Work Orders
-    actual_items = frappe.db.sql("""
-        SELECT
-            wo.custom_plan as wwo_name,
-            wo.production_item,
-            SUM(wo.produced_qty) as total_produced
-        FROM
-            `tabWork Order` wo
-        WHERE wo.custom_plan IN %(wwo_names)s
-        AND wo.custom_plan IS NOT NULL
-        AND wo.custom_plan != ''
-        AND wo.docstatus = 1
-        AND wo.status = 'Completed'
-        GROUP BY wo.custom_plan, wo.production_item
-    """, {"wwo_names": wwo_names}, as_dict=1)
+    # Get actual quantities from Work Orders (ORM, ưu tiên custom_plan, fallback theo ngày+item)
+    actual_items = []
+    # 1) Xác định khoảng ngày tuần (để giới hạn phạm vi tìm WO) và map (ngày,item)->LSX
+    date_item_to_parent = {}
+    min_date = None
+    max_date = None
+    for r in wwoi_rows:
+        if r.get("planned_start_time"):
+            d = r.get("planned_start_time")
+            date_only = d if isinstance(d, datetime) else datetime.strptime(str(d), "%Y-%m-%d")
+            date_key = date_only.date()
+            date_item_to_parent[(date_key, r["item"])] = r["wwo_name"]
+            if not min_date or date_key < min_date:
+                min_date = date_key
+            if not max_date or date_key > max_date:
+                max_date = date_key
+    # 2) Lấy Work Order trong khoảng ngày (bao phủ tuần đang xem) và cộng thực tế
+    wo_filters = {"docstatus": 1}
+    if min_date and max_date:
+        wo_filters["planned_start_date"] = ["between", [min_date, max_date]]
+    if item_codes:
+        wo_filters["production_item"] = ["in", item_codes]
+    wo_rows = frappe.get_all(
+        "Work Order",
+        filters=wo_filters,
+        fields=["name", "custom_plan", "production_item", "produced_qty", "planned_start_date"]
+    )
+    actual_map = defaultdict(float)  # (wwo_name, production_item) -> qty
+    wwo_name_set = set(wwo_names)
+    for wo in wo_rows:
+        # Ưu tiên match theo custom_plan nếu thuộc tập LSX đang xét
+        parent = wo.get("custom_plan")
+        if parent not in wwo_name_set:
+            d = wo.get("planned_start_date")
+            if d:
+                date_only = d if isinstance(d, datetime) else datetime.strptime(str(d), "%Y-%m-%d")
+                parent = date_item_to_parent.get((date_only.date(), wo.get("production_item")))
+        if parent in wwo_name_set:
+            key = (parent, wo.get("production_item"))
+            actual_map[key] += float(wo.get("produced_qty") or 0)
+    for (parent, item_code), total_produced in actual_map.items():
+        actual_items.append(frappe._dict({
+            "wwo_name": parent,
+            "production_item": item_code,
+            "total_produced": total_produced
+        }))
     
     # Group by LSX tuần (wwo_name)
     planned_data = defaultdict(lambda: defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}))
     
     # Process planned quantities
-    for item in planned_items:
-        scrubbed_name = frappe.scrub(item.item)
-        system_category = (item.manufacturing_category or '').strip()
+    for r in wwoi_rows:
+        item_code = r["item"]
+        item_meta = item_info.get(item_code, {})
+        system_category = (bom_info.get(r.get("bom")) or '').strip()
+        scrubbed_name = frappe.scrub(item_code)
         
-        planned_data[item.wwo_name][scrubbed_name]["planned_qty"] += (item.qty or 0)
-        planned_data[item.wwo_name][scrubbed_name]["system"] = system_category
-        planned_data[item.wwo_name][scrubbed_name]["start_date"] = date_mapping.get(item.wwo_name)
+        planned_data[r["wwo_name"]][scrubbed_name]["planned_qty"] += (r.get("qty") or 0)
+        planned_data[r["wwo_name"]][scrubbed_name]["system"] = system_category
+        planned_data[r["wwo_name"]][scrubbed_name]["start_date"] = date_mapping.get(r["wwo_name"])
     
     # Process actual quantities
     for item in actual_items:
         scrubbed_name = frappe.scrub(item.production_item)
-        if item.wwo_name in planned_data and scrubbed_name in planned_data[item.wwo_name]:
-            planned_data[item.wwo_name][scrubbed_name]["actual_qty"] += (item.total_produced or 0)
+        # Always ensure the key exists so actual can be recorded even if not present in planned items
+        if item.wwo_name not in planned_data:
+            planned_data[item.wwo_name] = defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None})
+        if scrubbed_name not in planned_data[item.wwo_name]:
+            planned_data[item.wwo_name][scrubbed_name] = {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}
+        planned_data[item.wwo_name][scrubbed_name]["actual_qty"] += (item.total_produced or 0)
     
     return planned_data
 
@@ -182,19 +210,30 @@ def get_columns(week_work_orders):
     product_details_list = []
     processed_items = set()
     
-    planned_items = frappe.db.sql("""
-        SELECT DISTINCT
-            wwoi.item,
-            item.item_name,
-            bom.custom_category AS manufacturing_category
-        FROM
-            `tabWeek Work Order` wwo
-        JOIN `tabWeek Work Order Item` wwoi ON wwo.name = wwoi.parent
-        JOIN `tabItem` item ON wwoi.item = item.name
-        LEFT JOIN `tabBOM` bom ON wwoi.bom = bom.name
-        WHERE wwo.name IN %(wwo_names)s
-        AND wwo.docstatus = 1
-    """, {"wwo_names": [wwo.name for wwo in week_work_orders]}, as_dict=1)
+    # Build product list from planned items (ORM)
+    wwo_names_list = [wwo.name for wwo in week_work_orders]
+    wwoi_rows_for_cols = frappe.get_all(
+        "Week Work Order Item",
+        filters={"parent": ["in", wwo_names_list]},
+        fields=["item", "bom"]
+    )
+    item_codes_cols = list({r["item"] for r in wwoi_rows_for_cols}) if wwoi_rows_for_cols else []
+    bom_names_cols = list({r["bom"] for r in wwoi_rows_for_cols if r.get("bom")}) if wwoi_rows_for_cols else []
+    item_meta_cols = {}
+    if item_codes_cols:
+        for it in frappe.get_all("Item", filters={"name": ["in", item_codes_cols]}, fields=["name", "item_name"]):
+            item_meta_cols[it["name"]] = it
+    bom_meta_cols = {}
+    if bom_names_cols:
+        for b in frappe.get_all("BOM", filters={"name": ["in", bom_names_cols]}, fields=["name", "custom_category"]):
+            bom_meta_cols[b["name"]] = b.get("custom_category")
+    planned_items = []
+    for r in wwoi_rows_for_cols:
+        planned_items.append(frappe._dict({
+            "item": r["item"],
+            "item_name": (item_meta_cols.get(r["item"], {}) or {}).get("item_name"),
+            "manufacturing_category": (bom_meta_cols.get(r.get("bom")) or "")
+        }))
     
     for item in planned_items:
         if item.item not in processed_items:
@@ -205,21 +244,28 @@ def get_columns(week_work_orders):
             })
             processed_items.add(item.item)
     
-    actual_items = frappe.db.sql("""
-        SELECT DISTINCT
-            wo.production_item,
-            item.item_name,
-            bom.custom_category AS manufacturing_category
-        FROM
-            `tabWork Order` wo
-        JOIN `tabItem` item ON wo.production_item = item.name
-        LEFT JOIN `tabBOM` bom ON wo.bom_no = bom.name
-        WHERE wo.custom_plan IN %(wwo_names)s
-        AND wo.custom_plan IS NOT NULL
-        AND wo.custom_plan != ''
-        AND wo.docstatus = 1
-        AND wo.status = 'Completed'
-    """, {"wwo_names": [wwo.name for wwo in week_work_orders]}, as_dict=1)
+    wo_rows_for_cols = frappe.get_all(
+        "Work Order",
+        filters={"docstatus": 1, "custom_plan": ["in", wwo_names_list]},
+        fields=["production_item", "bom_no"]
+    )
+    item_codes_actual = list({r["production_item"] for r in wo_rows_for_cols}) if wo_rows_for_cols else []
+    bom_names_actual = list({r["bom_no"] for r in wo_rows_for_cols if r.get("bom_no")}) if wo_rows_for_cols else []
+    item_meta_actual = {}
+    if item_codes_actual:
+        for it in frappe.get_all("Item", filters={"name": ["in", item_codes_actual]}, fields=["name", "item_name"]):
+            item_meta_actual[it["name"]] = it
+    bom_meta_actual = {}
+    if bom_names_actual:
+        for b in frappe.get_all("BOM", filters={"name": ["in", bom_names_actual]}, fields=["name", "custom_category"]):
+            bom_meta_actual[b["name"]] = b.get("custom_category")
+    actual_items = []
+    for r in wo_rows_for_cols:
+        actual_items.append(frappe._dict({
+            "production_item": r["production_item"],
+            "item_name": (item_meta_actual.get(r["production_item"], {}) or {}).get("item_name"),
+            "manufacturing_category": (bom_meta_actual.get(r.get("bom_no")) or "")
+        }))
     
     for item in actual_items:
         if item.production_item not in processed_items:
