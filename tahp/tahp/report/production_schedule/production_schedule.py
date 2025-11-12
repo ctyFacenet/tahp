@@ -84,32 +84,87 @@ def get_week_work_orders(filters):
     )
     return week_work_orders
 
+def _extract_date_part(value):
+    """Extract và normalize phần date từ identifier (ví dụ: '17.10.25' hoặc '17.10.2025' -> '17.10.25')."""
+    if not value:
+        return None
+    import re
+    # Tìm pattern ngày.tháng.năm (ví dụ: 17.10.25 hoặc 17.10.2025)
+    match = re.search(r'(\d+)\.(\d+)\.(\d+)', str(value))
+    if match:
+        day = match.group(1)
+        month = match.group(2)
+        year = match.group(3)
+        # Normalize năm: nếu năm là 4 chữ số, chuyển thành 2 chữ số cuối
+        if len(year) == 4:
+            year = year[-2:]
+        return f"{day}.{month}.{year}"
+    return None
+
+
+def match_custom_plan_to_lsx(custom_plan, lsx_name):
+    """
+    Kiểm tra xem custom_plan có match với tên LSX không.
+    Match nếu:
+    - custom_plan trùng chính xác với lsx_name
+    - custom_plan chứa lsx_name (ví dụ: "LSX.31.10.25-CA1" chứa "LSX.31.10.25")
+    - lsx_name chứa custom_plan (ví dụ: "LSX.31.10.25" chứa "31.10.25")
+    - Phần date được normalize giống nhau (ví dụ: "17.10.25" và "17.10.2025" đều thành "17.10.25")
+    """
+    if not custom_plan or not lsx_name:
+        return False
+    
+    custom_plan = str(custom_plan).strip()
+    lsx_name = str(lsx_name).strip()
+    
+    # Match chính xác
+    if custom_plan == lsx_name:
+        return True
+    
+    # Match nếu một trong hai chứa cái kia
+    if custom_plan in lsx_name or lsx_name in custom_plan:
+        return True
+    
+    # Match bằng cách so sánh phần date đã normalize
+    # Ví dụ: "LSX.17.10.25" và "LSX.17.10.2025" đều có date là "17.10.25"
+    custom_date = _extract_date_part(custom_plan)
+    lsx_date = _extract_date_part(lsx_name)
+    
+    if custom_date and lsx_date and custom_date == lsx_date:
+        return True
+    
+    return False
+
+
 def get_planned_data(week_work_orders, filters):
-    """Get planned data from Week Work Order Items - cumulative data per LSX tuần"""
+    """
+    Lấy dữ liệu kế hoạch và thực tế cho báo cáo tiến độ sản xuất theo LSX.
+    
+    Logic:
+    1. Với mỗi LSX, lấy các Week Work Order Item để có số lượng kế hoạch (planned_qty)
+    2. Với mỗi LSX, tìm tất cả Work Order có custom_plan trùng với tên LSX để lấy số lượng thực tế (actual_qty)
+    """
     if not week_work_orders:
         return {}
     
     wwo_names = [wwo.name for wwo in week_work_orders]
     
-    # Get planned quantities from Week Work Order Items (ORM)
+    # Bước 1: Lấy số lượng kế hoạch từ Week Work Order Items
     wwoi_rows = frappe.get_all(
         "Week Work Order Item",
         filters={"parent": ["in", wwo_names]},
-        fields=["parent as wwo_name", "item", "qty", "planned_start_time", "planned_end_time", "bom"]
+        fields=["parent as wwo_name", "item", "qty", "planned_start_time", "bom"]
     )
-    item_codes = list({r["item"] for r in wwoi_rows}) if wwoi_rows else []
-    bom_names = list({r["bom"] for r in wwoi_rows if r.get("bom")} ) if wwoi_rows else []
-
-    item_info = {}
-    if item_codes:
-        for it in frappe.get_all("Item", filters={"name": ["in", item_codes]}, fields=["name", "item_name", "item_group"]):
-            item_info[it["name"]] = it
+    
+    # Lấy thông tin BOM
+    bom_names = list({r["bom"] for r in wwoi_rows if r.get("bom")}) if wwoi_rows else []
+    
     bom_info = {}
     if bom_names:
         for b in frappe.get_all("BOM", filters={"name": ["in", bom_names]}, fields=["name", "custom_category"]):
             bom_info[b["name"]] = b.get("custom_category")
-
-    # Start dates map
+    
+    # Lưu ngày bắt đầu sớm nhất cho mỗi LSX
     date_mapping = {}
     for r in wwoi_rows:
         start = r.get("planned_start_time")
@@ -117,76 +172,71 @@ def get_planned_data(week_work_orders, filters):
         if nm not in date_mapping or (start and date_mapping[nm] and start < date_mapping[nm]) or (start and not date_mapping[nm]):
             date_mapping[nm] = start
     
-    # Get actual quantities from Work Orders (ORM, ưu tiên custom_plan, fallback theo ngày+item)
-    actual_items = []
-    # 1) Xác định khoảng ngày tuần (để giới hạn phạm vi tìm WO) và map (ngày,item)->LSX
-    date_item_to_parent = {}
-    min_date = None
-    max_date = None
-    for r in wwoi_rows:
-        if r.get("planned_start_time"):
-            d = r.get("planned_start_time")
-            date_only = d if isinstance(d, datetime) else datetime.strptime(str(d), "%Y-%m-%d")
-            date_key = date_only.date()
-            date_item_to_parent[(date_key, r["item"])] = r["wwo_name"]
-            if not min_date or date_key < min_date:
-                min_date = date_key
-            if not max_date or date_key > max_date:
-                max_date = date_key
-    # 2) Lấy Work Order trong khoảng ngày (bao phủ tuần đang xem) và cộng thực tế
-    wo_filters = {"docstatus": 1}
-    if min_date and max_date:
-        wo_filters["planned_start_date"] = ["between", [min_date, max_date]]
-    if item_codes:
-        wo_filters["production_item"] = ["in", item_codes]
+    # Bước 2: Lấy số lượng thực tế từ Work Orders
+    # Với mỗi LSX, tìm tất cả WO có custom_plan trùng với tên LSX
     wo_rows = frappe.get_all(
         "Work Order",
-        filters=wo_filters,
-        fields=["name", "custom_plan", "production_item", "produced_qty", "planned_start_date"]
+        filters={"docstatus": 1, "custom_plan": ["is", "set"]},
+        fields=["name", "custom_plan", "production_item", "produced_qty"]
     )
-    actual_map = defaultdict(float)  # (wwo_name, production_item) -> qty
-    wwo_name_set = set(wwo_names)
-    for wo in wo_rows:
-        # Ưu tiên match theo custom_plan nếu thuộc tập LSX đang xét
-        parent = wo.get("custom_plan")
-        if parent not in wwo_name_set:
-            d = wo.get("planned_start_date")
-            if d:
-                date_only = d if isinstance(d, datetime) else datetime.strptime(str(d), "%Y-%m-%d")
-                parent = date_item_to_parent.get((date_only.date(), wo.get("production_item")))
-        if parent in wwo_name_set:
-            key = (parent, wo.get("production_item"))
-            actual_map[key] += float(wo.get("produced_qty") or 0)
-    for (parent, item_code), total_produced in actual_map.items():
-        actual_items.append(frappe._dict({
-            "wwo_name": parent,
-            "production_item": item_code,
-            "total_produced": total_produced
-        }))
     
-    # Group by LSX tuần (wwo_name)
+    # Map: (lsx_name, item_code) -> total_produced_qty
+    actual_map = defaultdict(float)
+    
+    for wo in wo_rows:
+        custom_plan = wo.get("custom_plan")
+        if not custom_plan:
+            continue
+        
+        # Tìm LSX nào match với custom_plan này
+        # Ưu tiên match chính xác trước, sau đó mới match substring
+        matched_lsx = None
+        
+        # Bước 1: Tìm match chính xác
+        custom_plan_str = str(custom_plan).strip()
+        for lsx_name in wwo_names:
+            if custom_plan_str == str(lsx_name).strip():
+                matched_lsx = lsx_name
+                break
+        
+        # Bước 2: Nếu không có match chính xác, tìm match substring
+        if not matched_lsx:
+            for lsx_name in wwo_names:
+                if match_custom_plan_to_lsx(custom_plan, lsx_name):
+                    matched_lsx = lsx_name
+                    break
+        
+        # Nếu tìm thấy LSX match, cộng dồn produced_qty
+        if matched_lsx:
+            item_code = wo.get("production_item")
+            key = (matched_lsx, item_code)
+            actual_map[key] += float(wo.get("produced_qty") or 0)
+    
+    # Bước 3: Gộp dữ liệu kế hoạch và thực tế
     planned_data = defaultdict(lambda: defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}))
     
-    # Process planned quantities
+    # Xử lý số lượng kế hoạch từ Week Work Order Items
     for r in wwoi_rows:
+        lsx_name = r["wwo_name"]
         item_code = r["item"]
-        item_meta = item_info.get(item_code, {})
+        scrubbed_name = frappe.scrub(item_code)
         system_category = (bom_info.get(r.get("bom")) or '').strip()
+        
+        planned_data[lsx_name][scrubbed_name]["planned_qty"] += (r.get("qty") or 0)
+        planned_data[lsx_name][scrubbed_name]["system"] = system_category
+        planned_data[lsx_name][scrubbed_name]["start_date"] = date_mapping.get(lsx_name)
+    
+    # Xử lý số lượng thực tế từ Work Orders
+    for (lsx_name, item_code), total_produced in actual_map.items():
         scrubbed_name = frappe.scrub(item_code)
         
-        planned_data[r["wwo_name"]][scrubbed_name]["planned_qty"] += (r.get("qty") or 0)
-        planned_data[r["wwo_name"]][scrubbed_name]["system"] = system_category
-        planned_data[r["wwo_name"]][scrubbed_name]["start_date"] = date_mapping.get(r["wwo_name"])
-    
-    # Process actual quantities
-    for item in actual_items:
-        scrubbed_name = frappe.scrub(item.production_item)
-        # Always ensure the key exists so actual can be recorded even if not present in planned items
-        if item.wwo_name not in planned_data:
-            planned_data[item.wwo_name] = defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None})
-        if scrubbed_name not in planned_data[item.wwo_name]:
-            planned_data[item.wwo_name][scrubbed_name] = {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}
-        planned_data[item.wwo_name][scrubbed_name]["actual_qty"] += (item.total_produced or 0)
+        # Đảm bảo key tồn tại
+        if lsx_name not in planned_data:
+            planned_data[lsx_name] = defaultdict(lambda: {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None})
+        if scrubbed_name not in planned_data[lsx_name]:
+            planned_data[lsx_name][scrubbed_name] = {"planned_qty": 0, "actual_qty": 0, "system": None, "start_date": None}
+        
+        planned_data[lsx_name][scrubbed_name]["actual_qty"] += total_produced
     
     return planned_data
 
