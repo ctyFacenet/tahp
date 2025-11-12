@@ -32,7 +32,7 @@ def check_shift_handover(work_order, custom_plan, custom_plan_code):
         
         shift_handover = frappe.db.get_all(
             'Shift Handover',
-            filters={'work_order': late_work_order.name},
+            filters={'work_order': late_work_order.name, 'workflow_state': ['!=', 'Đã bị dừng']},
             fields=['name', 'workflow_state']
         )
         if shift_handover:

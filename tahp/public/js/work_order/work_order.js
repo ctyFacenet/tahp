@@ -437,7 +437,7 @@ async function change_time(frm) {
 frappe.ui.form.on("Work Order", {
     refresh: async function(frm) {
         frm.set_intro("");
-        if (!frm.is_new() && frm.doc.docstatus === 0) show_shift_handover(frm)
+        if (!frm.is_new() && frm.doc.docstatus === 0 && frm.doc.workflow_state != "Đã bị dừng") show_shift_handover(frm)
     }
 });
 

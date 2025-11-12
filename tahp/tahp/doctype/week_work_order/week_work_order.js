@@ -644,7 +644,8 @@ async function update_quantity(frm) {
         const work_orders = await frappe.db.get_list('Work Order', {
             filters: [
                 ['custom_plan_code', '=', row.name],
-                ['docstatus', '!=', 2]
+                ['docstatus', '!=', 2],
+                ['workflow_state','!=', 'Đã bị dừng']
             ],
             fields: ['name', 'production_item', 'qty', 'produced_qty', 'planned_start_date', 'custom_shift','status','item_name', 'docstatus','workflow_state']
         });
