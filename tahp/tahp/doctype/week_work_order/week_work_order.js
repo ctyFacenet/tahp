@@ -47,6 +47,14 @@ frappe.ui.form.on('Week Work Order', {
 				}
 			};
 		});
+
+        if (frm.is_new()) {
+            if (!frm.code_name) {
+                let response = await frappe.xcall("tahp.tahp.doctype.custom_planner.custom_planner.recommend_code_name")
+                frm.set_value("code_name", response)
+                frm.refresh_field("code_name")
+            }
+        }
 	},
     validate: function(frm) {
         if (!frm.doc.items.length) {
@@ -629,15 +637,17 @@ async function update_quantity(frm) {
     if (frm.doc.workflow_state !==  "Duyệt xong") return;
     if (frm.doc.items.length === 0) return;
     const detail_rows = frm.doc.items;
-    frm.doc.wo_detail = [];
+    let data = []
     
+    frm.clear_table("wo_detail");
     for (const row of detail_rows) {
         const work_orders = await frappe.db.get_list('Work Order', {
             filters: [
                 ['custom_plan_code', '=', row.name],
-                ['docstatus', '!=', 2]
+                ['docstatus', '!=', 2],
+                ['workflow_state','!=', 'Đã bị dừng']
             ],
-            fields: ['name', 'production_item', 'qty', 'produced_qty', 'planned_start_date', 'custom_shift']
+            fields: ['name', 'production_item', 'qty', 'produced_qty', 'planned_start_date', 'custom_shift','status','item_name', 'docstatus','workflow_state']
         });
                     
         const total_produced = work_orders.reduce((sum, wo) => sum + (wo.produced_qty || 0), 0);
@@ -649,28 +659,57 @@ async function update_quantity(frm) {
         row.pl_qty = total_scheduled_not_started;
         
         for (const wo of work_orders) {
-            frm.doc.wo_detail.push({
-                doctype: "Week Work Order Item 2",
-                parentfield: "wo_detail",
-                parenttype: frm.doc.doctype,
-                parent: frm.doc.name,
+            let status = wo.status
+            if (wo.docstatus === 0) status = wo.workflow_state
+
+            data.push({
                 wo: wo.name,
-                item: wo.production_item,
+                item_code: wo.production_item,
                 qty: wo.qty,
-                planned_start_time: wo.planned_start_date,
-                shift: wo.custom_shift
-            });
+                planned_start_date: wo.planned_start_date,
+                shift: wo.custom_shift,
+                item_name: wo.item_name,
+                status: __(status),                
+            })
         }
     }
     
-    frm.refresh_field("wo_detail");
     frm.fields_dict['items'].grid.refresh();
+
     if (frm.doc.docstatus === 1) {
         const has_incomplete_row = (frm.doc.items || []).some(row => (row.got_qty || 0) < (row.qty || 0));
         if (has_incomplete_row) {
             frm.add_custom_button('Tạo LSX Ca', () => open_create_shift_dialog(frm)).addClass("btn-primary");
         }
     }
+
+    if (data.length === 0) return
+    frm.fields_dict.wrapper.$wrapper.empty();
+    let table = new frappe.ui.form.ControlTable({
+        parent: frm.fields_dict.wrapper.$wrapper,
+        df: {
+            fieldname: "wo_preview",
+            label: __("Danh sách LSX Ca"),
+            read_only: 1,
+            parent: frm.doc.name,
+            fields: [
+                { fieldtype: "Link", fieldname: "wo", label: __("LSX ca"), in_list_view: 1, options: "Work Order", columns: 2, read_only: 1 },
+                { fieldtype: "Link", fieldname: "item_code", label: __("Thành phẩm"), in_list_view: 1, options: "Item", columns: 2, read_only: 1 },
+                { fieldtype: "Date", fieldname: "planned_start_date", label: __("Ngày dự kiến"), in_list_view: 1, columns: 1, read_only: 1 },
+                { fieldtype: "Link", fieldname: "shift", label: __("Ca thực hiện"), in_list_view: 1, options: "Shift", columns: 2, read_only: 1 },
+                { fieldtype: "Float", fieldname: "qty", label: __("Số lượng"), in_list_view: 1, columns: 1, read_only: 1 },
+                { fieldtype: "Data", fieldname: "status", label: __("Trạng thái"), in_list_view: 1, columns: 2, read_only: 1 },
+            ],
+            data: data, // sẽ gán sau
+            get_data: () => table.df.data,
+        },
+    });
+
+    table.make();
+
+    table.refresh();
+    table.grid.display_status = "Read"
+    table.grid.wrapper.find('.grid-add-row, .grid-remove-rows, .row-check').hide();
 }
 
 frappe.views.calendar["Week Work Order"] = {

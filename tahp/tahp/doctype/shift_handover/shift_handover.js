@@ -22,10 +22,15 @@ frappe.ui.form.on("Shift Handover", {
 function setup_button(frm) {
     switch(frm.doc.workflow_state) {
         case 'Draft':
-            setup_draft_buttons(frm);
+            create_buttons(frm, [
+                { label: "Bàn giao", class: "btn-primary", handler: setup_draft_buttons},
+            ])
             break;
         case 'Handed Over':
-            setup_handed_over_buttons(frm);
+            create_buttons(frm, [
+                {label: "Nhận bàn giao", class: "btn-primary", handler: setup_handed_over_buttons},
+                {label: "Từ chối", handler: setup_decline_buttons}
+            ])
             break;
         case 'Completed':
             setup_completed_buttons(frm);
@@ -33,60 +38,86 @@ function setup_button(frm) {
     }
 }
 
+async function create_buttons(frm, buttons) {
+    if (frm.is_new() || frm.doc.docstatus !== 0) return;
+
+    const $wrapper = $(frm.fields_dict.wrapper.wrapper || null);
+    if ($wrapper) $wrapper.empty();
+    console.log($wrapper)
+
+    buttons.forEach(btn => {
+        frm.add_custom_button(__(btn.label), async () => {
+            await btn.handler(frm);
+        }).addClass(btn.class || 'btn-default');
+
+        if ($wrapper) {
+            const $mobileBtn = $(`
+                <button 
+                    class="btn ${btn.class || 'btn-default'} ellipsis w-100 d-md-none mb-3 py-2"
+                    style="font-weight: 500;"
+                >
+                    ${btn.label}
+                </button>
+            `);
+            $mobileBtn.on("click", async () => {
+                await btn.handler(frm);
+            });
+            $wrapper.append($mobileBtn);
+        }
+    });
+}
+
 // Nút cho trạng thái Draft → Handed Over
 function setup_draft_buttons(frm) {
-    frm.add_custom_button("Bàn Giao", function() {
-        frappe.confirm(
-            "Bạn có chắc chắn muốn bàn giao ca làm việc này?",
-            function() {
-                frm.selected_workflow_action = "Bàn Giao";
-                trigger_workflow_action(frm, "Handed Over");
-            }
-        );
-    }).addClass("btn-primary");
+    frappe.confirm(
+        "Bạn có chắc chắn muốn bàn giao ca làm việc này?",
+        function() {
+            frm.selected_workflow_action = "Bàn Giao";
+            trigger_workflow_action(frm, "Handed Over");
+        }
+    );
 }
 
 // Nút cho trạng thái Handed Over → Completed
 async function setup_handed_over_buttons(frm) {
-    frm.add_custom_button("Nhận bàn giao", function() {
-        frappe.confirm(
-            "Bạn có chắc chắn muốn nhận bàn giao ca làm việc này?",
-            function() {
-                frm.selected_workflow_action = "Nhận bàn giao";
-                trigger_workflow_action(frm, "Completed");
-            }
-        );
-    }).addClass("btn-primary");
-    frm.add_custom_button("Từ chối", function() {
-        frappe.prompt(
-            [
-                {
-                    label: "Lý do từ chối",
-                    fieldname: "comment",
-                    fieldtype: "Small Text",
-                    reqd: 1
-                }
-            ],
-            async function(values) {
-                frm.selected_workflow_action = "Từ chối";
-                await frappe.call({
-                    method: "tahp.tahp.doctype.shift_handover.shift_handover.reject",
-                    args: {
-                        name: frm.doc.name,
-                        comment: values.comment
-                    }
-                });
-            },
-            "Nhập lý do từ chối",
-            "Xác nhận"
-        );
-    });
+    frappe.confirm(
+        "Bạn có chắc chắn muốn nhận bàn giao ca làm việc này?",
+        function() {
+            frm.selected_workflow_action = "Nhận bàn giao";
+            trigger_workflow_action(frm, "Completed");
+        }
+    );
+}
 
+async function setup_decline_buttons(frm) {
+    frappe.prompt(
+        [
+            {
+                label: "Lý do từ chối",
+                fieldname: "comment",
+                fieldtype: "Small Text",
+                reqd: 1
+            }
+        ],
+        async function(values) {
+            frm.selected_workflow_action = "Từ chối";
+            await frappe.call({
+                method: "tahp.tahp.doctype.shift_handover.shift_handover.reject",
+                args: {
+                    name: frm.doc.name,
+                    comment: values.comment
+                }
+            });
+        },
+        "Nhập lý do từ chối",
+        "Xác nhận"
+    );
 }
 
 // Nút cho trạng thái Completed
 async function setup_completed_buttons(frm) {
-    // Nếu đã xử lý rồi thì không chạy lại nữa
+    const $wrapper = $(frm.fields_dict.wrapper.wrapper || null);
+    if ($wrapper) $wrapper.empty();
     if (frm._completed_processed) return;
 
     frm._completed_processed = true;  // flag

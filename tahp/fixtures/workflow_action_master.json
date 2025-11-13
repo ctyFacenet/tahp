@@ -58,13 +58,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-15 08:55:05.159246",
-  "name": "Duyệt",
-  "workflow_action_name": "Duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-15 11:39:59.158061",
   "name": "Xác nhận",
   "workflow_action_name": "Xác nhận"
@@ -163,8 +156,22 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
+  "modified": "2025-11-12 14:07:41.639705",
+  "name": "Dừng LSX Ca",
+  "workflow_action_name": "Dừng LSX Ca"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
   "modified": "2025-09-07 17:32:48.039604",
   "name": "Gửi KHSX",
   "workflow_action_name": "Gửi KHSX"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-15 08:55:05.159246",
+  "name": "Duyệt",
+  "workflow_action_name": "Duyệt"
  }
 ]

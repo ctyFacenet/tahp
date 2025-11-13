@@ -84,15 +84,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-09-22 14:10:10.680709",
-  "name": "Handed Over",
-  "style": "Warning",
-  "workflow_state_name": "Handed Over"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-09-15 11:51:32.381659",
   "name": "Không được KDTM chọn",
   "style": "",
@@ -201,28 +192,19 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-10-10 22:47:41.373736",
-  "name": "Đợi Quản đốc duyệt",
-  "style": "Warning",
-  "workflow_state_name": "Đợi Quản đốc duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-22 14:10:19.576199",
-  "name": "Draft",
+  "modified": "2025-11-12 14:08:45.639293",
+  "name": "Đã bị dừng",
   "style": "Danger",
-  "workflow_state_name": "Draft"
+  "workflow_state_name": "Đã bị dừng"
  },
  {
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-10-13 16:25:12.101138",
-  "name": "Bắt đầu",
-  "style": "",
-  "workflow_state_name": "Bắt đầu"
+  "modified": "2025-09-22 14:10:10.680709",
+  "name": "Handed Over",
+  "style": "Warning",
+  "workflow_state_name": "Handed Over"
  },
  {
   "docstatus": 0,
@@ -246,10 +228,19 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-09-07 19:30:40.758642",
-  "name": "Duyệt xong",
-  "style": "Success",
-  "workflow_state_name": "Duyệt xong"
+  "modified": "2025-09-22 14:10:19.576199",
+  "name": "Draft",
+  "style": "Danger",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-10 22:47:41.373736",
+  "name": "Đợi Quản đốc duyệt",
+  "style": "Warning",
+  "workflow_state_name": "Đợi Quản đốc duyệt"
  },
  {
   "docstatus": 0,
@@ -268,5 +259,23 @@
   "name": "Đợi PTCN Duyệt",
   "style": "Warning",
   "workflow_state_name": "Đợi PTCN Duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-10-13 16:25:12.101138",
+  "name": "Bắt đầu",
+  "style": "",
+  "workflow_state_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-07 19:30:40.758642",
+  "name": "Duyệt xong",
+  "style": "Success",
+  "workflow_state_name": "Duyệt xong"
  }
 ]

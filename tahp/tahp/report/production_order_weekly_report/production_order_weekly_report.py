@@ -128,8 +128,8 @@ def get_actual_vs_planned(filters=None):
         },
         fields=[
             "production_item",
-            "planned_start_date", "planned_end_date",
-            "actual_start_date", "actual_end_date",
+            "planned_start_date",
+            
             "qty", "produced_qty"
         ]
     )
@@ -138,23 +138,14 @@ def get_actual_vs_planned(filters=None):
         return {"labels": [], "items": {item: {"actual": [], "planned": []} for item in items_list}}
 
    
-    planned_dates = []
-    actual_dates = []
+    # MỚI: Chỉ lấy từ planned_start_date
+    planned_dates = [wo.planned_start_date for wo in work_orders if wo.planned_start_date]
 
-    for wo in work_orders:
-        p_dates = [d for d in [wo.planned_start_date, wo.actual_start_date] if d]
-        if p_dates:
-            planned_dates.append(min(p_dates))
-
-        a_dates = [d for d in [wo.planned_end_date, wo.actual_end_date] if d]
-        if a_dates:
-            actual_dates.append(max(a_dates))
-
-    if not planned_dates or not actual_dates:
-        return {"labels": [], "items": {item: {"actual": [], "planned": []} for item in items_list}}
+    if not planned_dates:
+        return {"labels": [], "items": {}}
 
     min_start = min(planned_dates)
-    max_end = max(actual_dates)
+    max_end = max(planned_dates)
 
     start_date = min_start.date() if hasattr(min_start, "date") else getdate(min_start)
     end_date = max_end.date() if hasattr(max_end, "date") else getdate(max_end)
