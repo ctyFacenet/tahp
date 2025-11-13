@@ -390,26 +390,40 @@ frappe.query_reports["Production Report"] = {
         let canvas_width = num_days * bar_width_per_day;
         let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320;
         
+        // Đảm bảo width tối thiểu, nhưng không giới hạn max để có thể scroll
         if (canvas_width < 300) canvas_width = 300;
-        if (canvas_width > 1200) canvas_width = 1200;
     
         // Create chart wrapper
         const chartWrapper = $(`<div class="chart-wrapper" style="
-            overflow-x: auto;
-            overflow-y: hidden;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             padding: 15px;
             margin-top: 15px;
+            width: 100%;
         ">
-            <div class="chart-container" style="
-                position: relative; 
-                height: ${canvas_height}px;
-                min-width: ${canvas_width}px;
-                width: 100%;
+            <div style="
+                overflow-x: auto;
+                overflow-y: hidden;
             ">
-                <canvas id="daily-production-chart"></canvas>
+                <div class="chart-container" style="
+                    position: relative; 
+                    height: ${canvas_height}px;
+                    width: ${canvas_width}px;
+                    min-width: ${canvas_width}px;
+                ">
+                    <canvas id="daily-production-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-note" style="
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #6c757d;
+                text-align: left;
+            ">
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao</em>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -427,6 +441,16 @@ frappe.query_reports["Production Report"] = {
         const othersPlanned = dates.map(date => daily_data[date]["Thạch cao"].planned);
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
+        
+        // Tính phần trăm hoàn thành cho mỗi ngày (Thạch cao)
+        const completionPercentages = dates.map((date, index) => {
+            const planned = othersPlanned[index];
+            const actual = othersActual[index];
+            if (planned > 0) {
+                return Math.round((actual / planned) * 100);
+            }
+            return 0;
+        });
     
         // Calculate maximum values and expand Y axis (separate for bars and lines, giống production_schedule.js)
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
@@ -456,13 +480,63 @@ frappe.query_reports["Production Report"] = {
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
     
+        // Plugin tùy chỉnh để hiển thị label phần trăm hoàn thành
+        const percentageLabelPlugin = {
+            id: 'percentageLabel',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                const meta0 = chart.getDatasetMeta(0); // Thực tế Thạch cao
+                const meta1 = chart.getDatasetMeta(1); // Kế hoạch Thạch cao (phần còn lại)
+                
+                ctx.save();
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#2c3e50';
+                
+                meta0.data.forEach((bar, index) => {
+                    const percentage = completionPercentages[index];
+                    if (percentage !== undefined && percentage !== null) {
+                        const x = bar.x;
+                        // Lấy đỉnh của stack bar (tổng của planned + actual)
+                        // Trong stacked bar, dataset 1 (kế hoạch) được vẽ trên dataset 0 (thực tế)
+                        // Nên đỉnh của dataset 1 chính là đỉnh của stack bar
+                        const plannedBar = meta1.data[index];
+                        let topY;
+                        if (plannedBar && plannedBar.y !== null) {
+                            // Đỉnh của stack bar là đỉnh của cột kế hoạch (y nhỏ hơn = cao hơn)
+                            topY = plannedBar.y;
+                        } else if (bar.y !== null) {
+                            // Nếu không có phần kế hoạch, dùng đỉnh của cột thực tế
+                            topY = bar.y;
+                        } else {
+                            return; // Bỏ qua nếu không có dữ liệu
+                        }
+                        // Hiển thị label ở trên đỉnh của stack bar (5px phía trên)
+                        ctx.fillText(`${percentage}%`, x, topY - 5);
+                    }
+                });
+                
+                ctx.restore();
+            }
+        };
+    
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
+            plugins: [percentageLabelPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 15,
+                        left: 10,
+                        right: 10
+                    }
+                },
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -483,9 +557,16 @@ frappe.query_reports["Production Report"] = {
                     },
                     legend: { 
                         position: 'top',
+                        align: 'start',
+                        padding: {
+                            top: 0,
+                            bottom: 5,
+                            left: 10
+                        },
                         labels: {
                             usePointStyle: true,
                             pointStyle: 'line',
+                            padding: 8,
                             generateLabels: function(chart) {
                                 const original = Chart.defaults.plugins.legend.labels.generateLabels;
                                 const labels = original.call(this, chart);
@@ -506,18 +587,38 @@ frappe.query_reports["Production Report"] = {
                         display: true, 
                         text: 'Sản lượng sản xuất theo ngày' ,
                         font: {
-                            size: 22,
+                            size: window.innerWidth < 768 ? 18 : window.innerWidth < 1024 ? 22 : 26,
                             weight: 'bold'
                         },
-                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        align: 'start',
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10
+                        }
                     },
     
                 },
                 scales: {
                     x: {
+                        type: 'category',
+                        stacked: true,
                         grid: { 
                             drawOnChartArea: false,
+                            offset: true
                         },
+                        ticks: { 
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
+                            align: 'center',
+                            crossAlign: 'center',
+                            font: {
+                                size: 9
+                            },
+                            padding: 5
+                        },
+                        offset: true
                     },
                     y: {
                         stacked: true,

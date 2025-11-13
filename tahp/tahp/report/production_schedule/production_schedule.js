@@ -456,8 +456,6 @@ frappe.query_reports["Production Schedule"] = {
         // Xóa wrapper cũ trước khi tạo mới để không bị trùng lặp
         container.find('.chart-wrapper').remove();
         const chartWrapper = $(`<div class="chart-wrapper" style="
-            overflow-x: auto;
-            overflow-y: hidden;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
@@ -465,13 +463,28 @@ frappe.query_reports["Production Schedule"] = {
             margin-top: 15px;
             width: 100%;
         ">
-            <div class="chart-container" style="
-                position: relative; 
-                height: ${canvas_height}px;
-                width: ${canvas_width}px;
-                min-width: ${canvas_width}px;
+            <div style="
+                overflow-x: auto;
+                overflow-y: hidden;
             ">
-                <canvas id="week-plan-chart"></canvas>
+                <div class="chart-container" style="
+                    position: relative; 
+                    height: ${canvas_height}px;
+                    width: ${canvas_width}px;
+                    min-width: ${canvas_width}px;
+                ">
+                    <canvas id="week-plan-chart"></canvas>
+                </div>
+            </div>
+            <div class="chart-note" style="
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #6c757d;
+                text-align: left;
+            ">
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao</em>
             </div>
         </div>`);
         container.append(chartWrapper);

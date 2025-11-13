@@ -390,7 +390,13 @@ def get_data(planned_data, columns):
             actual_qty = wwo_info.get(fieldname, {}).get("actual_qty", 0)
             
             if actual_qty > 0 or planned_qty > 0:
-                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"
+                # Calculate percentage if planned_qty > 0
+                percentage_html = ""
+                if planned_qty > 0:
+                    percentage = round((actual_qty / planned_qty) * 100)
+                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                
+                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
                 total_summary[fieldname]["planned"] += planned_qty
                 total_summary[fieldname]["actual"] += actual_qty
             else:
@@ -405,7 +411,13 @@ def get_data(planned_data, columns):
             planned_total = total_summary[fieldname]["planned"]
             
             if actual_total > 0 or planned_total > 0:
-                total_row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_total)}</b> / {frappe.utils.fmt_money(planned_total)}</div>"
+                # Calculate percentage if planned_total > 0
+                percentage_html = ""
+                if planned_total > 0:
+                    percentage = round((actual_total / planned_total) * 100)
+                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                
+                total_row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_total)}</b> / {frappe.utils.fmt_money(planned_total)}{percentage_html}</div>"
             else:
                  total_row[fieldname] = "<div style='text-align: right;'>0 / 0</div>"
                  

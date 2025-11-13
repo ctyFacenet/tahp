@@ -124,8 +124,14 @@ def get_data(work_orders, columns):
             actual_qty = data_by_date[date][fieldname]["actual"]
             
             if actual_qty > 0 or planned_qty > 0:
+                # Calculate percentage if planned_qty > 0
+                percentage_html = ""
+                if planned_qty > 0:
+                    percentage = round((actual_qty / planned_qty) * 100)
+                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                
                 # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: center;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"
+                row[fieldname] = f"<div style='text-align: center;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
                 total_summary[fieldname]["planned"] += planned_qty
                 total_summary[fieldname]["actual"] += actual_qty
             else:
