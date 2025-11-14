@@ -11,13 +11,7 @@ frappe.ui.form.on('Week Work Order', {
 	    validate_roles(frm);
 	    show_duplicate(frm);
 	    await update_quantity(frm);
-        
-        if (frm.doc.docstatus === 1) {
-            const has_incomplete_row = (frm.doc.items || []).some(row => (row.got_qty || 0) < (row.qty || 0));
-            if (has_incomplete_row) {
-                frm.add_custom_button('Tạo LSX Ca', () => open_create_shift_dialog(frm)).addClass("btn-primary");
-            }
-        }
+        await stop_wwo(frm);
 
 		frm.fields_dict['items'].grid.get_field('bom').get_query = function (doc, cdt, cdn) {
             let row = locals[cdt][cdn];
@@ -678,13 +672,13 @@ async function update_quantity(frm) {
 
     if (frm.doc.docstatus === 1) {
         const has_incomplete_row = (frm.doc.items || []).some(row => (row.got_qty || 0) < (row.qty || 0));
-        if (has_incomplete_row) {
+        if (has_incomplete_row && frm.doc.wo_status != "Stopped") {
             frm.add_custom_button('Tạo LSX Ca', () => open_create_shift_dialog(frm)).addClass("btn-primary");
         }
     }
 
-    if (data.length === 0) return
     frm.fields_dict.wrapper.$wrapper.empty();
+    if (data.length === 0) return
     let table = new frappe.ui.form.ControlTable({
         parent: frm.fields_dict.wrapper.$wrapper,
         df: {
@@ -710,6 +704,24 @@ async function update_quantity(frm) {
     table.refresh();
     table.grid.display_status = "Read"
     table.grid.wrapper.find('.grid-add-row, .grid-remove-rows, .row-check').hide();
+}
+
+async function stop_wwo(frm) {
+    if (frm.is_new() || frm.doc.workflow_state != "Duyệt xong" || frm.doc.wo_status === "Stopped") return;
+
+    frm.add_custom_button("Dừng LSX", async () => {
+        frappe.confirm(
+            'Bạn có chắc chắn muốn dừng LSX này không?',
+            async () => {
+                let response = await frappe.xcall(
+                    "tahp.tahp.doctype.week_work_order.week_work_order.stop",
+                    { wwo: frm.doc.name }
+                );
+                await update_quantity(frm);
+            },
+            () => {}
+        );
+    });
 }
 
 frappe.views.calendar["Week Work Order"] = {

@@ -3,18 +3,18 @@ frappe.listview_settings['Work Order'] = {
     add_fields: ["workflow_state", "status"],
     get_indicator: function (doc) {
         const state = doc.workflow_state || "Nháp";
-        const status = doc.tatus || "Nháp";
+        const status = doc.status || "Nháp";
 
         if (doc.docstatus === 0) {
             if (doc.workflow_state === "Draft") return ["Nháp", "red", `workflow_state,=,Draft`]
             else if (doc.workflow_state === "Đợi Quản đốc duyệt") return ["Đợi Quản đốc duyệt", "orange", `workflow_state,=,Đợi Quản đốc duyệt`]
             else if (doc.workflow_state === "Duyệt xong") return ["Duyệt xong", "yellow", `workflow_state,=,Duyệt xong`] 
-            else if (doc.workflow_state === "Đã bị dừng") return ["Đã bị dừng", "red", `workflow_state,=,Đã bị dừng`]
+            else if (doc.workflow_state === "Đã bị dừng") return ["Đã bị dừng", "gray", `workflow_state,=,Đã bị dừng`]
         } else if (doc.docstatus === 1) {
-            if (doc.status === "In Process") return ["Đang sản xuất", "purple", `status,=,In Process`]
+            if (doc.status === "In Process") return ["Đang sản xuất", "blue", `status,=,In Process`]
             else if (doc.status === "Completed") return ["Hoàn thành", "green", `status,=,Completed`]
         } else {
-            return ["Đã hủy bỏ", "red", `docstatus,=,2`]
+            return ["Đã hủy bỏ", "gray", `docstatus,=,2`]
         }
     },
     refresh: function(listview){
