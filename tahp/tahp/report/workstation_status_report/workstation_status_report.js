@@ -213,7 +213,7 @@ frappe.query_reports["Workstation Status Report"] = {
 
 	
     get_datatable_options(options) {
-        return { ...options, headerBackground: "rgba(205, 222, 238, 1)"};
+        return { ...options};
     }
 };
 
@@ -235,14 +235,14 @@ async function execute_summary(report) {
         let html = `
             <div style="overflow-x:auto; width:100%;">
                 <table class="table table-bordered text-center" 
-                       style="min-width:100%; border-collapse: collapse; white-space: nowrap; border:1px solid #b6b6b6;">
-                    <thead style="background-color: rgb(205, 222, 238); font-weight: bold;">
+                       style="min-width:100%; border-collapse: collapse; white-space: nowrap;">
+                    <thead style="background-color: rgb(202, 235, 255); font-weight: bold;">
                         <tr>
         `;
 
         // header
         columns.forEach(col => {
-            html += `<th style="padding:5px 12px; border:1px solid #b6b6b6 !important;">${col.label}</th>`;
+            html += `<th style="padding:5px 12px;">${col.label}</th>`;
         });
         html += `</tr></thead><tbody>`;
 
@@ -257,18 +257,18 @@ async function execute_summary(report) {
             } else if (status === "Đang tắt") {
                 rowStyle = "background-color:rgba(238, 238, 238, 1);";
             } else if (status === "Tổng số máy") {
-                rowStyle = "background-color:rgb(205, 222, 238);";
+                rowStyle = "background-color:rgb(202, 235, 255)";
             }
 
             html += `<tr style="${rowStyle}">`;
 
             columns.forEach((col, idx) => {
                 let cellValue = row[col.fieldname] || "";
-                let cellStyle = "padding:5px; border:1px solid #b6b6b6; text-align:center; font-weight:bold;";
+                let cellStyle = "padding:5px;text-align:center; font-weight:bold;";
 
                 // cột đầu tiên luôn có nền
                 if (idx === 0) {
-                    cellStyle += " background-color: rgb(205, 222, 238);";
+                    cellStyle += " background-color: rgb(202, 235, 255)";
                 }
 
                 // sự cố / bảo trì: highlight ô > 0

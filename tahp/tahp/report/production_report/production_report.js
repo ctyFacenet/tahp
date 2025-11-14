@@ -27,7 +27,7 @@ frappe.query_reports["Production Report"] = {
     ],
 
     get_datatable_options(options) {
-        return { ...options, freezeIndex: 2, headerBackground: "rgb(205, 222, 238)"};
+        return { ...options, freezeIndex: 2};
     },
 
     "onload": function(report) {

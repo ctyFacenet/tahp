@@ -144,10 +144,10 @@
             </div>
 
             {# Content Section #}
-            <div style="background: {% if approved %} rgba(219, 255, 235, 1) {% else %} rgba(241, 241, 241, 1) {% endif %}; padding: 12px;">
+            <div style="background: {% if approved %} rgba(219, 255, 235, 1) {% else %} rgba(245, 245, 245, 1) {% endif %}; padding: 12px;">
                 {% for row in data %}
                     <div data-idx="{{row.idx - 1}}" data-role="mobile-row" class="mb-3 rounded" style="background: white; overflow: hidden;">
-                        <div class="p-3" style="background:{% if approved %} rgb(120, 255, 180) {% else %} rgba(226, 226, 226, 1);{% endif %}">
+                        <div class="p-3" style="background:{% if approved %} rgb(120, 255, 180) {% else %} rgba(236, 236, 236, 1);{% endif %}">
                             {% if 'item_code' in edit_fields %}
                                 <div class="mb-2">
                                     <span>Tên mặt hàng:</span>

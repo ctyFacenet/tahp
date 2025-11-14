@@ -59,7 +59,7 @@ frappe.query_reports["Material Consumption"] = {
     original_columns: null,
 
     get_datatable_options(options) {
-        return { ...options, freezeIndex: 4, headerBackground: "rgb(205, 222, 238)"};
+        return { ...options, freezeIndex: 4};
     },
     
     "onload": function(report) {
