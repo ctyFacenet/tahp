@@ -245,50 +245,34 @@ def get_workstations(job_card):
     result = []
     doc = frappe.get_doc("Job Card", job_card)
     workstation = frappe.get_doc("Workstation", doc.workstation)
-    if workstation.custom_is_parent:
-        all_problem = 0
-        all_busy = 0
-        children = frappe.db.get_all("Workstation", filters={"custom_parent": doc.workstation}, fields=["name", "status"])
-        for child in children:
-            if child.status == "Off":
-                result.append({
-                    "workstation": child.name,
-                    "status": "Sẵn sàng"
-                })
-            elif child.status in ["Problem", "Maintenance"]:
-                all_problem += 1
-            elif child.status == "Production":
-                all_busy += 1
 
-        if all_problem == len(children):
-            frappe.throw("Tất cả các máy trong cụm đều đang hỏng và đang được bảo trì")
-        if all_busy == len(children):
-            frappe.throw("Tất cả các máy trong cụm đều đang bận")
-    else:
-        if workstation.status == "Production":
-            print("hello")
-            wip_count = frappe.db.count(
-                "Job Card",
-                filters={
-                    "workstation": doc.workstation,
-                    "status": "Work In Progress",
-                    "name": ["!=", doc.name]
-                }
-            )
-            if wip_count >= workstation.production_capacity:
-                frappe.throw(f"Thiết bị {workstation.name} đã đạt tối đa công suất")
-            else:
-                result.append({
-                    "workstation": workstation.name,
-                    "status": "Sẵn sàng"
-                })
-        elif workstation.status == "Hỏng":
-            frappe.throw(f"Thiết bị {workstation.name} đang bị hỏng")
-        elif workstation.status == "Off":
+    if workstation.custom_is_parent:
+        children = frappe.db.get_all(
+            "Workstation",
+            filters={"custom_parent": doc.workstation},
+            fields=["name", "status"]
+        )
+
+        for child in children:
+            if child.status == "Hỏng":
+                continue
+            
             result.append({
-                "workstation": workstation.name,
+                "workstation": child.name,
                 "status": "Sẵn sàng"
-            })            
+            })
+
+        if not result:
+            frappe.throw("Không có máy con nào khả dụng trong cụm")
+
+    else:
+        if workstation.status == "Hỏng":
+            frappe.throw(f"Thiết bị {workstation.name} đang bị hỏng")
+
+        result.append({
+            "workstation": workstation.name,
+            "status": "Sẵn sàng"
+        })
 
     return result
 
