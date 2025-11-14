@@ -81,7 +81,7 @@ export default class ColumnManager {
                 // Nếu i === 0 thì không gán width
                 const styleAttr = (i === 0)
                     ? `${styleHeader};border-bottom: 1px solid var(--dt-border-color);`
-                    : `width:${totalWidth}px;${styleHeader};border-bottom: 1px solid var(--dt-border-color);`;
+                    : `width:${totalWidth - 1}px;${styleHeader};border-bottom: 1px solid var(--dt-border-color);`;
 
                 cells.push(`<div 
                     class="dt-cell-span dt-cell dt-cell--header py-2 ${freezeLeft} ${extraClass}"

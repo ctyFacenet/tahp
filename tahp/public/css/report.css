@@ -219,8 +219,8 @@
 }
 
 .dt-cell {
-  border: 1px solid #d1d8dd;
-  border: 1px solid var(--dt-border-color);
+  /* border: 1px solid var(--dt-border-color); */
+  border: none !important;
   border-bottom: none;
   border-right: none;
   position: relative;

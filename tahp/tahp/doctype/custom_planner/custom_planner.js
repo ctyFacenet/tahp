@@ -198,6 +198,20 @@ frappe.ui.form.on("Custom Planner", {
                 return;
             }
 
+            // Tính tổng tiêu hao dự kiến và thêm dòng đầu
+            let total_consumption = 0;
+            for (let material of items) {
+                total_consumption += (material.qty || 0) * (item.qty || 0);
+            }
+
+            const total_html = `
+                <div class="d-flex justify-content-between align-items-center fw-bold" style="margin-bottom:0.5rem;">
+                    <div>Tiêu hao dự kiến</div>
+                </div>
+            `;
+            $el.append(total_html);
+
+            // Render từng material
             for (let material of items) {
                 const name_html = is_mobile
                     ? `${material.item_code} - ${material.item_name}`
@@ -206,7 +220,7 @@ frappe.ui.form.on("Custom Planner", {
                 const html = `
                     <div class="d-flex justify-content-between align-items-center" style="color: grey;">
                         <div>${name_html}</div>
-                        <div>${material.qty} ${material.stock_uom}</div>
+                        <div>${material.qty * (item.qty || 0)} ${material.stock_uom}</div>
                     </div>
                 `;
                 $el.append(html);
