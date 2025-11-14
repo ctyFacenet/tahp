@@ -368,11 +368,38 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                             const index = elements[0].index;
                             const workOrders = workOrdersMap[index].workOrders;
                             if (workOrders.length > 0) {
-                                frappe.set_route("List", "Work Order", { "name": ["in", workOrders] });
+                                const url = `/app/work-order?name=["in",${JSON.stringify(workOrders)}]`;
+                                window.open(url, '_blank');
                             }
                         }
                     }
                 },
+            });
+
+
+            // Thêm event listener để click vào label trên trục Y
+            const canvas = document.getElementById("chart-category");
+            canvas.style.cursor = 'pointer';
+            canvas.addEventListener('click', (evt) => {
+                const chart = this.charts.category;
+                const rect = canvas.getBoundingClientRect();
+                const x = evt.clientX - rect.left;
+                const y = evt.clientY - rect.top;
+                
+                // Kiểm tra xem click có nằm trong vùng trục Y không
+                const yAxis = chart.scales.y;
+                if (x < yAxis.right && x > yAxis.left && y > yAxis.top && y < yAxis.bottom) {
+                    // Tìm index của label được click
+                    const clickedIndex = Math.floor((y - yAxis.top) / (yAxis.height / chartLabels.length));
+                    
+                    if (clickedIndex >= 0 && clickedIndex < chartLabels.length) {
+                        const workOrders = workOrdersMap[clickedIndex].workOrders;
+                        if (workOrders.length > 0) {
+                            const url = `/app/work-order?name=["in",${JSON.stringify(workOrders)}]`;
+                            window.open(url, '_blank');
+                        }
+                    }
+                }
             });
         }
 
@@ -682,7 +709,8 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                             }
 
                             if (wo_list.length > 0) {
-                                frappe.set_route("List", "Work Order", { name: ["in", wo_list] });
+                                const url = `/app/work-order?name=["in",${JSON.stringify(wo_list)}]`;
+                                window.open(url, '_blank');
                             } else {
                                 frappe.msgprint("Không có LSX ca nào trong danh sách này.");
                             }
@@ -694,18 +722,13 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
 
         if (response.bom_overall) {
             let bom = response.bom_overall;
-            let bomDates = Object.keys(bom).sort(); // sắp xếp ngày
-            let items = [...new Set(bomDates.flatMap(d => Object.keys(bom[d])))]; // tất cả item xuất hiện bất kỳ ngày nào
-
-            // container chứa các chart
+            let bomDates = Object.keys(bom).sort();
+            let items = [...new Set(bomDates.flatMap(d => Object.keys(bom[d])))];
             const container = document.getElementById("charts-container");
-            container.innerHTML = ""; // reset container
-
-            // Màu cho Produced_qty - luôn dùng màu thứ 2
+            container.innerHTML = "";
             let producedColor = modernColors[1];
 
             items.forEach((item, i) => {
-                // Tìm label + unit từ ngày đầu tiên có dữ liệu
                 let itemLabel = item;
                 let itemUnit = "";
                 for (let d of bomDates) {
@@ -716,17 +739,13 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                     }
                 }
 
-                // Tạo div cho chart
                 const chartDiv = document.createElement("div");
                 chartDiv.className = "bom-chart-wrapper"; 
-                chartDiv.style.width = "100%";
-                chartDiv.style.maxWidth = "800px";
                 chartDiv.style.height = "250px";
                 const canvas = document.createElement("canvas");
                 chartDiv.appendChild(canvas);
                 container.appendChild(chartDiv);
 
-                // Dataset
                 let qtyColor = modernColors[(i + 2) % modernColors.length];
                 const datasets = [
                     {
@@ -804,7 +823,8 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                     : (dayData.work_order_norm || []);
 
                                 if (wo_list.length > 0) {
-                                    frappe.set_route("List", "Work Order", { name: ["in", wo_list] });
+                                    const url = `/app/work-order?name=["in",${JSON.stringify(wo_list)}]`;
+                                    window.open(url, '_blank');
                                 } else {
                                     frappe.msgprint("Không có LSX nào trong danh sách này.");
                                 }

@@ -1,11 +1,11 @@
 <div class="container-fluid dashboard-wrapper">
-  <div class="d-flex flex-wrap" style="gap: 10px;">
+  <div class="d-flex flex-wrap" style="gap: 10px; margin: 0 -5px;">
 
     <!-- Cột 1: Main + Sub Card -->
-    <div class="d-flex flex-column" style="flex: 1; min-width: 280px; gap: 10px;">
+    <div class="d-flex flex-column" style="flex: 1 1 280px; min-width: 0; gap: 10px; padding: 0 5px;">
       <!-- Main Card -->
       <div class="card flex-fill">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="card-title mb-0 main-label">Chưa có</h5>
             <span class="main-change text-success">0</span>
@@ -23,7 +23,7 @@
 
       <!-- Sub Card -->
       <div class="card flex-fill">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h5 class="card-title mb-0 sub-label">Chưa có</h5>
             <span class="sub-change text-danger">0</span>
@@ -41,11 +41,11 @@
     </div>
 
     <!-- Cột 2: Chart Category -->
-    <div class="d-flex flex-column" style="flex: 1.8; min-width: 280px;">
+    <div class="d-flex flex-column" style="flex: 1.8 1 280px; min-width: 0; padding: 0 5px;">
       <div class="card flex-fill">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <h5 class="card-title category-title">Sản lượng mặt hàng theo hệ</h5>
-          <div class="chart-container" style="position: relative; height:320px;">
+          <div class="chart-container" style="position: relative; height:320px; min-width: 250px;">
             <canvas id="chart-category"></canvas>
           </div>
         </div>
@@ -53,9 +53,9 @@
     </div>
 
     <!-- Cột 3: Chart Attribute + Select -->
-    <div class="d-flex flex-column" style="flex: 1.2; min-width: 300px;">
+    <div class="d-flex flex-column" style="flex: 1.2 1 280px; min-width: 0; padding: 0 5px;">
       <div class="card flex-fill">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <!-- Hàng trên: Tiêu đề + Select -->
           <div class="d-flex justify-content-between align-items-center mb-1">
             <h5 class="card-title attribute-title">Sản lượng hoàn thành</h5>
@@ -65,7 +65,7 @@
           </div>
 
           <!-- Hàng dưới: Biểu đồ -->
-          <div class="chart-container" style="position: relative; height:300px;">
+          <div class="chart-container" style="position: relative; height:300px; min-width: 250px;">
             <canvas id="chart-attribute"></canvas>
           </div>
         </div>
@@ -79,9 +79,9 @@
   <div class="row g-3 mt-3">
     <div class="col-12">
       <div class="card h-100">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <h5 class="card-title">Báo cáo sản lượng sản xuất</h5>
-          <div class="chart-container" style="position: relative; height:350px;">
+          <div class="chart-container" style="position: relative; height:350px; min-width: 400px;">
             <canvas id="chart-manufacturing"></canvas>
           </div>
         </div>
@@ -93,14 +93,29 @@
   <div class="row g-3 mt-3">
     <div class="col-12">
       <div class="card h-100">
-        <div class="card-body">
+        <div class="card-body" style="overflow-x: auto;">
           <h5 class="card-title bom-title">Báo cáo tiêu hao NVL / 1 tấn thành phẩm</h5>
-          <div id="charts-container" class="charts-container" style="position: relative;display: flex;flex-wrap: wrap;justify-content: space-around;">
+          <div id="charts-container" class="charts-container" style="position: relative;display: flex;flex-wrap: wrap;justify-content: space-around; min-width: 400px;">
             <!-- JS sẽ tạo canvas cho từng mặt hàng vào đây -->
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <style>
+    /* Đảm bảo responsive tốt hơn trên mobile */
+    @media (max-width: 768px) {
+      .dashboard-wrapper > .d-flex {
+        gap: 10px !important;
+        margin: 0 !important;
+      }
+      
+      .dashboard-wrapper > .d-flex > div {
+        flex: 1 1 100% !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
 
 </div>
