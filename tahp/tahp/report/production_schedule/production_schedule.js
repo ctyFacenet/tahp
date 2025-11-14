@@ -473,7 +473,7 @@ frappe.query_reports["Production Schedule"] = {
                     width: ${canvas_width}px;
                     min-width: ${canvas_width}px;
                 ">
-                    <canvas id="week-plan-chart"></canvas>
+                    <canvas id="week-plan-chart" style="cursor: pointer;"></canvas>
                 </div>
             </div>
             <div class="chart-note" style="
@@ -484,7 +484,7 @@ frappe.query_reports["Production Schedule"] = {
                 color: #6c757d;
                 text-align: left;
             ">
-                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao</em>
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Order.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -573,14 +573,34 @@ frappe.query_reports["Production Schedule"] = {
             }
         };
 
-        const ctx = document.getElementById('week-plan-chart').getContext('2d');
-        new Chart(ctx, {
+        const canvas = document.getElementById('week-plan-chart');
+        const ctx = canvas.getContext('2d');
+        
+        const chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
             plugins: [percentageLabelPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, activeElements) => {
+                    // Handle click on chart elements
+                    if (activeElements && activeElements.length > 0) {
+                        const clickedElement = activeElements[0];
+                        const dataIndex = clickedElement.index;
+                        const wwo_name = wwo_names[dataIndex];
+                        
+                        // Show notification
+                        frappe.show_alert({
+                            message: __(`Đang mở Week Work Order ${wwo_name}...`),
+                            indicator: 'blue'
+                        }, 2);
+                        
+                        // Open Week Work Order form in new tab
+                        const wwo_url = `/app/week-work-order/${encodeURIComponent(wwo_name)}`;
+                        window.open(wwo_url, '_blank');
+                    }
+                },
                 layout: {
                     padding: {
                         top: 20,
@@ -591,28 +611,31 @@ frappe.query_reports["Production Schedule"] = {
                 },
                 plugins: {
 					tooltip: {
-						callbacks: {
-							label: function(context) {
-								let label = context.dataset.label || '';
-								
-								if (label) {
-									label += ': ';
-								}
-								
-								// Nếu là dataset "Kế hoạch (Thạch cao)", hiển thị giá trị gốc
-								if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
-									const originalValue = context.dataset.originalPlanned[context.dataIndex];
-									label += originalValue.toLocaleString('en-US') + ' Tấn';
-								} else {
-									// Các dataset khác hiển thị bình thường
-									if (context.parsed.y !== null) {
-										label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
-									}
-								}
-								
-								return label;
-							}
-                    	}
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                
+                                if (label) {
+                                    label += ': ';
+                                }
+                                
+                                // Nếu là dataset "Kế hoạch (Thạch cao)", hiển thị giá trị gốc
+                                if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
+                                    const originalValue = context.dataset.originalPlanned[context.dataIndex];
+                                    label += originalValue.toLocaleString('en-US') + ' Tấn';
+                                } else {
+                                    // Các dataset khác hiển thị bình thường
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
+                                    }
+                                }
+                                
+                                return label;
+                            },
+                            footer: function(tooltipItems) {
+                                return 'Click để xem chi tiết Week Work Order';
+                            }
+                        }
 					},
                     legend: { 
                         position: 'top',
