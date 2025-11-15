@@ -13,6 +13,10 @@ frappe.query_reports["Material Consumption"] = {
             "fieldname": "from_date",
             "label": __("Từ ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), 1);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Material Consumption"].handle_date_range_change();
             }
@@ -21,16 +25,12 @@ frappe.query_reports["Material Consumption"] = {
             "fieldname": "to_date",
             "label": __("Đến ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Material Consumption"].handle_date_range_change();
-            }
-        },
-        {
-            "fieldname": "week",
-            "label": __("Tuần"),
-            "fieldtype": "Date",
-            "on_change": function() {
-                frappe.query_reports["Material Consumption"].handle_week_change();
             }
         },
         {
@@ -142,7 +142,6 @@ frappe.query_reports["Material Consumption"] = {
         let previous_values = {
             from_date: report.get_filter_value("from_date"),
             to_date: report.get_filter_value("to_date"),
-            week: report.get_filter_value("week"),
             month: report.get_filter_value("month"),
             year: report.get_filter_value("year")
         };
@@ -164,7 +163,6 @@ frappe.query_reports["Material Consumption"] = {
 
         report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
         report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
-        report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
         report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
         report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
 
@@ -191,7 +189,6 @@ frappe.query_reports["Material Consumption"] = {
         const to_date = frappe.query_report.get_filter_value("to_date");
         
         if (from_date || to_date) {
-            frappe.query_report.set_filter_value("week", "", false);
             frappe.query_report.set_filter_value("month", "", false);
         }
         
@@ -205,34 +202,6 @@ frappe.query_reports["Material Consumption"] = {
         }, 500);
     },
 
-    "handle_week_change": function() {
-        const week_value = frappe.query_report.get_filter_value("week");
-        
-        if (week_value) {
-            frappe.query_report.set_filter_value("from_date", "", false);
-            frappe.query_report.set_filter_value("to_date", "", false);
-            frappe.query_report.set_filter_value("month", "", false);
-            
-            const selected_date = frappe.datetime.str_to_obj(week_value);
-            const monday = this.getMonday(selected_date);
-            const sunday = this.getSunday(monday);
-            
-            frappe.show_alert({
-                message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
-                indicator: 'blue'
-            }, 5);
-            
-            this.selected_material = null; // Reset filter
-            frappe.query_report.refresh();
-            setTimeout(() => {
-                if (!this.isDrawing) {
-                    this.draw_chart();
-                }
-                this.override_report_title(frappe.query_report);
-            }, 500);
-        }
-    },
-
     "handle_month_year_change": function() {
         const month_value = frappe.query_report.get_filter_value("month");
         const year_value = frappe.query_report.get_filter_value("year");
@@ -240,7 +209,6 @@ frappe.query_reports["Material Consumption"] = {
         if (month_value) {
             frappe.query_report.set_filter_value("from_date", "", false);
             frappe.query_report.set_filter_value("to_date", "", false);
-            frappe.query_report.set_filter_value("week", "", false);
             
             frappe.show_alert({
                 message: __(`Đã chọn tháng ${month_value}/${year_value}`),
@@ -256,19 +224,6 @@ frappe.query_reports["Material Consumption"] = {
                 this.override_report_title(frappe.query_report);
             }, 500);
         }
-    },
-
-    "getMonday": function(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(d.setDate(diff));
-    },
-
-    "getSunday": function(monday) {
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        return sunday;
     },
 
     "override_report_title": function(report) {
@@ -377,19 +332,22 @@ frappe.query_reports["Material Consumption"] = {
 
         // Tính toán chiều rộng dựa vào số lượng cột
         const numBars = material_summary_data.length;
-        let chartHeight = 400;
-        let minWidth = 600;
+        let chartHeight = 450; // Tăng chiều cao để có không gian cho labels
+        let minWidth = 800; // Tăng chiều rộng tối thiểu
         
-        // Nếu chỉ có 1 cột, giảm chiều rộng tối thiểu
+        // Điều chỉnh dựa trên số lượng cột
         if (numBars === 1) {
-            minWidth = 300;
-            chartHeight = 350;
-        } else if (numBars <= 3) {
             minWidth = 400;
+            chartHeight = 400;
+        } else if (numBars <= 3) {
+            minWidth = 600;
+        } else if (numBars > 5) {
+            // Với nhiều cột, tăng chiều rộng để tránh labels dính nhau
+            minWidth = Math.max(800, numBars * 120);
         }
 
         const chartContainer = $(`<div class="chart-container chart-3" style="position: relative; height: ${chartHeight}px; width: 100%; margin-bottom: 40px; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-            <div style="min-width: ${minWidth}px; width: 100%; height: 100%;">
+            <div style="min-width: ${minWidth}px; width: 100%; height: 100%; padding-bottom: 20px;">
                 <canvas id="percentageChart" style="width: 100%; height: 100%;"></canvas>
             </div>
         </div>`);
@@ -482,7 +440,7 @@ frappe.query_reports["Material Consumption"] = {
         const self = this;
         
         // Tính toán barPercentage dựa vào số lượng cột
-        let barPercentage = 0.8;
+        let barPercentage = 0.7;
         let categoryPercentage = 0.8;
         
         if (numBars === 1) {
@@ -511,6 +469,14 @@ frappe.query_reports["Material Consumption"] = {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 20,
+                        bottom: 30 // Tăng padding dưới để có không gian cho labels
+                    }
+                },
                 onClick: function(event, activeElements) {
                     if (activeElements.length > 0 && !self.isDrawing) {
                         const index = activeElements[0].index;
@@ -547,14 +513,54 @@ frappe.query_reports["Material Consumption"] = {
                 scales: {
                     x: { 
                         ticks: { 
-                            autoSkip: false, 
-                            maxRotation: numBars === 1 ? 0 : 45,
-                            minRotation: 0 
+                            autoSkip: false,
+                            maxRotation: 0,
+                            minRotation: 0,
+                            padding: 5,
+                            align: 'center',
+                            crossAlign: 'center',
+                            font: {
+                                size: 11
+                            },
+                            // Callback để wrap text nếu quá dài
+                            callback: function(value, index) {
+                                const label = this.getLabelForValue(value);
+                                // Nếu label quá dài (>25 ký tự), chia thành nhiều dòng
+                                if (label.length > 25) {
+                                    const words = label.split(' ');
+                                    const lines = [];
+                                    let currentLine = '';
+                                    
+                                    words.forEach(word => {
+                                        const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                                        if (testLine.length > 20) {
+                                            if (currentLine) lines.push(currentLine);
+                                            currentLine = word;
+                                        } else {
+                                            currentLine = testLine;
+                                        }
+                                    });
+                                    if (currentLine) lines.push(currentLine);
+                                    return lines;
+                                }
+                                return label;
+                            }
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
                         beginAtZero: true,
-                        ticks: { callback: function(value) { return value + '%'; } },
+                        ticks: { 
+                            callback: function(value) { return value + '%'; },
+                            font: {
+                                size: 11
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
                     }
                 },
                 plugins: {
@@ -563,12 +569,25 @@ frappe.query_reports["Material Consumption"] = {
                         text: self.selected_material 
                             ? `Tỷ lệ Tiêu hao: ${self.selected_material} - Click để bỏ lọc`
                             : 'Biểu đồ Tỷ lệ Tiêu hao Thực tế / Định mức (%) - Click để lọc',
-                        font: { size: 18 }
+                        font: { 
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
                     },
                     legend: {
                         display: true,
                         position: 'bottom',
+                        align: 'center',
                         labels: {
+                            boxWidth: 12,
+                            padding: 10,
+                            font: {
+                                size: 10
+                            },
                             generateLabels: function(chart) {
                                 const data = chart.data;
                                 if (data.labels.length && data.datasets.length) {
@@ -577,8 +596,13 @@ frappe.query_reports["Material Consumption"] = {
                                     const borderColors = data.datasets[0].borderColor;
                                     
                                     return labels.map((label, index) => {
+                                        // Rút ngắn label nếu quá dài trong legend
+                                        let displayLabel = label;
+                                        if (label.length > 35) {
+                                            displayLabel = label.substring(0, 32) + '...';
+                                        }
                                         return {
-                                            text: label,
+                                            text: displayLabel,
                                             fillStyle: bgColors[index],
                                             strokeStyle: borderColors[index],
                                             lineWidth: 1,
@@ -592,6 +616,15 @@ frappe.query_reports["Material Consumption"] = {
                         }
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
                         callbacks: {
                             title: function(tooltipItems) {
                                 return tooltipItems[0].label;
