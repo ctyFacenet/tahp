@@ -409,7 +409,7 @@ frappe.query_reports["Production Report"] = {
                 min-width: ${canvas_width}px;
                 width: 100%;
             ">
-                <canvas id="daily-production-chart"></canvas>
+                <canvas id="daily-production-chart" style="cursor: pointer;"></canvas>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -428,7 +428,7 @@ frappe.query_reports["Production Report"] = {
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
     
-        // Calculate maximum values and expand Y axis
+        // Calculate maximum values and expand Y axis (separate for bars and lines, giống production_schedule.js)
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
         const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
     
@@ -436,24 +436,77 @@ frappe.query_reports["Production Report"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
     
-        // Create datasets for mixed chart
+        // Create datasets: Thạch cao as stacked bars; P2O5 as lines (giữ nguyên như trước, chỉ chỉnh stacked logic)
         const datasets = [
-            // Bars for Thạch cao
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            // Lines for P2O5
+            // Thạch cao stack
+            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.6)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
+            { 
+                label: 'Kế hoạch (Thạch cao)', 
+                data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
+                backgroundColor: 'rgba(14, 165, 233, 0.25)', 
+                borderColor: 'rgba(14, 165, 233, 0.6)', 
+                borderWidth: 1, 
+                stack: 'Others', 
+                type: 'bar', 
+                order: 1,
+                originalPlanned: othersPlanned
+            },
+            // P2O5 lines (như production_schedule.js)
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
     
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
-        new Chart(ctx, {
+        const chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, activeElements) => {
+                    // Handle click on chart elements
+                    if (activeElements && activeElements.length > 0) {
+                        const clickedElement = activeElements[0];
+                        const dataIndex = clickedElement.index;
+                        const clicked_date = dates[dataIndex];
+                        
+                        // Show notification
+                        frappe.show_alert({
+                            message: __(`Đang mở Work Orders cho ${clicked_date}...`),
+                            indicator: 'blue'
+                        }, 2);
+                        
+                        // Build URL for Work Order list view with filter
+                        const route = frappe.utils.get_form_link('Work Order', null, {
+                            planned_start_date: clicked_date
+                        });
+                        
+                        // Open in new tab
+                        const list_url = `/app/work-order?planned_start_date=${encodeURIComponent(clicked_date)}`;
+                        window.open(list_url, '_blank');
+                    }
+                },
                 plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                
+                                // If this is a "Kế hoạch" dataset, show original planned value
+                                if (context.dataset.label && context.dataset.label.includes('Kế hoạch') && context.dataset.originalPlanned) {
+                                    const originalValue = context.dataset.originalPlanned[context.dataIndex];
+                                    label += (originalValue ?? 0).toLocaleString('en-US') + ' Tấn';
+                                } else if (context.parsed && context.parsed.y != null) {
+                                    label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
+                                }
+                                return label;
+                            },
+                            footer: function(tooltipItems) {
+                                return 'Click để xem chi tiết Work Orders';
+                            }
+                        }
+                    },
                     legend: { 
                         position: 'top',
                         labels: {

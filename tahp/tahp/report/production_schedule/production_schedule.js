@@ -291,8 +291,8 @@ frappe.query_reports["Production Schedule"] = {
 		});
 
 		return [
+			{ name: 'Thạch cao', ...others },
 			{ name: 'P2O5', ...p2o5 },
-			{ name: 'Thạch cao', ...others }
 		];
 	},
 
@@ -450,27 +450,41 @@ frappe.query_reports["Production Schedule"] = {
         let canvas_width = num_lsx * bar_width_per_lsx;
         let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
         
+        // Đảm bảo width tối thiểu, nhưng không giới hạn max để có thể scroll
         if (canvas_width < 300) canvas_width = 300;
-        if (canvas_width > 1200) canvas_width = 1200;
 
         // Xóa wrapper cũ trước khi tạo mới để không bị trùng lặp
         container.find('.chart-wrapper').remove();
         const chartWrapper = $(`<div class="chart-wrapper" style="
-            overflow-x: auto;
-            overflow-y: hidden;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             padding: 15px;
             margin-top: 15px;
+            width: 100%;
         ">
-            <div class="chart-container" style="
-                position: relative; 
-                height: ${canvas_height}px;
-                min-width: ${canvas_width}px;
-                width: 100%;
+            <div style="
+                overflow-x: auto;
+                overflow-y: hidden;
             ">
-                <canvas id="week-plan-chart"></canvas>
+                <div class="chart-container" style="
+                    position: relative; 
+                    height: ${canvas_height}px;
+                    width: ${canvas_width}px;
+                    min-width: ${canvas_width}px;
+                ">
+                    <canvas id="week-plan-chart" style="cursor: pointer;"></canvas>
+                </div>
+            </div>
+            <div class="chart-note" style="
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #6c757d;
+                text-align: left;
+            ">
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Order.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -481,6 +495,16 @@ frappe.query_reports["Production Schedule"] = {
         const othersPlanned = wwo_names.map(wwo => wwo_data[wwo]["Thạch cao"].planned);
         const p2o5Actual = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].actual);
         const p2o5Planned = wwo_names.map(wwo => wwo_data[wwo]["P2O5"].planned);
+        
+        // Tính phần trăm hoàn thành cho mỗi LSX (Thạch cao)
+        const completionPercentages = wwo_names.map((wwo, index) => {
+            const planned = othersPlanned[index];
+            const actual = othersActual[index];
+            if (planned > 0) {
+                return Math.round((actual / planned) * 100);
+            }
+            return 0;
+        });
 
         // Calculate maximum values and expand Y axis
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
@@ -490,26 +514,141 @@ frappe.query_reports["Production Schedule"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
 
-        const datasets = [
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
-            { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
-        ];
+		const datasets = [
+			{ label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+			{ 
+				label: 'Kế hoạch (Thạch cao)', 
+				data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
+				backgroundColor: 'rgba(14, 165, 233, 0.2)', 
+				borderColor: 'rgba(14, 165, 233, 0.6)', 
+				borderWidth: 2, 
+				stack: 'Others', 
+				type: 'bar', 
+				order: 1,
+				// Lưu giá trị kế hoạch gốc để hiển thị trong tooltip
+				originalPlanned: othersPlanned
+			},
+			{ label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
+			{ label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
+		];
 
-        const ctx = document.getElementById('week-plan-chart').getContext('2d');
-        new Chart(ctx, {
+        // Plugin tùy chỉnh để hiển thị label phần trăm hoàn thành
+        const percentageLabelPlugin = {
+            id: 'percentageLabel',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                const meta0 = chart.getDatasetMeta(0); // Thực tế Thạch cao
+                const meta1 = chart.getDatasetMeta(1); // Kế hoạch Thạch cao (phần còn lại)
+                
+                ctx.save();
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#2c3e50';
+                
+                meta0.data.forEach((bar, index) => {
+                    const percentage = completionPercentages[index];
+                    if (percentage !== undefined && percentage !== null) {
+                        const x = bar.x;
+                        // Lấy đỉnh của stack bar (tổng của planned + actual)
+                        // Trong stacked bar, dataset 1 (kế hoạch) được vẽ trên dataset 0 (thực tế)
+                        // Nên đỉnh của dataset 1 chính là đỉnh của stack bar
+                        const plannedBar = meta1.data[index];
+                        let topY;
+                        if (plannedBar && plannedBar.y !== null) {
+                            // Đỉnh của stack bar là đỉnh của cột kế hoạch (y nhỏ hơn = cao hơn)
+                            topY = plannedBar.y;
+                        } else if (bar.y !== null) {
+                            // Nếu không có phần kế hoạch, dùng đỉnh của cột thực tế
+                            topY = bar.y;
+                        } else {
+                            return; // Bỏ qua nếu không có dữ liệu
+                        }
+                        // Hiển thị label ở trên đỉnh của stack bar (5px phía trên)
+                        ctx.fillText(`${percentage}%`, x, topY - 5);
+                    }
+                });
+                
+                ctx.restore();
+            }
+        };
+
+        const canvas = document.getElementById('week-plan-chart');
+        const ctx = canvas.getContext('2d');
+        
+        const chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
+            plugins: [percentageLabelPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, activeElements) => {
+                    // Handle click on chart elements
+                    if (activeElements && activeElements.length > 0) {
+                        const clickedElement = activeElements[0];
+                        const dataIndex = clickedElement.index;
+                        const wwo_name = wwo_names[dataIndex];
+                        
+                        // Show notification
+                        frappe.show_alert({
+                            message: __(`Đang mở Week Work Order ${wwo_name}...`),
+                            indicator: 'blue'
+                        }, 2);
+                        
+                        // Open Week Work Order form in new tab
+                        const wwo_url = `/app/week-work-order/${encodeURIComponent(wwo_name)}`;
+                        window.open(wwo_url, '_blank');
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 15,
+                        left: 10,
+                        right: 10
+                    }
+                },
                 plugins: {
+					tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                
+                                if (label) {
+                                    label += ': ';
+                                }
+                                
+                                // Nếu là dataset "Kế hoạch (Thạch cao)", hiển thị giá trị gốc
+                                if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
+                                    const originalValue = context.dataset.originalPlanned[context.dataIndex];
+                                    label += originalValue.toLocaleString('en-US') + ' Tấn';
+                                } else {
+                                    // Các dataset khác hiển thị bình thường
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
+                                    }
+                                }
+                                
+                                return label;
+                            },
+                            footer: function(tooltipItems) {
+                                return 'Click để xem chi tiết Week Work Order';
+                            }
+                        }
+					},
                     legend: { 
                         position: 'top',
+                        align: 'start',
+                        padding: {
+                            top: 0,
+                            bottom: 5,
+                            left: 10
+                        },
                         labels: {
                             usePointStyle: true,
                             pointStyle: 'line',
+                            padding: 8,
                             generateLabels: function(chart) {
                                 const original = Chart.defaults.plugins.legend.labels.generateLabels;
                                 const labels = original.call(this, chart);
@@ -530,13 +669,14 @@ frappe.query_reports["Production Schedule"] = {
                         display: true, 
                         text: 'Sản lượng sản xuất theo LSX ',
                         font: {
-                            size: window.innerWidth < 768 ? 14 : window.innerWidth < 1024 ? 16 : 20,
+                            size: window.innerWidth < 768 ? 18 : window.innerWidth < 1024 ? 22 : 26,
                             weight: 'bold'
                         },
-                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        align: 'start',
                         padding: {
                             top: 10,
-                            bottom: 20
+                            bottom: 10,
+                            left: 10
                         }
                     },
                 },
@@ -549,12 +689,15 @@ frappe.query_reports["Production Schedule"] = {
                             offset: true
                         },
                         ticks: { 
-                            autoSkip: false,
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
                             align: 'center',
                             crossAlign: 'center',
                             font: {
-                                size: 10
-                            }
+                                size: 9
+                            },
+                            padding: 5
                         },
                         offset: true
                     },
