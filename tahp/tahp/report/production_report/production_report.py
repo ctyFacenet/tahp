@@ -12,8 +12,9 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    # Convert week filter to date range
+    # Convert week or month/year filter to date range
     filters = process_week_filter(filters)
+    filters = process_month_year_filter(filters)
     
     # Get work orders based on filters
     work_orders = get_completed_work_orders(filters)
@@ -50,6 +51,47 @@ def process_week_filter(filters):
         except Exception as e:
             frappe.log_error(f"Week filter error: {str(e)}", "Week Filter Error")
     
+    return filters
+
+
+def process_month_year_filter(filters):
+    """If a month is selected, convert month+year to from_date/to_date"""
+    month = filters.get("month")
+    year = filters.get("year")
+
+    if month:
+        try:
+            # month could be like "Tháng 1" or an integer; extract numeric part
+            if isinstance(month, str):
+                # Try to find digits in the string
+                import re
+                m = re.search(r"(\d+)", month)
+                month_num = int(m.group(1)) if m else None
+            else:
+                month_num = int(month)
+
+            if not month_num:
+                return filters
+
+            if not year:
+                # fallback to current year
+                from datetime import datetime
+                year = datetime.now().year
+
+            from datetime import date, timedelta
+            first_day = date(int(year), int(month_num), 1)
+            # compute last day of month by going to the first of next month and subtracting one day
+            if month_num == 12:
+                next_month_first = date(int(year) + 1, 1, 1)
+            else:
+                next_month_first = date(int(year), int(month_num) + 1, 1)
+            last_day = next_month_first - timedelta(days=1)
+
+            filters["from_date"] = first_day.strftime("%Y-%m-%d")
+            filters["to_date"] = last_day.strftime("%Y-%m-%d")
+        except Exception as e:
+            frappe.log_error(f"Month/Year filter error: {str(e)}", "Month Filter Error")
+
     return filters
 
 def get_columns(work_orders):

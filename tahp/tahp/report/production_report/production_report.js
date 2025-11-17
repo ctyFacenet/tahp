@@ -17,11 +17,21 @@ frappe.query_reports["Production Report"] = {
             }
         },
         {
-            "fieldname": "week",
-            "label": __("Tuần"),
-            "fieldtype": "Date",
+            "fieldname": "month",
+            "label": __("Tháng"),
+            "fieldtype": "Select",
+            "options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
             "on_change": function() {
-                frappe.query_reports["Production Report"].handle_week_change();
+                frappe.query_reports["Production Report"].handle_month_year_change();
+            }
+        },
+        {
+            "fieldname": "year",
+            "label": __("Năm"),
+            "fieldtype": "Int",
+            "default": new Date().getFullYear(),
+            "on_change": function() {
+                frappe.query_reports["Production Report"].handle_month_year_change();
             }
         }
     ],
@@ -40,11 +50,12 @@ frappe.query_reports["Production Report"] = {
         let previous_values = {
             from_date: report.get_filter_value("from_date"),
             to_date: report.get_filter_value("to_date"),
-            week: report.get_filter_value("week")
+            month: report.get_filter_value("month"),
+            year: report.get_filter_value("year")
         };
 
         // Handle filter clearing
-        const on_date_cleared_handler = (fieldname) => {
+    const on_date_cleared_handler = (fieldname) => {
             const new_value = report.page.fields_dict[fieldname].get_value();
             const old_value = previous_values[fieldname];
 
@@ -59,10 +70,12 @@ frappe.query_reports["Production Report"] = {
             previous_values[fieldname] = new_value;
         };
 
-        // Attach handlers to filter inputs
-        report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
-        report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
-        report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
+    // Attach handlers to filter inputs
+    report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
+    report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
+    // Month & year filters
+    if (report.page.fields_dict.month) report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
+    if (report.page.fields_dict.year) report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
     },
 
     "add_responsive_styles": function() {
@@ -393,7 +406,7 @@ frappe.query_reports["Production Report"] = {
         if (canvas_width < 300) canvas_width = 300;
         if (canvas_width > 1200) canvas_width = 1200;
     
-        // Create chart wrapper
+        // Create chart wrapper with note section (like production_schedule.js)
         const chartWrapper = $(`<div class="chart-wrapper" style="
             overflow-x: auto;
             overflow-y: hidden;
@@ -410,6 +423,16 @@ frappe.query_reports["Production Report"] = {
                 width: 100%;
             ">
                 <canvas id="daily-production-chart" style="cursor: pointer;"></canvas>
+            </div>
+            <div class="chart-note" style="
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #6c757d;
+                text-align: left;
+            ">
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Orders.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -428,7 +451,17 @@ frappe.query_reports["Production Report"] = {
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
     
-        // Calculate maximum values and expand Y axis (separate for bars and lines, giống production_schedule.js)
+        // Calculate completion percentages for each date (Thạch cao)
+        const completionPercentages = dates.map((date, index) => {
+            const planned = othersPlanned[index];
+            const actual = othersActual[index];
+            if (planned > 0) {
+                return Math.round((actual / planned) * 100);
+            }
+            return 0;
+        });
+    
+        // Calculate maximum values and expand Y axis
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
         const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
     
@@ -436,30 +469,66 @@ frappe.query_reports["Production Report"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
     
-        // Create datasets: Thạch cao as stacked bars; P2O5 as lines (giữ nguyên như trước, chỉ chỉnh stacked logic)
+        // Create datasets: Thạch cao as stacked bars; P2O5 as lines
         const datasets = [
-            // Thạch cao stack
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.6)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 1, stack: 'Others', type: 'bar', order: 1 },
+            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
             { 
                 label: 'Kế hoạch (Thạch cao)', 
                 data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
-                backgroundColor: 'rgba(14, 165, 233, 0.25)', 
+                backgroundColor: 'rgba(14, 165, 233, 0.2)', 
                 borderColor: 'rgba(14, 165, 233, 0.6)', 
-                borderWidth: 1, 
+                borderWidth: 2, 
                 stack: 'Others', 
                 type: 'bar', 
                 order: 1,
                 originalPlanned: othersPlanned
             },
-            // P2O5 lines (như production_schedule.js)
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
+    
+        // Plugin to display percentage labels on top of bars
+        const percentageLabelPlugin = {
+            id: 'percentageLabel',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                const meta0 = chart.getDatasetMeta(0); // Thực tế Thạch cao
+                const meta1 = chart.getDatasetMeta(1); // Kế hoạch Thạch cao (phần còn lại)
+                
+                ctx.save();
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#2c3e50';
+                
+                meta0.data.forEach((bar, index) => {
+                    const percentage = completionPercentages[index];
+                    if (percentage !== undefined && percentage !== null) {
+                        const x = bar.x;
+                        // Get top of stacked bar
+                        const plannedBar = meta1.data[index];
+                        let topY;
+                        if (plannedBar && plannedBar.y !== null) {
+                            topY = plannedBar.y;
+                        } else if (bar.y !== null) {
+                            topY = bar.y;
+                        } else {
+                            return;
+                        }
+                        // Display label above the stack bar (5px above)
+                        ctx.fillText(`${percentage}%`, x, topY - 5);
+                    }
+                });
+                
+                ctx.restore();
+            }
+        };
     
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
+            plugins: [percentageLabelPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -476,14 +545,17 @@ frappe.query_reports["Production Report"] = {
                             indicator: 'blue'
                         }, 2);
                         
-                        // Build URL for Work Order list view with filter
-                        const route = frappe.utils.get_form_link('Work Order', null, {
-                            planned_start_date: clicked_date
-                        });
-                        
                         // Open in new tab
                         const list_url = `/app/work-order?planned_start_date=${encodeURIComponent(clicked_date)}`;
                         window.open(list_url, '_blank');
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 15,
+                        left: 10,
+                        right: 10
                     }
                 },
                 plugins: {
@@ -494,9 +566,9 @@ frappe.query_reports["Production Report"] = {
                                 if (label) label += ': ';
                                 
                                 // If this is a "Kế hoạch" dataset, show original planned value
-                                if (context.dataset.label && context.dataset.label.includes('Kế hoạch') && context.dataset.originalPlanned) {
+                                if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
                                     const originalValue = context.dataset.originalPlanned[context.dataIndex];
-                                    label += (originalValue ?? 0).toLocaleString('en-US') + ' Tấn';
+                                    label += originalValue.toLocaleString('en-US') + ' Tấn';
                                 } else if (context.parsed && context.parsed.y != null) {
                                     label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
                                 }
@@ -509,9 +581,16 @@ frappe.query_reports["Production Report"] = {
                     },
                     legend: { 
                         position: 'top',
+                        align: 'start',
+                        padding: {
+                            top: 0,
+                            bottom: 5,
+                            left: 10
+                        },
                         labels: {
                             usePointStyle: true,
                             pointStyle: 'line',
+                            padding: 8,
                             generateLabels: function(chart) {
                                 const original = Chart.defaults.plugins.legend.labels.generateLabels;
                                 const labels = original.call(this, chart);
@@ -532,35 +611,50 @@ frappe.query_reports["Production Report"] = {
                         display: true, 
                         text: 'Sản lượng sản xuất theo ngày' ,
                         font: {
-                            size: 22,
+                            size: window.innerWidth < 768 ? 18 : window.innerWidth < 1024 ? 22 : 26,
                             weight: 'bold'
                         },
-                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        align: 'start',
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10
+                        }
                     },
-    
                 },
                 scales: {
                     x: {
+                        type: 'category',
+                        stacked: true,
                         grid: { 
                             drawOnChartArea: false,
+                            offset: true
                         },
+                        ticks: { 
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
+                            align: 'center',
+                            crossAlign: 'center',
+                            font: {
+                                size: 9
+                            },
+                            padding: 5
+                        },
+                        offset: true
                     },
                     y: {
                         stacked: true,
                         beginAtZero: true,
-                        // Set expanded maximum value
                         max: padded_max_y,
                         grid: {
                             drawTicks: false,
                         },
                         ticks: {
-                            // Customize highest label
                             callback: function(value, index, ticks) {
-                                // In Chart.js, highest label usually has index 0
                                 if (index === ticks.length - 1) {
-                                    return '( Tấn )'; // Replace number with 'Tấn'
+                                    return '( Tấn )';
                                 }
-                                // For other labels, display numbers only
                                 return value.toLocaleString('en-US');
                             }
                         }
@@ -568,11 +662,9 @@ frappe.query_reports["Production Report"] = {
                     y2: {
                         position: 'right',
                         beginAtZero: true,
-                        // Set expanded maximum value for y2 axis
                         max: padded_max_y2,
                         grid: { drawOnChartArea: false, drawTicks: false, },
                         ticks: {
-                            // Apply same logic for y2 axis
                             callback: function(value, index, ticks) {
                                 if (index === ticks.length - 1) {
                                     return '( Tấn )';
@@ -587,12 +679,13 @@ frappe.query_reports["Production Report"] = {
     },
 
     "handle_date_range_change": function() {
-        // Clear week filter when date range is selected
+        // Clear month filter when date range is selected
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
         
         if (from_date || to_date) {
-            frappe.query_report.set_filter_value("week", "", false);
+            // Clear month filter if user selects explicit dates
+            frappe.query_report.set_filter_value("month", "", false);
         }
         
         frappe.query_report.refresh();
@@ -601,43 +694,48 @@ frappe.query_reports["Production Report"] = {
         }, 500);
     },
 
-    "handle_week_change": function() {
-        const week_value = frappe.query_report.get_filter_value("week");
+    "handle_month_year_change": function() {
+        const month_value = frappe.query_report.get_filter_value("month");
+        const year_value = frappe.query_report.get_filter_value("year");
         
-        if (week_value) {
-            // Clear other date filters
-            frappe.query_report.set_filter_value("from_date", "", false);
-            frappe.query_report.set_filter_value("to_date", "", false);
-            
-            // Calculate week range and show alert
-            const selected_date = frappe.datetime.str_to_obj(week_value);
-            const monday = this.getMonday(selected_date);
-            const sunday = this.getSunday(monday);
-            
+        if (month_value) {
+            // Try to extract month number from option like "Tháng 1"
+            let month_num = null;
+            if (typeof month_value === 'string') {
+                const m = month_value.match(/(\d+)/);
+                if (m) month_num = parseInt(m[1], 10);
+            } else if (typeof month_value === 'number') {
+                month_num = month_value;
+            }
+
+            // If we could resolve month and year, set from_date/to_date client-side so server receives concrete dates
+            if (month_num) {
+                const y = year_value || new Date().getFullYear();
+                const firstDay = new Date(y, month_num - 1, 1);
+                // last day: day 0 of next month
+                const lastDay = new Date(y, month_num, 0);
+
+                // Use frappe helper to format date string
+                const fromStr = frappe.datetime.obj_to_str(firstDay);
+                const toStr = frappe.datetime.obj_to_str(lastDay);
+
+                frappe.query_report.set_filter_value("from_date", fromStr, false);
+                frappe.query_report.set_filter_value("to_date", toStr, false);
+            } else {
+                // Fallback: clear explicit dates so server-side month->date mapping can run
+                frappe.query_report.set_filter_value("from_date", "", false);
+                frappe.query_report.set_filter_value("to_date", "", false);
+            }
+
             frappe.show_alert({
-                message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
+                message: __(`Đã chọn tháng ${month_value}/${year_value}`),
                 indicator: 'blue'
             }, 5);
-            
+
             frappe.query_report.refresh();
             setTimeout(() => {
                 this.render_components();
             }, 500);
         }
-    },
-
-    // Get Monday of the week containing the given date
-    "getMonday": function(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(d.setDate(diff));
-    },
-
-    // Get Sunday of the week (6 days after Monday)
-    "getSunday": function(monday) {
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        return sunday;
     }
 };
