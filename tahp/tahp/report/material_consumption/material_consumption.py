@@ -10,9 +10,6 @@ from frappe.utils import getdate, nowdate
 def execute(filters=None):
     if not filters:
         filters = {}
-
-    # Handle week filter
-    filters = process_week_filter(filters)
     
     # Handle month/year filter
     filters = process_month_year_filter(filters)
@@ -21,29 +18,6 @@ def execute(filters=None):
     data = get_data(filters) 
     
     return columns, data, None, None, None
-
-def process_week_filter(filters):
-    """
-    Handle week filter: convert the chosen date to date range from MON to SUN
-    """
-    if filters.get("week"):
-        try:
-            if isinstance(filters["week"], str):
-                selected_date = datetime.strptime(filters["week"], "%Y-%m-%d")
-            else:
-                selected_date = filters["week"]
-            
-            weekday = selected_date.weekday()
-            monday = selected_date - timedelta(days=weekday)
-            sunday = monday + timedelta(days=6)
-            
-            filters["from_date"] = monday.strftime("%Y-%m-%d")
-            filters["to_date"] = sunday.strftime("%Y-%m-%d")
-            
-        except Exception as e:
-            frappe.log_error(f"Week filter error: {str(e)}", "Week Filter Error")
-    
-    return filters
 
 def process_month_year_filter(filters):
     """
@@ -112,7 +86,7 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
     bom_items = frappe.db.sql("""
         SELECT parent, item_code, required_qty, stock_uom
         FROM `tabWork Order Item` WHERE parent IN %(work_orders)s
-    """, {"work_orders": wo_list}, as_dict=1)
+    """, {"work_orders": wo_list}, as_dict=1)  
 
     for item in bom_items:
         material = item.item_code

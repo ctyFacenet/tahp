@@ -4,6 +4,10 @@ frappe.query_reports["Production Report"] = {
             "fieldname": "from_date",
             "label": __("Từ ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), 1);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
@@ -12,16 +16,30 @@ frappe.query_reports["Production Report"] = {
             "fieldname": "to_date",
             "label": __("Đến ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
         },
         {
-            "fieldname": "week",
-            "label": __("Tuần"),
-            "fieldtype": "Date",
+            "fieldname": "month",
+            "label": __("Tháng"),
+            "fieldtype": "Select",
+            "options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
             "on_change": function() {
-                frappe.query_reports["Production Report"].handle_week_change();
+                frappe.query_reports["Production Report"].handle_month_year_change();
+            }
+        },
+        {
+            "fieldname": "year",
+            "label": __("Năm"),
+            "fieldtype": "Int",
+            "default": new Date().getFullYear(),
+            "on_change": function() {
+                frappe.query_reports["Production Report"].handle_month_year_change();
             }
         }
     ],
@@ -40,11 +58,12 @@ frappe.query_reports["Production Report"] = {
         let previous_values = {
             from_date: report.get_filter_value("from_date"),
             to_date: report.get_filter_value("to_date"),
-            week: report.get_filter_value("week")
+            month: report.get_filter_value("month"),
+            year: report.get_filter_value("year")
         };
 
         // Handle filter clearing
-        const on_date_cleared_handler = (fieldname) => {
+    const on_date_cleared_handler = (fieldname) => {
             const new_value = report.page.fields_dict[fieldname].get_value();
             const old_value = previous_values[fieldname];
 
@@ -59,10 +78,75 @@ frappe.query_reports["Production Report"] = {
             previous_values[fieldname] = new_value;
         };
 
-        // Attach handlers to filter inputs
-        report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
-        report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
-        report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
+    // Attach handlers to filter inputs
+    report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
+    report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
+    // Month & year filters
+    if (report.page.fields_dict.month) report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
+    if (report.page.fields_dict.year) report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
+
+        // Enforce column widths after datatable render so server `width` values are respected
+        frappe.query_reports["Production Report"].after_datatable_render = function(datatable) {
+            if (!datatable || !datatable.$wrapper) return;
+
+            // Small timeout to let DataTable finish layout
+            setTimeout(() => {
+                try {
+                    const cols = frappe.query_report.columns || [];
+                    // Compute total width from column definitions (fallback to 200)
+                    let totalWidth = 0;
+                    cols.forEach(c => {
+                        const w = (typeof c.width === 'number') ? c.width : parseInt(c.width, 10) || 200;
+                        totalWidth += w;
+                    });
+
+                    // Target the actual table and wrapper
+                    const $table = datatable.$wrapper.find('table').first();
+                    const $tableContainer = datatable.$wrapper.find('.dt-table').first();
+
+                    if ($table && $table.length) {
+                        // Force fixed layout so th widths are respected
+                        $table.css('table-layout', 'fixed');
+
+                        // Ensure the table can scroll horizontally when needed
+                        if ($tableContainer && $tableContainer.length) {
+                            $tableContainer.css('min-width', totalWidth + 'px');
+                        } else {
+                            $table.css('min-width', totalWidth + 'px');
+                        }
+
+                        // Apply widths to header cells
+                        datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function(idx) {
+                            const col = cols[idx];
+                            if (!col) return;
+                            const width = (typeof col.width === 'number') ? col.width : parseInt(col.width, 10) || 200;
+                            $(this).css({ 'width': width + 'px', 'max-width': width + 'px', 'min-width': width + 'px' });
+                        });
+
+                        // Center table horizontally when total width is less than wrapper width
+                        const wrapperWidth = datatable.$wrapper.width() || datatable.$wrapper.parent().width() || 0;
+                        if (wrapperWidth && totalWidth < wrapperWidth) {
+                            // Force the table to the exact computed width to avoid extra space/gaps
+                            $table.css({ 'width': totalWidth + 'px', 'min-width': totalWidth + 'px' });
+                            // Use auto margins to center the table block inside its container
+                            $table.css({ 'margin-left': 'auto', 'margin-right': 'auto' });
+                            // Make wrapper center the table (remove any layout that forces full-width)
+                            if ($tableContainer && $tableContainer.length) {
+                                $tableContainer.css({ 'display': 'flex', 'justify-content': 'center', 'overflow-x': 'auto' });
+                            }
+                        } else {
+                            // Reset sizing to allow table to grow and enable horizontal scrolling
+                            $table.css({ 'width': '', 'min-width': totalWidth + 'px', 'margin-left': '', 'margin-right': '' });
+                            if ($tableContainer && $tableContainer.length) {
+                                $tableContainer.css({ 'display': '', 'justify-content': '', 'overflow-x': '' });
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error applying column widths for Production Report', err);
+                }
+            }, 50);
+        };
     },
 
     "add_responsive_styles": function() {
@@ -393,7 +477,7 @@ frappe.query_reports["Production Report"] = {
         if (canvas_width < 300) canvas_width = 300;
         if (canvas_width > 1200) canvas_width = 1200;
     
-        // Create chart wrapper
+        // Create chart wrapper with note section (like production_schedule.js)
         const chartWrapper = $(`<div class="chart-wrapper" style="
             overflow-x: auto;
             overflow-y: hidden;
@@ -409,7 +493,17 @@ frappe.query_reports["Production Report"] = {
                 min-width: ${canvas_width}px;
                 width: 100%;
             ">
-                <canvas id="daily-production-chart"></canvas>
+                <canvas id="daily-production-chart" style="cursor: pointer;"></canvas>
+            </div>
+            <div class="chart-note" style="
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #6c757d;
+                text-align: left;
+            ">
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Orders.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
@@ -428,6 +522,16 @@ frappe.query_reports["Production Report"] = {
         const p2o5Actual = dates.map(date => daily_data[date]["P2O5"].actual);
         const p2o5Planned = dates.map(date => daily_data[date]["P2O5"].planned);
     
+        // Calculate completion percentages for each date (Thạch cao)
+        const completionPercentages = dates.map((date, index) => {
+            const planned = othersPlanned[index];
+            const actual = othersActual[index];
+            if (planned > 0) {
+                return Math.round((actual / planned) * 100);
+            }
+            return 0;
+        });
+    
         // Calculate maximum values and expand Y axis
         const max_y_value = Math.max(...othersPlanned.map((p, i) => p), ...othersActual);
         const max_y2_value = Math.max(...p2o5Planned, ...p2o5Actual);
@@ -436,29 +540,128 @@ frappe.query_reports["Production Report"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
     
-        // Create datasets for mixed chart
+        // Create datasets: Thạch cao as stacked bars; P2O5 as lines
         const datasets = [
-            // Bars for Thạch cao
             { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            { label: 'Kế hoạch (Thạch cao)', data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), backgroundColor: 'rgba(14, 165, 233, 0.2)', borderColor: 'rgba(14, 165, 233, 0.6)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
-            // Lines for P2O5
+            { 
+                label: 'Kế hoạch (Thạch cao)', 
+                data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
+                backgroundColor: 'rgba(14, 165, 233, 0.2)', 
+                borderColor: 'rgba(14, 165, 233, 0.6)', 
+                borderWidth: 2, 
+                stack: 'Others', 
+                type: 'bar', 
+                order: 1,
+                originalPlanned: othersPlanned
+            },
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
         ];
     
+        // Plugin to display percentage labels on top of bars
+        const percentageLabelPlugin = {
+            id: 'percentageLabel',
+            afterDatasetsDraw: function(chart) {
+                const ctx = chart.ctx;
+                const meta0 = chart.getDatasetMeta(0); // Thực tế Thạch cao
+                const meta1 = chart.getDatasetMeta(1); // Kế hoạch Thạch cao (phần còn lại)
+                
+                ctx.save();
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#2c3e50';
+                
+                meta0.data.forEach((bar, index) => {
+                    const percentage = completionPercentages[index];
+                    if (percentage !== undefined && percentage !== null) {
+                        const x = bar.x;
+                        // Get top of stacked bar
+                        const plannedBar = meta1.data[index];
+                        let topY;
+                        if (plannedBar && plannedBar.y !== null) {
+                            topY = plannedBar.y;
+                        } else if (bar.y !== null) {
+                            topY = bar.y;
+                        } else {
+                            return;
+                        }
+                        // Display label above the stack bar (5px above)
+                        ctx.fillText(`${percentage}%`, x, topY - 5);
+                    }
+                });
+                
+                ctx.restore();
+            }
+        };
+    
         const ctx = document.getElementById('daily-production-chart').getContext('2d');
-        new Chart(ctx, {
+        const chart = new Chart(ctx, {
             type: 'bar',
             data: { labels, datasets },
+            plugins: [percentageLabelPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onClick: (event, activeElements) => {
+                    // Handle click on chart elements
+                    if (activeElements && activeElements.length > 0) {
+                        const clickedElement = activeElements[0];
+                        const dataIndex = clickedElement.index;
+                        const clicked_date = dates[dataIndex];
+                        
+                        // Show notification
+                        frappe.show_alert({
+                            message: __(`Đang mở Work Orders cho ${clicked_date}...`),
+                            indicator: 'blue'
+                        }, 2);
+                        
+                        // Open in new tab
+                        const list_url = `/app/work-order?planned_start_date=${encodeURIComponent(clicked_date)}`;
+                        window.open(list_url, '_blank');
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        bottom: 15,
+                        left: 10,
+                        right: 10
+                    }
+                },
                 plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                
+                                // If this is a "Kế hoạch" dataset, show original planned value
+                                if (context.dataset.label === 'Kế hoạch (Thạch cao)') {
+                                    const originalValue = context.dataset.originalPlanned[context.dataIndex];
+                                    label += originalValue.toLocaleString('en-US') + ' Tấn';
+                                } else if (context.parsed && context.parsed.y != null) {
+                                    label += context.parsed.y.toLocaleString('en-US') + ' Tấn';
+                                }
+                                return label;
+                            },
+                            footer: function(tooltipItems) {
+                                return 'Click để xem chi tiết Work Orders';
+                            }
+                        }
+                    },
                     legend: { 
                         position: 'top',
+                        align: 'start',
+                        padding: {
+                            top: 0,
+                            bottom: 5,
+                            left: 10
+                        },
                         labels: {
                             usePointStyle: true,
                             pointStyle: 'line',
+                            padding: 8,
                             generateLabels: function(chart) {
                                 const original = Chart.defaults.plugins.legend.labels.generateLabels;
                                 const labels = original.call(this, chart);
@@ -479,35 +682,50 @@ frappe.query_reports["Production Report"] = {
                         display: true, 
                         text: 'Sản lượng sản xuất theo ngày' ,
                         font: {
-                            size: 22,
+                            size: window.innerWidth < 768 ? 18 : window.innerWidth < 1024 ? 22 : 26,
                             weight: 'bold'
                         },
-                        align: window.innerWidth < 768 ? 'start' : 'center',
+                        align: 'start',
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10
+                        }
                     },
-    
                 },
                 scales: {
                     x: {
+                        type: 'category',
+                        stacked: true,
                         grid: { 
                             drawOnChartArea: false,
+                            offset: true
                         },
+                        ticks: { 
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
+                            align: 'center',
+                            crossAlign: 'center',
+                            font: {
+                                size: 9
+                            },
+                            padding: 5
+                        },
+                        offset: true
                     },
                     y: {
                         stacked: true,
                         beginAtZero: true,
-                        // Set expanded maximum value
                         max: padded_max_y,
                         grid: {
                             drawTicks: false,
                         },
                         ticks: {
-                            // Customize highest label
                             callback: function(value, index, ticks) {
-                                // In Chart.js, highest label usually has index 0
                                 if (index === ticks.length - 1) {
-                                    return '( Tấn )'; // Replace number with 'Tấn'
+                                    return '( Tấn )';
                                 }
-                                // For other labels, display numbers only
                                 return value.toLocaleString('en-US');
                             }
                         }
@@ -515,11 +733,9 @@ frappe.query_reports["Production Report"] = {
                     y2: {
                         position: 'right',
                         beginAtZero: true,
-                        // Set expanded maximum value for y2 axis
                         max: padded_max_y2,
                         grid: { drawOnChartArea: false, drawTicks: false, },
                         ticks: {
-                            // Apply same logic for y2 axis
                             callback: function(value, index, ticks) {
                                 if (index === ticks.length - 1) {
                                     return '( Tấn )';
@@ -534,12 +750,13 @@ frappe.query_reports["Production Report"] = {
     },
 
     "handle_date_range_change": function() {
-        // Clear week filter when date range is selected
+        // Clear month filter when date range is selected
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
         
         if (from_date || to_date) {
-            frappe.query_report.set_filter_value("week", "", false);
+            // Clear month filter if user selects explicit dates
+            frappe.query_report.set_filter_value("month", "", false);
         }
         
         frappe.query_report.refresh();
@@ -548,43 +765,25 @@ frappe.query_reports["Production Report"] = {
         }, 500);
     },
 
-    "handle_week_change": function() {
-        const week_value = frappe.query_report.get_filter_value("week");
+    "handle_month_year_change": function() {
+        const month_value = frappe.query_report.get_filter_value("month");
+        const year_value = frappe.query_report.get_filter_value("year");
         
-        if (week_value) {
-            // Clear other date filters
+        if (month_value) {
+            // Clear explicit date filters (material_consumption UX)
             frappe.query_report.set_filter_value("from_date", "", false);
             frappe.query_report.set_filter_value("to_date", "", false);
             
-            // Calculate week range and show alert
-            const selected_date = frappe.datetime.str_to_obj(week_value);
-            const monday = this.getMonday(selected_date);
-            const sunday = this.getSunday(monday);
-            
             frappe.show_alert({
-                message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
-                indicator: 'blue'
+                message: __(`Đã chọn tháng ${month_value}/${year_value}`),
+                indicator: 'green'
             }, 5);
             
+            // Re-render components after refresh
             frappe.query_report.refresh();
             setTimeout(() => {
                 this.render_components();
             }, 500);
         }
-    },
-
-    // Get Monday of the week containing the given date
-    "getMonday": function(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(d.setDate(diff));
-    },
-
-    // Get Sunday of the week (6 days after Monday)
-    "getSunday": function(monday) {
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        return sunday;
     }
 };

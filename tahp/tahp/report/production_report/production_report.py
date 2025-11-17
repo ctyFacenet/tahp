@@ -12,8 +12,9 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    # Convert week filter to date range
+    # Convert week or month/year filter to date range
     filters = process_week_filter(filters)
+    filters = process_month_year_filter(filters)
     
     # Get work orders based on filters
     work_orders = get_completed_work_orders(filters)
@@ -52,10 +53,51 @@ def process_week_filter(filters):
     
     return filters
 
+
+def process_month_year_filter(filters):
+    """If a month is selected, convert month+year to from_date/to_date"""
+    month = filters.get("month")
+    year = filters.get("year")
+
+    if month:
+        try:
+            # month could be like "Tháng 1" or an integer; extract numeric part
+            if isinstance(month, str):
+                # Try to find digits in the string
+                import re
+                m = re.search(r"(\d+)", month)
+                month_num = int(m.group(1)) if m else None
+            else:
+                month_num = int(month)
+
+            if not month_num:
+                return filters
+
+            if not year:
+                # fallback to current year
+                from datetime import datetime
+                year = datetime.now().year
+
+            from datetime import date, timedelta
+            first_day = date(int(year), int(month_num), 1)
+            # compute last day of month by going to the first of next month and subtracting one day
+            if month_num == 12:
+                next_month_first = date(int(year) + 1, 1, 1)
+            else:
+                next_month_first = date(int(year), int(month_num) + 1, 1)
+            last_day = next_month_first - timedelta(days=1)
+
+            filters["from_date"] = first_day.strftime("%Y-%m-%d")
+            filters["to_date"] = last_day.strftime("%Y-%m-%d")
+        except Exception as e:
+            frappe.log_error(f"Month/Year filter error: {str(e)}", "Month Filter Error")
+
+    return filters
+
 def get_columns(work_orders):
     """Generate dynamic columns for production report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 120},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 150, "align": "left"},
     ]
 
     if not work_orders:
@@ -88,7 +130,7 @@ def get_columns(work_orders):
             "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 250,
+            "width": 300,
             "align": "left",
             "parent": group_label  # For multi-level header - parent shows the system category
         })
@@ -104,7 +146,7 @@ def get_data(work_orders, columns):
     data_by_date = defaultdict(lambda: defaultdict(lambda: {"planned": 0, "actual": 0, "system": None}))
     
     for wo in work_orders:
-        date_str = wo.actual_end_date.strftime('%Y-%m-%d')
+        date_str = wo.planned_start_date.strftime('%Y-%m-%d')
         scrubbed_name = frappe.scrub(wo.production_item)
         system_category = (getattr(wo, 'manufacturing_category', None) or '').strip()
         data_by_date[date_str][scrubbed_name]["planned"] += wo.qty
@@ -124,8 +166,14 @@ def get_data(work_orders, columns):
             actual_qty = data_by_date[date][fieldname]["actual"]
             
             if actual_qty > 0 or planned_qty > 0:
+                # Calculate percentage if planned_qty > 0
+                percentage_html = ""
+                if planned_qty > 0:
+                    percentage = round((actual_qty / planned_qty) * 100)
+                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                
                 # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: center;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}</div>"
+                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
                 total_summary[fieldname]["planned"] += planned_qty
                 total_summary[fieldname]["actual"] += actual_qty
             else:
@@ -154,11 +202,11 @@ def get_completed_work_orders(filters):
     
     # Handle date filters (inclusive by date, ignore time component)
     if filters.get("from_date") and filters.get("to_date"):
-        conditions += " AND DATE(wo.actual_end_date) BETWEEN %(from_date)s AND %(to_date)s"
+        conditions += " AND DATE(wo.planned_start_date) BETWEEN %(from_date)s AND %(to_date)s"
     elif filters.get("from_date"):
-        conditions += " AND DATE(wo.actual_end_date) >= %(from_date)s"
+        conditions += " AND DATE(wo.planned_start_date) >= %(from_date)s"
     elif filters.get("to_date"):
-        conditions += " AND DATE(wo.actual_end_date) <= %(to_date)s"
+        conditions += " AND DATE(wo.planned_start_date) <= %(to_date)s"
     
     if filters.get("company"):
         conditions += " AND wo.company = %(company)s"
@@ -170,7 +218,7 @@ def get_completed_work_orders(filters):
     # Get work orders with manufacturing category from BOM
     work_orders = frappe.db.sql("""
         SELECT
-            wo.actual_end_date,
+            wo.planned_start_date,
             wo.production_item,
             item.item_name,
             item.item_group,
