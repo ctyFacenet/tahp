@@ -97,7 +97,7 @@ def process_month_year_filter(filters):
 def get_columns(work_orders):
     """Generate dynamic columns for production report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 120},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 150, "align": "left"},
     ]
 
     if not work_orders:
@@ -130,7 +130,7 @@ def get_columns(work_orders):
             "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 250,
+            "width": 300,
             "align": "left",
             "parent": group_label  # For multi-level header - parent shows the system category
         })
@@ -173,7 +173,7 @@ def get_data(work_orders, columns):
                     percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
                 
                 # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: center;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
                 total_summary[fieldname]["planned"] += planned_qty
                 total_summary[fieldname]["actual"] += actual_qty
             else:

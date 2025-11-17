@@ -84,6 +84,69 @@ frappe.query_reports["Production Report"] = {
     // Month & year filters
     if (report.page.fields_dict.month) report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
     if (report.page.fields_dict.year) report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
+
+        // Enforce column widths after datatable render so server `width` values are respected
+        frappe.query_reports["Production Report"].after_datatable_render = function(datatable) {
+            if (!datatable || !datatable.$wrapper) return;
+
+            // Small timeout to let DataTable finish layout
+            setTimeout(() => {
+                try {
+                    const cols = frappe.query_report.columns || [];
+                    // Compute total width from column definitions (fallback to 200)
+                    let totalWidth = 0;
+                    cols.forEach(c => {
+                        const w = (typeof c.width === 'number') ? c.width : parseInt(c.width, 10) || 200;
+                        totalWidth += w;
+                    });
+
+                    // Target the actual table and wrapper
+                    const $table = datatable.$wrapper.find('table').first();
+                    const $tableContainer = datatable.$wrapper.find('.dt-table').first();
+
+                    if ($table && $table.length) {
+                        // Force fixed layout so th widths are respected
+                        $table.css('table-layout', 'fixed');
+
+                        // Ensure the table can scroll horizontally when needed
+                        if ($tableContainer && $tableContainer.length) {
+                            $tableContainer.css('min-width', totalWidth + 'px');
+                        } else {
+                            $table.css('min-width', totalWidth + 'px');
+                        }
+
+                        // Apply widths to header cells
+                        datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function(idx) {
+                            const col = cols[idx];
+                            if (!col) return;
+                            const width = (typeof col.width === 'number') ? col.width : parseInt(col.width, 10) || 200;
+                            $(this).css({ 'width': width + 'px', 'max-width': width + 'px', 'min-width': width + 'px' });
+                        });
+
+                        // Center table horizontally when total width is less than wrapper width
+                        const wrapperWidth = datatable.$wrapper.width() || datatable.$wrapper.parent().width() || 0;
+                        if (wrapperWidth && totalWidth < wrapperWidth) {
+                            // Force the table to the exact computed width to avoid extra space/gaps
+                            $table.css({ 'width': totalWidth + 'px', 'min-width': totalWidth + 'px' });
+                            // Use auto margins to center the table block inside its container
+                            $table.css({ 'margin-left': 'auto', 'margin-right': 'auto' });
+                            // Make wrapper center the table (remove any layout that forces full-width)
+                            if ($tableContainer && $tableContainer.length) {
+                                $tableContainer.css({ 'display': 'flex', 'justify-content': 'center', 'overflow-x': 'auto' });
+                            }
+                        } else {
+                            // Reset sizing to allow table to grow and enable horizontal scrolling
+                            $table.css({ 'width': '', 'min-width': totalWidth + 'px', 'margin-left': '', 'margin-right': '' });
+                            if ($tableContainer && $tableContainer.length) {
+                                $tableContainer.css({ 'display': '', 'justify-content': '', 'overflow-x': '' });
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error applying column widths for Production Report', err);
+                }
+            }, 50);
+        };
     },
 
     "add_responsive_styles": function() {

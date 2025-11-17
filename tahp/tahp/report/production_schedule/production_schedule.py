@@ -278,8 +278,8 @@ def get_planned_data(week_work_orders, filters):
 def get_columns(week_work_orders):
     """Generate dynamic columns for week plan report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 120},
-        {"label": _("LSX Tuần"), "fieldname": "wwo_name", "fieldtype": "Link", "options": "Week Work Order", "width": 150},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 150},
+        {"label": _("LSX Tuần"), "fieldname": "wwo_name", "fieldtype": "Link", "options": "Week Work Order", "width": 200},
     ]
 
     if not week_work_orders:
@@ -384,7 +384,7 @@ def get_columns(week_work_orders):
             "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 250,
+            "width": 300,
             "parent": group_label
         })
         

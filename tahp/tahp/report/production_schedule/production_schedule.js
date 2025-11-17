@@ -700,27 +700,70 @@ frappe.query_reports["Production Schedule"] = {
                         }
                     },
                 },
-                scales: {
-                    x: {
-                        type: 'category',
-                        stacked: true,
-                        grid: { 
-                            drawOnChartArea: false,
-                            offset: true
-                        },
-                        ticks: { 
-                            autoSkip: true,
-                            maxRotation: 0,
-                            minRotation: 0,
-                            align: 'center',
-                            crossAlign: 'center',
-                            font: {
-                                size: 9
-                            },
-                            padding: 5
-                        },
-                        offset: true
-                    },
+				scales: {
+					x: {
+						type: 'category',
+						stacked: true,
+						grid: { 
+							drawOnChartArea: false,
+							offset: true
+						},
+						ticks: { 
+							// Always show every label and wrap long labels into multiple lines
+							autoSkip: false,
+							maxRotation: 0,
+							minRotation: 0,
+							align: 'center',
+							crossAlign: 'center',
+							font: {
+								size: is_mobile ? 8 : 9
+							},
+							padding: 5,
+							callback: function(value, index, values) {
+								// Chart.js sometimes passes numeric indices as `value`.
+								// Map numeric values to the actual label string from chart data.
+								try {
+									const chart = this.chart || this; // different contexts
+									let label = value;
+									if (typeof value === 'number') {
+										const labels = (chart && chart.data && chart.data.labels) || values || [];
+										label = labels[value] || labels[index] || '';
+									}
+
+									if (!label || typeof label !== 'string') return label;
+									if (label.length <= 20) return label;
+
+									const words = label.split(' ');
+									const lines = [];
+									let current = '';
+									for (let w of words) {
+										if ((current + (current ? ' ' : '') + w).length > 20) {
+											if (current) lines.push(current);
+											current = w;
+										} else {
+											current = current ? (current + ' ' + w) : w;
+										}
+									}
+									if (current) lines.push(current);
+
+									const finalLines = [];
+									lines.forEach(l => {
+										if (l.length <= 20) finalLines.push(l);
+										else {
+											for (let i = 0; i < l.length; i += 20) {
+												finalLines.push(l.substring(i, i+20));
+											}
+										}
+									});
+
+									return finalLines;
+								} catch (e) {
+									return value;
+								}
+							}
+						},
+						offset: true
+					},
                     y: {
                         stacked: true,
                         beginAtZero: true,
