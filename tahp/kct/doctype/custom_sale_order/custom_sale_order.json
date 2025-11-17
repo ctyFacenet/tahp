@@ -14,7 +14,9 @@
   "remainingquantity",
   "deliverydate",
   "salesperson",
-  "roles"
+  "roles",
+  "label",
+  "column_break_evdb"
  ],
  "fields": [
   {
@@ -78,12 +80,22 @@
    "in_list_view": 1,
    "label": "Quy\u1ec1n ng\u01b0\u1eddi d\u00f9ng",
    "options": "Admin\nOwner\nMember"
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Link",
+   "label": "label",
+   "options": "Custom Production Order"
+  },
+  {
+   "fieldname": "column_break_evdb",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-29 10:46:06.007570",
+ "modified": "2025-11-01 10:29:22.381724",
  "modified_by": "Administrator",
  "module": "KCT",
  "name": "Custom Sale Order",
