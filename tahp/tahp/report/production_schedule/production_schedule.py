@@ -12,13 +12,14 @@ def execute(filters=None):
     try:
         if not filters:
             filters = {}
-
+        # Handle week or month/year filters
         filters = process_week_filter(filters)
+        filters = process_month_year_filter(filters)
         week_work_orders = get_week_work_orders(filters)
         planned_data = get_planned_data(week_work_orders, filters)
         columns = get_columns(week_work_orders)
         data = get_data(planned_data, columns)
-        
+
         return columns, data, None, None, None
     except Exception as e:
         frappe.log_error(f"Production Schedule Report Error: {str(e)}", "Production Schedule Error")
@@ -83,6 +84,39 @@ def get_week_work_orders(filters):
         order_by="creation_time asc"
     )
     return week_work_orders
+
+
+def process_month_year_filter(filters):
+    """Convert month+year selection to from_date/to_date like material_consumption"""
+    month = filters.get("month")
+    year = filters.get("year")
+
+    if month:
+        try:
+            # month could be like "Tháng 1" or numeric
+            if isinstance(month, str) and month.startswith("Tháng"):
+                month_num = int(month.replace("Tháng", "").strip())
+            else:
+                month_num = int(month)
+
+            if not year:
+                from datetime import datetime
+                year = datetime.now().year
+
+            from datetime import date, timedelta
+            first_day = date(int(year), int(month_num), 1)
+            if month_num == 12:
+                next_month_first = date(int(year) + 1, 1, 1)
+            else:
+                next_month_first = date(int(year), int(month_num) + 1, 1)
+            last_day = next_month_first - timedelta(days=1)
+
+            filters["from_date"] = first_day.strftime("%Y-%m-%d")
+            filters["to_date"] = last_day.strftime("%Y-%m-%d")
+        except Exception as e:
+            frappe.log_error(f"Month filter error: {str(e)}", "Month Filter Error")
+
+    return filters
 
 def _extract_date_part(value):
     """Extract và normalize phần date từ identifier (ví dụ: '17.10.25' hoặc '17.10.2025' -> '17.10.25')."""

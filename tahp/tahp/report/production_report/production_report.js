@@ -4,6 +4,10 @@ frappe.query_reports["Production Report"] = {
             "fieldname": "from_date",
             "label": __("Từ ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), 1);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
@@ -12,6 +16,10 @@ frappe.query_reports["Production Report"] = {
             "fieldname": "to_date",
             "label": __("Đến ngày"),
             "fieldtype": "Date",
+            "default": function() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            }(),
             "on_change": function() {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
@@ -699,39 +707,16 @@ frappe.query_reports["Production Report"] = {
         const year_value = frappe.query_report.get_filter_value("year");
         
         if (month_value) {
-            // Try to extract month number from option like "Tháng 1"
-            let month_num = null;
-            if (typeof month_value === 'string') {
-                const m = month_value.match(/(\d+)/);
-                if (m) month_num = parseInt(m[1], 10);
-            } else if (typeof month_value === 'number') {
-                month_num = month_value;
-            }
-
-            // If we could resolve month and year, set from_date/to_date client-side so server receives concrete dates
-            if (month_num) {
-                const y = year_value || new Date().getFullYear();
-                const firstDay = new Date(y, month_num - 1, 1);
-                // last day: day 0 of next month
-                const lastDay = new Date(y, month_num, 0);
-
-                // Use frappe helper to format date string
-                const fromStr = frappe.datetime.obj_to_str(firstDay);
-                const toStr = frappe.datetime.obj_to_str(lastDay);
-
-                frappe.query_report.set_filter_value("from_date", fromStr, false);
-                frappe.query_report.set_filter_value("to_date", toStr, false);
-            } else {
-                // Fallback: clear explicit dates so server-side month->date mapping can run
-                frappe.query_report.set_filter_value("from_date", "", false);
-                frappe.query_report.set_filter_value("to_date", "", false);
-            }
-
+            // Clear explicit date filters (material_consumption UX)
+            frappe.query_report.set_filter_value("from_date", "", false);
+            frappe.query_report.set_filter_value("to_date", "", false);
+            
             frappe.show_alert({
                 message: __(`Đã chọn tháng ${month_value}/${year_value}`),
-                indicator: 'blue'
+                indicator: 'green'
             }, 5);
-
+            
+            // Re-render components after refresh
             frappe.query_report.refresh();
             setTimeout(() => {
                 this.render_components();

@@ -7,6 +7,10 @@ frappe.query_reports["Production Schedule"] = {
 			"fieldname": "from_date",
 			"label": __("Từ ngày"),
 			"fieldtype": "Date",
+			"default": function() {
+				const now = new Date();
+				return new Date(now.getFullYear(), now.getMonth(), 1);
+			}(),
 			"on_change": function() {
 				frappe.query_reports["Production Schedule"].handle_date_range_change();
 			}
@@ -15,16 +19,30 @@ frappe.query_reports["Production Schedule"] = {
 			"fieldname": "to_date",
 			"label": __("Đến ngày"),
 			"fieldtype": "Date",
+			"default": function() {
+				const now = new Date();
+				return new Date(now.getFullYear(), now.getMonth() + 1, 0);
+			}(),
 			"on_change": function() {
 				frappe.query_reports["Production Schedule"].handle_date_range_change();
 			}
 		},
 		{
-			"fieldname": "week",
-			"label": __("Tuần"),
-			"fieldtype": "Date",
+			"fieldname": "month",
+			"label": __("Tháng"),
+			"fieldtype": "Select",
+			"options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
 			"on_change": function() {
-				frappe.query_reports["Production Schedule"].handle_week_change();
+				frappe.query_reports["Production Schedule"].handle_month_year_change();
+			}
+		},
+		{
+			"fieldname": "year",
+			"label": __("Năm"),
+			"fieldtype": "Int",
+			"default": new Date().getFullYear(),
+			"on_change": function() {
+				frappe.query_reports["Production Schedule"].handle_month_year_change();
 			}
 		}
 	],
@@ -36,14 +54,15 @@ frappe.query_reports["Production Schedule"] = {
 	"onload": function(report) {
 		setTimeout(() => { 
 			this.render_components(); 
-		}, 1000);
+		}, 500);
 		
 		this.add_responsive_styles();
 
 		let previous_values = {
 			from_date: report.get_filter_value("from_date"),
 			to_date: report.get_filter_value("to_date"),
-			week: report.get_filter_value("week")
+			month: report.get_filter_value("month"),
+			year: report.get_filter_value("year")
 		};
 
 		const on_date_cleared_handler = (fieldname) => {
@@ -62,7 +81,8 @@ frappe.query_reports["Production Schedule"] = {
 
 		report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
 		report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
-		report.page.fields_dict.week.$input.on('change', () => on_date_cleared_handler("week"));
+		if (report.page.fields_dict.month) report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
+		if (report.page.fields_dict.year) report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
 	},
 
 	"add_responsive_styles": function() {
@@ -747,7 +767,7 @@ frappe.query_reports["Production Schedule"] = {
 		const to_date = frappe.query_report.get_filter_value("to_date");
 		
 		if (from_date || to_date) {
-			frappe.query_report.set_filter_value("week", "", false);
+			frappe.query_report.set_filter_value("month", "", false);
 		}
 		
 		frappe.query_report.refresh();
@@ -756,19 +776,16 @@ frappe.query_reports["Production Schedule"] = {
 		}, 500);
 	},
 
-	"handle_week_change": function() {
-		const week_value = frappe.query_report.get_filter_value("week");
+	"handle_month_year_change": function() {
+		const month_value = frappe.query_report.get_filter_value("month");
+		const year_value = frappe.query_report.get_filter_value("year");
 		
-		if (week_value) {
+		if (month_value) {
 			frappe.query_report.set_filter_value("from_date", "", false);
 			frappe.query_report.set_filter_value("to_date", "", false);
 			
-			const selected_date = frappe.datetime.str_to_obj(week_value);
-			const monday = this.getMonday(selected_date);
-			const sunday = this.getSunday(monday);
-			
 			frappe.show_alert({
-				message: __(`Đã chọn tuần từ ${frappe.datetime.obj_to_str(monday)} đến ${frappe.datetime.obj_to_str(sunday)}`),
+				message: __(`Đã chọn tháng ${month_value}/${year_value}`),
 				indicator: 'blue'
 			}, 5);
 			
@@ -777,18 +794,5 @@ frappe.query_reports["Production Schedule"] = {
 				this.render_components();
 			}, 500);
 		}
-	},
-
-	"getMonday": function(date) {
-		const d = new Date(date);
-		const day = d.getDay();
-		const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-		return new Date(d.setDate(diff));
-	},
-
-	"getSunday": function(monday) {
-		const sunday = new Date(monday);
-		sunday.setDate(monday.getDate() + 6);
-		return sunday;
 	}
 };
