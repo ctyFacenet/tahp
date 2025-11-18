@@ -72,63 +72,41 @@ frappe.query_reports["Material Consumption"] = {
         
         // Hook để lưu columns sau khi datatable render
         frappe.query_reports["Material Consumption"].after_datatable_render = function(datatable) {
-            // Lưu columns từ frappe.query_report.columns (columns gốc từ Python)
-            // và filter bỏ hidden columns (giống như render_datatable)
             if (frappe.query_report && frappe.query_report.columns) {
                 self.original_columns = frappe.query_report.columns.filter((col) => !col.hidden);
             }
             
-            // Thêm CSS để đảm bảo labels header không bị nghiêng
+            // Thêm CSS để header labels hiển thị ngang, KHÔNG động đến transform
             setTimeout(() => {
-                // Thêm CSS để header labels hiển thị ngang, không nghiêng
                 const styleId = 'material-consumption-header-style';
                 if (!$(`#${styleId}`).length) {
                     $('<style>', {
                         id: styleId,
                         text: `
-                            /* Chỉ target header cells, không ảnh hưởng đến body rows */
-                            .report-wrapper .dt-header th,
-                            .report-wrapper .dt-header .dt-cell,
-                            .report-wrapper .dt-header .dt-cell__content {
-                                transform: none !important;
-                                writing-mode: horizontal-tb !important;
-                                text-orientation: upright !important;
-                            }
-                            
-                            /* Cho phép text wrap trong header */
-                            .report-wrapper .dt-header .dt-cell__content,
+                            /* Chỉ target header cells content, KHÔNG override transform */
                             .report-wrapper .dt-header .dt-cell__content-text {
+                                writing-mode: horizontal-tb !important;
+                                text-orientation: mixed !important;
                                 white-space: normal !important;
                                 word-wrap: break-word !important;
                                 overflow-wrap: break-word !important;
+                                max-width: 100%;
                             }
                         `
                     }).appendTo('head');
                 }
                 
-                // Apply trực tiếp vào các header cells - chỉ remove transform
+                // KHÔNG apply transform: none, chỉ sửa text orientation
                 if (datatable && datatable.$wrapper) {
-                    datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
-                        const $cell = $(this);
-                        // Chỉ remove transform, không thay đổi layout
-                        $cell.css({
-                            'transform': 'none',
+                    datatable.$wrapper.find('.dt-header .dt-cell__content-text').each(function() {
+                        const $text = $(this);
+                        // CHỈ sửa text properties, KHÔNG động đến transform
+                        $text.css({
                             'writing-mode': 'horizontal-tb',
-                            'text-orientation': 'upright'
-                        });
-                        
-                        // Cho phép text wrap trong content
-                        $cell.find('.dt-cell__content, .dt-cell__content-text').css({
+                            'text-orientation': 'mixed',
                             'white-space': 'normal',
                             'word-wrap': 'break-word',
                             'overflow-wrap': 'break-word'
-                        });
-                        
-                        // Loại bỏ transform từ các phần tử con
-                        $cell.find('.dt-cell__content *, .dt-cell__content-text *').css({
-                            'transform': 'none',
-                            'writing-mode': 'horizontal-tb',
-                            'text-orientation': 'upright'
                         });
                     });
                 }
@@ -664,18 +642,13 @@ frappe.query_reports["Material Consumption"] = {
         if (!frappe.query_report || !frappe.query_report.datatable) return;
         
         const filtered_data = this.get_filtered_data();
-        
-        // Ưu tiên dùng original_columns đã lưu (columns đã được filter đúng)
         let columns = this.original_columns;
         
-        // Nếu không có original_columns, lấy từ report và filter
         if (!columns || columns.length === 0) {
             columns = frappe.query_report.columns || [];
             if (columns.length === 0) {
-                // Fallback: lấy từ datatable nếu không có trong report
                 columns = frappe.query_report.datatable.datamanager.columns || [];
             }
-            // Filter bỏ hidden columns (giống như Frappe làm trong render_datatable)
             columns = columns.filter((col) => !col.hidden);
         }
         
@@ -684,49 +657,33 @@ frappe.query_reports["Material Consumption"] = {
             return;
         }
         
-        // Clone columns để tránh reference issues
         const columns_copy = columns.map(col => ({ ...col }));
         
-        // Refresh datatable với filtered data và columns đã filter
         if (frappe.query_report.datatable && typeof frappe.query_report.datatable.refresh === 'function') {
             try {
                 frappe.query_report.datatable.refresh(filtered_data, columns_copy);
                 
-                // Apply CSS để đảm bảo header labels không bị nghiêng sau khi refresh
+                // Apply CSS sau khi refresh - CHỈ sửa text, KHÔNG động đến transform
                 setTimeout(() => {
                     if (frappe.query_report.datatable && frappe.query_report.datatable.$wrapper) {
-                        frappe.query_report.datatable.$wrapper.find('.dt-header .dt-cell, .dt-header th').each(function() {
-                            const $cell = $(this);
-                            // Chỉ remove transform, không thay đổi layout
-                            $cell.css({
-                                'transform': 'none',
+                        frappe.query_report.datatable.$wrapper.find('.dt-header .dt-cell__content-text').each(function() {
+                            const $text = $(this);
+                            // CHỈ sửa text properties
+                            $text.css({
                                 'writing-mode': 'horizontal-tb',
-                                'text-orientation': 'upright'
-                            });
-                            
-                            // Cho phép text wrap trong content
-                            $cell.find('.dt-cell__content, .dt-cell__content-text').css({
+                                'text-orientation': 'mixed',
                                 'white-space': 'normal',
                                 'word-wrap': 'break-word',
                                 'overflow-wrap': 'break-word'
-                            });
-                            
-                            // Loại bỏ transform từ các phần tử con
-                            $cell.find('.dt-cell__content *, .dt-cell__content-text *').css({
-                                'transform': 'none',
-                                'writing-mode': 'horizontal-tb',
-                                'text-orientation': 'upright'
                             });
                         });
                     }
                 }, 50);
             } catch (error) {
                 console.error("Lỗi khi refresh datatable:", error);
-                // Fallback: reload toàn bộ report nếu refresh thất bại
                 frappe.query_report.refresh();
             }
         } else {
-            // Fallback: reload toàn bộ report nếu method refresh không tồn tại
             frappe.query_report.refresh();
         }
     },
