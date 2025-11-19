@@ -198,7 +198,6 @@ frappe.query_reports["Downtime Report"] = {
                         flex: 1 !important;
                     }
                 }
-                    
             `;
             document.head.appendChild(style);
         }
@@ -346,36 +345,6 @@ async function draw_column_chart() {
 
         const ctx = canvas.getContext("2d");
 
-        // Custom plugin để hiển thị số ở đỉnh cột
-        const dataLabelsPlugin = {
-            id: 'dataLabelsPlugin',
-            afterDatasetsDraw(chart) {
-                const { ctx, data } = chart;
-                
-                ctx.save();
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillStyle = '#374151';
-                
-                data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        const label = `${value.toFixed(2)}`;
-                        
-                        const xPos = bar.x;
-                        const yPos = bar.y - 5;
-                        
-                        ctx.fillText(label, xPos, yPos);
-                    });
-                });
-                
-                ctx.restore();
-            }
-        };
-
         let chartInstance = new Chart(ctx, {
             type: "bar",
             data: {
@@ -423,9 +392,13 @@ async function draw_column_chart() {
                 plugins: {
                     legend: { display: false, position: "top" },
                     
-                    
-                    // Tắt datalabels mặc định nếu dùng custom plugin
-                    datalabels: { display: false }
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#3b3939ff',
+                        font: { weight: 'bold' },
+                        formatter: (value) => value.toFixed(2)
+                    }
                 },
                 scales: { 
                     y: { 
@@ -451,7 +424,6 @@ async function draw_column_chart() {
                      
                 }
             },
-            plugins: [dataLabelsPlugin]
         });
        
         let titleDiv = document.createElement("div");
@@ -492,7 +464,6 @@ async function draw_horizontal_chart() {
     wrapper.classList.add("custom-chart-wrapper", "chart-container-device-horizontal");
     wrapper.style.width = "100%";
     wrapper.style.flex = "1";
-    
 
     chartsContainer.appendChild(wrapper);
 
@@ -527,36 +498,6 @@ async function draw_horizontal_chart() {
         combined.sort((a, b) => b.value - a.value);
 
         const ctx = canvas.getContext("2d");
-
-        // Custom plugin để hiển thị số ở cuối thanh ngang
-        const dataLabelsPlugin = {
-            id: 'dataLabelsPlugin',
-            afterDatasetsDraw(chart) {
-                const { ctx, data } = chart;
-                
-                ctx.save();
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#374151';
-                
-                data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        const label = `${value.toFixed(2)}`;
-                        
-                        const xPos = bar.x + 5; // Cách thanh 5px
-                        const yPos = bar.y;
-                        
-                        ctx.fillText(label, xPos, yPos);
-                    });
-                });
-                
-                ctx.restore();
-            }
-        };
 
         let chartInstance = new Chart(ctx, {
             type: "bar",
@@ -602,8 +543,13 @@ async function draw_horizontal_chart() {
                 plugins: {
                     legend: { display: false, position: "top" },
                     
-                    
-                    datalabels: { display: false }
+                    datalabels: {
+                        anchor: 'end',   
+                        align: 'right',  
+                        color: '#3b3939ff',
+                        font: { weight: 'bold' },
+                        formatter: (value) => value.toFixed(2)
+                    }
                 },
                 scales: { 
                     x: { 
@@ -618,7 +564,6 @@ async function draw_horizontal_chart() {
                     } 
                 }
             },
-            plugins: [dataLabelsPlugin]
             
         });
 
@@ -780,34 +725,6 @@ async function draw_column_chart1() {
         const colors = chartData.colors;
         
         const ctx = canvas.getContext("2d");
-        const dataLabelsPlugin = {
-            id: 'dataLabelsPlugin',
-            afterDatasetsDraw(chart) {
-                const { ctx, data } = chart;
-                
-                ctx.save();
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'bottom';
-                ctx.fillStyle = '#374151';
-                
-                data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        const label = `${value.toFixed(2)}`;
-                        
-                        const xPos = bar.x;
-                        const yPos = bar.y - 5;
-                        
-                        ctx.fillText(label, xPos, yPos);
-                    });
-                });
-                
-                ctx.restore();
-            }
-        };
        
         let chartInstance = new Chart(ctx, {
             type: "bar",
@@ -853,7 +770,13 @@ async function draw_column_chart1() {
                 plugins: {
                     legend: { display: false, position: "top" },
                     
-                    datalabels: { display: false }
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#3b3939ff',
+                        font: { weight: 'bold' },
+                        formatter: (value) => value.toFixed(2)
+                    }
                 },
                 scales: { 
                     y: { 
@@ -876,7 +799,7 @@ async function draw_column_chart1() {
                     }
                 }
             },
-            plugins: [dataLabelsPlugin]
+            
         });
       
         let titleDiv = document.createElement("div");
@@ -949,35 +872,6 @@ async function draw_horizontal_chart1() {
         combined.sort((a, b) => b.value - a.value);
 
         const ctx = canvas.getContext("2d");
-        // Custom plugin để hiển thị số ở cuối thanh ngang
-        const dataLabelsPlugin = {
-            id: 'dataLabelsPlugin',
-            afterDatasetsDraw(chart) {
-                const { ctx, data } = chart;
-                
-                ctx.save();
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#374151';
-                
-                data.datasets.forEach((dataset, datasetIndex) => {
-                    const meta = chart.getDatasetMeta(datasetIndex);
-                    
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        const label = `${value.toFixed(2)}`;
-                        
-                        const xPos = bar.x + 5;
-                        const yPos = bar.y;
-                        
-                        ctx.fillText(label, xPos, yPos);
-                    });
-                });
-                
-                ctx.restore();
-            }
-        };
        
         let chartInstance = new Chart(ctx, {
             type: "bar",
@@ -1025,7 +919,13 @@ async function draw_horizontal_chart1() {
                     legend: { display: false, position: "top" },
                     
                     
-                    datalabels: { display: false }
+                    datalabels: {
+                        anchor: 'end',   
+                        align: 'right',  
+                        color: '#3b3939ff',
+                        font: { weight: 'bold' },
+                        formatter: (value) => value.toFixed(2)
+                    }
                 },
                 scales: { 
                     x: { 
@@ -1040,7 +940,7 @@ async function draw_horizontal_chart1() {
                     } 
                 }
             },
-            plugins: [dataLabelsPlugin]
+            
         });
 
         let titleDiv = document.createElement("div");

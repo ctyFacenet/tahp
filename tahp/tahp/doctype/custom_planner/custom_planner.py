@@ -5,6 +5,7 @@ import json
 import frappe
 from frappe.model.document import Document
 from frappe.utils import now_datetime, add_days, nowdate, getdate, formatdate
+from frappe.model.workflow import apply_workflow
 
 STEPS = {
     "Nháp": {
@@ -160,6 +161,10 @@ def handle_approve(planner, post, comment=None):
         plan.submit()
 
     doc.db_set("workflow_state", "Duyệt xong")
+    doc.add_comment(
+        comment_type="Workflow",
+        text="Duyệt xong"
+    )
     doc.submit()
 
     subject= f"LSX Tuần {plan.name} đã được Giám đốc duyệt"

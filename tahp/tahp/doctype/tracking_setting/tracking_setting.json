@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-19 09:21:08.539307",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "first_step",
+  "second_step",
+  "third_step",
+  "fourth_step",
+  "fifth_step",
+  "column_break_qotr",
+  "sixth_step",
+  "seventh_step",
+  "eighth_step",
+  "ninth_step",
+  "tenth_step",
+  "section_break_upnn",
+  "warning_minute"
+ ],
+ "fields": [
+  {
+   "default": "13:15",
+   "fieldname": "first_step",
+   "fieldtype": "Data",
+   "label": "\u0110\u1ee3i PTCN duy\u1ec7t"
+  },
+  {
+   "default": "13:30",
+   "fieldname": "second_step",
+   "fieldtype": "Data",
+   "label": "\u0110\u00e3 \u0111\u01b0\u1ee3c PTCN duy\u1ec7t"
+  },
+  {
+   "default": "13:45",
+   "fieldname": "third_step",
+   "fieldtype": "Data",
+   "label": "\u0110\u1ee3i G\u0110 duy\u1ec7t"
+  },
+  {
+   "default": "14:00",
+   "fieldname": "fourth_step",
+   "fieldtype": "Data",
+   "label": "Duy\u1ec7t xong"
+  },
+  {
+   "default": "14:30",
+   "fieldname": "fifth_step",
+   "fieldtype": "Data",
+   "label": "Qu\u1ea3n \u0111\u1ed1c t\u1ea1o LSX Ca"
+  },
+  {
+   "default": "15:00",
+   "fieldname": "sixth_step",
+   "fieldtype": "Data",
+   "label": "\u0110\u1ee3i Qu\u1ea3n \u0111\u1ed1c duy\u1ec7t"
+  },
+  {
+   "default": "60",
+   "fieldname": "seventh_step",
+   "fieldtype": "Data",
+   "label": "Duy\u1ec7t xong"
+  },
+  {
+   "default": "60",
+   "fieldname": "eighth_step",
+   "fieldtype": "Data",
+   "label": "Tr\u01b0\u1edfng ca b\u1eaft \u0111\u1ea7u"
+  },
+  {
+   "default": "60",
+   "fieldname": "ninth_step",
+   "fieldtype": "Data",
+   "label": "Tr\u01b0\u1edfng ca ch\u1ed1t s\u1ea3n l\u01b0\u1ee3ng"
+  },
+  {
+   "default": "60",
+   "fieldname": "tenth_step",
+   "fieldtype": "Data",
+   "label": "KCS x\u00e1c nh\u1eadn th\u00e0nh ph\u1ea9m"
+  },
+  {
+   "fieldname": "column_break_qotr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_upnn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "60",
+   "fieldname": "warning_minute",
+   "fieldtype": "Data",
+   "label": "Th\u1eddi gian c\u1ea3nh b\u00e1o"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-11-19 10:10:32.336294",
+ "modified_by": "Administrator",
+ "module": "Tahp",
+ "name": "Tracking Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

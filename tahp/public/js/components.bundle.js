@@ -1,5 +1,6 @@
 import { mountVue, unmountVue } from "./vue_helper.js";
 import BaseLayout from "./components/BaseLayout.vue";
+import TrackingProduction from "../../tahp/page/tracking_production/TrackingProduction.vue";
 
 frappe.provide("tahp.ui");
 tahp.ui.mountVue = mountVue;
@@ -26,6 +27,7 @@ function createVueWrapper(name, component) {
 }
 
 createVueWrapper("BaseLayout", BaseLayout);
+createVueWrapper("TrackingProduction", TrackingProduction)
 
 // 	const facenet_wrapper_html = `<div class="facenet-view">Anh Lộc chẻ châu</div>`;
 // 	this.$frappe_list.html(facenet_wrapper_html);

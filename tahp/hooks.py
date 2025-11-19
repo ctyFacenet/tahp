@@ -48,6 +48,7 @@ app_include_css = [
     "/assets/tahp/js/tahp/custom/datatable/style.css",
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
     "/assets/tahp/css/planner.css",
+    "/assets/tahp/css/build.css"
 ]
 # app_include_js = "/assets/tahp/js/tahp.js"
 app_include_js = [
