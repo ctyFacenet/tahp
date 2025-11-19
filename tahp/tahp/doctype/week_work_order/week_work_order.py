@@ -52,6 +52,10 @@ def stop(wwo):
 		wo_doc = frappe.get_doc("Work Order", wo)
 		if wo_doc.docstatus == 0:
 			wo_doc.workflow_state = "Đã bị dừng"
+			wo_doc.add_comment(
+				comment_type="Workflow",
+				text="Đã bị dừng"
+			)
 			wo_doc.save()
 		elif wo_doc.docstatus == 1:
 			shift_leader = wo_doc.custom_shift_leader
