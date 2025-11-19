@@ -49,7 +49,7 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
         order_by="creation asc"
     )
 
-    if wwo.doctype == "Week Work Order" and wwo.plan:
+    if wwo.doctype == "Week Work Order" and wwo.plan and wwo.docstatus == 1:
         plan_modified, plan_modified_by = frappe.db.get_value(
             "WWO Plan",
             wwo.plan,
@@ -113,9 +113,14 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
     creation_dt = get_datetime(wwo.creation)
     now_dt = frappe.utils.now_datetime()
 
-    late = False
     processing = False
     for step in steps:
+        if processing:
+            step["state"] = "pending"
+            step["status"] = None
+            step.pop("workflow", None)
+            continue
+
         workflow_name = step.get("workflow")
         if not workflow_name:  continue
 
@@ -136,44 +141,53 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
 
         step_state = step["state"]
         status = None
+
         if step.get("flag"):
             step_state = "processing"
+            processing = True
+
             delta_hours = abs((now_dt - now_dt).total_seconds()) / helper
             time_str = get_time_str(now_dt, target_dt)
+
             if delta_hours <= warning_hour:
-                if not late:
-                    step_state = "late_warning"
-                    late = True
+                step_state = "late_warning"
             else:
-                if not late:
-                    step_state = "late_danger"
-                    late = True
+                step_state = "late_danger"
+
             status = f"Trễ {time_str}"
-        else:
-            if comment_dt < target_dt:
-                if not processing:
-                    if comment_for_step:
-                        step_state = "completed"
-                        status = f"Sớm {time_str}"
-                    else:
-                        step_state = "processing"
-                        processing = True
+
+            step["status"] = status
+            step["updated"] = now_dt.strftime("%H:%M %d/%m")
+            step["state"] = step_state
+            step.pop("workflow", None)
+            continue
+
+        if comment_dt < target_dt:
+            if comment_for_step:
+                step_state = "completed"
+                status = f"Sớm {time_str}"
             else:
-                delta_hours = abs((comment_dt - target_dt).total_seconds()) / helper
-                if delta_hours <= warning_hour:
-                    if not late:
-                        step_state = "warning"
-                        if not comment_for_step:
-                            step_state = "late_warning"
-                            late = True
-                        status = f"Trễ {time_str}"
-                else:
-                    if not late:
-                        step_state = "danger"
-                        if not comment_for_step:
-                            step_state = "late_danger"
-                            late = True
-                        status = f"Trễ {time_str}"
+                step_state = "processing"
+                processing = True
+            
+            step["state"] = step_state
+        else:
+            delta_hours = abs((comment_dt - target_dt).total_seconds()) / helper
+            if delta_hours <= warning_hour:
+                step_state = "warning"
+
+                if not comment_for_step:
+                    step_state = "late_warning"
+                    processing = True
+
+            else:
+                step_state = "danger"
+
+                if not comment_for_step:
+                    step_state = "late_danger"
+                    processing = True
+
+            status = f"Trễ {time_str}"
 
         step["status"] = status
         if status not in ["pending", "processing"] and status:
