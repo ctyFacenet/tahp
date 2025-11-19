@@ -101,7 +101,9 @@ doctype_js = {
     "Job Card": "/public/js/job_card/job_card.js",
     "Employee": "/public/js/employee/employee.js",
     "Workstation": "/public/js/workstation/workstation.js",
-    "Supplier": "/public/js/supplier/supplier.js"
+    "Supplier": "/public/js/supplier/supplier.js",
+    "Material Request": "/public/js/material_request/material_request.js"
+    
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}

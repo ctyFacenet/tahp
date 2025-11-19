@@ -1,5 +1,11 @@
 frappe.ui.form.on('Material Request', {
+
+    onload: function(frm) {
+        console.log("hello - onload");
+    },
+    
     refresh: function(frm) {
+        console.log("hello1")
         // Thêm nút "Chọn mặt hàng từ BOM"
         frm.fields_dict['items'].grid.add_custom_button(__('Chọn mặt hàng từ BOM'), function() {
             // Tạo dialog
@@ -82,7 +88,7 @@ frappe.ui.form.on('Material Request', {
                 method: 'frappe.client.get_list',
                 args: {
                     doctype: 'Week Work Order',
-                    fields: ['name', 'creation', ],
+                    fields: ['name', 'creation'],
                     filters: {
                         workflow_state: 'Duyệt xong'
                     },
@@ -140,10 +146,11 @@ frappe.ui.form.on('Material Request', {
                                 <table class="table table-bordered" style="font-size: 13px;">
                                     <thead>
                                         <tr style="background-color: #f5f5f5;">
+                                            <th style="width: 40px; text-align: center;"></th>
                                             <th style="width: 60px;">Thứ tự</th>
                                             <th>Lệnh sản xuất</th>
-                                            <th>Ngày bắt đầu dự kiến</th>
-                                            <th style="width: 50px;"></th>
+                                            <th style="width: 150px;">Ngày bắt đầu dự kiến</th>
+                                            <th style="width: 50px; text-align: center;">Chọn</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -152,29 +159,38 @@ frappe.ui.form.on('Material Request', {
                             valid_results.forEach((result, idx) => {
                                 let wwo_id = 'wwo_' + idx;
                                 
+                                // Dòng LSX
                                 html += `
-                                    <tr>
-                                        <td rowspan="${result.items.length + 1}">${idx + 1}</td>
+                                    <tr class="wwo-row">
+                                        <td style="text-align: center;">
+                                            <i class="fa fa-chevron-right wwo-toggle" 
+                                               data-wwo="${wwo_id}"
+                                               style="cursor: pointer; color: #666;"
+                                               title="Click để ẩn/hiện BOM"></i>
+                                        </td>
+                                        <td>${idx + 1}</td>
                                         <td>
                                             <div style="font-weight: 600;">
                                                 ${result.wwo}
                                             </div>
                                         </td>
-                                        <td rowspan="${result.items.length + 1}">${result.planned_start_date || ''}</td>
-                                        <td rowspan="${result.items.length + 1}" style="text-align: center;">
+                                        <td>${result.planned_start_date || ''}</td>
+                                        <td style="text-align: center;">
                                             <input type="checkbox" 
                                                    class="wwo-checkbox" 
-                                                   id="${wwo_id}">
+                                                   data-wwo="${wwo_id}">
                                         </td>
                                     </tr>
                                 `;
 
-                                // Hiển thị từng BOM với checkbox riêng
+                                // Hiển thị từng BOM với checkbox (mặc định ẩn)
                                 result.items.forEach((item, item_idx) => {
                                     let bom_id = 'bom_' + idx + '_' + item_idx;
                                     html += `
-                                        <tr>
-                                            <td style="padding-left: 30px; color: #666;">
+                                        <tr class="bom-row" data-parent="${wwo_id}" style="display: none;">
+                                            <td></td>
+                                            <td></td>
+                                            <td style="padding-left: 40px; color: #666;">
                                                 ${item.bom}
                                             </td>
                                             <td></td>
@@ -197,25 +213,50 @@ frappe.ui.form.on('Material Request', {
 
                             d.fields_dict.wwo_html.$wrapper.html(html);
 
-                            // Xử lý khi checkbox WWO được click
+                            // Xử lý khi click vào icon toggle LSX
+                            d.$wrapper.find('.wwo-toggle').on('click', function() {
+                                let wwo_id = $(this).attr('data-wwo');
+                                let $icon = $(this);
+                                let $bomRows = d.$wrapper.find(`.bom-row[data-parent="${wwo_id}"]`);
+                                
+                                // Toggle hiển thị BOM
+                                $bomRows.toggle();
+                                
+                                // Đổi icon
+                                if ($bomRows.is(':visible')) {
+                                    $icon.removeClass('fa-chevron-right').addClass('fa-chevron-down');
+                                } else {
+                                    $icon.removeClass('fa-chevron-down').addClass('fa-chevron-right');
+                                }
+                            });
+
+                            // Xử lý khi checkbox LSX được click
                             d.$wrapper.find('.wwo-checkbox').on('change', function() {
-                                let wwo_id = $(this).attr('id');
+                                let wwo_id = $(this).attr('data-wwo');
                                 let is_checked = $(this).is(':checked');
                                 
                                 // Check/uncheck tất cả BOM con
                                 d.$wrapper.find(`.bom-checkbox[data-wwo="${wwo_id}"]`).prop('checked', is_checked);
                             });
 
-                            // Xử lý khi checkbox BOM được click - cập nhật trạng thái WWO
+                            // Xử lý khi checkbox BOM được click - cập nhật trạng thái LSX
                             d.$wrapper.find('.bom-checkbox').on('change', function() {
                                 let wwo_id = $(this).attr('data-wwo');
                                 let total_bom = d.$wrapper.find(`.bom-checkbox[data-wwo="${wwo_id}"]`).length;
                                 let checked_bom = d.$wrapper.find(`.bom-checkbox[data-wwo="${wwo_id}"]:checked`).length;
                                 
+                                // Cập nhật trạng thái checkbox LSX
+                                let $wwoCheckbox = d.$wrapper.find(`.wwo-checkbox[data-wwo="${wwo_id}"]`);
+                                
                                 if (checked_bom === 0) {
-                                    d.$wrapper.find(`#${wwo_id}`).prop('checked', false);
+                                    $wwoCheckbox.prop('checked', false);
+                                    $wwoCheckbox.prop('indeterminate', false);
                                 } else if (checked_bom === total_bom) {
-                                    d.$wrapper.find(`#${wwo_id}`).prop('checked', true);
+                                    $wwoCheckbox.prop('checked', true);
+                                    $wwoCheckbox.prop('indeterminate', false);
+                                } else {
+                                    $wwoCheckbox.prop('checked', false);
+                                    $wwoCheckbox.prop('indeterminate', true);
                                 }
                             });
                         });
