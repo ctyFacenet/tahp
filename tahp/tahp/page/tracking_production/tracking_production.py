@@ -274,16 +274,15 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
         order_by="creation asc"
     )
 
-    creation_dt = get_datetime(wo.creation)
+    planned_start_date = get_datetime(wo.planned_start_date)
     target_hour, target_minute = map(int, workflow_mapping_wo["Đợi Quản đốc duyệt"].split(":"))
-    target_dt = creation_dt.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+    target_dt = planned_start_date.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
     now_dt = frappe.utils.now_datetime()
     block_index = None
     process_step(steps[0], "Đợi Quản đốc duyệt", target_dt, comments, now_dt, warning_hour, helper)
 
     if steps[0].get("block"): block_index = 0
 
-    planned_start_date = get_datetime(wo.planned_start_date)
     shift_doc = frappe.get_doc("Shift", wo.custom_shift)
     start_time = shift_doc.start_time
     end_time = shift_doc.end_time
@@ -457,8 +456,10 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                     status = f"Trễ {time_str}"
                 steps[5]["updated"] = finish_dt.strftime("%H:%M %d/%m")
                 steps[5]["creation_dt"] = finish_dt
-                steps[5]["doctype"] = "Work Order Finished Item"
-                steps[5]["name"] = [r.name for r in result]
+                
+            steps[5]["doctype"] = "Work Order Finished Item"
+            steps[5]["name"] = [r.name for r in result]
+
 
             steps[5]["state"] = state
             steps[5]["status"] = status
