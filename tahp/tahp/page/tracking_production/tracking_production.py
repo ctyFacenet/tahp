@@ -1,6 +1,7 @@
 import frappe
 import json
 from frappe.utils import time_diff_in_seconds, get_datetime, add_to_date
+from frappe.utils import getdate, get_first_day, get_last_day, nowdate
 from collections import Counter
 
 def get_time_str(dt_actual, dt_target):
@@ -531,8 +532,13 @@ def build_record(name, posts, wos, creation, wwo, warning_hour, helper, workflow
 @frappe.whitelist()
 def get_response(filters=dict()):
     if isinstance(filters, str): filters = json.loads(filters)
-    from_date = frappe.utils.getdate(filters.get("from_date")) if filters.get("from_date") else None
-    to_date = frappe.utils.getdate(filters.get("to_date")) if filters.get("to_date") else None
+    today = getdate(nowdate())
+    default_from = get_first_day(today)
+    default_to = get_last_day(today)
+
+    from_date = getdate(filters.get("from_date")) if filters.get("from_date") else default_from
+    to_date = getdate(filters.get("to_date")) if filters.get("to_date") else default_to
+
     status = filters.get("status") if filters.get("status") else None
 
     results = []
@@ -559,11 +565,11 @@ def get_response(filters=dict()):
 
     wwo_filters = {"new_plan": ["is", "not set"], "docstatus": ["!=", "2"]}
     if from_date and to_date:
-        wwo_filters["creation"] = ["between", [from_date, to_date]]
+        wwo_filters["start_date"] = ["between", [from_date, to_date]]
     elif from_date:
-        wwo_filters["creation"] = [">=", from_date]
+        wwo_filters["start_date"] = [">=", from_date]
     elif to_date:
-        wwo_filters["creation"] = ["<=", to_date]
+        wwo_filters["start_date"] = ["<=", to_date]
 
     week_wos = frappe.db.get_all(
         "Week Work Order",
