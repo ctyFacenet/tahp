@@ -134,7 +134,7 @@
               <!-- Tổng thời gian và Đánh giá -->
               <div v-if="record.total_time" class="tw-mt-4 tw-pt-3 tw-border-t tw-border-gray-200">
                 <div class="tw-flex tw-items-center tw-gap-2 tw-text-sm">
-                  <span class="tw-text-gray-600">Tổng thời gian: </span>
+                  <span class="tw-text-gray-600">Tổng thời gian bị chậm: </span>
                   <span :class="['tw-font-bold', getStateTextColor(record.total_time.state)]">
                       {{ record.total_time.time_count }}
                   </span>
@@ -197,6 +197,7 @@
 
               <!-- Thời gian / Đánh giá -->
               <div class="tw-flex tw-flex-col tw-items-end tw-gap-1 tw-text-xs">
+                <div class="tw-font-medium">Tổng thời gian bị chậm</div>
                 <div :class="['tw-font-bold', getStateTextColor(record.total_time?.state)]">
                   {{ record.total_time?.time_count }}
                 </div>
@@ -316,6 +317,7 @@
                         </div>
                       </div>
                       <div class="tw-flex tw-flex-col tw-items-end tw-gap-1 tw-text-xs">
+                        <div class="tw-font-medium">Tổng thời gian bị chậm</div>
                         <div :class="['tw-font-bold', getStateTextColor(child.total_time?.state)]">
                           {{ child.total_time?.time_count }}
                         </div>
@@ -466,8 +468,8 @@ defineExpose({ loadData });
 
 const columns = [
   { title: '', key: 'expand', width: 50, fixed: 'left' },
-  { title: 'Mã LSX/LSX Ca', dataIndex: 'lsx_name', key: 'lsx_name', width: 180, fixed: 'left'  },
-  { title: 'Sản phẩm', dataIndex: 'items', key: 'items', width: 280, fixed: 'left'  },
+  { title: 'Mã LSX/LSX Ca', dataIndex: 'lsx_name', key: 'lsx_name', width: 180 },
+  { title: 'Sản phẩm', dataIndex: 'items', key: 'items', width: 250 },
   { title: 'Quy trình', dataIndex: 'steps', key: 'steps' },
 ];
 

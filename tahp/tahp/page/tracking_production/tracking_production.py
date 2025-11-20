@@ -3,6 +3,7 @@ import json
 from frappe.utils import time_diff_in_seconds, get_datetime, add_to_date
 from frappe.utils import getdate, get_first_day, get_last_day, nowdate
 from collections import Counter
+import datetime
 
 def get_time_str(dt_actual, dt_target):
     diff_sec = abs(time_diff_in_seconds(dt_actual, dt_target))
@@ -156,6 +157,7 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
 
             status = f"Trễ {time_str}"
 
+            step["late_dt"] = delta_hours
             step["status"] = status
             step["updated"] = now_dt.strftime("%H:%M %d/%m")
             step["state"] = step_state
@@ -187,6 +189,7 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
                     step_state = "late_danger"
                     processing = True
 
+            step["late_dt"] = delta_hours
             status = f"Trễ {time_str}"
 
         step["status"] = status
@@ -207,15 +210,20 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
     end_dt = max(creation_times)
     total_time = get_time_str(start_dt, end_dt)
 
-    evaluation = "completed"
-    for s in steps:
-        st = s["state"]
-        if st in ("late_danger", "danger"):
-            evaluation = "danger"
-            break
-        if st in ("late_warning", "warning"):
-            evaluation = "warning"
-            break
+    total_late_dt = sum([s.get("late_dt", 0) for s in steps if s.get("late_dt")])
+
+    if total_late_dt < warning_hour:
+        evaluation = "warning"
+    else:
+        evaluation = "danger"
+
+    if total_late_dt > 0:
+        start_dt = datetime.timedelta(0)
+        end_dt = datetime.timedelta(minutes=total_late_dt)
+        total_time = get_time_str(start_dt, end_dt)
+    else:
+        total_time = "0 phút"
+        evaluation = "completed"
 
     return steps, evaluation, total_time
 
@@ -234,6 +242,7 @@ def process_step(step, comment_content, target_dt, comments, now_dt, warning_hou
             else:
                 step["state"] = "late_danger"
             step["status"] = f"Trễ {time_str}"
+            step["late_dt"] = delta_hours
         step["block"] = True
     else:
         check_dt = get_datetime(comment.creation)
@@ -249,6 +258,7 @@ def process_step(step, comment_content, target_dt, comments, now_dt, warning_hou
             else:
                 step["state"] = "danger"
             step["status"] = f"Trễ {time_str}"
+            step["late_dt"] = delta_hours
         step["updated"] = check_dt.strftime("%H:%M %d/%m")
 
     step["creation_dt"] = check_dt
@@ -349,6 +359,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                     else:
                         state = "late_danger"
                     status = f"Trễ {time_str}"
+                    steps[3]["late_dt"] = delta_hours
                 steps[3]["creation_dt"] = now_dt
                 steps[3]["block"] = True
                 block_index = 3
@@ -358,6 +369,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                     time_str = get_time_str(latest_modified, end_shift)
                     state = "warning" if delta_hours <= warning_hour else "danger"
                     status = f"Trễ {time_str}"
+                    steps[3]["late_dt"] = delta_hours
                 elif latest_modified <= end_shift:
                     time_str = get_time_str(latest_modified, end_shift)
                     state = "completed"
@@ -396,6 +408,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                 else:
                     state = "late_danger"
                 status = f"Trễ {time_str}"
+                steps[4]["late_dt"] = delta_hours
             steps[4]["creation_dt"] = now_dt
             steps[4]["block"] = True
             block_index = 4
@@ -414,6 +427,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                 else:
                     state = "danger"
                 status = f"Trễ {time_str}"
+                steps[4]["late_dt"] = delta_hours
             steps[4]["updated"] = finish_dt.strftime("%H:%M %d/%m")
             steps[4]["creation_dt"] = finish_dt
 
@@ -436,6 +450,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                     else:
                         state = "late_danger"
                     status = f"Trễ {time_str}"
+                    steps[5]["late_dt"] = delta_hours
                 steps[5]["creation_dt"] = now_dt
                 steps[5]["block"] = True
                 block_index = 5
@@ -454,6 +469,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                     else:
                         state = "danger"
                     status = f"Trễ {time_str}"
+                    steps[5]["late_dt"] = delta_hours
                 steps[5]["updated"] = finish_dt.strftime("%H:%M %d/%m")
                 steps[5]["creation_dt"] = finish_dt
                 
@@ -493,15 +509,20 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
     end_dt = max(creation_times)
     total_time = get_time_str(start_dt, end_dt)
 
-    evaluation = "completed"
-    for s in steps:
-        st = s["state"]
-        if st in ("late_danger", "danger"):
-            evaluation = "danger"
-            break
-        if st in ("late_warning", "warning"):
-            evaluation = "warning"
-            break
+    total_late_dt = sum([s.get("late_dt", 0) for s in steps if s.get("late_dt")])
+
+    if total_late_dt < warning_hour:
+        evaluation = "warning"
+    else:
+        evaluation = "danger"
+
+    if total_late_dt > 0:
+        start_dt = datetime.timedelta(0)
+        end_dt = datetime.timedelta(minutes=total_late_dt)
+        total_time = get_time_str(start_dt, end_dt)
+    else:
+        total_time = "0 phút"
+        evaluation = "completed"
 
     return steps, evaluation, total_time
 
