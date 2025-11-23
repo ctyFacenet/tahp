@@ -73,41 +73,49 @@
 
           <!-- Cột Quy trình -->
           <template v-else-if="column.key === 'steps'">
-            <div class="tw-py-4 tw-w-full">
-              <div class="tw-relative tw-w-full tw-overflow-x-auto">
+            <div class="tw-py-4">
+              <div class="tw-relative tw-overflow-x-auto">
                 <div class="tw-flex tw-items-start tw-relative" style="min-height: 100px;">
                   <template v-for="(step, idx) in record.steps" :key="idx">
                     <div 
-                      class="tw-flex tw-flex-col tw-items-start tw-relative" 
-                      :style="{ width: idx < record.steps.length - 1 ? '180px' : '160px' }"
+                      class="tw-flex tw-flex-col tw-items-start tw-relative tw-flex-shrink-0" 
+                      :style="{ width: '180px'}"
                     >
                       <!-- Dot và Line -->
                       <div class="tw-flex tw-items-center tw-w-full">
                         <div 
                           @click="handleStepClick(step)"
-                          :class="['tw-cursor-pointer tw-w-10 tw-h-10 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-shadow tw-flex-shrink-0 tw-text-xl', getStepDotColor(step.state)]"
+                          :class="['tw-cursor-pointer tw-w-10 tw-h-10 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-flex-shrink-0 tw-text-xl', 
+                          getStepDotColor(step.state)]"
                         >
-                          <CheckCircleFilled 
-                            v-if="step.state === 'completed'" 
-                            class="tw-text-white" 
-                          />
-                          <CheckCircleFilled 
-                            v-else-if="step.state === 'warning'" 
-                            class="tw-text-white" 
-                          />
-                          <CheckCircleFilled 
-                            v-else-if="step.state === 'danger'" 
-                            class="tw-text-white" 
-                          />
-                          <SyncOutlined 
-                            v-else-if="step.state === 'processing' || step.state.includes('late')"
-                            :spin="true" 
-                            class="tw-text-white"
-                          />
-                          <div 
-                            v-else 
-                            class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-white"
-                          ></div>
+                          <span 
+                            class="tw-flex tw-items-center tw-justify-center"
+                            style="transition: transform 0.2s ease;"
+                            @mouseenter="$event.currentTarget.style.transform = 'scale(1.3)'"
+                            @mouseleave="$event.currentTarget.style.transform = 'scale(1)'"
+                          >
+                            <CheckCircleFilled 
+                              v-if="step.state === 'completed'" 
+                              class="tw-text-white" 
+                            />
+                            <CheckCircleFilled 
+                              v-else-if="step.state === 'warning'" 
+                              class="tw-text-white" 
+                            />
+                            <CheckCircleFilled 
+                              v-else-if="step.state === 'danger'" 
+                              class="tw-text-white" 
+                            />
+                            <SyncOutlined 
+                              v-else-if="step.state === 'processing' || step.state.includes('late')"
+                              :spin="true" 
+                              class="tw-text-white"
+                            />
+                            <div 
+                              v-else 
+                              class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-white"
+                            ></div>
+                          </span>
                         </div>
 
                         <!-- Line nối -->
@@ -427,11 +435,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { 
   CheckCircleFilled, 
-  ExclamationCircleFilled, 
-  ExclamationOutlined, 
   SyncOutlined, 
   CheckOutlined,
   CaretRightOutlined,
@@ -465,11 +471,10 @@ onMounted(() => {
 
 defineExpose({ loadData });
 
-
 const columns = [
   { title: '', key: 'expand', width: 50, fixed: 'left' },
   { title: 'Mã LSX/LSX Ca', dataIndex: 'lsx_name', key: 'lsx_name', width: 180 },
-  { title: 'Sản phẩm', dataIndex: 'items', key: 'items', width: 250 },
+  { title: 'Sản phẩm', dataIndex: 'items', key: 'items', width: 230 },
   { title: 'Quy trình', dataIndex: 'steps', key: 'steps' },
 ];
 

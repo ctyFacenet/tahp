@@ -2,7 +2,7 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
     const today = frappe.datetime.get_today().split("-");
     const months = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
     this.refreshTimeout = null;
-
+    
     const page = frappe.ui.make_app_page({
         parent: wrapper,
         title: "Theo dõi chu trình sản xuất",

@@ -702,6 +702,18 @@ def get_response(filters=dict()):
 
         results = new_results
 
+    late_states = {"late_danger", "late_warning", "processing"}
+    for r in results:
+        
+        for s in r.get("steps", []):
+            if s.get("state") in late_states:
+                s["label"] = f"Đợi {s['label']}"
+        
+        for w in r.get("wos", []):
+            for s in w.get("steps", []):
+                if s.get("state") in late_states:
+                    s["label"] = f"Đợi {s['label']}"        
+
     results.sort(key=lambda x: x["creation"], reverse=True)
     return results
 
