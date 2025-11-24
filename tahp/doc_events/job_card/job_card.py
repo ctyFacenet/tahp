@@ -143,17 +143,14 @@ def set_team(job_card, team):
 
     for emp in team:
         emp_id = emp.get("employee")
-        emp_name = emp.get("employee_name")
-        if not emp_id or not emp_name:
+        if not emp_id:
             continue
 
         last_record = last_history.get(emp_id)
 
         if not last_record:
-            # Nhân viên hoàn toàn mới → thêm bản ghi lịch sử
             doc.append("custom_teams", {
                 "employee": emp_id,
-                "employee_name": emp_name,
                 "from_time": from_time,
                 "exit": False
             })
@@ -161,20 +158,20 @@ def set_team(job_card, team):
             if getattr(last_record, "exit", False):
                 doc.append("custom_teams", {
                     "employee": emp_id,
-                    "employee_name": emp_name,
                     "from_time": from_time,
                     "exit": False
                 })
 
-    format_team = {r.employee: r for r in doc.custom_team_table or []}
-    for employee in last_history:
-        if employee not in format_team and not getattr(last_record, "exit", False):
-            doc.append("custom_teams", {
-                "employee": r.employee,
-                "employee_name": getattr(r, "employee_name", ""),
-                "from_time": from_time,
-                "exit": True
-            })
+    format_team = {r.employee for r in doc.custom_team_table or []}
+
+    for emp_id, last_record in last_history.items():
+        if emp_id not in format_team:
+            if not last_record.exit:
+                doc.append("custom_teams", {
+                    "employee": emp_id,
+                    "from_time": from_time,
+                    "exit": True
+                })
 
     doc.save(ignore_permissions=True)
 

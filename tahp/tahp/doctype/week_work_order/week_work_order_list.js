@@ -39,5 +39,12 @@ frappe.listview_settings['Week Work Order'] = {
         document.querySelectorAll('.list-row .level-right').forEach(function(col){
             col.style.flex = '1';
         })
+
+        listview.page.add_inner_button(
+            __("Màn hình lập kế hoạch mới"),
+            function() {
+                frappe.set_route("List", "Custom Planner");
+            }
+        )
     }
 };

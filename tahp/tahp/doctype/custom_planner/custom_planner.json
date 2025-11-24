@@ -13,7 +13,11 @@
   "wrapper",
   "posts",
   "items",
-  "amended_from"
+  "amended_from",
+  "item_list",
+  "start_date",
+  "end_date",
+  "choice_length"
  ],
  "fields": [
   {
@@ -68,13 +72,44 @@
    "fieldname": "\u0111i\u1ec1u_khi\u1ec3n_tab",
    "fieldtype": "Tab Break",
    "label": "\u0110i\u1ec1u khi\u1ec3n"
+  },
+  {
+   "fieldname": "item_list",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Danh s\u00e1ch m\u1eb7t h\u00e0ng"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Ng\u00e0y b\u1eaft \u0111\u1ea7u"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Ng\u00e0y k\u1ebft th\u00fac"
+  },
+  {
+   "fieldname": "choice_length",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "S\u1ed1 ph\u01b0\u01a1ng \u00e1n"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-26 19:58:05.113744",
+ "modified": "2025-11-24 09:24:25.018947",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Custom Planner",
