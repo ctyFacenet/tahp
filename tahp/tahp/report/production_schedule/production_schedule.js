@@ -653,7 +653,7 @@ frappe.query_reports["Production Schedule"] = {
                                 return label;
                             },
                             footer: function(tooltipItems) {
-                                return 'Click để xem chi tiết Week Work Order';
+                                return 'Click để xem chi tiết LSX';
                             }
                         }
 					},

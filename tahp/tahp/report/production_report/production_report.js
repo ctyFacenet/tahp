@@ -646,7 +646,7 @@ frappe.query_reports["Production Report"] = {
                                 return label;
                             },
                             footer: function(tooltipItems) {
-                                return 'Click để xem chi tiết Work Orders';
+                                return 'Click để xem chi tiết LSX Ca';
                             }
                         }
                     },

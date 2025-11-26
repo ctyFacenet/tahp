@@ -7,6 +7,16 @@ from frappe import _
 from datetime import datetime, timedelta
 from frappe.utils import getdate, nowdate
 
+
+def _normalize_whole_number_floats(row):
+    """Convert float values that are whole numbers (e.g. 300.0) to int for cleaner display."""
+    for k, v in list(row.items()):
+        if v is None:
+            continue
+        # Convert Python floats that are integers to int
+        if isinstance(v, float) and v.is_integer():
+            row[k] = int(v)
+
 def execute(filters=None):
     if not filters:
         filters = {}
@@ -128,21 +138,21 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
     for index, material_code in enumerate(sorted(material_map.keys())):
         row_data = material_map[material_code]
         material_name = item_name_map.get(material_code, material_code)
-        
+
         row = {
             "serial_no": index + 1,
             "material": f'<a href="/app/item/{material_code}">{material_name}</a>',
-            "material_name": material_name, 
+            "material_name": material_name,
             "uom": row_data.get("uom"),
-            
+
             # Data for charts and total columns
             "total_actual_qty": row_data.get("total_actual_qty", 0),
             "total_planned_qty": row_data.get("total_planned_qty", 0),
         }
-        
+
         for prod_item in prod_item_list:
             scrubbed_name = frappe.scrub(prod_item)
-            
+
             total_material_actual = row_data.get(scrubbed_name + "_actual", 0)
             total_material_planned = row_data.get(scrubbed_name + "_planned", 0)
 
@@ -151,15 +161,17 @@ def get_monthly_data(work_orders, wo_list, prod_item_list):
 
             actual_per_ton = (total_material_actual / prod_produced) if prod_produced else 0
             planned_per_ton = (total_material_planned / prod_planned) if prod_planned else 0
-            
+
             # Data for table display (per ton)
             row[scrubbed_name + "_actual_per_ton"] = actual_per_ton
             row[scrubbed_name + "_planned_per_ton"] = planned_per_ton
-            
+
             # Data for chart (total quantity)
             row[scrubbed_name + "_actual"] = total_material_actual
             row[scrubbed_name + "_planned"] = total_material_planned
 
+        # Normalize numeric display (after all per-product fields are populated)
+        _normalize_whole_number_floats(row)
         dataset.append(row)
 
     return dataset
@@ -224,18 +236,22 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
         for prod in prod_item_list:
             scrubbed_name = frappe.scrub(prod)
             if prod == prod_item:
-                # Data for table display (per ton)
-                row[scrubbed_name + "_actual_per_ton"] = actual_per_ton
-                row[scrubbed_name + "_planned_per_ton"] = planned_per_ton
-                # Data for chart (total quantity)
+                # Data for table display (per ton) - leave blank if value is 0
+                row[scrubbed_name + "_actual_per_ton"] = actual_per_ton if actual_per_ton != 0 else None
+                row[scrubbed_name + "_planned_per_ton"] = planned_per_ton if planned_per_ton != 0 else None
+                # Data for chart (total quantity) - keep numeric so JS charts still aggregate correctly
                 row[scrubbed_name + "_actual"] = actual_material_qty
                 row[scrubbed_name + "_planned"] = planned_material_qty
             else:
-                row[scrubbed_name + "_actual_per_ton"] = 0
-                row[scrubbed_name + "_planned_per_ton"] = 0
+                # For other production items, leave display cells blank instead of 0
+                row[scrubbed_name + "_actual_per_ton"] = None
+                row[scrubbed_name + "_planned_per_ton"] = None
+                # Hidden chart fields remain numeric (0)
                 row[scrubbed_name + "_actual"] = 0
                 row[scrubbed_name + "_planned"] = 0
-        
+
+        # Normalize numeric display for detailed row
+        _normalize_whole_number_floats(row)
         dataset.append(row)
         index += 1
 
