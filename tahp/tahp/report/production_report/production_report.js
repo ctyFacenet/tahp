@@ -24,24 +24,6 @@ frappe.query_reports["Production Report"] = {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
         },
-        {
-            "fieldname": "month",
-            "label": __("Tháng"),
-            "fieldtype": "Select",
-            "options": ["", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
-            "on_change": function() {
-                frappe.query_reports["Production Report"].handle_month_year_change();
-            }
-        },
-        {
-            "fieldname": "year",
-            "label": __("Năm"),
-            "fieldtype": "Int",
-            "default": new Date().getFullYear(),
-            "on_change": function() {
-                frappe.query_reports["Production Report"].handle_month_year_change();
-            }
-        }
     ],
 
     get_datatable_options(options) {
@@ -464,20 +446,20 @@ frappe.query_reports["Production Report"] = {
     "draw_daily_production_chart": function(daily_data, container) {
         const dates = Object.keys(daily_data).sort();
         if (dates.length === 0) return;
-    
+
         // Calculate canvas size based on device
         const num_days = dates.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-        
+
         let bar_width_per_day = is_mobile ? 50 : is_tablet ? 70 : 90;
         let canvas_width = num_days * bar_width_per_day;
         let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320;
-        
+
         if (canvas_width < 300) canvas_width = 300;
-        if (canvas_width > 1200) canvas_width = 1200;
-    
-        // Create chart wrapper with note section (like production_schedule.js)
+        // Do not cap max width, allow scroll for long charts
+
+        // Create chart wrapper with scroll and note section (like production_schedule.js)
         const chartWrapper = $(`<div class="chart-wrapper" style="
             overflow-x: auto;
             overflow-y: hidden;
@@ -491,9 +473,9 @@ frappe.query_reports["Production Report"] = {
                 position: relative; 
                 height: ${canvas_height}px;
                 min-width: ${canvas_width}px;
-                width: 100%;
+                width: ${canvas_width}px;
             ">
-                <canvas id="daily-production-chart" style="cursor: pointer;"></canvas>
+                <canvas id="daily-production-chart" style="cursor: pointer; width: ${canvas_width}px; height: ${canvas_height}px;"></canvas>
             </div>
             <div class="chart-note" style="
                 margin-top: 10px;
@@ -756,7 +738,10 @@ frappe.query_reports["Production Report"] = {
         
         if (from_date || to_date) {
             // Clear month filter if user selects explicit dates
-            frappe.query_report.set_filter_value("month", "", false);
+            const month_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("month");
+            if (month_filter) {
+                month_filter.set_value("");
+            }
         }
         
         frappe.query_report.refresh();
@@ -771,14 +756,18 @@ frappe.query_reports["Production Report"] = {
         
         if (month_value) {
             // Clear explicit date filters (material_consumption UX)
-            frappe.query_report.set_filter_value("from_date", "", false);
-            frappe.query_report.set_filter_value("to_date", "", false);
-            
+            const from_date_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("from_date");
+            const to_date_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("to_date");
+            if (from_date_filter) {
+                from_date_filter.set_value("");
+            }
+            if (to_date_filter) {
+                to_date_filter.set_value("");
+            }
             frappe.show_alert({
                 message: __(`Đã chọn tháng ${month_value}/${year_value}`),
                 indicator: 'green'
             }, 5);
-            
             // Re-render components after refresh
             frappe.query_report.refresh();
             setTimeout(() => {
