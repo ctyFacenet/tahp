@@ -134,7 +134,7 @@ def update_wwo(wo_doc):
 
     all_done = all(wo.status == "Completed" for wo in work_orders)
 
-    if all_done and wwo.wo_status != "Completed":
+    if all_done and wwo.wo_status not in ["Completed", "Stopped", "Requested Stop"]:
         wwo.wo_status = "Completed"
         wwo.save(ignore_permissions=True)
 

@@ -219,15 +219,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:25.464673",
-  "name": "Nháp",
-  "style": "",
-  "workflow_state_name": "Nháp"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-09-22 14:10:19.576199",
   "name": "Draft",
   "style": "Danger",
@@ -268,6 +259,15 @@
   "name": "Bắt đầu",
   "style": "",
   "workflow_state_name": "Bắt đầu"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
+  "style": "",
+  "workflow_state_name": "Nháp"
  },
  {
   "docstatus": 0,

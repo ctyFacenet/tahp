@@ -29,6 +29,9 @@ frappe.listview_settings['Week Work Order'] = {
             if (status === "Stopped") {
                 return [__("Đã bị dừng"), "gray", "wo_status,=,Stopped"]
             }
+            if (status === "Requested Stop") {
+                return [__("Yêu cầu dừng"), "red", "wo_status,=,Requested Stop"]
+            }
         }
 
         // Còn lại hiển thị theo workflow_state

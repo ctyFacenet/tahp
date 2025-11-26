@@ -206,7 +206,7 @@ frappe.ui.form.on("Custom Planner", {
 
             const total_html = `
                 <div class="d-flex justify-content-between align-items-center fw-bold" style="margin-bottom:0.5rem;">
-                    <div>Tiêu hao dự kiến</div>
+                    <div>Đầu vào dự kiến</div>
                 </div>
             `;
             $el.append(total_html);
