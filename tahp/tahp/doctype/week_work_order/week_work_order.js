@@ -709,66 +709,94 @@ async function update_quantity(frm) {
 async function stop_wwo(frm) {
     if (frm.is_new() || frm.doc.workflow_state !== "Duyệt xong" || frm.doc.wo_status === "Stopped") return;
 
-    if (frappe.user_roles.includes("Giám đốc") && frm.doc.wo_status === "Requested Stop") {
-        frm.add_custom_button("Xử lý yêu cầu dừng LSX", async () => {
+    if (frappe.user_roles.includes("Giám đốc") && frm.doc.wo_status !== "Stopped") {
+        if (frm.doc.wo_status === "Requested Stop") {
+            frm.add_custom_button("Xử lý yêu cầu dừng LSX", async () => {
 
-            frappe.msgprint({
-                title: "Xác nhận dừng LSX",
-                indicator: "red",
-                message: "Bạn đồng ý hay từ chối duyệt yêu cầu này?",
-                
-                primary_action: {
-                    label: "Đồng ý",
-                    action: async () => {
-                        frappe.hide_msgprint();
+                frappe.msgprint({
+                    title: "Xác nhận dừng LSX",
+                    indicator: "red",
+                    message: "Bạn đồng ý hay từ chối duyệt yêu cầu này?",
+                    
+                    primary_action: {
+                        label: "Đồng ý",
+                        action: async () => {
+                            frappe.hide_msgprint();
 
+                            await frappe.xcall(
+                                "tahp.tahp.doctype.week_work_order.week_work_order.process_stop",
+                                {
+                                    wwo: frm.doc.name,
+                                    choice: "Accepted",
+                                }
+                            );
+
+                            await update_quantity(frm);
+                        }
+                    },
+
+                    secondary_action: {
+                        label: "Từ chối",
+                        action: () => {
+                            frappe.hide_msgprint();
+
+                            frappe.prompt(
+                                [
+                                    {
+                                        fieldname: "reason",
+                                        fieldtype: "Small Text",
+                                        label: "Lý do từ chối",
+                                        reqd: 1
+                                    }
+                                ],
+                                async (values) => {
+                                    await frappe.xcall(
+                                        "tahp.tahp.doctype.week_work_order.week_work_order.process_stop",
+                                        {
+                                            wwo: frm.doc.name,
+                                            choice: "Rejected",
+                                            reason: values.reason
+                                        }
+                                    );
+
+                                    await update_quantity(frm);
+                                },
+                                "Nhập lý do từ chối",
+                                "Gửi"
+                            );
+                        }
+                    }
+                });
+
+            });
+        } else {
+            frm.add_custom_button("Dừng LSX", async () => {
+                frappe.prompt(
+                    [
+                        {
+                            fieldname: "reason",
+                            fieldtype: "Small Text",
+                            label: "Điền lý do dừng LSX",
+                        }
+                    ],
+                    async (values) => {
                         await frappe.xcall(
                             "tahp.tahp.doctype.week_work_order.week_work_order.process_stop",
                             {
                                 wwo: frm.doc.name,
                                 choice: "Accepted",
+                                reason: values.reason,
+                                standalone: true
                             }
                         );
 
                         await update_quantity(frm);
-                    }
-                },
-
-                secondary_action: {
-                    label: "Từ chối",
-                    action: () => {
-                        frappe.hide_msgprint();
-
-                        frappe.prompt(
-                            [
-                                {
-                                    fieldname: "reason",
-                                    fieldtype: "Small Text",
-                                    label: "Lý do từ chối",
-                                    reqd: 1
-                                }
-                            ],
-                            async (values) => {
-                                await frappe.xcall(
-                                    "tahp.tahp.doctype.week_work_order.week_work_order.process_stop",
-                                    {
-                                        wwo: frm.doc.name,
-                                        choice: "Rejected",
-                                        reason: values.reason
-                                    }
-                                );
-
-                                await update_quantity(frm);
-                            },
-                            "Nhập lý do từ chối",
-                            "Gửi"
-                        );
-                    }
-                }
-            });
-
-        });
-
+                    },
+                    "Giám đốc quyết định dừng LSX này? ",
+                    "Xác nhận dừng"
+                );
+            });            
+        }
     }
 
     if (frappe.user_roles.includes("Kế hoạch sản xuất") && frm.doc.wo_status !== "Requested Stop") {
@@ -791,8 +819,8 @@ async function stop_wwo(frm) {
                             reason: values.reason
                         }
                     );
-                    frappe.msgprint("Đã gửi yêu cầu dừng tới Giám đốc")
                     await update_quantity(frm);
+                    frappe.msgprint("Đã gửi yêu cầu dừng tới Giám đốc")
                 },
                 "Bạn đang yêu cầu dừng LSX Ca?",
                 "Gửi yêu cầu"

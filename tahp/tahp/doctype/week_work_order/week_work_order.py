@@ -87,14 +87,15 @@ def request_stop(wwo, reason):
 	wwo_doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
-def process_stop(wwo, choice, reason=None):
+def process_stop(wwo, choice, reason=None, standalone=False):
 	wwo_doc = frappe.get_doc("Week Work Order", wwo)
 	requester = wwo_doc.requested_stop_by
 	subject = None
 
 	if choice == "Accepted":
-		subject = f"Yêu cầu dừng LSX {wwo_doc.name} đã được Giám đốc chấp nhận"
+		if not standalone: subject = f"Yêu cầu dừng LSX {wwo_doc.name} đã được Giám đốc chấp nhận"
 		wo_list = frappe.db.get_all("Work Order", {"custom_plan": wwo_doc.name}, pluck='name')
+		sent_users = []
 		for wo in wo_list:
 			wo_doc = frappe.get_doc("Work Order", wo)
 			if wo_doc.docstatus == 0:
@@ -117,9 +118,38 @@ def process_stop(wwo, choice, reason=None):
 						"document_type": "Work Order",
 						"document_name": wo_doc.name
 					}).insert(ignore_permissions=True)
+					sent_users.append(user)
 
 		wwo_doc.wo_status = "Stopped"
 		wwo_doc.add_comment(comment_type="Workflow", text="LSX đã bị dừng")
+
+		sub_subject = None
+		comment_text = None
+		list_user = ["Phát triển công nghệ", "Quản đốc"]
+		if reason:
+			sub_subject = f"LSX {wwo_doc.name} bị Giám đốc yêu cầu <b style='font-weight:bold'>dừng lại</b>. Lý do: {reason}",
+			comment_text = f"Giám đốc đã dừng LSX. Lý do: {reason}"
+			list_user.append("Kế hoạch sản xuất")
+		else:
+			sub_subject = f"LSX {wwo_doc.name} bị Giám đốc yêu cầu <b style='font-weight:bold'>dừng lại</b>."
+			comment_text = "Giám đốc đã dừng LSX."
+
+
+		wwo_doc.add_comment(comment_type="Workflow", text=comment_text)
+		outline_users = frappe.db.get_all("User", filters={"role_profile_name": ["in", list_user], "enabled": 1}, pluck="name")
+		outline_users = [u for u in outline_users if u not in sent_users]
+		outline_users = list(set(outline_users))		
+
+		for u in outline_users:
+			frappe.get_doc({
+				"doctype": "Notification Log",
+				"for_user": u,
+				"subject": sub_subject,
+				"email_content": sub_subject,
+				"type": "Alert",
+				"document_type": "Week Work Order",
+				"document_name": wwo_doc.name
+			}).insert(ignore_permissions=True)
 	else:
 		if reason:
 			subject = f"Yêu cầu dừng LSX {wwo_doc.name} đã bị Giám đốc từ chối. Lý do: {reason}"
@@ -131,15 +161,16 @@ def process_stop(wwo, choice, reason=None):
 		wwo_doc.wo_status = wwo_doc.wo_status_saved
 		wwo_doc.add_comment(comment_type="Workflow", text=comment_text)
 
-	frappe.get_doc({
-		"doctype": "Notification Log",
-		"for_user": requester,
-		"subject": subject,
-		"email_content": subject,
-		"type": "Alert",
-		"document_type": "Week Work Order",
-		"document_name": wwo_doc.name
-	}).insert(ignore_permissions=True)
+	if not standalone:
+		frappe.get_doc({
+			"doctype": "Notification Log",
+			"for_user": requester,
+			"subject": subject,
+			"email_content": subject,
+			"type": "Alert",
+			"document_type": "Week Work Order",
+			"document_name": wwo_doc.name
+		}).insert(ignore_permissions=True)
 
 	wwo_doc.save(ignore_permissions=True)
 	
