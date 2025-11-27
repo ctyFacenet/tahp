@@ -28,8 +28,8 @@ frappe.query_reports["Production Report"] = {
             "fieldname": "group_by",
             "label": __("Nhóm theo"),
             "fieldtype": "Select",
-            "options": [],
-            "default": "",
+            "options": ["Mặc định"],
+            "default": "Mặc định",
             "on_change": function() {
                 frappe.query_report.refresh();
             }
@@ -273,15 +273,15 @@ frappe.query_reports["Production Report"] = {
             const diffMonths = diffDays / 30.44;
             const diffYears = diffDays / 365.25;
 
-            let options = [];
+            let options = ["Mặc định"];
             if (diffYears > 1) {
-                options = ["Năm", "Quý"];
+                options = options.concat(["Năm", "Quý"]);
             } else if (diffMonths > 3 && diffYears <= 1) {
-                options = ["Quý", "Tháng"];
+                options = options.concat(["Quý", "Tháng"]);
             } else if (diffMonths <= 3 && diffMonths >= 1) {
-                options = ["Tháng", "Tuần"];
+                options = options.concat(["Tháng", "Tuần"]);
             } else if (diffMonths < 1) {
-                options = ["Tuần", "Ngày"];
+                options = options.concat(["Tuần", "Ngày"]);
             }
             // Cập nhật filter
             const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
@@ -289,6 +289,13 @@ frappe.query_reports["Production Report"] = {
                 groupByFilter.df.options = options.join("\n");
                 groupByFilter.refresh();
             }
+// Nếu có hàm get_filtered_data thì cần sửa lại:
+// get_filtered_data: function(data, group_by) {
+//     if (group_by === "Mặc định" || group_by === "Ngày" || !group_by) {
+//         // ... xử lý mặc định (group theo ngày)
+//     }
+//     // ... các trường hợp khác
+// },
         }
 
         // Create main layout container
