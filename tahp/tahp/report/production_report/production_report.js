@@ -24,6 +24,16 @@ frappe.query_reports["Production Report"] = {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
         },
+        {
+            "fieldname": "group_by",
+            "label": __("Nhóm theo"),
+            "fieldtype": "Select",
+            "options": [],
+            "default": "",
+            "on_change": function() {
+                frappe.query_report.refresh();
+            }
+        },
     ],
 
     get_datatable_options(options) {
@@ -243,6 +253,43 @@ frappe.query_reports["Production Report"] = {
         const data_rows = frappe.query_report.data;
         const columns = frappe.query_report.columns;
         if (!data_rows || data_rows.length < 1) return;
+
+        // --- Bổ sung cập nhật filter group_by ---
+        // Tìm ngày đầu và cuối
+        let firstDate = null, lastDate = null;
+        for (let i = 0; i < data_rows.length; i++) {
+            const d = data_rows[i].production_date;
+            if (d && !d.includes("Tổng cộng")) {
+                if (!firstDate) firstDate = d;
+                lastDate = d;
+            }
+        }
+        if (firstDate && lastDate) {
+            // Chuyển về dạng Date
+            const date1 = new Date(firstDate);
+            const date2 = new Date(lastDate);
+            const diffMs = Math.abs(date2 - date1);
+            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+            const diffMonths = diffDays / 30.44;
+            const diffYears = diffDays / 365.25;
+
+            let options = [];
+            if (diffYears > 1) {
+                options = ["Năm", "Quý"];
+            } else if (diffMonths > 3 && diffYears <= 1) {
+                options = ["Quý", "Tháng"];
+            } else if (diffMonths <= 3 && diffMonths >= 1) {
+                options = ["Tháng", "Tuần"];
+            } else if (diffMonths < 1) {
+                options = ["Tuần", "Ngày"];
+            }
+            // Cập nhật filter
+            const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
+            if (groupByFilter) {
+                groupByFilter.df.options = options.join("\n");
+                groupByFilter.refresh();
+            }
+        }
 
         // Create main layout container
         const mainContainer = $(`<div class="main-layout-container" style="
@@ -735,7 +782,32 @@ frappe.query_reports["Production Report"] = {
         // Clear month filter when date range is selected
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
-        
+
+        // --- Bổ sung cập nhật filter group_by ---
+        if (from_date && to_date) {
+            const date1 = new Date(from_date);
+            const date2 = new Date(to_date);
+            const diffMs = Math.abs(date2 - date1);
+            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+            const diffMonths = diffDays / 30.44;
+            const diffYears = diffDays / 365.25;
+            let options = [];
+            if (diffYears > 1) {
+                options = ["Năm", "Quý"];
+            } else if (diffMonths > 3 && diffYears <= 1) {
+                options = ["Quý", "Tháng"];
+            } else if (diffMonths <= 3 && diffMonths >= 1) {
+                options = ["Tháng", "Tuần"];
+            } else if (diffMonths < 1) {
+                options = ["Tuần", "Ngày"];
+            }
+            const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
+            if (groupByFilter) {
+                groupByFilter.df.options = options.join("\n");
+                groupByFilter.refresh();
+            }
+        }
+
         if (from_date || to_date) {
             // Clear month filter if user selects explicit dates
             const month_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("month");
@@ -743,7 +815,7 @@ frappe.query_reports["Production Report"] = {
                 month_filter.set_value("");
             }
         }
-        
+
         frappe.query_report.refresh();
         setTimeout(() => {
             this.render_components();

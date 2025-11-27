@@ -21,7 +21,7 @@ def execute(filters=None):
     
     # Generate columns and data
     columns = get_columns(work_orders)
-    data = get_data(work_orders, columns)
+    data = get_data(work_orders, columns, filters)
     
     return columns, data, None, None, None
 
@@ -137,10 +137,12 @@ def get_columns(work_orders):
         
     return columns
 
-def get_data(work_orders, columns):
-    """Generate report data with right-aligned numbers"""
+def get_data(work_orders, columns, filters=None):
+    """Generate report data with right-aligned numbers, optionally grouped by week/month/quarter/year"""
     if not work_orders:
         return []
+
+    group_by = (filters or {}).get("group_by", "")
 
     # Group data by date and product
     data_by_date = defaultdict(lambda: defaultdict(lambda: {"planned": 0, "actual": 0, "system": None}))
@@ -159,27 +161,184 @@ def get_data(work_orders, columns):
     total_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
 
     sorted_dates = sorted(data_by_date.keys())
-    for date in sorted_dates:
-        row = {"production_date": date}
-        for fieldname in product_fieldnames:
-            planned_qty = data_by_date[date][fieldname]["planned"]
-            actual_qty = data_by_date[date][fieldname]["actual"]
-            
-            if actual_qty > 0 or planned_qty > 0:
-                # Calculate percentage if planned_qty > 0
-                percentage_html = ""
-                if planned_qty > 0:
-                    percentage = round((actual_qty / planned_qty) * 100)
-                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
-                
-                # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
-                total_summary[fieldname]["planned"] += planned_qty
-                total_summary[fieldname]["actual"] += actual_qty
+
+    # --- Group logic ---
+    def get_group_keys(date_str):
+        """Return list of (key, label, level) tuples for hierarchical grouping based on group_by filter"""
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+        month = dt.month
+        year = dt.year
+        quarter = (month - 1) // 3 + 1
+
+        # Tính tuần theo tháng
+        first_day = dt.replace(day=1)
+        # Thứ của ngày đầu tháng (0=Monday, 6=Sunday)
+        first_weekday = first_day.weekday()
+        # Số ngày đã qua từ đầu tháng
+        days_since_first = (dt - first_day).days
+        # Tuần trong tháng: tuần đầu tiên là 1
+        week_in_month = ((days_since_first + first_weekday) // 7) + 1
+        week_key = f"{year}-{month:02d}-W{week_in_month}"
+        week_label = f"Tuần {week_in_month}, {month}/{year}"
+        month_key = f"{year}-{month:02d}"
+        month_label = f"Tháng {month}, {year}"
+        quarter_key = f"{year}-Q{quarter}"
+        quarter_label = f"Quý {quarter}, {year}"
+        year_key = f"{year}"
+        year_label = f"Năm {year}"
+
+        # Return hierarchy based on group_by
+        if group_by == "Tuần":
+            return [(week_key, week_label, 0)]
+        elif group_by == "Tháng":
+            # Month -> Week -> Date
+            return [(month_key, month_label, 0), (week_key, week_label, 1)]
+        elif group_by == "Quý":
+            # Quarter -> Month -> Date
+            return [(quarter_key, quarter_label, 0), (month_key, month_label, 1)]
+        elif group_by == "Năm":
+            # Year -> Quarter -> Date
+            return [(year_key, year_label, 0), (quarter_key, quarter_label, 1)]
+        else:
+            return []
+
+    if group_by and group_by in ["Tuần", "Tháng", "Quý", "Năm"]:
+        # Build hierarchical structure
+        from collections import OrderedDict
+
+        # Determine depth based on group_by
+        if group_by == "Tuần":
+            depth = 1  # Week -> Date
+        else:
+            depth = 2  # Parent -> Child Group -> Date
+
+        # Build nested structure
+        hierarchy = OrderedDict()
+        for date in sorted_dates:
+            keys = get_group_keys(date)
+            if depth == 1:
+                # Single level grouping (Week)
+                key, label, level = keys[0]
+                if key not in hierarchy:
+                    hierarchy[key] = {"label": label, "dates": [], "children": None}
+                hierarchy[key]["dates"].append(date)
             else:
-                row[fieldname] = ""
+                # Two level grouping
+                parent_key, parent_label, parent_level = keys[0]
+                child_key, child_label, child_level = keys[1]
+                if parent_key not in hierarchy:
+                    hierarchy[parent_key] = {"label": parent_label, "dates": [], "children": OrderedDict()}
+                if child_key not in hierarchy[parent_key]["children"]:
+                    hierarchy[parent_key]["children"][child_key] = {"label": child_label, "dates": []}
+                hierarchy[parent_key]["children"][child_key]["dates"].append(date)
+
+        # Build dataset from hierarchy
+        for parent_key, parent_info in hierarchy.items():
+            # Parent row (level 0)
+            parent_row = {"production_date": f"<b>{parent_info['label']}</b>", "indent": 0}
+            for fieldname in product_fieldnames:
+                parent_row[fieldname] = ""
+            dataset.append(parent_row)
+            parent_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
+
+            if parent_info["children"]:
+                # Two-level grouping
+                for child_key, child_info in parent_info["children"].items():
+                    # Child group row (level 1)
+                    child_row = {"production_date": f"<b>{child_info['label']}</b>", "indent": 1}
+                    for fieldname in product_fieldnames:
+                        child_row[fieldname] = ""
+                    dataset.append(child_row)
+                    child_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
+
+                    # Date rows (level 2)
+                    for date in child_info["dates"]:
+                        row = {"production_date": date, "indent": 2}
+                        for fieldname in product_fieldnames:
+                            planned_qty = data_by_date[date][fieldname]["planned"]
+                            actual_qty = data_by_date[date][fieldname]["actual"]
+                            
+                            if actual_qty > 0 or planned_qty > 0:
+                                percentage_html = ""
+                                if planned_qty > 0:
+                                    percentage = round((actual_qty / planned_qty) * 100)
+                                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                                child_summary[fieldname]["planned"] += planned_qty
+                                child_summary[fieldname]["actual"] += actual_qty
+                            else:
+                                row[fieldname] = ""
+                        dataset.append(row)
+
+                    # Update child group row with summary
+                    for fieldname in product_fieldnames:
+                        actual_total = child_summary[fieldname]["actual"]
+                        planned_total = child_summary[fieldname]["planned"]
+                        if actual_total > 0 or planned_total > 0:
+                            percentage_html = ""
+                            if planned_total > 0:
+                                percentage = round((actual_total / planned_total) * 100)
+                                percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                            child_row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_total)}</b> / {frappe.utils.fmt_money(planned_total)}{percentage_html}</div>"
+                        parent_summary[fieldname]["planned"] += child_summary[fieldname]["planned"]
+                        parent_summary[fieldname]["actual"] += child_summary[fieldname]["actual"]
+                        total_summary[fieldname]["planned"] += child_summary[fieldname]["planned"]
+                        total_summary[fieldname]["actual"] += child_summary[fieldname]["actual"]
+            else:
+                # Single-level grouping (Week -> Date)
+                for date in parent_info["dates"]:
+                    row = {"production_date": date, "indent": 1}
+                    for fieldname in product_fieldnames:
+                        planned_qty = data_by_date[date][fieldname]["planned"]
+                        actual_qty = data_by_date[date][fieldname]["actual"]
+                        
+                        if actual_qty > 0 or planned_qty > 0:
+                            percentage_html = ""
+                            if planned_qty > 0:
+                                percentage = round((actual_qty / planned_qty) * 100)
+                                percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                            row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                            parent_summary[fieldname]["planned"] += planned_qty
+                            parent_summary[fieldname]["actual"] += actual_qty
+                            total_summary[fieldname]["planned"] += planned_qty
+                            total_summary[fieldname]["actual"] += actual_qty
+                        else:
+                            row[fieldname] = ""
+                    dataset.append(row)
+
+            # Update parent row with summary
+            for fieldname in product_fieldnames:
+                actual_total = parent_summary[fieldname]["actual"]
+                planned_total = parent_summary[fieldname]["planned"]
+                if actual_total > 0 or planned_total > 0:
+                    percentage_html = ""
+                    if planned_total > 0:
+                        percentage = round((actual_total / planned_total) * 100)
+                        percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                    parent_row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_total)}</b> / {frappe.utils.fmt_money(planned_total)}{percentage_html}</div>"
+    else:
+        # No grouping, original logic
+        for date in sorted_dates:
+            row = {"production_date": date}
+            for fieldname in product_fieldnames:
+                planned_qty = data_by_date[date][fieldname]["planned"]
+                actual_qty = data_by_date[date][fieldname]["actual"]
                 
-        dataset.append(row)
+                if actual_qty > 0 or planned_qty > 0:
+                    # Calculate percentage if planned_qty > 0
+                    percentage_html = ""
+                    if planned_qty > 0:
+                        percentage = round((actual_qty / planned_qty) * 100)
+                        percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                    
+                    # Right-align numbers with HTML
+                    row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                    total_summary[fieldname]["planned"] += planned_qty
+                    total_summary[fieldname]["actual"] += actual_qty
+                else:
+                    row[fieldname] = ""
+                    
+            dataset.append(row)
 
     # Add total row
     if dataset:
