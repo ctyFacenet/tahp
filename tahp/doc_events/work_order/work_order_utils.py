@@ -28,9 +28,7 @@ def get_consumed_produced_items(work_order):
                     if item["item_code"] == row.item_code:
                         if not item["flag"]:
                             item["flag"] = True
-                            item["standard_qty"] = 0
                             item["actual_qty"] = 0
-                        item["standard_qty"] += row.qty
                         item["actual_qty"] += row.qty
     
     result["produced"].append({
@@ -69,12 +67,13 @@ def get_consumed_produced_items(work_order):
                         "warehouse": doc.fg_warehouse,
                         "posting_date": now_datetime(),
                         "type_posting": "Phụ phẩm",
+                        "scrap": True
                     })
 
     return result
 
 @frappe.whitelist()
-def process_consumed_produced_items(work_order, required, produced, actual_start_date=None, actual_end_date=None, raise_qc=None):
+def process_consumed_produced_items(work_order, required, produced, requireds_reason=None, finished_reason=None):
     if isinstance(required, str): required = json.loads(required)
     if isinstance(produced, str): produced = json.loads(produced)
     wo_doc = frappe.get_doc("Work Order", work_order)
@@ -89,8 +88,12 @@ def process_consumed_produced_items(work_order, required, produced, actual_start
             doc.standard_qty = flt(item.get("standard_qty"))
             doc.actual_qty = flt(item.get("actual_qty"))
             doc.warehouse = item.get("warehouse")
-            doc.posting_date = get_datetime(actual_end_date)
+            doc.posting_date = get_datetime(item.get("posting_date"))
             doc.type_posting = item.get("type_posting")
+            if item_list is required:
+                doc.reason = requireds_reason
+            else:
+                doc.reason = finished_reason
             doc.save(ignore_permissions=True)
             doc.submit()
 
@@ -106,12 +109,11 @@ def process_consumed_produced_items(work_order, required, produced, actual_start
                         row.db_set("consumed_qty", doc.actual_qty, update_modified=False)
 
 
-
+    if requireds_reason:
+        wo_doc.db_set("custom_requireds_reason", requireds_reason)
+    if finished_reason:
+        wo_doc.db_set("custom_finished_reason", finished_reason)
     wo_doc.db_set("status", "Completed")
-    if actual_start_date:
-        wo_doc.db_set("actual_start_date", get_datetime(actual_start_date))
-    if actual_end_date:
-        wo_doc.db_set("actual_end_date", get_datetime(actual_end_date) if actual_end_date else now_datetime())
     wo_doc.save(ignore_permissions=True)
 
     noti_shift_handover(wo_doc)
@@ -226,7 +228,7 @@ def noti_foreman(doc):
     comment = frappe.db.get_all("Comment", filters={"reference_name": doc.name,"comment_type": "Workflow", "content": "Duyệt xong"}, fields=["owner"], limit=1)
     shift_handover = frappe.db.get_all("Shift Handover", filters={"work_order": doc.name}, fields=["name"], limit=1)
 
-    if comment:
+    if comment and shift_handover:
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": comment[0].owner,

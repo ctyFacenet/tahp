@@ -278,28 +278,25 @@ async function complete_wo(frm) {
                 fieldtype: "Section Break"
             },
             {
-                fieldname: "actual_start_date",
-                label: "Ngày bắt đầu thực tế",
-                fieldtype: "Datetime",
-                default: frm.doc.actual_start_date? frm.doc.actual_start_date : frappe.datetime.now_datetime(),
-                reqd: 1
+                fieldname: "requireds_reason",
+                fieldtype: "Small Text",
+                label: "Giải trình nguyên liệu",
+                placeholder: "Phát hiện số lượng nguyên liệu sử dụng thực tế nhiều hơn so với định mức, vui lòng điền giải trình tại đây",
+                reqd: 0,
             },
             {
-                fieldname: "actual_end_date",
-                label: "Ngày kết thúc thực tế",
-                fieldtype: "Datetime",
-                default: frappe.datetime.now_datetime(),
-                reqd: 1
-            }
+                fieldname: "finished_reason",
+                fieldtype: "Small Text",
+                label: "Giải trình sản lượng",
+                placeholder: "Phát hiện số lượng thành phẩm thực tế nhỏ ít hơn so với định mức, vui lòng điền giải trình tại đây",
+                reqd: 0,
+            },
         ],
         primary_action_label: __('Xác nhận'),
         primary_action: async function() {
             // ✅ Lấy dữ liệu từ cả 2 bảng
             const requireds_data = covertAllData(requiredsRawData, $firstWrapper.find('.wo-value-input, .wo-select-middle'));
             const finisheds_data = covertAllData(finishedsRawData, $secondWrapper.find('.wo-value-input, .wo-select-middle'));
-            let actual_start_date = d.get_value("actual_start_date");
-            let actual_end_date = d.get_value("actual_end_date");
-            let raise_qc = d.get_value("raise_qc");
 
             await frappe.call({
                 method: "tahp.doc_events.work_order.work_order_utils.process_consumed_produced_items",
@@ -307,9 +304,8 @@ async function complete_wo(frm) {
                     work_order: frm.doc.name, 
                     required: requireds_data, 
                     produced: finisheds_data,
-                    actual_start_date,
-                    actual_end_date,
-                    raise_qc
+                    requireds_reason: d.get_value("requireds_reason"),
+                    finished_reason: d.get_value("finished_reason"),
                 }
             })
 
@@ -324,6 +320,8 @@ async function complete_wo(frm) {
 
     // Khi dialog mở
     d.show();
+    d.get_field("requireds_reason").wrapper.style.display = "none"
+    d.get_field("finished_reason").wrapper.style.display = "none"
 
     // Lấy wrapper của field HTML
     let $firstWrapper = $(d.fields_dict.requireds.$wrapper);
@@ -331,7 +329,6 @@ async function complete_wo(frm) {
     $secondWrapper.css({'margin-top': '20px'})
 
     let response = await frappe.call({method: "tahp.doc_events.work_order.work_order_utils.get_consumed_produced_items", args: {work_order: frm.doc.name}})
-    console.log(response.message)
 
     // Dữ liệu khác nhau
     requiredsRawData = response.message.required
@@ -343,27 +340,28 @@ async function complete_wo(frm) {
     let columns1 = [
         { fieldname: "item_code", label: "Mã NVL", is_secondary: true, ratio: 2 },
         { fieldname: "stock_uom", label: "ĐVT", is_unit: true, ratio: 1 },
-        { fieldname: "item_name", label: "Tên NVL", is_primary: true, ratio: 3 },
-        { fieldname: "warehouse", label: "Kho", is_select_middle: true, options: warehouse, ratio: 4 },
+        { fieldname: "item_name", label: "Tên NVL", is_primary: true, ratio: 2 },
+        { fieldname: "warehouse", label: "Kho", is_select_middle: true, options: warehouse, ratio: 3 },
+        { fieldname: "standard_qty", label: "SL định mức", is_sub_secondary: true, ratio: 2},
         { fieldname: "actual_qty", label: "SL tiêu hao", is_value: true, ratio: 2 },
     ];
 
     let columns2 = [
         { fieldname: "item_code", label: "Mã TP", is_secondary: true, ratio: 2 },
         { fieldname: "stock_uom", label: "ĐVT", is_unit: true, ratio: 1 },
-        { fieldname: "item_name", label: "Tên TP", is_primary: true, ratio: 3 },
-        { fieldname: "warehouse", label: "Kho", is_select_middle: true, options: warehouse, ratio: 4 },
+        { fieldname: "item_name", label: "Tên TP", is_primary: true, ratio: 2 },
+        { fieldname: "warehouse", label: "Kho", is_select_middle: true, options: warehouse, ratio: 3 },
+        { fieldname: "standard_qty", label: "SL định mức", is_sub_secondary: true, ratio: 2},
         { fieldname: "actual_qty", label: "SL sản xuất", is_value: true, ratio: 2 },
     ];
 
-    await define_table(frm, $firstWrapper, "Nguyên vật liệu tiêu hao", columns1, requiredsRawData, true, null, null, false, "red");
-    await define_table(frm, $secondWrapper, "Thành phẩm", columns2, finishedsRawData, true, null, null, false, "green");
+    await define_table(frm, $firstWrapper, "Nguyên vật liệu tiêu hao", columns1, requiredsRawData, "red", d.get_field("requireds_reason"), false);
+    await define_table(frm, $secondWrapper, "Thành phẩm", columns2, finishedsRawData, "green", d.get_field("finished_reason"), true);
 }
 
 async function autofill_items(frm) {
     setTimeout(async () => {
         for (let row of frm.doc.operations) {
-            // chỉ xử lý nếu custom_employee chưa có
             if (!row.custom_employee) {
                 let op_doc = await frappe.db.get_doc("Operation", row.operation);
                 if (op_doc.custom_team && op_doc.custom_team.length > 0) {
@@ -384,6 +382,7 @@ async function change_time(frm) {
     if (frappe.session.user !== "Administrator") return;
     if (frm.doc.status == "Completed") return;
     if (frm.is_new()) return;
+    if (frm.doc.docstatus != 0) return;
     frm.add_custom_button("Chỉnh sửa thời gian", function() {
         let d = new frappe.ui.Dialog({
             title: "Chỉnh sửa mốc thời gian",
@@ -452,7 +451,7 @@ function show_shift_handover(frm) {
     }
 }
 
-async function define_table(frm, $wrapper, title, columns, data, edittable = false, action = null, action_param = null, confirmAction = true, titleColor = null) {
+async function define_table(frm, $wrapper, title, columns, data, titleColor = null, dialog_field, is_production) {
 
     const $header = $(`
         <div class="wo-header">
@@ -531,6 +530,7 @@ async function define_table(frm, $wrapper, title, columns, data, edittable = fal
     data.forEach((row, rowIndex) => {
         const primary = columns.find(c => c.is_primary);
         const secondary = columns.find(c => c.is_secondary);
+        const sub_secondary = columns.find(c => c.is_sub_secondary);
         const middles = columns.filter(c => c.is_middle || c.is_select_middle);
         const valueCol = columns.find(c => c.is_value);
         const unitCol = columns.find(c => c.is_unit);
@@ -539,7 +539,8 @@ async function define_table(frm, $wrapper, title, columns, data, edittable = fal
         const $left = $('<div class="wo-col wo-col-left"></div>');
         $left.append(
             `<div class="wo-primary">${row[primary?.fieldname] || ''}</div>`,
-            `<div class="wo-secondary">${row[secondary?.fieldname] || ''}</div>`
+            `<div class="wo-secondary">${row[secondary?.fieldname] || ''}</div>`,
+            `<div class="wo-secondary">${sub_secondary.label}: ${row[sub_secondary?.fieldname] || ''} ${row[unitCol?.fieldname]}</div>`
         );
 
         const $middle = $('<div class="wo-col wo-col-middle"></div>');
@@ -582,6 +583,21 @@ async function define_table(frm, $wrapper, title, columns, data, edittable = fal
         $wrapper.find(`[data-fieldname="${field}"][data-rowindex="${rowIndex}"]`)
             .not($this)
             .val(val);
+
+        let checked = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
+        let needs_reason_row;
+        if (is_production) needs_reason_row = checked.find(row => !row.scrap && row.standard_qty > row.actual_qty);
+        else needs_reason_row = checked.find(row => row.standard_qty < row.actual_qty);
+
+        if (needs_reason_row) {
+            dialog_field.df.reqd = 1
+            dialog_field.wrapper.style.display = '';
+        } else {
+            dialog_field.df.reqd = 0
+            dialog_field.wrapper.style.display = 'none';
+            dialog_field.set_value("")
+        }
+        dialog_field.refresh();
     });
 
     // ✏️ Inline editing logic giữ nguyên
@@ -608,21 +624,8 @@ async function define_table(frm, $wrapper, title, columns, data, edittable = fal
             $input.on("blur.saveCheck", function() {
                 setTimeout(() => {
                     if (!$(".wo-editing:focus").length) {
-                        if (confirmAction) {
-                            frappe.confirm(
-                                "Lưu thay đổi?",
-                                () => {
-                                    const result = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
-                                    if (action) console.log(result);
-                                    disableInlineEditing(inputs, false);
-                                },
-                                () => { disableInlineEditing(inputs, true); }
-                            );
-                        } else {
-                            const result = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
-                            if (action) console.log(result);
-                            disableInlineEditing(inputs, false);
-                        }
+                        const result = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
+                        disableInlineEditing(inputs, false);
                     }
                 }, 150);
             });

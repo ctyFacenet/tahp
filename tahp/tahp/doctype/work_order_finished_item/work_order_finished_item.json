@@ -15,7 +15,8 @@
   "standard_qty",
   "actual_qty",
   "warehouse",
-  "type_posting"
+  "type_posting",
+  "reason"
  ],
  "fields": [
   {
@@ -107,6 +108,11 @@
    "in_list_view": 1,
    "label": "M\u00e3 m\u1eb7t h\u00e0ng th\u1ef1c t\u1ebf",
    "options": "Item"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Gi\u1ea3i tr\u00ecnh"
   }
  ],
  "grid_page_length": 50,
@@ -114,7 +120,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-10-13 16:03:25.235438",
+ "modified": "2025-11-27 16:34:05.517533",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Work Order Finished Item",
