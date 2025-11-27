@@ -115,6 +115,7 @@ def process_consumed_produced_items(work_order, required, produced, actual_start
     wo_doc.save(ignore_permissions=True)
 
     noti_shift_handover(wo_doc)
+    noti_foreman(wo_doc)
     update_wwo(wo_doc)
     return
 
@@ -210,7 +211,6 @@ def noti_shift_handover(doc):
         user = frappe.db.get_value("Employee", shift_leader, "user_id")
         if not user: return
 
-        # Tạo Notification Log
         frappe.get_doc({
             "doctype": "Notification Log",
             "for_user": user,
@@ -219,6 +219,21 @@ def noti_shift_handover(doc):
             "type": "Alert",
             "document_type": "Shift Handover",
             "document_name": handover_name
+        }).insert(ignore_permissions=True)
+
+@frappe.whitelist()
+def noti_foreman(doc):
+    comment = frappe.db.get_all("Comment", filters={"reference_name": doc.name,"comment_type": "Workflow", "content": "Duyệt xong"}, fields=["owner"], limit=1)
+    shift_handover = frappe.db.get_all("Shift Handover", filters={"work_order": doc.name}, fields=["name"], limit=1)
+
+    if comment:
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "for_user": comment[0].owner,
+            "subject": f"LSX ca {doc.name} đã hoàn thành. Quản đốc có thể click vào đây để điền đề xuất tại Biên bản giao ca",
+            "email_content": f"LSX ca {doc.name} đã hoàn thành. Quản đốc có thể click vào đây để điền đề xuất tại Biên bản giao ca",
+            "document_type": "Shift Handover",
+            "document_name": shift_handover[0].name
         }).insert(ignore_permissions=True)
 
 @frappe.whitelist()

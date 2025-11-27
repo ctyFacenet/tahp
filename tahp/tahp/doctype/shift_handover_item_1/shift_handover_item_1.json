@@ -10,7 +10,6 @@
   "status",
   "safe",
   "clean",
-  "percent_use",
   "note",
   "is_header"
  ],
@@ -21,28 +20,28 @@
    "fieldname": "caption",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "H\u1ea1ng m\u1ee5c",
+   "label": "Thi\u1ebft b\u1ecb",
    "read_only": 1
   },
   {
    "bold": 1,
    "columns": 1,
-   "default": "\u0110\u1ea1t",
+   "default": "100%",
    "fieldname": "safe",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "An to\u00e0n",
-   "options": "\u0110\u1ea1t\nKh\u00f4ng \u0111\u1ea1t"
+   "options": "0%\n25%\n50%\n75%\n100%"
   },
   {
    "bold": 1,
    "columns": 1,
-   "default": "S\u1ea1ch",
+   "default": "100%",
    "fieldname": "clean",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "V\u1ec7 sinh",
-   "options": "S\u1ea1ch\nB\u1ea9n"
+   "options": "0%\n25%\n50%\n75%\n100%"
   },
   {
    "bold": 1,
@@ -55,32 +54,25 @@
   {
    "bold": 1,
    "columns": 1,
-   "default": "T\u1ed1t",
+   "default": "100%",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Tr\u1ea1ng th\u00e1i H\u0110",
-   "options": "T\u1ed1t\nB\u00ecnh th\u01b0\u1eddng\nH\u01b0 h\u1ecfng"
+   "options": "0%\n25%\n50%\n75%\n100%"
   },
   {
    "default": "0",
    "fieldname": "is_header",
    "fieldtype": "Check",
    "hidden": 1
-  },
-  {
-   "columns": 2,
-   "fieldname": "percent_use",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "% S\u1eed d\u1ee5ng c\u1ee5m m\u00e1y"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-21 15:46:55.613782",
+ "modified": "2025-11-27 09:51:37.387812",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover Item 1",

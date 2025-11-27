@@ -41,4 +41,29 @@ def cleanup_custom():
     else:
         print("Không tìm thấy công ty mặc định trong Global Defaults")
 
+    percentage_values = ["0%", "25%", "50%", "75%", "100%"]
+    shift_list = frappe.get_all("Shift Handover", fields=["name"])
+
+    for sh in shift_list:
+        doc = frappe.get_doc("Shift Handover", sh.name)
+
+        for row in doc.table:
+            fields_to_update = {}
+
+            if row.status not in percentage_values and row.status == "Tốt":
+                fields_to_update["status"] = "100%"
+
+            if row.safe not in percentage_values and row.safe == "Đạt":
+                fields_to_update["safe"] = "100%"
+
+            if row.clean not in percentage_values and row.clean == "Sạch":
+                fields_to_update["clean"] = "100%"
+
+            if fields_to_update:
+                frappe.db.set_value(
+                    row.doctype,
+                    row.name,
+                    fields_to_update
+                )
+
     frappe.db.commit()

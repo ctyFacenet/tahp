@@ -136,6 +136,7 @@
    "hide_border": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "notes_3",
    "fieldtype": "Small Text",
    "label": "\u0110\u00e1nh gi\u00e1 c\u1ee7a qu\u1ea3n \u0111\u1ed1c, \u0111\u1ec1 xu\u1ea5t, ki\u1ebfn ngh\u1ecb"
@@ -145,7 +146,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-27 09:23:56.719522",
+ "modified": "2025-11-27 10:49:41.172653",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Shift Handover",
