@@ -770,6 +770,14 @@ frappe.ui.form.on('Job Card', {
             }
             expanded = !expanded
         })
+
+        // Nút thêm bình luận của nhân viên
+        let $commentButton = $('<div class="w-100 text-center jc-comment-button"><span>Gửi phản ánh, đề xuất</span></div>')
+        if (frm.doc.docstatus !== 0) return
+        $wrapper.append($commentButton)
+        $commentButton.on("click", async function() {
+            await frm.events.send_comment(frm)
+        })
     },
 
     define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null, action_param=null) {
@@ -1017,6 +1025,31 @@ frappe.ui.form.on('Job Card', {
         $wrapper.on("click", ".jc-tb-mobile-row", function() {
             if (!editing) enableEditing(mobileInputs);
         });
+    },
+
+    send_comment: async function(frm) {
+        const teams = ["Toàn bộ công nhân"]
+        frm.doc.custom_team_table.forEach(row => teams.push(`${row.employee}: ${row.employee_name}`))
+        const workstations  = ["Toàn bộ thiết bị"]
+        frm.doc.custom_workstation_table.forEach(row => workstations.push(row.workstation))
+
+        let d = new frappe.ui.Dialog({
+            title: "Điền thông tin phản ánh, đề xuất",
+            fields: [
+                {fieldname: "employee", fieldtype: "Select", options: teams, label: "Chọn người phản ánh", default: "Toàn bộ công nhân"},
+                {fieldname: "workstation", fieldtype: "Select", options: workstations, label: "Chọn thiết bị liên quan", default: "Toàn bộ thiết bị"},
+                {fieldname: "reason", fieldtype: "Small Text", label: "Nội dung phản ánh"}
+            ],
+            primary_action_label: "Gửi phản ánh",
+            primary_action: async (values) => {
+                await frappe.xcall("tahp.doc_events.job_card.job_card.process_comment", 
+                      {job_card: frm.doc.name, employee: values.employee, workstation: values.workstation, reason: values.reason})
+                d.hide();
+                frappe.msgprint("Gửi phản ánh thành công, phản ánh sẽ được thông báo tới Trưởng ca")
+            }
+        })
+
+        d.show();
     },
 
     start_job_card: async function(frm) {

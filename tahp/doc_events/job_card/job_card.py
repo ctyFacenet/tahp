@@ -731,3 +731,59 @@ def update_feedback(docname):
                 row.approved_date = now_datetime()
                 update = True
         if update: insp_doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def process_comment(job_card, employee, workstation, reason):
+    employee_name = None
+    if employee != "Toàn bộ công nhân": 
+        employee_code = employee.split(":")[0].strip()
+        employee_name = employee.split(":")[1].strip()
+    else:
+        employee_code = employee
+        employee_name = "mọi công nhân"
+
+    doc = frappe.get_doc("Job Card", job_card)
+    from_time = now_datetime()
+    doc.append("custom_comment", {
+        "from_date": from_time,
+        "employee": employee_code,
+        "workstation": workstation,
+        "reason": reason
+    })
+    doc.save(ignore_permissions=True)
+
+    shift_handover = frappe.get_all(
+        "Shift Handover",
+        filters={"work_order": doc.work_order},
+        fields=["name"],
+        limit=1
+    )
+
+    note = None
+    timestamp = from_time.strftime("%H:%M")
+    if workstation != "Toàn bộ thiết bị":
+        note = f"[{timestamp}] Công đoạn {doc.operation}, {employee_name} phản ánh ở {workstation}: {reason}"
+    else:
+        note = f"[{timestamp}] Công đoạn {doc.operation}, {employee_name} phản ánh: {reason}"
+
+    if shift_handover:
+        sh_doc = frappe.get_doc("Shift Handover", shift_handover[0].name)
+
+        if sh_doc.notes_1:
+            sh_doc.notes_1 = note + "\n" + sh_doc.notes_1
+        else:
+            sh_doc.notes_1 = note
+        sh_doc.save(ignore_permissions=True)
+
+    shift_leader = frappe.db.get_value("Work Order", doc.work_order, "custom_shift_leader")
+    if shift_leader:
+        user = frappe.db.get_value("Employee", shift_leader, "user_id")
+        if user:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "for_user": user,
+                "subject": note,
+                "email_content": note,
+                "document_type": "Job Card",
+                "document_name": job_card
+            }).insert(ignore_permissions=True)        
