@@ -5,6 +5,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "section_break_inee",
+  "wrapper",
+  "section_break_acpg",
   "work_order",
   "item_code",
   "item_code_new",
@@ -16,7 +19,9 @@
   "actual_qty",
   "warehouse",
   "type_posting",
-  "reason"
+  "reason",
+  "section_break_rrlg",
+  "items"
  ],
  "fields": [
   {
@@ -105,7 +110,7 @@
    "depends_on": "eval:doc.type_posting != 'Nguy\u00ean li\u1ec7u ti\u00eau hao'",
    "fieldname": "item_code_new",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "M\u00e3 m\u1eb7t h\u00e0ng th\u1ef1c t\u1ebf",
    "options": "Item"
   },
@@ -113,6 +118,32 @@
    "fieldname": "reason",
    "fieldtype": "Small Text",
    "label": "Gi\u1ea3i tr\u00ecnh"
+  },
+  {
+   "fieldname": "wrapper",
+   "fieldtype": "HTML",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_acpg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_inee",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "section_break_rrlg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "K\u1ebft qu\u1ea3 \u0111o \u0111\u1ea1c th\u00e0nh ph\u1ea9m th\u1eadt s\u1ef1",
+   "options": "Work Order Finished Child",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -120,7 +151,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-27 16:34:05.517533",
+ "modified": "2025-11-28 10:36:42.180215",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Work Order Finished Item",

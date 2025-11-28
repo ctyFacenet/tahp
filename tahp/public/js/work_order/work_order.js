@@ -35,6 +35,13 @@ frappe.ui.form.on('Work Order', {
                 frappe.set_route("List", "Work Order Finished Item");            
             }).addClass('btn-primary')
 
+            frm.add_custom_button("Xem biên bản giao ca", async function () {
+                frappe.route_options = {
+                    "work_order": frm.doc.name
+                };
+                frappe.set_route("List", "Shift Handover");
+            }).addClass('btn-secondary');
+
             const $wrapper = $(frm.fields_dict.custom_complete_list.wrapper);
             $wrapper.empty();
             const $btn = $(`
@@ -52,6 +59,22 @@ frappe.ui.form.on('Work Order', {
                     "work_order": frm.doc.name
                 };
                 frappe.set_route("List", "Work Order Finished Item");                    
+            });
+
+            const $btn2 = $(`
+                <button 
+                    class="btn btn-default ellipsis w-100 d-md-none mb-3 py-2"
+                    style="font-weight: 500;"
+                >
+                    Xem biên bản giao ca
+                </button>
+            `);
+            $wrapper.append($btn2);
+            $btn2.on("click", async () => {
+                frappe.route_options = {
+                    "work_order": frm.doc.name
+                };
+                frappe.set_route("List", "Shift Handover");
             });
         }
 

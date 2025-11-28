@@ -4,6 +4,7 @@ from frappe.utils import time_diff_in_seconds, get_datetime, add_to_date
 from frappe.utils import getdate, get_first_day, get_last_day, nowdate
 from collections import Counter
 import datetime
+from datetime import timedelta
 
 def get_time_str(dt_actual, dt_target):
     diff_sec = abs(time_diff_in_seconds(dt_actual, dt_target))
@@ -111,7 +112,7 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
             "comment_type": "Workflow"
         }))
 
-    creation_dt = get_datetime(wwo.creation)
+    creation_dt = get_datetime(wwo.start_date) - timedelta(days=1)
     now_dt = frappe.utils.now_datetime()
 
     processing = False
@@ -147,7 +148,7 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
             step_state = "processing"
             processing = True
 
-            delta_hours = abs((now_dt - now_dt).total_seconds()) / helper
+            delta_hours = abs((now_dt - target_dt).total_seconds()) / helper
             time_str = get_time_str(now_dt, target_dt)
 
             if delta_hours <= warning_hour:
@@ -229,7 +230,6 @@ def fake_steps(wwo, wos, warning_hour = 60, helper = 60, workflow_mapping=None):
 
 def process_step(step, comment_content, target_dt, comments, now_dt, warning_hour = 60, helper = 60):
     comment = next((c for c in comments if c["content"] == comment_content), None)
-    
     if not comment:
         check_dt = now_dt
         if now_dt < target_dt:
@@ -389,9 +389,11 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
 
     if block_index is None:
         result = frappe.db.get_all("Work Order Finished Item",
-            filters={"work_order": wo.name, "type_posting": ["in", ["Thành phẩm", "TP sau QC"]], "item_code": wo.production_item},
-            fields = ["name", "item_code", "item_code_new", "creation", "owner", "modified_by", "modified"]
+            filters={"work_order": wo.name, "type_posting": ["in", ["Thành phẩm", "Thành phẩm sau QC"]], "item_code": wo.production_item},
+            fields = ["name", "item_code", "item_code_new", "creation", "owner", "modified_by", "modified", "type_posting"]
         )
+        if wo.name == "WO.28.11.25.001":
+            print(result)
 
         state = "pending"
         status = None
@@ -439,8 +441,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
             status = None
             on_time_min = workflow_mapping_wo["KCS xác nhận thành phẩm"]["on_time"]
             target_dt = add_to_date(end_shift, minutes=on_time_min)
-
-            if not result or not result[0].item_code_new:
+            if not result or result[0].type_posting != "Thành phẩm sau QC":
                 state = "processing"
                 if now_dt > target_dt:
                     delta_hours = abs((now_dt - target_dt).total_seconds()) / helper
@@ -474,7 +475,7 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
                 steps[5]["creation_dt"] = finish_dt
                 
             steps[5]["doctype"] = "Work Order Finished Item"
-            steps[5]["name"] = [r.name for r in result]
+            steps[5]["name"] = result[0].name
 
 
             steps[5]["state"] = state
@@ -489,8 +490,10 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
             "state": "warning",
             "workflow": None,
             "doctype": "Work Order",
-            "name": wo.name
+            "name": wo.name,
+            "creation_dt": stop_dt
         }
+
         insert_idx = None
         for i, s in enumerate(steps):
             step_dt = s.get("creation_dt")
@@ -523,6 +526,9 @@ def fake_wo_steps(wo, warning_hour = 60, helper = 60, workflow_mapping_wo=None):
     else:
         total_time = "0 phút"
         evaluation = "completed"
+        for step in steps:
+            if step["label"] == "LSX Ca bị dừng":
+                evaluation = ""
 
     return steps, evaluation, total_time
 
@@ -725,7 +731,6 @@ def get_deadline():
 @frappe.whitelist()
 def save_deadline(values):
     if isinstance(values, str): values = json.loads(values)
-    print(values)
     deadlines = frappe.get_single("Tracking Setting")
     time_fields = ["first_step", "second_step", "third_step", "fourth_step", "fifth_step", "sixth_step"]
     int_fields = ["seventh_step", "eighth_step", "ninth_step", "tenth_step"]
