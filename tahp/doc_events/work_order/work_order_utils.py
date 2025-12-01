@@ -253,7 +253,8 @@ def noti_foreman(doc):
             "subject": f"LSX ca {doc.name} đã hoàn thành. Quản đốc có thể click vào đây để điền đề xuất tại Biên bản giao ca",
             "email_content": f"LSX ca {doc.name} đã hoàn thành. Quản đốc có thể click vào đây để điền đề xuất tại Biên bản giao ca",
             "document_type": "Shift Handover",
-            "document_name": shift_handover[0].name
+            "document_name": shift_handover[0].name,
+            "type": "Alert"
         }).insert(ignore_permissions=True)
 
 @frappe.whitelist()

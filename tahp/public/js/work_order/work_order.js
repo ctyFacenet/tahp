@@ -360,6 +360,22 @@ async function complete_wo(frm) {
     let rawWarehouse = await frappe.db.get_list('Warehouse')
     let warehouse = rawWarehouse.map(w => w.name)
 
+    const check_reqs = requiredsRawData.find(row => row.standard_qty < row.actual_qty)
+    if (check_reqs) {
+        const temp = d.get_field("requireds_reason")
+        temp.df.reqd = 1
+        temp.wrapper.style.display = '';
+        temp.refresh();
+    }
+
+    const check_fins = finishedsRawData.find(row => !row.scrap && row.standard_qty > row.actual_qty)
+    if (check_fins) {
+        const temp = d.get_field("finished_reason")
+        temp.df.reqd = 1
+        temp.wrapper.style.display = '';
+        temp.refresh();        
+    }
+
     let columns1 = [
         { fieldname: "item_code", label: "Mã NVL", is_secondary: true, ratio: 2 },
         { fieldname: "stock_uom", label: "ĐVT", is_unit: true, ratio: 1 },
