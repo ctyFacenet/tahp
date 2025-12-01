@@ -26,11 +26,34 @@ frappe.query_reports["Production Report"] = {
         },
         {
             "fieldname": "group_by",
-            "label": __("Nhóm theo"),
+            "label": __("Nhóm biểu đồ"),
             "fieldtype": "Select",
             "options": ["Mặc định"],
             "default": "Mặc định",
             "on_change": function() {
+                const table_view = frappe.query_report.get_filter_value("table_view");
+                if (table_view === "Theo nhóm") {
+                    // If table view is grouped, refresh report to update table hierarchy
+                    frappe.query_report.refresh();
+                    setTimeout(() => {
+                        frappe.query_reports["Production Report"].render_components();
+                    }, 500);
+                } else {
+                    // Only re-render chart, don't refresh report data
+                    setTimeout(() => {
+                        frappe.query_reports["Production Report"].render_components();
+                    }, 100);
+                }
+            }
+        },
+        {
+            "fieldname": "table_view",
+            "label": __("Chế độ xem bảng"),
+            "fieldtype": "Select",
+            "options": ["Mặc định", "Theo nhóm"],
+            "default": "Mặc định",
+            "on_change": function() {
+                // Refresh report to change table view
                 frappe.query_report.refresh();
             }
         },
@@ -41,7 +64,11 @@ frappe.query_reports["Production Report"] = {
     },
 
     "onload": function(report) {
-        setTimeout(() => { this.render_components(); }, 500);
+        // Update group_by options based on initial date range
+        setTimeout(() => {
+            this.update_group_by_options();
+            this.render_components();
+        }, 500);
         
         // Add responsive CSS
         this.add_responsive_styles();
@@ -251,52 +278,11 @@ frappe.query_reports["Production Report"] = {
         $('.report-wrapper .main-layout-container').remove();
         
         const data_rows = frappe.query_report.data;
+        
         const columns = frappe.query_report.columns;
         if (!data_rows || data_rows.length < 1) return;
 
-        // --- Bổ sung cập nhật filter group_by ---
-        // Tìm ngày đầu và cuối
-        let firstDate = null, lastDate = null;
-        for (let i = 0; i < data_rows.length; i++) {
-            const d = data_rows[i].production_date;
-            if (d && !d.includes("Tổng cộng")) {
-                if (!firstDate) firstDate = d;
-                lastDate = d;
-            }
-        }
-        if (firstDate && lastDate) {
-            // Chuyển về dạng Date
-            const date1 = new Date(firstDate);
-            const date2 = new Date(lastDate);
-            const diffMs = Math.abs(date2 - date1);
-            const diffDays = diffMs / (1000 * 60 * 60 * 24);
-            const diffMonths = diffDays / 30.44;
-            const diffYears = diffDays / 365.25;
-
-            let options = ["Mặc định"];
-            if (diffYears > 1) {
-                options = options.concat(["Năm", "Quý"]);
-            } else if (diffMonths > 3 && diffYears <= 1) {
-                options = options.concat(["Quý", "Tháng"]);
-            } else if (diffMonths <= 3 && diffMonths >= 1) {
-                options = options.concat(["Tháng", "Tuần"]);
-            } else if (diffMonths < 1) {
-                options = options.concat(["Tuần", "Ngày"]);
-            }
-            // Cập nhật filter
-            const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
-            if (groupByFilter) {
-                groupByFilter.df.options = options.join("\n");
-                groupByFilter.refresh();
-            }
-// Nếu có hàm get_filtered_data thì cần sửa lại:
-// get_filtered_data: function(data, group_by) {
-//     if (group_by === "Mặc định" || group_by === "Ngày" || !group_by) {
-//         // ... xử lý mặc định (group theo ngày)
-//     }
-//     // ... các trường hợp khác
-// },
-        }
+    // ...existing code...
 
         // Create main layout container
         const mainContainer = $(`<div class="main-layout-container" style="
@@ -339,9 +325,17 @@ frappe.query_reports["Production Report"] = {
         let p2o5 = { planned: 0, actual: 0 };
         let others = { planned: 0, actual: 0 };
 
-        // Process each row
+        // Process each row - only count raw date rows (YYYY-MM-DD format)
         data_rows.forEach(row => {
-            if (row.production_date && row.production_date.includes("Tổng cộng")) return;
+            const date = row.production_date;
+            if (!date) return;
+            
+            // Skip summary rows (Tổng cộng) and group header rows (bold labels)
+            if (date.includes("Tổng cộng") || date.includes("<b>")) return;
+            
+            // Skip if not a valid date format (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+            
             product_columns.forEach(col => {
                 const value_str = row[col.fieldname];
                 if (value_str && typeof value_str === 'string' && value_str.includes('/')) {
@@ -465,6 +459,9 @@ frappe.query_reports["Production Report"] = {
     },
 
     "aggregate_data_for_daily_chart": function(data_rows, columns) {
+        // Get current group_by value
+        const group_by = frappe.query_report.get_filter_value("group_by") || "Mặc định";
+        
         // Group data by date and system category
         let daily_summary = {};
         const product_columns = columns.filter(c => c.fieldname !== 'production_date');
@@ -473,10 +470,30 @@ frappe.query_reports["Production Report"] = {
 
         data_rows.forEach(row => {
             const date = row.production_date;
-            if (!date || date.includes("Tổng cộng")) return;
-            if (!daily_summary[date]) {
-                daily_summary[date] = { "P2O5": { planned: 0, actual: 0 }, "Thạch cao": { planned: 0, actual: 0 } };
+            if (!date) return;
+            
+            // Skip summary rows (Tổng cộng) and group header rows (bold labels)
+            if (date.includes("Tổng cộng") || date.includes("<b>")) return;
+            
+            // Skip if not a valid date format (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+            
+            // Get group key based on group_by selection
+            const groupKey = this.get_group_key(date, group_by);
+            if (!groupKey) return;
+            
+            if (!daily_summary[groupKey]) {
+                daily_summary[groupKey] = { 
+                    "P2O5": { planned: 0, actual: 0 }, 
+                    "Thạch cao": { planned: 0, actual: 0 },
+                    "_dates": [] // Store original dates for click handler
+                };
             }
+            // Store original date for reference
+            if (!daily_summary[groupKey]._dates.includes(date)) {
+                daily_summary[groupKey]._dates.push(date);
+            }
+            
             product_columns.forEach(col => {
                 const value_str = row[col.fieldname];
                 if (value_str && typeof value_str === 'string' && value_str.includes('/')) {
@@ -485,51 +502,189 @@ frappe.query_reports["Production Report"] = {
                     const planned = parseFloat(parts[1].trim().replace(/,/g, '')) || 0;
                     const system_name = (system_by_field[col.fieldname] || '');
                     if (system_name.toLowerCase().includes('p2o5')) {
-                        daily_summary[date]["P2O5"].planned += planned;
-                        daily_summary[date]["P2O5"].actual += actual;
+                        daily_summary[groupKey]["P2O5"].planned += planned;
+                        daily_summary[groupKey]["P2O5"].actual += actual;
                     } else {
-                        daily_summary[date]["Thạch cao"].planned += planned;
-                        daily_summary[date]["Thạch cao"].actual += actual;
+                        daily_summary[groupKey]["Thạch cao"].planned += planned;
+                        daily_summary[groupKey]["Thạch cao"].actual += actual;
                     }
                 }
             });
         });
         return daily_summary;
     },
+    
+    "get_group_key": function(dateStr, group_by) {
+        // Convert date string (YYYY-MM-DD) to group key based on group_by
+        if (!dateStr || dateStr.indexOf('-') === -1) return dateStr;
+        
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        
+        switch (group_by) {
+            case "Ngày":
+            case "Mặc định":
+                return dateStr; // Keep original date
+                
+            case "Tuần": {
+                // Calculate week of month - matching Python logic exactly
+                // Python: week_in_month = ((days_since_first + first_weekday) // 7) + 1
+                const firstDay = new Date(year, month - 1, 1);
+                const firstWeekday = firstDay.getDay(); // 0=Sunday, need to convert to 0=Monday
+                const firstWeekdayMon = (firstWeekday + 6) % 7; // Convert: Sunday=6, Monday=0, etc.
+                const daysSinceFirst = day - 1;
+                const weekOfMonth = Math.floor((daysSinceFirst + firstWeekdayMon) / 7) + 1;
+                return `${year}-${month.toString().padStart(2, '0')}-W${weekOfMonth}`;
+            }
+            
+            case "Tháng":
+                return `${year}-${month.toString().padStart(2, '0')}`;
+                
+            case "Quý": {
+                const quarter = Math.ceil(month / 3);
+                return `${year}-Q${quarter}`;
+            }
+            
+            case "Năm":
+                return `${year}`;
+                
+            default:
+                return dateStr;
+        }
+    },
+    
+    "format_group_label": function(groupKey, group_by) {
+        // Format group key for display on chart
+        if (!groupKey) return groupKey;
+        
+        switch (group_by) {
+            case "Ngày":
+            case "Mặc định": {
+                // Format as dd/mm
+                if (groupKey.indexOf('-') === -1) return groupKey;
+                const [y, m, d] = groupKey.split('-');
+                return `${d}/${m}`;
+            }
+            
+            case "Tuần": {
+                // Format as "Tuần X, MM/YYYY"
+                // groupKey format: YYYY-MM-WX
+                const match = groupKey.match(/(\d{4})-(\d{2})-W(\d)/);
+                if (match) {
+                    return `Tuần ${match[3]}, ${parseInt(match[2])}/${match[1]}`;
+                }
+                return groupKey;
+            }
+            
+            case "Tháng": {
+                // Format as "Tháng MM/YYYY"
+                const [y, m] = groupKey.split('-');
+                return `Tháng ${parseInt(m)}/${y}`;
+            }
+            
+            case "Quý": {
+                // Format as "Quý X/YYYY"
+                const match = groupKey.match(/(\d{4})-Q(\d)/);
+                if (match) {
+                    return `Quý ${match[2]}/${match[1]}`;
+                }
+                return groupKey;
+            }
+            
+            case "Năm":
+                return `Năm ${groupKey}`;
+                
+            default:
+                return groupKey;
+        }
+    },
+    
+    "get_chart_title": function(group_by) {
+        // Get chart title based on group_by
+        switch (group_by) {
+            case "Tuần":
+                return "Sản lượng sản xuất theo tuần";
+            case "Tháng":
+                return "Sản lượng sản xuất theo tháng";
+            case "Quý":
+                return "Sản lượng sản xuất theo quý";
+            case "Năm":
+                return "Sản lượng sản xuất theo năm";
+            case "Ngày":
+            case "Mặc định":
+            default:
+                return "Sản lượng sản xuất theo ngày";
+        }
+    },
 
     "draw_daily_production_chart": function(daily_data, container) {
+        // Get current group_by value
+        const group_by = frappe.query_report.get_filter_value("group_by") || "Mặc định";
+
         const dates = Object.keys(daily_data).sort();
         if (dates.length === 0) return;
 
-        // Calculate canvas size based on device
-        const num_days = dates.length;
+        // Calculate canvas size based on device and number of items
+        const num_items = dates.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+        
+        // Get container width for responsive sizing
+        const containerWidth = container.width() || (is_mobile ? 300 : is_tablet ? 500 : 700);
 
-        let bar_width_per_day = is_mobile ? 50 : is_tablet ? 70 : 90;
-        let canvas_width = num_days * bar_width_per_day;
+        // Calculate bar width based on number of items and container
+        let min_bar_width, max_bar_width;
+        if (group_by === "Ngày" || group_by === "Mặc định") {
+            min_bar_width = is_mobile ? 40 : is_tablet ? 50 : 60;
+            max_bar_width = is_mobile ? 80 : is_tablet ? 100 : 120;
+        } else {
+            // Wider bars for grouped data (week/month/quarter/year)
+            min_bar_width = is_mobile ? 60 : is_tablet ? 80 : 100;
+            max_bar_width = is_mobile ? 150 : is_tablet ? 200 : 250;
+        }
+        
+        // Calculate optimal bar width
+        let bar_width_per_item = Math.max(min_bar_width, Math.min(max_bar_width, Math.floor(containerWidth / num_items)));
+        
+        // Calculate canvas dimensions
+        let canvas_width = num_items * bar_width_per_item;
         let canvas_height = is_mobile ? 220 : is_tablet ? 280 : 320;
 
-        if (canvas_width < 300) canvas_width = 300;
-        // Do not cap max width, allow scroll for long charts
+        // Ensure minimum width but also respect container width for few items
+        const min_canvas_width = 300;
+        if (canvas_width < min_canvas_width) {
+            canvas_width = min_canvas_width;
+            bar_width_per_item = Math.floor(canvas_width / num_items);
+        }
+        
+        // For few items, expand chart to fill container width
+        // This makes bars appear centered with proper spacing
+        const needsScroll = canvas_width > containerWidth - 30;
+        if (!needsScroll) {
+            // Use full container width, Chart.js will center the bars automatically
+            canvas_width = containerWidth - 30;
+        }
+        
+        // Chart container style
+        const chartContainerStyle = needsScroll
+            ? `position: relative; height: ${canvas_height}px; width: ${canvas_width}px; flex-shrink: 0;`
+            : `position: relative; height: ${canvas_height}px; width: 100%;`;
 
-        // Create chart wrapper with scroll and note section (like production_schedule.js)
+        // Create chart wrapper with scroll and note section
         const chartWrapper = $(`<div class="chart-wrapper" style="
-            overflow-x: auto;
-            overflow-y: hidden;
             border-radius: 12px;
             background: #fff;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             padding: 15px;
             margin-top: 15px;
         ">
-            <div class="chart-container" style="
-                position: relative; 
-                height: ${canvas_height}px;
-                min-width: ${canvas_width}px;
-                width: ${canvas_width}px;
+            <div class="chart-scroll-area" style="
+                overflow-x: ${needsScroll ? 'auto' : 'hidden'};
+                overflow-y: hidden;
             ">
-                <canvas id="daily-production-chart" style="cursor: pointer; width: ${canvas_width}px; height: ${canvas_height}px;"></canvas>
+                <div class="chart-container" style="${chartContainerStyle}">
+                    <canvas id="daily-production-chart" style="cursor: pointer;"></canvas>
+                </div>
             </div>
             <div class="chart-note" style="
                 margin-top: 10px;
@@ -537,20 +692,16 @@ frappe.query_reports["Production Report"] = {
                 border-top: 1px solid #e0e0e0;
                 font-size: 12px;
                 color: #6c757d;
-                text-align: left;
+                text-align: center;
+                width: 100%;
             ">
                 <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Orders.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
     
-        // Format dates to dd/mm
-        const formatDM = (s) => {
-            if (!s || typeof s !== 'string' || s.indexOf('-') === -1) return s;
-            const [y,m,d] = s.split('-');
-            return `${d}/${m}`;
-        };
-        const labels = dates.map(formatDM);
+        // Format labels based on group_by
+        const labels = dates.map(d => this.format_group_label(d, group_by));
         
         // Prepare data for chart
         const othersActual = dates.map(date => daily_data[date]["Thạch cao"].actual);
@@ -576,9 +727,37 @@ frappe.query_reports["Production Report"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
     
+        // Calculate bar thickness based on number of items
+        // Fewer items = wider bars to fill space nicely
+        let barPercentage, categoryPercentage;
+        if (num_items <= 2) {
+            barPercentage = 0.6;
+            categoryPercentage = 0.5;
+        } else if (num_items <= 4) {
+            barPercentage = 0.7;
+            categoryPercentage = 0.6;
+        } else if (num_items <= 8) {
+            barPercentage = 0.8;
+            categoryPercentage = 0.7;
+        } else {
+            barPercentage = 0.9;
+            categoryPercentage = 0.8;
+        }
+
         // Create datasets: Thạch cao as stacked bars; P2O5 as lines
         const datasets = [
-            { label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+            { 
+                label: 'Thực tế (Thạch cao)', 
+                data: othersActual, 
+                backgroundColor: 'rgba(14, 165, 233, 0.5)', 
+                borderColor: 'rgba(14, 165, 233, 1)', 
+                borderWidth: 2, 
+                stack: 'Others', 
+                type: 'bar', 
+                order: 1,
+                barPercentage: barPercentage,
+                categoryPercentage: categoryPercentage
+            },
             { 
                 label: 'Kế hoạch (Thạch cao)', 
                 data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
@@ -588,7 +767,9 @@ frappe.query_reports["Production Report"] = {
                 stack: 'Others', 
                 type: 'bar', 
                 order: 1,
-                originalPlanned: othersPlanned
+                originalPlanned: othersPlanned,
+                barPercentage: barPercentage,
+                categoryPercentage: categoryPercentage
             },
             { label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
             { label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
@@ -644,16 +825,33 @@ frappe.query_reports["Production Report"] = {
                     if (activeElements && activeElements.length > 0) {
                         const clickedElement = activeElements[0];
                         const dataIndex = clickedElement.index;
-                        const clicked_date = dates[dataIndex];
+                        const clicked_key = dates[dataIndex];
+                        const clicked_data = daily_data[clicked_key];
+                        
+                        // Get date range for this group
+                        let from_date, to_date;
+                        if (clicked_data && clicked_data._dates && clicked_data._dates.length > 0) {
+                            const sortedDates = clicked_data._dates.sort();
+                            from_date = sortedDates[0];
+                            to_date = sortedDates[sortedDates.length - 1];
+                        } else {
+                            from_date = to_date = clicked_key;
+                        }
                         
                         // Show notification
+                        const displayLabel = this.format_group_label(clicked_key, group_by);
                         frappe.show_alert({
-                            message: __(`Đang mở Work Orders cho ${clicked_date}...`),
+                            message: __(`Đang mở Work Orders cho ${displayLabel}...`),
                             indicator: 'blue'
                         }, 2);
                         
-                        // Open in new tab
-                        const list_url = `/app/work-order?planned_start_date=${encodeURIComponent(clicked_date)}`;
+                        // Open in new tab with date range
+                        let list_url;
+                        if (from_date === to_date) {
+                            list_url = `/app/work-order?planned_start_date=${encodeURIComponent(from_date)}`;
+                        } else {
+                            list_url = `/app/work-order?planned_start_date=[">="${encodeURIComponent(from_date)}","<="${encodeURIComponent(to_date)}"]`;
+                        }
                         window.open(list_url, '_blank');
                     }
                 },
@@ -716,7 +914,7 @@ frappe.query_reports["Production Report"] = {
                     },
                     title: { 
                         display: true, 
-                        text: 'Sản lượng sản xuất theo ngày' ,
+                        text: this.get_chart_title(group_by),
                         font: {
                             size: window.innerWidth < 768 ? 18 : window.innerWidth < 1024 ? 22 : 26,
                             weight: 'bold'
@@ -738,15 +936,16 @@ frappe.query_reports["Production Report"] = {
                             offset: true
                         },
                         ticks: { 
-                            autoSkip: true,
-                            maxRotation: 0,
-                            minRotation: 0,
+                            autoSkip: false, // Show all labels
+                            maxRotation: 0, // Never rotate
+                            minRotation: 0, // Never rotate
                             align: 'center',
                             crossAlign: 'center',
                             font: {
-                                size: 9
+                                size: num_items <= 5 ? 12 : num_items <= 10 ? 10 : 9,
+                                weight: num_items <= 5 ? 'bold' : 'normal'
                             },
-                            padding: 5
+                            padding: 8
                         },
                         offset: true
                     },
@@ -790,30 +989,8 @@ frappe.query_reports["Production Report"] = {
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
 
-        // --- Bổ sung cập nhật filter group_by ---
-        if (from_date && to_date) {
-            const date1 = new Date(from_date);
-            const date2 = new Date(to_date);
-            const diffMs = Math.abs(date2 - date1);
-            const diffDays = diffMs / (1000 * 60 * 60 * 24);
-            const diffMonths = diffDays / 30.44;
-            const diffYears = diffDays / 365.25;
-            let options = [];
-            if (diffYears > 1) {
-                options = ["Năm", "Quý"];
-            } else if (diffMonths > 3 && diffYears <= 1) {
-                options = ["Quý", "Tháng"];
-            } else if (diffMonths <= 3 && diffMonths >= 1) {
-                options = ["Tháng", "Tuần"];
-            } else if (diffMonths < 1) {
-                options = ["Tuần", "Ngày"];
-            }
-            const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
-            if (groupByFilter) {
-                groupByFilter.df.options = options.join("\n");
-                groupByFilter.refresh();
-            }
-        }
+        // Update group_by filter options
+        this.update_group_by_options();
 
         if (from_date || to_date) {
             // Clear month filter if user selects explicit dates
@@ -827,6 +1004,43 @@ frappe.query_reports["Production Report"] = {
         setTimeout(() => {
             this.render_components();
         }, 500);
+    },
+
+    "update_group_by_options": function() {
+        // Update group_by filter options based on date range
+        const from_date = frappe.query_report.get_filter_value("from_date");
+        const to_date = frappe.query_report.get_filter_value("to_date");
+
+        let options = ["Mặc định"];
+        if (from_date && to_date) {
+            const date1 = new Date(from_date);
+            const date2 = new Date(to_date);
+            const diffMs = Math.abs(date2 - date1);
+            const diffDays = diffMs / (1000 * 60 * 60 * 24);
+            const diffMonths = diffDays / 30.44;
+            const diffYears = diffDays / 365.25;
+            
+            if (diffYears > 1) {
+                options = ["Mặc định", "Năm", "Quý", "Tháng", "Tuần"];
+            } else if (diffMonths > 3 && diffYears <= 1) {
+                options = ["Mặc định", "Quý", "Tháng", "Tuần"];
+            } else if (diffMonths <= 3 && diffMonths >= 1) {
+                options = ["Mặc định", "Tháng", "Tuần"];
+            } else if (diffMonths < 1) {
+                options = ["Mặc định", "Tuần"];
+            }
+        }
+        
+        const groupByFilter = frappe.query_report.get_filter && frappe.query_report.get_filter("group_by");
+        if (groupByFilter) {
+            groupByFilter.df.options = options.join("\n");
+            groupByFilter.refresh();
+            // Nếu giá trị hiện tại không nằm trong options thì set lại về option đầu tiên
+            const currentValue = groupByFilter.get_value();
+            if (!options.includes(currentValue)) {
+                groupByFilter.set_value(options[0]);
+            }
+        }
     },
 
     "handle_month_year_change": function() {
