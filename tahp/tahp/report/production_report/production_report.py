@@ -97,7 +97,7 @@ def process_month_year_filter(filters):
 def get_columns(work_orders):
     """Generate dynamic columns for production report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 250, "align": "left"},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 300, "align": "left"},
     ]
 
     if not work_orders:
@@ -130,7 +130,7 @@ def get_columns(work_orders):
             "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 300,
+            "width": 325,
             "align": "left",
             "parent": group_label  # For multi-level header - parent shows the system category
         })
@@ -138,12 +138,9 @@ def get_columns(work_orders):
     return columns
 
 def get_data(work_orders, columns, filters=None):
-    """Generate report data with right-aligned numbers, optionally grouped by week/month/quarter/year"""
+    """Generate report data with right-aligned numbers, grouped by week/month/quarter/year"""
     if not work_orders:
         return []
-
-    # table_view controls table grouping (Mặc định = flat, Theo nhóm = hierarchical)
-    table_view = (filters or {}).get("table_view", "Mặc định")
 
     # Group data by date and product
     data_by_date = defaultdict(lambda: defaultdict(lambda: {"planned": 0, "actual": 0, "system": None}))
@@ -278,48 +275,24 @@ def get_data(work_orders, columns, filters=None):
         
         return all_summary
 
-    if table_view == "Theo nhóm":
-        # Hierarchical view - levels based on group_by filter
-        group_by = (filters or {}).get("group_by", "Mặc định")
-        
-        # Determine hierarchy levels based on group_by selection
-        if group_by == "Năm":
-            levels = ["year", "quarter", "month", "week"]  # Year → Quarter → Month → Week → Date
-        elif group_by == "Quý":
-            levels = ["quarter", "month", "week"]  # Quarter → Month → Week → Date
-        elif group_by == "Tháng":
-            levels = ["month", "week"]  # Month → Week → Date
-        elif group_by == "Tuần":
-            levels = ["week"]  # Week → Date
-        else:
-            # Default: use month → week
-            levels = ["month", "week"]
-        
-        hierarchy = build_nested_hierarchy(sorted_dates, levels)
-        process_hierarchy(hierarchy, 0, product_fieldnames, data_by_date, dataset, total_summary)
+    # Always use hierarchical view - levels based on group_by filter
+    group_by = (filters or {}).get("group_by", "Mặc định")
+    
+    # Determine hierarchy levels based on group_by selection
+    if group_by == "Năm":
+        levels = ["year", "quarter", "month", "week"]  # Year → Quarter → Month → Week → Date
+    elif group_by == "Quý":
+        levels = ["quarter", "month", "week"]  # Quarter → Month → Week → Date
+    elif group_by == "Tháng":
+        levels = ["month", "week"]  # Month → Week → Date
+    elif group_by == "Tuần":
+        levels = ["week"]  # Week → Date
     else:
-        # Default flat view - no grouping
-        for date in sorted_dates:
-            row = {"production_date": date}
-            for fieldname in product_fieldnames:
-                planned_qty = data_by_date[date][fieldname]["planned"]
-                actual_qty = data_by_date[date][fieldname]["actual"]
-                
-                if actual_qty > 0 or planned_qty > 0:
-                    # Calculate percentage if planned_qty > 0
-                    percentage_html = ""
-                    if planned_qty > 0:
-                        percentage = round((actual_qty / planned_qty) * 100)
-                        percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
-                    
-                    # Right-align numbers with HTML
-                    row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
-                    total_summary[fieldname]["planned"] += planned_qty
-                    total_summary[fieldname]["actual"] += actual_qty
-                else:
-                    row[fieldname] = ""
-                    
-            dataset.append(row)
+        # Default: use month → week
+        levels = ["month", "week"]
+    
+    hierarchy = build_nested_hierarchy(sorted_dates, levels)
+    process_hierarchy(hierarchy, 0, product_fieldnames, data_by_date, dataset, total_summary)
 
     # Add total row
     if dataset:

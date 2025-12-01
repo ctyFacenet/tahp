@@ -12,6 +12,7 @@ frappe.query_reports["Production Report"] = {
                 frappe.query_reports["Production Report"].handle_date_range_change();
             }
         },
+
         {
             "fieldname": "to_date",
             "label": __("Đến ngày"),
@@ -26,35 +27,16 @@ frappe.query_reports["Production Report"] = {
         },
         {
             "fieldname": "group_by",
-            "label": __("Nhóm biểu đồ"),
+            "label": __("Nhóm theo"),
             "fieldtype": "Select",
             "options": ["Mặc định"],
             "default": "Mặc định",
             "on_change": function() {
-                const table_view = frappe.query_report.get_filter_value("table_view");
-                if (table_view === "Theo nhóm") {
-                    // If table view is grouped, refresh report to update table hierarchy
-                    frappe.query_report.refresh();
-                    setTimeout(() => {
-                        frappe.query_reports["Production Report"].render_components();
-                    }, 500);
-                } else {
-                    // Only re-render chart, don't refresh report data
-                    setTimeout(() => {
-                        frappe.query_reports["Production Report"].render_components();
-                    }, 100);
-                }
-            }
-        },
-        {
-            "fieldname": "table_view",
-            "label": __("Chế độ xem bảng"),
-            "fieldtype": "Select",
-            "options": ["Mặc định", "Theo nhóm"],
-            "default": "Mặc định",
-            "on_change": function() {
-                // Refresh report to change table view
+                // Refresh report to update both table hierarchy and chart
                 frappe.query_report.refresh();
+                setTimeout(() => {
+                    frappe.query_reports["Production Report"].render_components();
+                }, 500);
             }
         },
     ],
@@ -850,7 +832,9 @@ frappe.query_reports["Production Report"] = {
                         if (from_date === to_date) {
                             list_url = `/app/work-order?planned_start_date=${encodeURIComponent(from_date)}`;
                         } else {
-                            list_url = `/app/work-order?planned_start_date=[">="${encodeURIComponent(from_date)}","<="${encodeURIComponent(to_date)}"]`;
+                            // Use Frappe's "between" filter format: ["between", [from, to]]
+                            const betweenFilter = JSON.stringify(["between", [from_date, to_date]]);
+                            list_url = `/app/work-order?planned_start_date=${encodeURIComponent(betweenFilter)}`;
                         }
                         window.open(list_url, '_blank');
                     }
