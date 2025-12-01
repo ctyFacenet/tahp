@@ -24,10 +24,11 @@ frappe.ui.form.on('Job Card', {
         $wrapper.find('.page-container').css({'background': background})
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item').css({'background': background})
         $wrapper.find('.form-tabs-list .nav.form-tabs .nav-item .nav-link').css({'background': background})
+        $wrapper.find('.form-tabs-list').css({'background': background})
         $wrapper.find('.layout-main').css({'margin-inline': '-30px'})
         $wrapper.find('.form-page').css({'border': 'none'})
-        $wrapper.find('.layout-main-section-wrapper').attr('style', 'padding-left:5px !important; padding-right:5px !important;')
-        $wrapper.find('.form-column').attr('style', 'padding-left:5px !important; padding-right:5px !important;')
+        $wrapper.find('.layout-main-section-wrapper').attr('style', 'padding-inline: 1px !important;')
+        $wrapper.find('.form-column').attr('style', 'padding-inline:1px !important;')
     },
 
     define_layout: async function(frm) {
@@ -40,21 +41,14 @@ frappe.ui.form.on('Job Card', {
         $row0.append($col0);
 
         let $row1 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
-        let $row2 = $(`<div class="jc-container d-flex flex-wrap w-100 justify-content-start"></div>`)
-        let $row3 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
-        let $row4 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
-
-        // Row 1
-        let $col1 = $(`<div class="jc-col col-25"></div>`)
-        let $col2 = $(`<div class="jc-col col-45"></div>`)
-        let $col3 = $(`<div class="jc-col col-30 d-none d-md-block"></div>`)
-        $row1.append($col1, $col2, $col3)
-        // $row1.append($col1, $col2)
-
-        // Row 2
+        let $row2 = $(``)
+        let $col
         for (let workstation of frm.doc.custom_workstation_table) {
-            let $col = $(`<div class="jc-col col-25s"></div>`)
+            $col = $(`<div class="jc-col col-25s"></div>`)
             data = frm.doc.custom_config_table.filter(r => r.workstation === workstation.workstation)
+            if (data.length === 0) continue;
+            $row2 = $(`<div class="jc-container d-flex flex-wrap w-100 justify-content-start"></div>`)
+            let tracker;
             frm.events.define_table(
                 frm, $col, `Cấu hình ${workstation.workstation}`,
                 columns = [
@@ -65,15 +59,33 @@ frappe.ui.form.on('Job Card', {
                 data = data,
                 edittable=true,
                 action="update_configs",
-                action_param=workstation.workstation
+                action_param=workstation.workstation,
             )
             $row2.append($col)
         }
 
-        // Row 3
-        let $col4 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào phụ gia</div>`)
-        let $col5 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào đo bằng đồng hồ</div>`)
-        $row3.append($col4, $col5)
+        let $row3 = $(``)
+        let $col4, $col5
+        if (frm.doc.custom_input_table && frm.doc.custom_input_table.length > 0) {
+            $row3 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
+
+            if (frm.doc.custom_input_table.length > 0) {
+                $col4 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào phụ gia</div>`);
+                $row3.append($col4);
+            }
+
+            if (frm.doc.custom_input_table.some(r => r.is_meter)) {
+                $col5 = $(`<div class="jc-col col-50"></div>`).append(`<div class="jc-title">Đầu vào đo bằng đồng hồ</div>`);
+                $row3.append($col5);
+            }
+        }
+        let $row4 = $(`<div class="jc-container d-flex flex-wrap w-100"></div>`)
+
+        // Row 1
+        let $col1 = $(`<div class="jc-col col-25"></div>`)
+        let $col2 = $(`<div class="jc-col col-45"></div>`)
+        let $col3 = $(`<div class="jc-col col-30 d-none d-md-block"></div>`)
+        $row1.append($col1, $col2, $col3)
 
         // Row 4
         let $col6 = $(`<div class="jc-col col-50"></div>`)
@@ -151,6 +163,11 @@ frappe.ui.form.on('Job Card', {
                 };
             }),
             edittable=false,
+            action=null,
+            action_param=null,
+            focus=true,
+            tracker=null,
+            ratio=[1.5, 0.8, 0.7]
         )
         if (frm.__workstation_timer) clearInterval(frm.__workstation_timer);
         frm.__workstation_timer = setInterval(() => frm.events.update_workstations_timer_display(frm, $col2), 1000);
@@ -189,9 +206,9 @@ frappe.ui.form.on('Job Card', {
                     { label: 'Mã mặt hàng', fieldname: 'item_code', is_primary: true },
                     { label: 'Tên mặt hàng', fieldname: 'item_name', is_secondary: true },
                     { label: 'Đã tiêu hao', fieldname: 'qty' },
+                    { label: 'Đơn vị', fieldname: 'uom', is_middle_unit: true},
                     { label: 'Số đo đầu', fieldname: 'meter', is_value: true, symbolize: '<i class="fas fa-arrow-right jc-i mx-1"></i>', nowrap: true },
                     { label: 'Số đo mới', fieldname: 'meter_out', is_value: true, nowrap: true },
-                    { label: 'Đơn vị', fieldname: 'uom', is_unit: true},
                 ],
                 data=frm.doc.custom_input_table.filter(d => d.is_meter).map(d => {
                     return {
@@ -204,7 +221,11 @@ frappe.ui.form.on('Job Card', {
                     };
                 }),
                 edittable=true,
-                action="edit_inputs_meter"
+                action="edit_inputs_meter",
+                action_param=null,
+                focus=true,
+                tracker=null,
+                ratio=[1, 0.5, 1.5]
             )
         }
 
@@ -244,6 +265,9 @@ frappe.ui.form.on('Job Card', {
             }),
             edittable=false,
             action = async () => {await frm.events.update_team_async(frm)},
+            action_param = null,
+            focus = true,
+            tracker = null,
         )
 
         if (frm.doc.custom_downtime && frm.doc.custom_downtime.length > 0) {
@@ -292,47 +316,18 @@ frappe.ui.form.on('Job Card', {
                         group_name: d.group_name,
                     };
                 }),
+                edittable=false,
+                action=null,
+                action_param=null, 
+                focus=true,
+                tracker=null,
+                ratio=[1, 2]
             )
         }
 
         frm.events.create_chart(frm, $col3)
         frm.events.update_feedback(frm, $col0)
     },
-
-    // update_comment: async function (frm, $col0) {
-    //     let r = await frappe.call({
-    //         method: "tahp.doc_events.job_card.job_card.check_ptcn_role",
-    //     });
-    //     if (!r.message) $col0.hide();
-    //     $col0.on("click", function () {
-    //         frappe.prompt(
-    //             [
-    //                 {
-    //                     label: "Điền bình luận",
-    //                     fieldname: "comment",
-    //                     fieldtype: "Small Text",
-    //                     reqd: 1
-    //                 }
-    //             ],
-    //             async function (values) {
-    //                 try {
-    //                     await frappe.call({
-    //                         method: "tahp.doc_events.job_card.job_card.update_comment",
-    //                         args: {
-    //                             docname: frm.doc.name,
-    //                             comment: values.comment
-    //                         }
-    //                     });
-    //                 } catch (err) {
-    //                     frappe.msgprint(__("Có lỗi xảy ra khi xử lý"));
-    //                     console.error(err);
-    //                 }
-    //             },
-    //             "Thêm bình luận",
-    //             "Gửi"
-    //         );
-    //     });
-    // },
 
     update_feedback: async function(frm, $col0) {
         const tracker = frm.doc.custom_tracker;
@@ -362,271 +357,36 @@ frappe.ui.form.on('Job Card', {
     },
 
     create_chart(frm, $col3) {
-        const inputs = frm.doc.custom_inputs || [];
-
-        const itemNameMap = {};
-        (frm.doc.custom_input_table || []).forEach(row => {
-            itemNameMap[row.item_code] = row.item_name;
-        });
-
-        // Lấy toàn bộ label (chỉ HH:MM:SS, không ngày tháng)
-        const labels = [...new Set(
-            inputs.map(i => new Date(i.from_time).toLocaleTimeString('en-GB', { hour12: false }))
-        )];
-
-        // Màu hiện đại với gradient
-        const modernColors = [
-            { border: '#FF6B6B', bg: 'rgba(255, 107, 107, 0.1)' }, // Red
-            { border: '#4ECDC4', bg: 'rgba(78, 205, 196, 0.1)' }, // Teal
-            { border: '#45B7D1', bg: 'rgba(69, 183, 209, 0.1)' }, // Blue
-            { border: '#96CEB4', bg: 'rgba(150, 206, 180, 0.1)' }, // Green
-            { border: '#FFEAA7', bg: 'rgba(255, 234, 167, 0.1)' }, // Yellow
-            { border: '#DDA0DD', bg: 'rgba(221, 160, 221, 0.1)' }, // Purple
-            { border: '#98D8C8', bg: 'rgba(152, 216, 200, 0.1)' }, // Mint
-            { border: '#F7DC6F', bg: 'rgba(247, 220, 111, 0.1)' }, // Gold
-            { border: '#BB8FCE', bg: 'rgba(187, 143, 206, 0.1)' }, // Lavender
-            { border: '#85C1E9', bg: 'rgba(133, 193, 233, 0.1)' }  // Light Blue
-        ];
-
-        let colorIndex = 0;
-
-        const datasetsMap = {};
-
-        // Tạo datasets với dữ liệu ban đầu
-        inputs.forEach(row => {
-            const timeLabel = new Date(row.from_time).toLocaleTimeString('en-GB', { hour12: false });
-
-            if (!datasetsMap[row.item_code]) {
-                const color = modernColors[colorIndex % modernColors.length];
-                colorIndex++;
-
-                datasetsMap[row.item_code] = {
-                    // lấy tên từ bảng custom_input_table
-                    label: `${row.item_code}: ${itemNameMap[row.item_code] || 'Unknown'}`,
-                    data: Array(labels.length).fill(null),
-                    borderWidth: 3,
-                    borderColor: color.border,
-                    backgroundColor: color.bg,
-                    fill: true, // Bật fill để có nền gradient
-                    tension: 0.4,
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                    pointBackgroundColor: color.border,
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: color.border,
-                    pointHoverBorderColor: '#ffffff',
-                    pointHoverBorderWidth: 3
-                };
-            }
-
-            const idx = labels.indexOf(timeLabel);
-            if (idx !== -1) {
-                datasetsMap[row.item_code].data[idx] = row.qty;
-            }
-        });
-
-        // Fill giá trị thiếu bằng giá trị trước đó gần nhất
-        Object.keys(datasetsMap).forEach(itemCode => {
-            const data = datasetsMap[itemCode].data;
-            let lastValue = null;
-            
-            for (let i = 0; i < data.length; i++) {
-                if (data[i] !== null) {
-                    lastValue = data[i];
-                } else if (lastValue !== null) {
-                    // Nếu không có giá trị tại vị trí này và có giá trị trước đó
-                    data[i] = lastValue;
+        $col3.empty()
+        frm.events.define_table(frm, $col3, "Phản ánh của nhân viên",
+            columns=[
+                { label: "Ghi nhận", fieldname: "from_date", is_primary: true},
+                { label: "Phản ánh bởi", fieldname: "employee" , is_secondary: true},
+                { label: "Bị ảnh hưởng", fieldname: "workstation", is_unit: true, type: "string"},
+                { label: "Nội dung", fieldname: "reason", is_value: true, type: "string"},
+            ],
+            data=(frm.doc.custom_comment || []).map(row => {
+                let employee_name = row.employee
+                if (row.employee !== "Toàn bộ công nhân") employee_name = row.employee_name
+                else employee_name = "Toàn bộ"
+                let workstation = row.workstation
+                if (row.workstation == "Toàn bộ thiết bị") workstation = "Mọi thiết bị"
+                const from_date = row.from_date ? row.from_date.slice(11, 16) : "";
+                return {
+                    employee: employee_name,
+                    workstation: workstation,
+                    reason: row.reason,
+                    from_date: from_date
                 }
-            }
-        });
-
-        const datasets = Object.values(datasetsMap);
-
-        // Xóa chart cũ nếu có
-        if (window.myChart) {
-            window.myChart.destroy();
-        }
-
-        // Xóa resize observer cũ nếu có
-        if (window.chartResizeObserver) {
-            window.chartResizeObserver.disconnect();
-        }
-
-        // Vẽ chart với Chart.js
-        $col3.empty(); 
-
-        // Tạo container div cho chart
-        const chartContainer = document.createElement("div");
-        chartContainer.style.position = 'relative';
-        chartContainer.style.height = '250px';
-        chartContainer.style.width = '100%';
-        $col3.append(chartContainer);
-
-        // Tạo thẻ canvas mới
-        const canvas = document.createElement("canvas");
-        chartContainer.appendChild(canvas);
-
-        // Lấy context từ canvas
-        const ctx = canvas.getContext("2d");
-
-        // Tạo gradient cho background
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(250, 250, 255, 0.8)');
-        gradient.addColorStop(1, 'rgba(240, 248, 255, 0.2)');
-
-        window.myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Biểu đồ theo dõi số lượng tiêu hao',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        },
-                        color: '#2c3e50',
-                        padding: {
-                            bottom: 5
-                        }
-                    },
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: { 
-                                size: 12,
-                                weight: '500'
-                            },
-                            color: '#2c3e50',
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(45, 52, 73, 0.95)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
-                        borderColor: '#4ECDC4',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                        padding: 12,
-                        displayColors: true,
-                        titleFont: {
-                            size: 13,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 12
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Thời gian',
-                            color: '#2c3e50',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#5a6c7d',
-                            font: {
-                                size: 11
-                            }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Số lượng',
-                            color: '#2c3e50',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            }
-                        },
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#5a6c7d',
-                            font: {
-                                size: 11
-                            }
-                        }
-                    }
-                },
-                layout: {
-                    padding: {
-                        top: 20,
-                        right: 20,
-                        bottom: 20,
-                        left: 20
-                    }
-                },
-                elements: {
-                    point: {
-                        radius: 4,
-                        hoverRadius: 8
-                    }
-                }
-            }
-        });
-
-        // Thêm ResizeObserver để theo dõi thay đổi kích thước container
-        if (window.ResizeObserver) {
-            window.chartResizeObserver = new ResizeObserver(entries => {
-                if (window.myChart) {
-                    // Đợi một chút để DOM cập nhật xong
-                    setTimeout(() => {
-                        window.myChart.resize();
-                    }, 100);
-                }
-            });
-            
-            window.chartResizeObserver.observe($col3[0]);
-        }
-
-        // Fallback: Lắng nghe sự kiện resize của window
-        const handleResize = () => {
-            if (window.myChart) {
-                setTimeout(() => {
-                    window.myChart.resize();
-                }, 150);
-            }
-        };
-
-        // Xóa listener cũ nếu có
-        if (window.chartResizeHandler) {
-            window.removeEventListener('resize', window.chartResizeHandler);
-        }
-
-        window.chartResizeHandler = handleResize;
-        window.addEventListener('resize', handleResize);
+            }),
+            edittable=false,
+            action=null,
+            action_param=null,
+            focus=true,
+            tracker=null,
+            ratio=null,
+            overflow=true
+        )
     },
 
     update_workstations_timer_display(frm, $wrapper) {
@@ -739,7 +499,17 @@ frappe.ui.form.on('Job Card', {
         // Toggle hiển thị danh sách
         let expanded = false
         let $originalContent = $('<div class="jc-content"></div>');
-        if (frm.doc.docstatus === 0)  $originalContent.append($task, $button);
+        if (frm.doc.docstatus === 0)  {
+            $originalContent.append($task, $button);
+
+                let $commentButton = $('<div class="w-100 text-center jc-comment-button"><span>Gửi phản ánh, đề xuất</span></div>');
+            $originalContent.append($commentButton);
+
+            $commentButton.on("click", async function() {
+                await frm.events.send_comment(frm);
+            });
+        }
+
         $wrapper.append($originalContent);
         
         let $listView = $(`<div class="jc-list" style="display:none"></div>`)
@@ -772,251 +542,271 @@ frappe.ui.form.on('Job Card', {
         })
     },
 
-    define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null, action_param=null) {
-
+    define_table: function(frm, $wrapper, title, columns, data, edittable=false, action=null, action_param=null, focus=true, tracker=null, ratio=null, overflow=false) {
         // Header
-        let $header = $(`
-            <div class="d-flex flex-wrap justify-content-between jc-title jc-tb-title">
-                <div class="flex-grow-1">${title}</div>
-            </div>
-        `);
-        $wrapper.append($header);
+        const $header = $(`<div class="d-flex flex-wrap justify-content-between jc-title jc-tb-title"><div>${title || ""}</div></div>`)
+        $wrapper.append($header)
 
-        // Nút sửa
-        if ((edittable || action) && frm.doc.docstatus === 0) {
-            if (data.length > 0) {
-                let $editBtn = $('<button class="btn btn-secondary d-none d-md-table jc-edit-btn">Sửa</button>')
-                $header.append($editBtn)
-            }
-
-            if (!edittable && action && data.length > 0) {
-                let $editBtn = $('<button class="btn btn-secondary d-md-none jc-edit-btn">Sửa</button>')       
-                $header.append($editBtn)                
-            }
-
-            // let $editMobileBtn = $('<button class="btn btn-secondary d-md-none w-100 mt-2 jc-edit-btn jc-mobile-input">Sửa</button>')
-            // $wrapper.append($editMobileBtn)
+        // Edit Button
+        if (frm.doc.docstatus === 0 && !edittable && action && data.length > 0) {
+            const $editBtn = $(`<button class="btn btn-secondary jc-edit-btn">Sửa</button>`).on("click", action)
+            $header.append($editBtn)
         }
 
-
         // Desktop
-        let $desktopWrapper = $('<div class="d-none d-md-block overflow-auto"></div>');
-        let $desktopTable = $('<table class="table table-sm"></table>')
-        let $thead = $('<thead><tr></tr></thead>')
-        columns.forEach(col => {
-            let th = `<th>${col.label || ""}</th>`
-            $thead.find('tr').append(th)
-        })
-        $desktopWrapper.append($desktopTable);
-        $desktopTable.append($thead)
-        $wrapper.append($desktopWrapper)
+        const $desktopWrapper = $(`
+            <div class="d-none d-md-block" style="user-select:none;">
+                <table class="table table-sm table-bordered">
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        `);
 
-        let $tbody = $('<tbody></tbody>')
-        let desktopInputs = [];
-        data.forEach((row, rowIndex) => {
-            let $tr = $('<tr></tr>')
-            if (rowIndex % 2 === 0) {
-                $tr.css("background-color", "#f5f5f5ff");
-            } else {
-                $tr.css("background-color", "#ffffff");
-            }
+        const $container = $('<div></div>').css({
+            ...(overflow ? {
+                maxHeight: "220px",
+                overflowY: "auto",
+            } : {})
+        });
+
+        $container.append($desktopWrapper);
+        $wrapper.append($container);
+        const $desktopTable = $desktopWrapper.find('table')
+        const desktopInputs = [] 
+        columns.forEach((col, i) => {
+            const isLast = i === columns.length - 1;
+            const thStyle = `
+                ${overflow && !isLast ? 'white-space: nowrap;' : ''}
+                ${col.action ? 'text-align: end; width: 1%; min-width: 100px; padding-right: 15px;' : ''}
+            `;
+            const th = `<th style="${thStyle}">${col.label || ""}</th>`;
+            $desktopTable.find('tr').append(th);
+        });
+
+
+        data.forEach((row, index) => {
+            let $tr = $(`<tr class="desktop-row" style="background-color: ${index % 2 == 0 ? '#f9f9f9' : '#ffffff'}"></tr>`)
+            $desktopTable.find('tbody').append($tr)
             columns.forEach(col => {
-                let $td
+                let $td = null
                 if (col.action && frm.doc.docstatus === 0) {
-                    $td = $('<td class="text-nowrap"></td>')
+                    $td = $(`<td class="text-nowrap" style="text-align: end;"></td>`)
                     col.action.forEach(btn => {
                         if (!btn.condition || btn.condition(row)) {
-                            let $b = $(`<button class="${btn.class} btn btn-sm mr-2">${btn.label}</button>`)
-                            $b.on("click", () => btn.handler(row, rowIndex))
-                            $td.append($b)
+                            const $button = $(`<button class="${btn.class} btn btn-sm mr-2">${btn.label}</button>`).on("click", () => btn.handler(row, index))
+                            $td.append($button)
                         }
                     })
-                } else if (col.is_value) {
-                    if (col.type !== 'string') {
-                        let value = row[col.fieldname] != null ? row[col.fieldname] : '';
-                        if (col.type === 'number' && value !== '') value = parseFloat(value);
-
-                        let $input = $(`<input type="number" class="jc-tb-mobile-value text-left" value="${value}" style="max-width:10ch;">`);
-                        $input.attr('data-fieldname', col.fieldname);
-                        $input.attr('data-rowindex', rowIndex);
-                        $input.css('pointer-events', 'none')
-                        $input.css('background', 'transparent')
-                        $td = $('<td></td>');
-                        desktopInputs.push($input);
-                        $td.append($input);
-                    } else {
-                        $td = $(`<td>${row[col.fieldname] || ''}</td>`);
-                    }
                 } else {
-                    $td = $(`<td>${row[col.fieldname] || ''}</td>`)
-                    $td.attr('data-fieldname', col.fieldname)
-                    $td.attr('data-rowindex', rowIndex)
+                    $td = $(`<td style="vertical-align: middle;">${row[col.fieldname] || ''}</td>`)
+                    let flag = true
+                    if (col.is_value && col.type !== "string" && frm.doc.docstatus === 0) {
+                        const $input = $(`<input data-display="desktop" data-fieldname="${col.fieldname}" data-rowindex="${index}" class="wo-input wo-value-input" style="max-width:100px;" value="${row[col.fieldname] || ''}">`)
+                        $td.empty().append($input)
+                        desktopInputs.push($input)
+                        flag = false
+                    }
+                        if (flag) {
+                        $td.attr('data-fieldname', col.fieldname)
+                        $td.attr('data-rowindex', index)                    
+                    }
                 }
                 $tr.append($td)
             })
-            $tbody.append($tr);
         })
-        $desktopTable.append($tbody)
 
         // Mobile
-        let $mobileTable = $('<div class="d-md-none"></div>')
-        let primary = columns.find(c => c.is_primary);
-        let middle = columns.find(c => !c.is_primary && !c.is_secondary && !c.is_value && !c.is_unit && !c.action);
-        let value = columns.find(c => c.is_value);
-        let $theadMobile = $(`<div class="d-flex py-1 mb-1 border-bottom"></div>`)
-        if (middle) {
-            $theadMobile.append(`<div style="flex:1" class="text-left">${primary?.label || ""}</div>`)
-            $theadMobile.append(`<div style="flex:1" class="text-center">${middle?.label || ""}</div>`)
-            $theadMobile.append(`<div style="flex:1" class="text-right">${value?.label || ""}</div>`)
+        const $mobileWrapper = $(`<div class="d-md-none mt-2" style="font-size: 14px;"><div class="d-flex mobile-head" style="font-weight:bold"></div></div>`)
+        $wrapper.append($mobileWrapper)
+        const primary = columns.find(c => c.is_primary)
+        const middle = columns.filter(c => !c.is_primary && !c.is_secondary && !c.is_value && !c.is_unit && !c.action)
+        const secondary = columns.filter(c => c.is_secondary)
+        const value = columns.filter(c => c.is_value)
+        const unit = columns.filter(c => c.is_unit)
+        const is_middle_unit = columns.filter(c => c.is_middle_unit)
+        const mobileInputs = []
+        let $theadMobile = $mobileWrapper.find('.mobile-head')
+        const columnCount = middle.length > 0 ? 3 : 2
+        const defineRatio = ratio ?? Array(columnCount).fill(1)
+        if (middle.length > 0) {
+            $theadMobile.append(`<div style="flex:${defineRatio[0]}" class="text-left border-bottom">${primary?.label || ""}</div>`)
+            $theadMobile.append(`<div style="flex:${defineRatio[1]}; border-left:1px solid #dee2e6; border-right:1px solid #dee2e6;" class="text-center border-bottom">${middle[0]?.label || ""}</div>`)
+            $theadMobile.append(`<div style="flex:${defineRatio[2]}" class="text-right border-bottom">${value[0]?.label || ""}</div>`)
         } else {
-            $theadMobile.append(`<div style="flex:2" class="text-left">${primary?.label || ""}</div>`)
-            $theadMobile.append(`<div style="flex:1" class="text-right">${value?.label || ""}</div>`)
+            $theadMobile.append(`<div style="flex:${defineRatio[0]}; border-right:1px solid #dee2e6;" class="text-left border-bottom">${primary?.label || ""}</div>`)
+            $theadMobile.append(`<div style="flex:${defineRatio[1]}" class="text-right border-bottom">${value[0]?.label || ""}</div>`)
         }
-        $mobileTable.append($theadMobile)
-        $wrapper.append($mobileTable)
-
-        let mobileInputs = [];
-        data.forEach((row, rowIndex) => {
-            let $row = $(`<div class="d-flex mb-2 py-1 jc-tb-mobile-row"></div>`)
-            let $left, $right, $middle
-
-            if (middle) {
-                $left = $(`<div style="flex:1" class="text-left"></div>`)
-                $middle = $(`<div style="flex:1" class="text-center"></div>`)
-                $right = $(`<div style="flex:1" class="text-right"></div>`)
-                $realRight = $('<div class="jc-tb-right"></div>')
-                $right.append($realRight)
+        data.forEach((row, index) => {
+            const $row = $(`<div class="d-flex flex-column align-items-stretch mobile-row" style="background-color: ${index % 2 == 0 ? '#f9f9f9' : '#ffffff'}"><div class="mobile-row-wrapper d-flex"></div></div>`)
+            const $rowWrapper = $row.find('.mobile-row-wrapper')
+            $mobileWrapper.append($row)
+            let $left, $middle, $right
+            if (middle.length > 0) {
+                $left = $(`<div style="flex:${defineRatio[0]}" class="text-left py-2"></div>`)
+                $middle = $(`<div style="flex:${defineRatio[1]}; border-left:1px solid #dee2e6; border-right:1px solid #dee2e6;" class="text-center py-2"></div>`)
+                $right = $(`<div style="flex:${defineRatio[2]}" class="text-right py-2"></div>`)
+                $rowWrapper.append($left, $middle, $right)
             } else {
-                $left = $(`<div style="flex:2" class="text-left"></div>`)
-                $right = $(`<div style="flex:1" class="text-right"></div>`)
-                $realRight = $('<div class="jc-tb-right"></div>')
-                $right.append($realRight)
-
+                $left = $(`<div style="flex:${defineRatio[0]}; border-right:1px solid #dee2e6;" class="text-left py-2"></div>`)
+                $right = $(`<div style="flex:${defineRatio[1]}" class="text-right py-2"></div>`)
+                $rowWrapper.append($left, $right)
             }
 
-            let $buttons = $(`<div></div>`)
-            columns.forEach(col => {
-                if (col.is_primary && row[col.fieldname]) {$left.append(`<div class="">${row[col.fieldname]}</div>`)}
-                else if(col.is_secondary && row[col.fieldname]) $left.append(`<div class="jc-tb-secondary">${row[col.fieldname]}</div>`)
-                else if(col.is_value) {
-                    if (col.type !== 'string') {
-                        let value = row[col.fieldname] != null ? row[col.fieldname] : '';
-                        if (col.type === 'number' && value !== '') value = parseFloat(value);
-                        let $input = $(`<input type="number" class="jc-tb-mobile-value" value="${value}">`);
-                        $input.attr('data-fieldname', col.fieldname);
-                        $input.attr('data-rowindex', rowIndex);
-                        $input.css('pointer-events', 'none')
-                        if (col.nowrap) $input.css({'max-width': '5ch'})
-                        else $input.css({'width':'100%'})
-                        if (frm.doc.docstatus == 0) $input.addClass('jc-tb-mobile-value-new')
-                        $realRight.append($input);
-                        if (col.symbolize) $realRight.append(col.symbolize);
-                        mobileInputs.push($input);
+            if (primary.fieldname in row) $left.append($(`<div data-fieldname="${primary.fieldname}" data-rowindex=${index}>${row[primary.fieldname]}</div>`))
+            if (secondary.length > 0) {
+                secondary.forEach((item) => {
+                    if (item.fieldname in row) $left.append($(`<div style="font-size: 11px; line-height: 11px;padding-bottom: 10px;" data-fieldname="${row.fieldname}" data-rowindex=${index}>${row[item.fieldname]}</div>`))
+                })
+            }
+
+            if (middle.length > 0) {
+                let middle_unit = '';
+                if (is_middle_unit.length > 0)  middle_unit = row[is_middle_unit[0].fieldname]
+                if (middle[0].fieldname in row) $middle.append($(`<div data-fieldname="${middle[0].fieldname}" data-rowindex=${index}>${row[middle[0].fieldname]} ${middle_unit}</div>`))
+            }
+
+            if (value.length > 0) {
+                const $rightWrapper = $(`<div class="d-flex justify-content-end align-items-center" style="gap:5px;padding-left:10px;"></div>`)
+                value.forEach((item) => {
+                    if (item.type != "string" && frm.doc.docstatus === 0) {
+                        const $input = $(`<input data-display="mobile" data-fieldname="${item.fieldname}" data-rowindex=${index} class="wo-input wo-value-input" style="max-width:100px;text-align:end" value="${row[item.fieldname] || ''}">`)
+                        $rightWrapper.append($input)
+                        mobileInputs.push($input)
+                        if (item.symbolize) $rightWrapper.append(item.symbolize)
                     } else {
-                        $realRight.append(`<div>${row[col.fieldname] || ''}</div>`);
+                        $rightWrapper.append($(`<div class="" data-fieldname="${row.fieldname}" data-rowindex=${index}>${row[item.fieldname]}</div>`))
                     }
+                })
+                $right.append($rightWrapper)
+                if (unit.length > 0) {
+                    const only_unit = unit[0]
+                    if (only_unit.type === "string") $right.append($(`<div style="font-size: 11px; line-height: 11px;padding-bottom: 10px;">${row[only_unit.fieldname]}</div>`))
+                    else $rightWrapper.append($(`<div>${row[only_unit.fieldname]}</div>`))
                 }
-                else if(col.is_unit && row[col.fieldname]) $right.append(`<div class="ml-2 jc-tb-secondary">${row[col.fieldname]}</div>`)
-                else if (col.action && frm.doc.docstatus === 0) {
+            }
+
+            const actionColumns = columns.filter(col => col.action);
+            if (frm.doc.docstatus === 0 && actionColumns.length > 0) {
+                const $rowButtons = $(`<div class="py-2"></div>`)
+                $left.append($rowButtons)
+                actionColumns.forEach(col => {
                     col.action.forEach(btn => {
                         if (!btn.condition || btn.condition(row)) {
-                            let $b = $(`<button class="${btn.class} btn btn-sm mr-2">${btn.label}</button>`)
-                            $b.on("click", () => btn.handler(row, rowIndex))
-                            $buttons.append($b)
+                            const $button = $(`<button class="${btn.class} btn btn-sm mr-2 mb-2 text-nowrap">${btn.label}</button>`)
+                                .on("click", () => btn.handler(row, index));
+                            $rowButtons.append($button);
                         }
-                    })
-                }
-                else {
-                    if (middle && col.fieldname !== "action") $middle.append(`<div data-fieldname=${col.fieldname} data-rowindex=${rowIndex} class="text-center">${row[col.fieldname]}</div>`)
-                }
-            })
-
-            if ($middle) $row.append($left, $middle, $right)
-            else $row.append($left, $right)
-            $mobileTable.append($row)
-            if (!$buttons.is(':empty')) {
-                let $wrapper = $('<div class="border-bottom mb-2 pb-2"></div>')
-                $wrapper.append($row)
-                $wrapper.append($buttons)
-                $mobileTable.append($wrapper)
-            } else {
-                $row.addClass("border-bottom mb-2 pb-1")
-                $mobileTable.append($row)
+                    });
+                });
+            }
+            
+            if (secondary.length === 0 && actionColumns.length === 0) {
+                $left.css({'display': 'flex', 'align-items': 'center'})
             }
         })
 
-        if (edittable === false && action) {
-             $wrapper.on("click", ".jc-edit-btn", action)
-             return;
-        }
-
-        // ----- XỬ LÝ CHẾ ĐỘ EDIT -----
         if (frm.doc.docstatus != 0) return;
         let editing = false;
 
-        function enableEditing(inputs ,$btn=null) {
-            if (editing) return;
-            editing = true;
+        $wrapper.on('input', '.wo-value-input', function() {
+            const $this = $(this)
+            const field = $this.data('fieldname')
+            const rowIndex = $this.data('rowindex')
+            const val = $this.val()
+
+            $wrapper.find(`[data-fieldname="${field}"][data-rowindex="${rowIndex}"]`).not($this).val(val)
+            if (!focus) {
+                const inputsArray = $wrapper.find('.wo-value-input').map((_, el) => $(el)).get()
+                const result = covertAllData(data, inputsArray)
+                tracker.data = result;
+            }
+        })
+
+        function enableEditing(inputs) {
+            if (editing) return
+            editing = true
 
             inputs.forEach(($input, index) => {
-                $input.css('pointer-events', 'auto').addClass('jc-edit-editing');
                 $input.data("original-value", $input.val());
-                // Enter để nhảy qua input kế tiếp
                 $input.on('keydown.nextFocus', function(e) {
                     if (e.key === 'Enter' || e.keyCode === 13) {
                         e.preventDefault();
                         const nextIndex = index + 1;
-                        if (nextIndex < inputs.length) {
-                            scrollAndFocus(inputs, nextIndex);
-                        } else {
-                            $input.blur(); // giả lập blur cuối cùng
-                        }
+                        if (nextIndex < inputs.length) scrollAndFocus(inputs, nextIndex);
+                        else $input.blur();
                     }
                 });
-                // Khi blur thì kiểm tra xem có phải input cuối hoặc rời hết không
+
                 $input.on('blur.saveCheck', function() {
+                    const hasChanges = inputs.some($inp => $inp.val() !== $inp.data("original-value"));
+                    if (!hasChanges) return;
                     setTimeout(() => {
-                        if (!$(".jc-edit-editing:focus").length) { // không còn input nào focus
-                            frappe.confirm(
-                                "Lưu thay đổi?",
-                                () => {
-                                    const result = covertAllData(data, inputs);
-                                    if (action) frm.events[action](frm, result, action_param);;
-                                    disableEditing(inputs, $btn);
-                                },
-                                () => { disableEditing(inputs, $btn); }
-                            );
+                        const stillEditing = inputs.some($inp => $inp.is(':focus'));
+                        if (!stillEditing) {
+                            if (focus) {
+                                frappe.confirm(
+                                    "Lưu thay đổi?",
+                                    () => {
+                                        const result = covertAllData(data, inputs);
+                                        if (action) frm.events[action](frm, result, action_param);
+                                        disableEditing(inputs);
+                                    },
+                                    () => disableEditing(inputs)
+                                );
+                            }
                         }
                     }, 150);
-                });
-            });
-            if ($btn) $btn.addClass('jc-edit-btn-save').text('Lưu');
+                });                
+            })
             if (inputs[0]) scrollAndFocus(inputs, 0);
         }
 
-        function disableEditing(inputs, $btn) {
+        function disableEditing(inputs) {
             editing = false;
+
             inputs.forEach($input => {
-                $input.val($input.data("original-value"));
-                $input
-                    .css('pointer-events', 'none')
-                    .removeClass('jc-edit-editing')
-                    .off('keydown.nextFocus')
-                    .off('blur.saveCheck');
+                const original = $input.data("original-value");
+                $input.val(original).off('keydown.nextFocus').off('blur.saveCheck');
+
+                const field = $input.data('fieldname');
+                const rowIndex = $input.data('rowindex');
+                $wrapper.find(`[data-fieldname="${field}"][data-rowindex="${rowIndex}"]`).not($input).val(original);
             });
-            if ($btn) $btn.removeClass('jc-edit-btn-save').text('Sửa');
         }
 
-        // Desktop: vẫn dùng nút Sửa
-        $wrapper.on("click", ".jc-edit-btn", function() {
-            const $btn = $(this);
-            enableEditing(desktopInputs, $btn);
+        $wrapper.on("click", ".desktop-row", function() {
+            if (!editing) enableEditing(desktopInputs);
         });
 
-        // Mobile: click vào bảng để bật edit
-        $wrapper.on("click", ".jc-tb-mobile-row", function() {
+        $wrapper.on("click", ".mobile-row", function() {
             if (!editing) enableEditing(mobileInputs);
         });
+    },
+
+    send_comment: async function(frm) {
+        const teams = ["Toàn bộ công nhân"]
+        frm.doc.custom_team_table.forEach(row => teams.push(`${row.employee}: ${row.employee_name}`))
+        const workstations  = ["Toàn bộ thiết bị"]
+        frm.doc.custom_workstation_table.forEach(row => workstations.push(row.workstation))
+
+        let d = new frappe.ui.Dialog({
+            title: "Điền thông tin phản ánh, đề xuất",
+            fields: [
+                {fieldname: "employee", fieldtype: "Select", options: teams, label: "Chọn người phản ánh", default: "Toàn bộ công nhân"},
+                {fieldname: "workstation", fieldtype: "Select", options: workstations, label: "Chọn thiết bị liên quan", default: "Toàn bộ thiết bị"},
+                {fieldname: "reason", fieldtype: "Small Text", label: "Nội dung phản ánh"}
+            ],
+            primary_action_label: "Gửi phản ánh",
+            primary_action: async (values) => {
+                await frappe.xcall("tahp.doc_events.job_card.job_card.process_comment", 
+                      {job_card: frm.doc.name, employee: values.employee, workstation: values.workstation, reason: values.reason})
+                d.hide();
+                frappe.msgprint("Gửi phản ánh thành công, phản ánh sẽ được thông báo tới Trưởng ca")
+            }
+        })
+
+        d.show();
     },
 
     start_job_card: async function(frm) {
@@ -1110,18 +900,82 @@ frappe.ui.form.on('Job Card', {
             }
         }
 
-        const message = `Xác nhận hoàn thành LSX Công đoạn?`;
-        await new Promise((resolve, reject) => {
-            frappe.confirm(message, resolve, () => {
-                reject();
-                return;
-            });
-        });
+        let flag = await frappe.xcall("tahp.doc_events.job_card.job_card.check_operation", {operation: frm.doc.operation, bom: frm.doc.bom_no})
+        if (flag === true) {
+            let tracker = { data: null };
 
-        await frappe.call({
-            method: "tahp.doc_events.job_card.job_card.submit",
-            args: { job_card: frm.doc.name }
-        });
+            const d = new frappe.ui.Dialog({
+                title: "Chốt sản lượng của từng máy",
+                fields: [
+                    { fieldname: "confirm_msg", fieldtype: "HTML", options: '' },
+                    { fieldname: "wrapper", fieldtype: "HTML" }
+                ],
+                primary_action_label: "Tiếp tục",
+                primary_action: async () => {
+                    if (!d._confirmed) {
+                        d.get_field("confirm_msg").$wrapper.html(
+                            `<div style="padding:10px; background:#fff3cd; border:1px solid #ffeeba; margin-bottom:10px;">
+                                Bạn có chắc chắn chốt sản lượng đã nhập bên dưới không? Vui lòng kiểm tra lại số lượng một lần nữa trước khi bấm <b>Xác nhận</b>
+                            </div>`
+                        )
+                        d.get_field("confirm_msg").wrapper.style.display = ""
+                        d._confirmed = true;
+
+                        d.set_primary_action("Xác nhận", async () => {
+
+                            await frappe.xcall("tahp.doc_events.job_card.job_card.save_operation_qty", {
+                                job_card: frm.doc.name,
+                                items: tracker.data
+                            });
+
+                            await frappe.call({
+                                method: "tahp.doc_events.job_card.job_card.submit",
+                                args: { job_card: frm.doc.name }
+                            });
+
+                            d.hide();
+                        });
+                    }
+                }
+            });
+
+            const $wrapper = d.get_field("wrapper").$wrapper;
+            d.get_field("confirm_msg").wrapper.style.display = "none"
+
+            frm.events.define_table(
+                frm, $wrapper, '',
+                columns = [
+                    { label: 'Tên thiết bị', fieldname: 'workstation', is_primary: true },
+                    { label: 'Sản lượng', fieldname: 'qty', is_value: true },
+                    { label: 'Đơn vị', fieldname: 'uom', is_unit: true },
+                ],
+                data = frm.doc.custom_workstation_table.map(w => ({
+                    workstation: w.workstation,
+                    qty: 0,
+                    uom: "Tấn"
+                })),
+                edittable = false,
+                action = null,
+                action_param = null,
+                focus = false,
+                tracker = tracker
+            );
+
+            d.show();
+        } else {
+            const message = `Xác nhận hoàn thành LSX Công đoạn?`;
+            await new Promise((resolve, reject) => {
+                frappe.confirm(message, resolve, () => {
+                    reject();
+                    return;
+                });
+            });
+
+            await frappe.call({
+                method: "tahp.doc_events.job_card.job_card.submit",
+                args: { job_card: frm.doc.name }
+            });
+        }
     },
 
     transfer_job_card: async function(frm) {
@@ -1209,16 +1063,16 @@ frappe.ui.form.on('Job Card', {
                         <thead style="background: #eee">
                             <tr>
                                 <th>Tên thiết bị</th>
-                                <th>Hành động</th>
+                                <th style="width:1%; white-space:nowrap;">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${workstations.map((ws, i) =>
                                 `<tr>
                                     <td>${ws.workstation}</td>
-                                    <td>
+                                    <td  style="text-align:center;">
                                         ${workstations.length > 1 
-                                            ? `<button class="btn btn-xs btn-danger" data-idx="${i}">Xóa</button>` 
+                                            ? `<button class="btn btn-xs btn-danger" style="padding:5px 10px;" data-idx="${i}">Xóa</button>` 
                                             : ""}
                                     </td>
                                 </tr>`
@@ -1244,128 +1098,181 @@ frappe.ui.form.on('Job Card', {
 
     update_team: async function(frm) {
         return new Promise(async (resolve, reject) => {
-            if (frm.doc.custom_team_table && frm.doc.custom_team_table.length > 0) {
-                resolve(true);
-                return;
-            }
-            const response =  await frappe.call({method: "tahp.doc_events.job_card.job_card.get_team", args: {job_card: frm.doc.name}})
-            const team = response.message
+            try {
+                if (frm.doc.custom_team_table && frm.doc.custom_team_table.length > 0) {
+                    resolve(true);
+                    return;
+                }
 
-            const d = new frappe.ui.Dialog({
-                title: 'Danh sách nhân viên',
-                fields: [{
-                    fieldname: "items",
-                    fieldtype: "Table",
-                    data: team,
-                    in_place_edit: true,
+                const response = await frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.get_team",
+                    args: { job_card: frm.doc.name }
+                });
+
+                let team = response.message || [];
+
+                const d = new frappe.ui.Dialog({
+                    title: 'Danh sách nhân viên',
                     fields: [
+                        { fieldname: "html_table", fieldtype: "HTML" },
                         {
-                            fieldname: "employee",
-                            label: __("Mã nhân viên"),
+                            label: "Gõ tên nhân viên muốn thêm tại đây",
+                            fieldname: "employee_input",
                             fieldtype: "Link",
-                            in_list_view: 1,
                             options: "Employee",
-                            onchange: async function(e) {
-                                let emp = await frappe.db.get_value("Employee", this.value, fields=['employee_name']);
-                                this.doc.employee_name = emp.message.employee_name
-                                d.fields_dict.items.grid.refresh();
+                            change: async function() {
+                                const emp_id = d.get_value("employee_input");
+                                if (!emp_id) return;
+
+                                let emp = await frappe.db.get_value(
+                                    "Employee",
+                                    emp_id,
+                                    "employee_name"
+                                );
+
+                                team.push({
+                                    employee: emp_id,
+                                    employee_name: emp.message.employee_name
+                                });
+
+                                d.set_value("employee_input", "");
+                                renderTable();
                             },
                             get_query: function() {
-                                let selected = (d.get_values().items || [])
-                                    .map(r => r.employee)
-                                    .filter(Boolean);
+                                let selected = team.map(r => r.employee);
                                 return {
-                                        filters: [
-                                            ["Employee", "employee", "not in", selected]
-                                        ]
-                                    };
+                                    filters: [["Employee", "employee", "not in", selected]]
+                                };
                             }
-                        },
-                        {
-                            fieldname: "employee_name",
-                            label: __("Nhân viên"),
-                            fieldtype: "Data",
-                            in_list_view: 1,
-                            read_only: 1
                         }
-                    ]
-                }],
-                primary_action_label: "Tiếp tục",
-                primary_action: async function() {
-                    const values = d.get_values();
-                    if (!values || !values.items || values.items.length === 0) {
-                        frappe.msgprint(__('Trong danh sách phải ít nhất có 1 thành viên'));
-                        return;
-                    }
+                    ],
+                    primary_action_label: "Tiếp tục",
+                    primary_action: async function() {
+                        if (!team || team.length === 0) {
+                            frappe.msgprint("Phải có ít nhất 1 thành viên.");
+                            return;
+                        }
 
-                    let has_valid_row = values.items.some(row => row.employee && row.employee.trim() !== "");
+                        await frappe.call({
+                            method: "tahp.doc_events.job_card.job_card.set_team",
+                            args: { job_card: frm.doc.name, team }
+                        });
 
-                    if (!has_valid_row) {
-                        frappe.msgprint(__('Trong danh sách phải có ít nhất 1 thành viên hợp lệ'));
-                        return;
+                        d.hide();
+                        resolve();
                     }
+                });
 
-                    if (values && values.items) {
-                        await frappe.call({method: "tahp.doc_events.job_card.job_card.set_team", args: {job_card: frm.doc.name, team: values.items}})
-                    }
-                    d.hide();
-                    resolve();
-                },
-            })
-            d.show();
+                d.show();
+
+                // -------------------------------------------------------------------
+                // RENDER TABLE
+                // -------------------------------------------------------------------
+                const renderTable = () => {
+                    const html = `
+                        <table class="table table-bordered">
+                            <thead style="background:#eee">
+                                <tr>
+                                    <th>Nhân viên</th>
+                                    <th style="width:1%; white-space:nowrap;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${team
+                                    .map(
+                                        (row, i) => `
+                                    <tr>
+                                        <td>
+                                            ${row.employee}: ${row.employee_name}
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <button 
+                                                class="btn btn-xs btn-danger" 
+                                                data-idx="${i}"
+                                                style="padding:5px 10px;"
+                                            >
+                                                Xóa
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    `
+                                    )
+                                    .join("")}
+                            </tbody>
+                        </table>
+                    `;
+
+                    d.fields_dict.html_table.$wrapper.html(html);
+
+                    // event delete
+                    d.fields_dict.html_table.$wrapper.find("button").click(e => {
+                        const i = $(e.currentTarget).data("idx");
+                        team.splice(i, 1);
+                        renderTable();
+                    });
+                };
+
+                renderTable();
+
+            } catch (err) {
+                reject(err);
+            }
         });
     },
 
     update_team_async: async function(frm) {
-        // Lấy team bằng await
         const response = await frappe.call({
             method: "tahp.doc_events.job_card.job_card.get_team",
             args: { job_card: frm.doc.name }
         });
-        const team = response.message || [];
 
-        // Tạo dialog
+        let team = response.message || [];
+
         const d = new frappe.ui.Dialog({
             title: 'Danh sách nhân viên',
-            fields: [{
-                fieldname: "items",
-                fieldtype: "Table",
-                data: team,
-                in_place_edit: true,
-                fields: [
-                    {
-                        fieldname: "employee",
-                        label: __("Mã nhân viên"),
-                        fieldtype: "Link",
-                        options: "Employee",
-                        in_list_view: 1,
-                        onchange: async function() {
-                            const emp = await frappe.db.get_value("Employee", this.value, ['employee_name']);
-                            this.doc.employee_name = emp.message.employee_name;
-                            d.fields_dict.items.grid.refresh();
-                        }
+            fields: [
+                { fieldname: "html_table", fieldtype: "HTML" },
+                {
+                    label: "Gõ tên nhân viên muốn thêm tại đây",
+                    fieldname: "employee_input",
+                    fieldtype: "Link",
+                    options: "Employee",
+                    change: async function() {
+                        const emp_id = d.get_value("employee_input");
+                        if (!emp_id) return;
+
+                        let emp = await frappe.db.get_value(
+                            "Employee",
+                            emp_id,
+                            "employee_name"
+                        );
+
+                        team.push({
+                            employee: emp_id,
+                            employee_name: emp.message.employee_name
+                        });
+
+                        d.set_value("employee_input", "");
+                        renderTable();
                     },
-                    {
-                        fieldname: "employee_name",
-                        label: __("Nhân viên"),
-                        fieldtype: "Data",
-                        in_list_view: 1,
-                        read_only: 1
+                    get_query: function() {
+                        let selected = team.map(r => r.employee);
+                        return {
+                            filters: [["Employee", "employee", "not in", selected]]
+                        };
                     }
-                ]
-            }],
+                }
+            ],
             primary_action_label: "Xác nhận",
             primary_action: async function() {
-                const values = d.get_values();
-                if (!values || !values.items || values.items.length === 0) {
-                    frappe.msgprint(__('Trong danh sách phải ít nhất có 1 thành viên'));
+                if (!team || team.length === 0) {
+                    frappe.msgprint("Phải có ít nhất 1 thành viên.");
                     return;
                 }
 
-                // Gọi API set_team bằng await
                 await frappe.call({
                     method: "tahp.doc_events.job_card.job_card.set_team",
-                    args: { job_card: frm.doc.name, team: values.items }
+                    args: { job_card: frm.doc.name, team }
                 });
 
                 d.hide();
@@ -1373,6 +1280,52 @@ frappe.ui.form.on('Job Card', {
         });
 
         d.show();
+
+        // RENDER TABLE GIỐNG HỆT update_team
+        const renderTable = () => {
+            const html = `
+                <table class="table table-bordered">
+                    <thead style="background:#eee">
+                        <tr>
+                            <th>Nhân viên</th>
+                            <th style="width:1%; white-space:nowrap;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${team
+                            .map(
+                                (row, i) => `
+                            <tr>
+                                <td>
+                                    ${row.employee}: ${row.employee_name}
+                                </td>
+                                <td style="text-align:center;">
+                                    <button 
+                                        class="btn btn-xs btn-danger" 
+                                        data-idx="${i}"
+                                        style="padding:5px 10px;"
+                                    >
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                            `
+                            )
+                            .join("")}
+                    </tbody>
+                </table>
+            `;
+
+            d.fields_dict.html_table.$wrapper.html(html);
+
+            d.fields_dict.html_table.$wrapper.find("button").click(e => {
+                const i = $(e.currentTarget).data("idx");
+                team.splice(i, 1);
+                renderTable();
+            });
+        };
+
+        renderTable();
     },
 
     change_employee: async function(frm, row) {
@@ -1853,7 +1806,6 @@ frappe.ui.form.on('Job Card', {
         d.show();
     },
 });
-
 
 function scrollAndFocus(mobileInputs, index) {
     const $input = mobileInputs[index];

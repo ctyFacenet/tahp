@@ -143,17 +143,14 @@ def set_team(job_card, team):
 
     for emp in team:
         emp_id = emp.get("employee")
-        emp_name = emp.get("employee_name")
-        if not emp_id or not emp_name:
+        if not emp_id:
             continue
 
         last_record = last_history.get(emp_id)
 
         if not last_record:
-            # Nhân viên hoàn toàn mới → thêm bản ghi lịch sử
             doc.append("custom_teams", {
                 "employee": emp_id,
-                "employee_name": emp_name,
                 "from_time": from_time,
                 "exit": False
             })
@@ -161,20 +158,20 @@ def set_team(job_card, team):
             if getattr(last_record, "exit", False):
                 doc.append("custom_teams", {
                     "employee": emp_id,
-                    "employee_name": emp_name,
                     "from_time": from_time,
                     "exit": False
                 })
 
-    format_team = {r.employee: r for r in doc.custom_team_table or []}
-    for employee in last_history:
-        if employee not in format_team and not getattr(last_record, "exit", False):
-            doc.append("custom_teams", {
-                "employee": r.employee,
-                "employee_name": getattr(r, "employee_name", ""),
-                "from_time": from_time,
-                "exit": True
-            })
+    format_team = {r.employee for r in doc.custom_team_table or []}
+
+    for emp_id, last_record in last_history.items():
+        if emp_id not in format_team:
+            if not last_record.exit:
+                doc.append("custom_teams", {
+                    "employee": emp_id,
+                    "from_time": from_time,
+                    "exit": True
+                })
 
     doc.save(ignore_permissions=True)
 
@@ -569,6 +566,34 @@ def set_subtask(job_card, reason=None):
     doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
+def check_operation(operation, bom):
+    routing = frappe.db.get_value("BOM", bom, "routing")
+    routing_doc = frappe.get_doc("Routing", routing)
+    flag = False
+    for row in routing_doc.operations:
+        if row.operation == operation and row.custom_is_finished_operation:
+            flag = True
+            break
+
+    return flag
+
+@frappe.whitelist()
+def save_operation_qty(job_card, items):
+    doc = frappe.get_doc("Job Card", job_card)
+    if isinstance(items, str):
+        items = json.loads(items)
+    
+    flag = False
+    for row in doc.custom_workstation_table:
+        for item in items:
+            qty = float(item["qty"])
+            if item["workstation"] == row.workstation:
+                row.qty = qty
+                flag = True
+
+    if flag: doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
 def submit(job_card):
     doc = frappe.get_doc("Job Card", job_card)
     from_time = frappe.utils.now_datetime()
@@ -658,7 +683,8 @@ def send_noti_workstation(operation, workstation, job_card, reason):
                 "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "document_type": "Job Card",
-                "document_name": doc.name
+                "document_name": doc.name,
+                "type": "Alert",
             }).insert(ignore_permissions=True)
 
 @frappe.whitelist()
@@ -734,3 +760,60 @@ def update_feedback(docname):
                 row.approved_date = now_datetime()
                 update = True
         if update: insp_doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def process_comment(job_card, employee, workstation, reason):
+    employee_name = None
+    if employee != "Toàn bộ công nhân": 
+        employee_code = employee.split(":")[0].strip()
+        employee_name = employee.split(":")[1].strip()
+    else:
+        employee_code = employee
+        employee_name = "mọi công nhân"
+
+    doc = frappe.get_doc("Job Card", job_card)
+    from_time = now_datetime()
+    doc.append("custom_comment", {
+        "from_date": from_time,
+        "employee": employee_code,
+        "employee_name": employee_name if employee_name != "mọi công nhân" else None,
+        "workstation": workstation,
+        "reason": reason
+    })
+    doc.save(ignore_permissions=True)
+
+    shift_handover = frappe.get_all(
+        "Shift Handover",
+        filters={"work_order": doc.work_order},
+        fields=["name"],
+        limit=1
+    )
+
+    note = None
+    timestamp = from_time.strftime("%H:%M")
+    if workstation != "Toàn bộ thiết bị":
+        note = f"[{timestamp}] Công đoạn {doc.operation}, {employee_name} phản ánh ở {workstation}: {reason}"
+    else:
+        note = f"[{timestamp}] Công đoạn {doc.operation}, {employee_name} phản ánh: {reason}"
+
+    if shift_handover:
+        sh_doc = frappe.get_doc("Shift Handover", shift_handover[0].name)
+
+        if sh_doc.notes_1:
+            sh_doc.notes_1 = note + "\n" + sh_doc.notes_1
+        else:
+            sh_doc.notes_1 = note
+        sh_doc.save(ignore_permissions=True)
+
+    shift_leader = frappe.db.get_value("Work Order", doc.work_order, "custom_shift_leader")
+    if shift_leader:
+        user = frappe.db.get_value("Employee", shift_leader, "user_id")
+        if user:
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "for_user": user,
+                "subject": note,
+                "document_type": "Job Card",
+                "document_name": job_card,
+                "type": "Alert"
+            }).insert(ignore_permissions=True)        

@@ -29,6 +29,9 @@ frappe.listview_settings['Week Work Order'] = {
             if (status === "Stopped") {
                 return [__("Đã bị dừng"), "gray", "wo_status,=,Stopped"]
             }
+            if (status === "Requested Stop") {
+                return [__("Yêu cầu dừng"), "red", "wo_status,=,Requested Stop"]
+            }
         }
 
         // Còn lại hiển thị theo workflow_state
@@ -39,5 +42,12 @@ frappe.listview_settings['Week Work Order'] = {
         document.querySelectorAll('.list-row .level-right').forEach(function(col){
             col.style.flex = '1';
         })
+
+        listview.page.add_inner_button(
+            __("Màn hình lập kế hoạch mới"),
+            function() {
+                frappe.set_route("List", "Custom Planner");
+            }
+        )
     }
 };

@@ -42,64 +42,29 @@ def reject(name, comment):
 
 
 def create_shift_handover(work_order_name):
-    """
-    Tạo mới một bản ghi Shift Handover dựa trên Work Order.
-
-    Quy trình:
-        1. Lấy Work Order theo `work_order_name`.
-        3. Kiểm tra xem đã tồn tại Shift Handover nào cho Work Order này chưa.
-            - Nếu có, trả về lỗi.
-        4. Nếu chưa có, tạo mới Shift Handover:
-            - Gán work_order, shift_leader_1 (từ custom field trên Work Order).
-            - Duyệt qua operations của Work Order:
-                + Tìm tất cả Job Card theo work_order + operation.
-                + Ghi nhận Job Card ID vào child table `job_card_list`.
-        5. Lưu Shift Handover vào database.
-
-    Args:
-        work_order_name (str): ID của Work Order cần tạo Shift Handover.
-
-    Returns:
-        dict: 
-            - Nếu lỗi:
-                {"status": "error", "message": <lý do>}
-            - Nếu thành công:
-                {"status": "success", "handover": <ID Shift Handover>}
-    """
     work_order = frappe.get_doc('Work Order', work_order_name)
-    print("Work Order status:", work_order.status)
-    # check xem có tồn tại một bản ghi Shift Handover nào chưa
     existing_handover = frappe.db.exists('Shift Handover', {"work_order": work_order_name})
-    if existing_handover:
-        return {"status": "error", "message": "Đã tồn tại 1 bản ghi Shift Handover"}
-    # chưa tồn tại bản ghi nào thì tạo mới
+    if existing_handover: return
+
     shift_handover = frappe.new_doc('Shift Handover')
     shift_handover.work_order = work_order_name
     shift_handover.shift_leader_1 = work_order.custom_shift_leader
-    # shilf_handover.notes_1 = work_order.notes_1
     
-    #duyêt qua operations của workorder lấy ra job_card
+    operations = [op.operation for op in work_order.operations]
+    job_cards = frappe.db.get_all('Job Card', filters = {'work_order': work_order_name, 'operation': ["in", operations]}, fields = ['name', 'operation'])
+
+    for op in operations:
+        for jc in job_cards:
+            if jc.operation == op:
+                shift_handover.append("job_card_list", {"operation": op, "job_card": jc.name})
+
     for op in work_order.operations:
-        
-        job_cards = frappe.get_all(
-            'Job Card',
-            filters = {'work_order': work_order_name, 'operation': op.operation},
-            fields = ['name']
-        )
-        
-        operation_doc = frappe.get_doc('Operation', op.operation)
-        shift_handover.append("table", {
-            "caption": operation_doc.name,
-        })
-       
-        for jd in job_cards:
-            shift_handover.append("job_card_list", {
-                    "operation": op.operation,
-                    "job_card": jd['name']
-                })
+        if op.workstation:
+            childs = frappe.db.get_all("Workstation", filters={"custom_parent": op.workstation}, fields=["name"], order_by="name asc")
+            if childs:
+                for ch in childs:
+                    shift_handover.append("table", {"caption": ch.name})
+            else:
+                shift_handover.append("table", {"caption": op.workstation})
 
     shift_handover.insert(ignore_permissions=True)
-    return {
-        "status": "success",
-        "handover": shift_handover.name
-    }

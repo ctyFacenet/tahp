@@ -4,16 +4,50 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
+import json
 from frappe.utils import now_datetime
-from frappe.model.mapper import get_mapped_doc
 
 
 class WorkOrderFinishedItem(Document):
+    pass
 
-    def on_update_after_submit(self):
-        if self.item_code_new and self.item_code_new != self.item_code:
-            frappe.db.set_value("Work Order", self.work_order, "produced_qty", 0)
-            self.db_set("posting_date", now_datetime())
-            item_doc = frappe.get_doc("Item", self.item_code_new)
-            self.db_set("item_name", item_doc.item_name)
-            self.db_set("type_posting", "Thành phẩm sau QC")
+@frappe.whitelist()
+def get_finished_items(item_code, qty, attribute):
+    doc = frappe.get_doc("Item", item_code)
+    if not doc.variant_of: return
+
+    attribute_value = None
+    result = [{"item_code": item_code, "item_name": doc.item_name, "qty": qty}]
+    for row in doc.attributes:
+        if row.attribute == attribute:
+            attribute_value = row.attribute_value
+            break
+
+    variants = frappe.db.get_all("Item", filters={"variant_of": doc.variant_of, "name": ["!=", item_code]}, fields=["name"])
+    for variant in variants:
+        variant_doc = frappe.get_doc("Item", variant.name)
+        for row in variant_doc.attributes:
+            if row.attribute == attribute and row.attribute_value == attribute_value:
+                result.append({"item_code": variant.name, "item_name": variant_doc.item_name, "qty": 0})
+                break
+
+    return result
+
+@frappe.whitelist()
+def process_finished_items(doc_name, items):
+    if isinstance(items, str): items = json.loads(items)
+    doc = frappe.get_doc("Work Order Finished Item", doc_name)
+
+    for item in items:
+        item = frappe._dict(item)
+        item.qty = float(item.qty)
+        if item.item_code == doc.item_code:
+            frappe.db.set_value("Work Order", doc.work_order, "produced_qty", item.qty)
+            doc.actual_qty = item.qty
+            doc.append("items", {"item_code": item.item_code, "qty": item.qty})
+        else:
+            if item.qty > 0:
+                doc.append("items", {"item_code": item.item_code, "qty": item.qty})
+
+    doc.type_posting = "Thành phẩm sau QC"
+    doc.save(ignore_permissions=True)

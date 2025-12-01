@@ -144,7 +144,7 @@ frappe.query_reports["Downtime Report"] = {
         this.setup_title_observer(report);
         this.load_manufacturing_categories(report);
 
-        report.page.wrapper.find(".standard-actions").css("display", "none");
+        // report.page.wrapper.find(".standard-actions").css("display", "none");
         report.page.wrapper.find(".custom-actions.hidden-xs.hidden-md").css("display", "none");
 
         let title_el = report.page.wrapper.find(".page-head-content .title-text");

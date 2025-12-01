@@ -68,6 +68,28 @@
     border-bottom: 1px solid #eee;    
 }
 
+.jc-comment-button {
+    margin-top: 0.7rem; 
+    margin-bottom: 0.5rem; 
+    padding: 5px; 
+    box-sizing: border-box; 
+    background: #f3f3f3;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.jc-comment-button span {
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+
+.jc-comment-button:hover span {
+    transform: scale(1.1);
+}
+
 .jc-g {
     gap: var(--jc-gap)
 }
@@ -183,9 +205,9 @@ jc-tb-right > input {
     table-layout: auto;
 }
 
-th {
+/* th {
     border: none !important;
-}
+} */
 
 
 @keyframes pulse {

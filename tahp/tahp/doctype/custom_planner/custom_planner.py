@@ -58,6 +58,27 @@ class CustomPlanner(Document):
                     if item.parent_name == post.routing:
                         item.parent_name = post.name
                         break
+        if self.items:
+            item_names = []
+            start_times = []
+            end_times = []
+
+            for item in self.items:
+                if item.item_code and item.item_name:
+                    item_names.append(item.item_name)
+                if item.start_date:
+                    start_times.append(item.start_date)
+                if item.end_date:
+                    end_times.append(item.end_date)
+
+            self.start_date = min(start_times) if start_times else None
+            self.end_date = max(end_times) if end_times else None
+            self.item_list = ", ".join(item_names)
+
+        if self.posts:
+            new_length = len(self.posts)
+            if self.choice_length != new_length:
+                self.choice_length = new_length
 
     def on_cancel(self):
         self.workflow_state = "Đã hủy bỏ"
@@ -115,6 +136,10 @@ def render_content(planner, post, items={}):
         for k in keys:
             if k not in item or item[k] is None:
                 item[k] = 0 if k == "qty" else ""
+
+        for date_key in ["start_date", "end_date"]:
+            if item.get(date_key):
+                item[date_key] = frappe.format_value(item[date_key], {"fieldtype": "Date"})
 
         item_dict = {k: frappe._(item[k]) for k in keys}
         post["data"].append(item_dict)

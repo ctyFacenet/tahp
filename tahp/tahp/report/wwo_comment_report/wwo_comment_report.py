@@ -41,7 +41,7 @@ def get_columns():
             "align": "left"
         },
         {
-            "label": _("Nội dung bình luận (Click để xem chi tiết)"),
+            "label": _("Nội dung bình luận"),
             "fieldname": "comment",
             "fieldtype": "Small Text",
             "width": 700,

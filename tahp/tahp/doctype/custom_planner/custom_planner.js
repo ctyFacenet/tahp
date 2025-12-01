@@ -150,6 +150,13 @@ frappe.ui.form.on("Custom Planner", {
         $delete_item_button.off("click").on("click", async function() {
             frm.events.apply_delete_item(frm, this)
         })
+
+        // Bấm nút Xem lệnh
+        if (frm.doc.docstatus !== 1) return
+        let $btn_watch_wwo = $wrapper.find('.btn-watch-wwo')
+        $btn_watch_wwo.off("click").on("click", function() {
+            frappe.set_route("Form", "Week Work Order", frm.doc.code_name)
+        })
     },
 
     define_materials: async function(frm) {
@@ -206,7 +213,7 @@ frappe.ui.form.on("Custom Planner", {
 
             const total_html = `
                 <div class="d-flex justify-content-between align-items-center fw-bold" style="margin-bottom:0.5rem;">
-                    <div>Tiêu hao dự kiến</div>
+                    <div>Đầu vào dự kiến</div>
                 </div>
             `;
             $el.append(total_html);

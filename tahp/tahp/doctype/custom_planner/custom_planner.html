@@ -26,11 +26,16 @@
                 {% endif %}
                 </div>
             </div>
-            <div>
-                {% for action in actions %}
-                    <button class="btn btn-default btn-primary planner-action" title='{{ action }}'>{{action}}</button>
-                {% endfor %}
-            </div>
+            {% if approved %}
+                <button class="btn btn-default btn-watch-wwo">Xem lệnh</button>
+            {% endif %}
+            {% if actions %}
+                <div>
+                    {% for action in actions %}
+                        <button class="btn btn-default btn-primary planner-action" title='{{ action }}'>{{action}}</button>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         {# Content Section #}
@@ -123,14 +128,17 @@
                         <i class="fa fa-check-circle mx-2"></i>
                         Phương án #{{idx}} đã được duyệt
                     </div>
+                    <button class="btn btn-default btn-watch-wwo">Xem lệnh</button>
                 {% else %}
                     <div class="first-title pl-2" style="font-weight:bold;font-size: 1.1rem;">Phương án #{{idx}}</div>
                 {% endif %}
+                {% if actions %}
                 <div>
                     {% for action in actions %}
-                        <button class="btn btn-default btn-primary planner-action" title='{{ action }}'>{{action}}</button>
+                        <button class="btn btn-default btn-primary planner-action" title="{{ action }}">{{ action }}</button>
                     {% endfor %}
                 </div>
+                {% endif %}
                 {% if edit_post %}
                     <div>
                         <button class="btn btn-warning planner-copy-post mr-2">

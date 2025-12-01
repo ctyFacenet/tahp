@@ -366,7 +366,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			translations: frappe.utils.datatable.get_translations(),
 			checkboxColumn: true,
 			inlineFilters: true,
-			hasAction: true,
+			// hasAction: true,
 			treeView: true,
 			freezeIndex: 2,
 			direction: frappe.utils.is_rtl() ? "rtl" : "ltr",
