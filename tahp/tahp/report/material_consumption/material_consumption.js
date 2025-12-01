@@ -355,9 +355,11 @@ frappe.query_reports["Material Consumption"] = {
             return material_colors[index % material_colors.length].border;
         });
 
+        // Draw reference line earlier in the draw cycle so tooltips and dataset labels
+        // render above it. Use `beforeDraw` instead of `afterDraw` to lower its z-order.
         const referenceLinePlugin = {
             id: 'referenceLinePlugin',
-            afterDraw(chart) {
+            beforeDraw(chart) {
                 const { ctx, scales: { y }, chartArea } = chart;
                 const yValue = y.getPixelForValue(100);
                 if (yValue >= chartArea.top && yValue <= chartArea.bottom) {
@@ -373,7 +375,7 @@ frappe.query_reports["Material Consumption"] = {
                     ctx.font = '12px Arial';
                     ctx.textAlign = 'right';
                     // ctx.fillText('Định mức (100%)', chartArea.right - 10, yValue - 8);
-                    ctx.restore();                                                                                                                                                                                                                                                                                                  
+                    ctx.restore();
                 }
             }
         };
