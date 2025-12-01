@@ -31,12 +31,30 @@ def get_consumed_produced_items(work_order):
                             item["actual_qty"] = 0
                         item["actual_qty"] += row.qty
     
+    routing = frappe.db.get_value("BOM", doc.bom_no, "routing")
+    routing_doc = frappe.get_doc("Routing", routing)
+    flag = False
+    operation = None
+    for row in routing_doc.operations:
+        if row.custom_is_finished_operation:
+            flag = True
+            operation = row.operation
+            break
+
+    job_card = frappe.db.get_all("Job Card", {"work_order": work_order, "operation": operation, "docstatus": 1}, pluck="name", limit_page_length=1)
+    jc_qty = 0
+    if job_card:
+        job_card_doc = frappe.get_doc("Job Card", job_card[0])
+        for item in job_card_doc.custom_workstation_table:
+            jc_qty += float(item.qty)
+
+    result_qty = doc.qty if not flag else jc_qty
     result["produced"].append({
             "item_code": doc.production_item,
             "item_name": doc.item_name,
             "stock_uom": doc.stock_uom,
             "standard_qty": doc.qty,
-            "actual_qty": doc.qty,
+            "actual_qty": result_qty,
             "warehouse": doc.fg_warehouse,
             "posting_date": now_datetime(),
             "type_posting": "Thành phẩm",

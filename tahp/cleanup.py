@@ -66,4 +66,18 @@ def cleanup_custom():
                     fields_to_update
                 )
 
+    routings = frappe.get_all("Routing", fields=["name"])
+    TARGET_OPS = ["Lọc tách chân không", "Hệ sấy"]
+    for r in routings:
+        doc = frappe.get_doc("Routing", r.name)
+        for op in doc.operations:
+            if op.custom_is_finished_operation == 1: continue
+
+            if op.operation in TARGET_OPS:
+                op.custom_is_finished_operation = 1
+                updated = True
+        
+
+    if updated: doc.save()
+
     frappe.db.commit()

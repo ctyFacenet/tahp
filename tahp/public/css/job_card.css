@@ -205,9 +205,9 @@ jc-tb-right > input {
     table-layout: auto;
 }
 
-th {
+/* th {
     border: none !important;
-}
+} */
 
 
 @keyframes pulse {

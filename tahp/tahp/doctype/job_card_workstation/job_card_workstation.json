@@ -8,7 +8,7 @@
  "field_order": [
   "workstation",
   "status",
-  "action",
+  "qty",
   "start_time",
   "time",
   "active"
@@ -33,14 +33,6 @@
    "read_only": 1
   },
   {
-   "columns": 8,
-   "fieldname": "action",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Thao t\u00e1c",
-   "read_only": 1
-  },
-  {
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
@@ -58,13 +50,21 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "\u0110ang h\u1ecdat \u0111\u1ed9ng"
+  },
+  {
+   "columns": 8,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ea3n l\u01b0\u1ee3ng",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-09-05 01:09:10.249807",
+ "modified": "2025-11-29 16:32:47.914753",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Job Card Workstation",

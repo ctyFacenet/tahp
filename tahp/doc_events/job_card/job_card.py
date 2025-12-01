@@ -566,6 +566,34 @@ def set_subtask(job_card, reason=None):
     doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
+def check_operation(operation, bom):
+    routing = frappe.db.get_value("BOM", bom, "routing")
+    routing_doc = frappe.get_doc("Routing", routing)
+    flag = False
+    for row in routing_doc.operations:
+        if row.operation == operation and row.custom_is_finished_operation:
+            flag = True
+            break
+
+    return flag
+
+@frappe.whitelist()
+def save_operation_qty(job_card, items):
+    doc = frappe.get_doc("Job Card", job_card)
+    if isinstance(items, str):
+        items = json.loads(items)
+    
+    flag = False
+    for row in doc.custom_workstation_table:
+        for item in items:
+            qty = float(item["qty"])
+            if item["workstation"] == row.workstation:
+                row.qty = qty
+                flag = True
+
+    if flag: doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
 def submit(job_card):
     doc = frappe.get_doc("Job Card", job_card)
     from_time = frappe.utils.now_datetime()
@@ -655,7 +683,8 @@ def send_noti_workstation(operation, workstation, job_card, reason):
                 "subject": f"Công nhân công đoạn <b style='font-weight:bold'>{operation}</b> báo thiết bị <b style='font-weight:bold'>{workstation}</b> đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "email_content": f"Công nhân công đoạn {operation} báo thiết bị {workstation} đang bị hỏng. Nguyên nhận: {reason}. Trưởng ca vui lòng tiến hành kiểm tra",
                 "document_type": "Job Card",
-                "document_name": doc.name
+                "document_name": doc.name,
+                "type": "Alert",
             }).insert(ignore_permissions=True)
 
 @frappe.whitelist()
@@ -747,6 +776,7 @@ def process_comment(job_card, employee, workstation, reason):
     doc.append("custom_comment", {
         "from_date": from_time,
         "employee": employee_code,
+        "employee_name": employee_name if employee_name != "mọi công nhân" else None,
         "workstation": workstation,
         "reason": reason
     })
@@ -783,7 +813,7 @@ def process_comment(job_card, employee, workstation, reason):
                 "doctype": "Notification Log",
                 "for_user": user,
                 "subject": note,
-                "email_content": note,
                 "document_type": "Job Card",
-                "document_name": job_card
+                "document_name": job_card,
+                "type": "Alert"
             }).insert(ignore_permissions=True)        
