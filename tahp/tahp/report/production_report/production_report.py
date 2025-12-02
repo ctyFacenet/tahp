@@ -21,7 +21,7 @@ def execute(filters=None):
     
     # Generate columns and data
     columns = get_columns(work_orders)
-    data = get_data(work_orders, columns)
+    data = get_data(work_orders, columns, filters)
     
     return columns, data, None, None, None
 
@@ -97,7 +97,8 @@ def process_month_year_filter(filters):
 def get_columns(work_orders):
     """Generate dynamic columns for production report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 150, "align": "left"},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 200, "align": "left"},
+        {"label": _("Chi tiết"), "fieldname": "detail_button", "fieldtype": "HTML", "width": 120, "align": "center"},
     ]
 
     if not work_orders:
@@ -137,8 +138,8 @@ def get_columns(work_orders):
         
     return columns
 
-def get_data(work_orders, columns):
-    """Generate report data with right-aligned numbers"""
+def get_data(work_orders, columns, filters=None):
+    """Generate report data with right-aligned numbers, grouped by week/month/quarter/year"""
     if not work_orders:
         return []
 
@@ -155,35 +156,189 @@ def get_data(work_orders, columns):
 
     # Build dataset rows
     dataset = []
-    product_fieldnames = [c["fieldname"] for c in columns if c["fieldname"] != "production_date"]
+    # Exclude both production_date and detail_button from product fieldnames
+    product_fieldnames = [c["fieldname"] for c in columns if c["fieldname"] not in ("production_date", "detail_button")]
     total_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
 
     sorted_dates = sorted(data_by_date.keys())
-    for date in sorted_dates:
-        row = {"production_date": date}
-        for fieldname in product_fieldnames:
-            planned_qty = data_by_date[date][fieldname]["planned"]
-            actual_qty = data_by_date[date][fieldname]["actual"]
+
+    # --- Group logic ---
+    def get_date_hierarchy(date_str):
+        """Return full hierarchy info for a date"""
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+        month = dt.month
+        year = dt.year
+        day = dt.day
+        quarter = (month - 1) // 3 + 1
+
+        # Tính tuần theo tháng
+        first_day = dt.replace(day=1)
+        first_weekday = first_day.weekday()
+        days_since_first = (dt - first_day).days
+        week_in_month = ((days_since_first + first_weekday) // 7) + 1
+
+        return {
+            "year": {"key": f"{year}", "label": f"Năm {year}"},
+            "quarter": {"key": f"{year}-Q{quarter}", "label": f"Quý {quarter}, {year}"},
+            "month": {"key": f"{year}-{month:02d}", "label": f"Tháng {month}, {year}"},
+            "week": {"key": f"{year}-{month:02d}-W{week_in_month}", "label": f"Tuần {week_in_month}, {month}/{year}"},
+            "date": date_str
+        }
+
+    def build_nested_hierarchy(dates, levels):
+        """Build nested hierarchy based on specified levels"""
+        from collections import OrderedDict
+        
+        hierarchy = OrderedDict()
+        
+        for date in dates:
+            info = get_date_hierarchy(date)
+            current = hierarchy
             
-            if actual_qty > 0 or planned_qty > 0:
-                # Calculate percentage if planned_qty > 0
-                percentage_html = ""
-                if planned_qty > 0:
-                    percentage = round((actual_qty / planned_qty) * 100)
-                    percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+            for i, level in enumerate(levels):
+                key = info[level]["key"]
+                label = info[level]["label"]
                 
-                # Right-align numbers with HTML
-                row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
-                total_summary[fieldname]["planned"] += planned_qty
-                total_summary[fieldname]["actual"] += actual_qty
+                if key not in current:
+                    current[key] = {
+                        "label": label,
+                        "children": OrderedDict() if i < len(levels) - 1 else None,
+                        "dates": [] if i == len(levels) - 1 else None
+                    }
+                
+                if i == len(levels) - 1:
+                    # Last level before dates
+                    current[key]["dates"].append(date)
+                else:
+                    current = current[key]["children"]
+        
+        return hierarchy
+
+    def process_hierarchy(hierarchy, level, product_fieldnames, data_by_date, dataset, total_summary):
+        """Recursively process hierarchy and build dataset rows"""
+        all_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
+        
+        for key, info in hierarchy.items():
+            # Create group row
+            group_row = {"production_date": f"<b>{info['label']}</b>", "indent": level}
+            # Add detail button for group rows with date range
+            dates_in_group = []
+            def collect_dates(node):
+                if node.get("dates"):
+                    dates_in_group.extend(node["dates"])
+                if node.get("children"):
+                    for child in node["children"].values():
+                        collect_dates(child)
+            collect_dates(info)
+            if dates_in_group:
+                sorted_group_dates = sorted(dates_in_group)
+                from_date = sorted_group_dates[0]
+                to_date = sorted_group_dates[-1]
+                # No button for group rows
+                group_row["detail_button"] = ""
             else:
-                row[fieldname] = ""
+                group_row["detail_button"] = ""
+            for fieldname in product_fieldnames:
+                group_row[fieldname] = ""
+            dataset.append(group_row)
+            
+            group_summary = defaultdict(lambda: {"planned": 0, "actual": 0})
+            
+            if info["children"]:
+                # Process child groups recursively
+                child_summary = process_hierarchy(
+                    info["children"], level + 1, product_fieldnames, 
+                    data_by_date, dataset, total_summary
+                )
+                # Aggregate child summaries
+                for fieldname in product_fieldnames:
+                    group_summary[fieldname]["planned"] += child_summary[fieldname]["planned"]
+                    group_summary[fieldname]["actual"] += child_summary[fieldname]["actual"]
+            
+            if info["dates"]:
+                # Process date rows
+                for date in info["dates"]:
+                    row = {"production_date": date, "indent": level + 1}
+                    # Render HTML button with inline onclick
+                    row["detail_button"] = f'''<button class="btn btn-xs" onclick="frappe.query_reports['Production Report'].open_detail_dialog('{date}', '{date}')" style="background:#e8f4fd;color:#2490ef;border:1px solid #c8e1f8;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;"><i class="fa fa-eye"></i> Xem</button>'''
+                    for fieldname in product_fieldnames:
+                        planned_qty = data_by_date[date][fieldname]["planned"]
+                        actual_qty = data_by_date[date][fieldname]["actual"]
+                        
+                        if actual_qty > 0 or planned_qty > 0:
+                            percentage_html = ""
+                            if planned_qty > 0:
+                                percentage = round((actual_qty / planned_qty) * 100)
+                                percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                            row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                            group_summary[fieldname]["planned"] += planned_qty
+                            group_summary[fieldname]["actual"] += actual_qty
+                            total_summary[fieldname]["planned"] += planned_qty
+                            total_summary[fieldname]["actual"] += actual_qty
+                        else:
+                            row[fieldname] = ""
+                    dataset.append(row)
+            
+            # Update group row with summary
+            for fieldname in product_fieldnames:
+                actual_total = group_summary[fieldname]["actual"]
+                planned_total = group_summary[fieldname]["planned"]
+                if actual_total > 0 or planned_total > 0:
+                    percentage_html = ""
+                    if planned_total > 0:
+                        percentage = round((actual_total / planned_total) * 100)
+                        percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                    group_row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_total)}</b> / {frappe.utils.fmt_money(planned_total)}{percentage_html}</div>"
                 
-        dataset.append(row)
+                # Accumulate to all_summary for parent
+                all_summary[fieldname]["planned"] += group_summary[fieldname]["planned"]
+                all_summary[fieldname]["actual"] += group_summary[fieldname]["actual"]
+        
+        return all_summary
+
+    # Always use hierarchical view - levels based on group_by filter
+    group_by = (filters or {}).get("group_by", "Mặc định")
+    
+    # If only 1 date, show flat list without hierarchy
+    if len(sorted_dates) <= 1:
+        for date in sorted_dates:
+            row = {"production_date": date, "indent": 0}
+            row["detail_button"] = f'''<button class="btn btn-xs" onclick="frappe.query_reports['Production Report'].open_detail_dialog('{date}', '{date}')" style="background:#e8f4fd;color:#2490ef;border:1px solid #c8e1f8;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;"><i class="fa fa-eye"></i> Xem</button>'''
+            for fieldname in product_fieldnames:
+                planned_qty = data_by_date[date][fieldname]["planned"]
+                actual_qty = data_by_date[date][fieldname]["actual"]
+                
+                if actual_qty > 0 or planned_qty > 0:
+                    percentage_html = ""
+                    if planned_qty > 0:
+                        percentage = round((actual_qty / planned_qty) * 100)
+                        percentage_html = f" (<span style='color: #0066cc;'>{percentage}%</span>)"
+                    row[fieldname] = f"<div style='text-align: right;'><b>{frappe.utils.fmt_money(actual_qty)}</b> / {frappe.utils.fmt_money(planned_qty)}{percentage_html}</div>"
+                    total_summary[fieldname]["planned"] += planned_qty
+                    total_summary[fieldname]["actual"] += actual_qty
+                else:
+                    row[fieldname] = ""
+            dataset.append(row)
+    else:
+        # Determine hierarchy levels based on group_by selection
+        if group_by == "Năm":
+            levels = ["year", "quarter", "month", "week"]  # Year → Quarter → Month → Week → Date
+        elif group_by == "Quý":
+            levels = ["quarter", "month", "week"]  # Quarter → Month → Week → Date
+        elif group_by == "Tháng":
+            levels = ["month", "week"]  # Month → Week → Date
+        elif group_by == "Tuần":
+            levels = ["week"]  # Week → Date
+        else:
+            # Default: use month → week
+            levels = ["month", "week"]
+        
+        hierarchy = build_nested_hierarchy(sorted_dates, levels)
+        process_hierarchy(hierarchy, 0, product_fieldnames, data_by_date, dataset, total_summary)
 
     # Add total row
     if dataset:
-        total_row = {"production_date": f"<b>{_('Tổng cộng')}</b>"}
+        total_row = {"production_date": f"<b>{_('Tổng cộng')}</b>", "detail_button": ""}
         for fieldname in product_fieldnames:
             actual_total = total_summary[fieldname]["actual"]
             
