@@ -97,7 +97,7 @@ def process_month_year_filter(filters):
 def get_columns(work_orders):
     """Generate dynamic columns for production report with multi-level headers"""
     columns = [
-        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 300, "align": "left"},
+        {"label": _("Ngày"), "fieldname": "production_date", "fieldtype": "Data", "width": 200, "align": "left"},
     ]
 
     if not work_orders:
@@ -130,7 +130,7 @@ def get_columns(work_orders):
             "label": f"<br><b>{item['item_name']}</b>",
             "fieldname": scrubbed_name,
             "fieldtype": "HTML",
-            "width": 325,
+            "width": 300,
             "align": "left",
             "parent": group_label  # For multi-level header - parent shows the system category
         })
