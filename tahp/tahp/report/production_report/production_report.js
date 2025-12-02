@@ -5,8 +5,9 @@ frappe.query_reports["Production Report"] = {
             "label": __("Từ ngày"),
             "fieldtype": "Date",
             "default": function() {
+                // Ngày đầu tháng trước (2 tháng gần nhất)
                 const now = new Date();
-                return new Date(now.getFullYear(), now.getMonth(), 1);
+                return new Date(now.getFullYear(), now.getMonth() - 1, 1);
             }(),
             "on_change": function() {
                 frappe.query_reports["Production Report"].handle_date_range_change();
@@ -18,6 +19,7 @@ frappe.query_reports["Production Report"] = {
             "label": __("Đến ngày"),
             "fieldtype": "Date",
             "default": function() {
+                // Ngày cuối tháng hiện tại
                 const now = new Date();
                 return new Date(now.getFullYear(), now.getMonth() + 1, 0);
             }(),
@@ -43,6 +45,25 @@ frappe.query_reports["Production Report"] = {
 
     get_datatable_options(options) {
         return { ...options, freezeIndex: 2};
+    },
+
+    "formatter": function(value, row, column, data, default_formatter) {
+        // For HTML columns, return value as-is (don't escape)
+        if (column.fieldtype === "HTML" && value) {
+            return value;
+        }
+        return default_formatter(value, row, column, data);
+    },
+    
+    "open_detail_dialog": function(fromDate, toDate) {
+        console.log('open_detail_dialog called:', fromDate, toDate);
+        if (typeof frappe.custom_utils_detail_reason === 'function') {
+            console.log('Calling frappe.custom_utils_detail_reason');
+            frappe.custom_utils_detail_reason(null, fromDate, toDate);
+        } else {
+            console.error('frappe.custom_utils_detail_reason is not a function');
+            frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
+        }
     },
 
     "onload": function(report) {
@@ -146,8 +167,48 @@ frappe.query_reports["Production Report"] = {
                 } catch (err) {
                     console.error('Error applying column widths for Production Report', err);
                 }
+                
+                // Attach click handlers for detail buttons
+                frappe.query_reports["Production Report"].attach_detail_button_handlers(datatable);
             }, 50);
         };
+    },
+    
+    "attach_detail_button_handlers": function(datatable) {
+        // Remove existing handlers to prevent duplicates
+        $('.report-wrapper').off('click', '.detail-btn');
+        
+        // Attach click handler for detail buttons using event delegation on report wrapper
+        $('.report-wrapper').on('click', '.detail-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const $btn = $(this);
+            const fromDate = $btn.attr('data-from');
+            const toDate = $btn.attr('data-to');
+            
+            console.log('Detail button clicked:', fromDate, toDate);
+            
+            // Call detail reason dialog with work_orders=null, from_date=date, to_date=date
+            if (typeof frappe.custom_utils_detail_reason === 'function') {
+                frappe.custom_utils_detail_reason(null, fromDate, toDate);
+            } else {
+                frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
+            }
+        });
+        
+        // Add hover effects for buttons
+        $('.report-wrapper').on('mouseenter', '.detail-btn', function() {
+            $(this).css({
+                'transform': 'translateY(-1px)',
+                'box-shadow': '0 4px 8px rgba(0,0,0,0.2)'
+            });
+        }).on('mouseleave', '.detail-btn', function() {
+            $(this).css({
+                'transform': 'translateY(0)',
+                'box-shadow': '0 2px 4px rgba(102, 126, 234, 0.3)'
+            });
+        });
     },
 
     "add_responsive_styles": function() {
@@ -299,8 +360,8 @@ frappe.query_reports["Production Report"] = {
     },
     
     "aggregate_total_summary": function(data_rows, columns) {
-        // Get product columns and their system categories
-        const product_columns = columns.filter(c => c.fieldname !== 'production_date');
+        // Get product columns and their system categories (exclude non-product columns)
+        const product_columns = columns.filter(c => c.fieldname !== 'production_date' && c.fieldname !== 'detail_button');
         const system_by_field = {};
         product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
@@ -446,7 +507,7 @@ frappe.query_reports["Production Report"] = {
         
         // Group data by date and system category
         let daily_summary = {};
-        const product_columns = columns.filter(c => c.fieldname !== 'production_date');
+        const product_columns = columns.filter(c => c.fieldname !== 'production_date' && c.fieldname !== 'detail_button');
         const system_by_field = {};
         product_columns.forEach(c => { system_by_field[c.fieldname] = (c.parent || '').toString().trim(); });
 
@@ -820,23 +881,12 @@ frappe.query_reports["Production Report"] = {
                             from_date = to_date = clicked_key;
                         }
                         
-                        // Show notification
-                        const displayLabel = this.format_group_label(clicked_key, group_by);
-                        frappe.show_alert({
-                            message: __(`Đang mở Work Orders cho ${displayLabel}...`),
-                            indicator: 'blue'
-                        }, 2);
-                        
-                        // Open in new tab with date range
-                        let list_url;
-                        if (from_date === to_date) {
-                            list_url = `/app/work-order?planned_start_date=${encodeURIComponent(from_date)}`;
+                        // Open detail reason dialog
+                        if (typeof frappe.custom_utils_detail_reason === 'function') {
+                            frappe.custom_utils_detail_reason(null, from_date, to_date);
                         } else {
-                            // Use Frappe's "between" filter format: ["between", [from, to]]
-                            const betweenFilter = JSON.stringify(["between", [from_date, to_date]]);
-                            list_url = `/app/work-order?planned_start_date=${encodeURIComponent(betweenFilter)}`;
+                            frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
                         }
-                        window.open(list_url, '_blank');
                     }
                 },
                 layout: {

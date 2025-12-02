@@ -7,7 +7,7 @@ def get_detail_reason(work_orders=None, from_date=None, to_date=None):
         if from_date:
             from_date = frappe.utils.getdate(from_date)
         if to_date:
-            from_date = frappe.utisl.getdate(to_date)
+            to_date = frappe.utils.getdate(to_date)
         work_orders = frappe.db.get_all("Work Order", filters={"planned_start_date": ["between", [from_date, to_date]]}, fields=["name"], pluck="name")
 
     if isinstance(work_orders, str):
@@ -61,7 +61,12 @@ def get_detail_reason(work_orders=None, from_date=None, to_date=None):
 
         if handover:
             shift_doc = frappe.get_doc("Shift Handover", handover[0].name)
-            notes = { "name": shift_doc.name, "notes_1": shift_doc.notes_1, "notes_2": shift_doc.notes_2, "notes_3": shift_doc.notes_3,}
+            notes = { 
+                "name": shift_doc.name, 
+                "notes_1": getattr(shift_doc, 'notes_1', None), 
+                "notes_2": getattr(shift_doc, 'notes_2', None), 
+                "notes_3": getattr(shift_doc, 'notes_3', None),
+            }
             notes = {k: v for k, v in notes.items() if v}
             if notes: shift_handover = notes
 
