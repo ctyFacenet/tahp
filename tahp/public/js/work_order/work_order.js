@@ -264,6 +264,11 @@ async function complete_wo(frm) {
         args: { work_order: frm.doc.name }
     });
 
+    let requiredsRawData
+    let finishedsRawData
+    let workstationRawData
+    let jobcard
+
     if (res.message === false) {
         const filters = { work_order: frm.doc.name, docstatus: 0 };
 
@@ -298,6 +303,11 @@ async function complete_wo(frm) {
                 label: "Bảng dữ liệu demo",
             },
             {
+                fieldname: "workstation",
+                fieldtype: "HTML",
+                label: "Bảng dữ liệu demo",
+            },
+            {
                 fieldtype: "Section Break"
             },
             {
@@ -320,6 +330,10 @@ async function complete_wo(frm) {
             // ✅ Lấy dữ liệu từ cả 2 bảng
             const requireds_data = covertAllData(requiredsRawData, $firstWrapper.find('.wo-value-input, .wo-select-middle'));
             const finisheds_data = covertAllData(finishedsRawData, $secondWrapper.find('.wo-value-input, .wo-select-middle'));
+            const workstation_data = covertAllData(workstationRawData, $thirdWrapper.find('.wo-value-input, .wo-select-middle'));
+            // --- Check lại lần cuối
+            const required_need = requireds_data.find(row => row.standard_qty < row.actual_qty);
+            const finished_need = finisheds_data.find(row => !row.scrap && row.standard_qty > row.actual_qty);
 
             await frappe.call({
                 method: "tahp.doc_events.work_order.work_order_utils.process_consumed_produced_items",
@@ -327,8 +341,10 @@ async function complete_wo(frm) {
                     work_order: frm.doc.name, 
                     required: requireds_data, 
                     produced: finisheds_data,
-                    requireds_reason: d.get_value("requireds_reason"),
-                    finished_reason: d.get_value("finished_reason"),
+                    requireds_reason: required_need ? d.get_value("requireds_reason") : null,
+                    finished_reason: finished_need ? d.get_value("finished_reason"): null,
+                    workstation_data: workstation_data.length > 0 ? workstation_data : null,
+                    job_card: jobcard ? jobcard : null,
                 }
             })
 
@@ -349,13 +365,17 @@ async function complete_wo(frm) {
     // Lấy wrapper của field HTML
     let $firstWrapper = $(d.fields_dict.requireds.$wrapper);
     let $secondWrapper = $(d.fields_dict.finisheds.$wrapper);
+    let $thirdWrapper = $(d.fields_dict.workstation.$wrapper);
     $secondWrapper.css({'margin-top': '20px'})
+    $thirdWrapper.css({'margin-top': '20px'})
 
     let response = await frappe.call({method: "tahp.doc_events.work_order.work_order_utils.get_consumed_produced_items", args: {work_order: frm.doc.name}})
 
     // Dữ liệu khác nhau
     requiredsRawData = response.message.required
     finishedsRawData = response.message.produced
+    workstationRawData = response.message.workstation
+    jobcard = response.message.job_card
 
     let rawWarehouse = await frappe.db.get_list('Warehouse')
     let warehouse = rawWarehouse.map(w => w.name)
@@ -391,11 +411,76 @@ async function complete_wo(frm) {
         { fieldname: "item_name", label: "Tên TP", is_primary: true, ratio: 2 },
         { fieldname: "warehouse", label: "Kho", is_select_middle: true, options: warehouse, ratio: 3 },
         { fieldname: "standard_qty", label: "SL định mức", is_sub_secondary: true, ratio: 2},
-        { fieldname: "actual_qty", label: "SL sản xuất", is_value: true, ratio: 2 },
+        { fieldname: "actual_qty", label: "SL sản xuất", is_value: true, ratio: 2, read_only: workstationRawData.length > 0? 1 : null },
     ];
 
-    await define_table(frm, $firstWrapper, "Nguyên vật liệu tiêu hao", columns1, requiredsRawData, "red", d.get_field("requireds_reason"), false);
-    await define_table(frm, $secondWrapper, "Thành phẩm", columns2, finishedsRawData, "green", d.get_field("finished_reason"), true);
+    let columns3 = [
+        { fieldname: "workstation", label: "Tên thiết bị", is_primary: true},
+        { fieldname: "uom", label: "ĐVT", is_unit: true},
+        { fieldname: "qty", label: "Sản lượng từng thiết bị", is_value: true},
+    ]
+
+    await define_table(
+        frm,
+        $firstWrapper,
+        "Nguyên vật liệu tiêu hao",
+        columns1,
+        requiredsRawData,
+        "red",
+        (checked) => {
+            const dialog_field = d.get_field("requireds_reason");
+
+            const needs_reason_row = checked.find(
+                row => row.standard_qty < row.actual_qty
+            );
+
+            if (needs_reason_row) {
+                dialog_field.df.reqd = 1;
+                dialog_field.wrapper.style.display = "";
+            } else {
+                dialog_field.df.reqd = 0;
+                dialog_field.wrapper.style.display = "none";
+            }
+            dialog_field.refresh();
+        }
+    );
+
+    await define_table(
+        frm,
+        $secondWrapper,
+        "Thành phẩm",
+        columns2,
+        finishedsRawData,
+        "green",
+        (checked) => {
+            const dialog_field = d.get_field("finished_reason");
+
+            const needs_reason_row = checked.find(
+                row => !row.scrap && row.standard_qty > row.actual_qty
+            );
+
+            if (needs_reason_row) {
+                dialog_field.df.reqd = 1;
+                dialog_field.wrapper.style.display = "";
+            } else {
+                dialog_field.df.reqd = 0;
+                dialog_field.wrapper.style.display = "none";
+            }
+            dialog_field.refresh();
+        }
+    );
+
+    if (workstationRawData.length > 0) {
+        await define_table(
+            frm,
+            $thirdWrapper,
+            "Chốt sản lượng từng máy",
+            columns3,
+            workstationRawData,
+            "blue",
+
+        )
+    }
 }
 
 async function autofill_items(frm) {
@@ -490,7 +575,7 @@ function show_shift_handover(frm) {
     }
 }
 
-async function define_table(frm, $wrapper, title, columns, data, titleColor = null, dialog_field, is_production) {
+async function define_table(frm, $wrapper, title, columns, data, titleColor = null, onChange = null) {
 
     const $header = $(`
         <div class="wo-header">
@@ -563,7 +648,10 @@ async function define_table(frm, $wrapper, title, columns, data, titleColor = nu
     $leftHeader.append(`<div class="wo-header-cell">${primaryLabel}</div>`);
     middleLabels.forEach(lbl => $middleHeader.append(`<div class="wo-header-cell">${lbl}</div>`));
     $rightHeader.append(`<div class="wo-header-cell">${valueLabel}</div>`);
-    $mobileHeader.append($leftHeader, $middleHeader, $rightHeader);
+
+    console.log(middleLabels)
+    if (middleLabels.length > 0) $mobileHeader.append($leftHeader, $middleHeader, $rightHeader)
+    else $mobileHeader.append($leftHeader, $rightHeader)
     $mobileWrapper.append($mobileHeader);
 
     data.forEach((row, rowIndex) => {
@@ -579,8 +667,8 @@ async function define_table(frm, $wrapper, title, columns, data, titleColor = nu
         $left.append(
             `<div class="wo-primary">${row[primary?.fieldname] || ''}</div>`,
             `<div class="wo-secondary">${row[secondary?.fieldname] || ''}</div>`,
-            `<div class="wo-secondary">${sub_secondary.label}: ${row[sub_secondary?.fieldname] || ''} ${row[unitCol?.fieldname]}</div>`
         );
+        if (sub_secondary) $left.append($(`<div class="wo-secondary">${sub_secondary.label}: ${row[sub_secondary?.fieldname] || ''} ${row[unitCol?.fieldname]}</div>`))
 
         const $middle = $('<div class="wo-col wo-col-middle"></div>');
         middles.forEach(m => {
@@ -605,10 +693,14 @@ async function define_table(frm, $wrapper, title, columns, data, titleColor = nu
         const $right = $('<div class="wo-col wo-col-right"></div>');
         let value = row[valueCol?.fieldname] ?? '';
         const $valueInput = $(`<input type="number" class="wo-input-value wo-value-input" data-fieldname="${valueCol?.fieldname}" data-rowindex="${rowIndex}" value="${value}">`);
+        // if (valueCol?.read_only) {
+        //     $valueInput.prop("readonly", true);
+        //     $valueInput.addClass("wo-input-readonly");
+        // }
         if (unitCol) $right.append($valueInput, `<span class="wo-unit">${row[unitCol.fieldname] || ''}</span>`);
         else $right.append($valueInput);
-
-        $row.append($left, $middle, $right);
+        if (middles.length > 0) $row.append($left, $middle, $right)
+        else $row.append($left, $right)
         $mobileWrapper.append($row);
     });
     $wrapper.append($mobileWrapper);
@@ -623,20 +715,8 @@ async function define_table(frm, $wrapper, title, columns, data, titleColor = nu
             .not($this)
             .val(val);
 
-        let checked = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
-        let needs_reason_row;
-        if (is_production) needs_reason_row = checked.find(row => !row.scrap && row.standard_qty > row.actual_qty);
-        else needs_reason_row = checked.find(row => row.standard_qty < row.actual_qty);
-
-        if (needs_reason_row) {
-            dialog_field.df.reqd = 1
-            dialog_field.wrapper.style.display = '';
-        } else {
-            dialog_field.df.reqd = 0
-            dialog_field.wrapper.style.display = 'none';
-            dialog_field.set_value("")
-        }
-        dialog_field.refresh();
+        const checked = covertAllData(data, $wrapper.find('.wo-value-input, .wo-select-middle'));
+        if (typeof onChange === "function") onChange(checked);
     });
 
     // ✏️ Inline editing logic giữ nguyên

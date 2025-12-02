@@ -900,82 +900,18 @@ frappe.ui.form.on('Job Card', {
             }
         }
 
-        let flag = await frappe.xcall("tahp.doc_events.job_card.job_card.check_operation", {operation: frm.doc.operation, bom: frm.doc.bom_no})
-        if (flag === true) {
-            let tracker = { data: null };
-
-            const d = new frappe.ui.Dialog({
-                title: "Chốt sản lượng của từng máy",
-                fields: [
-                    { fieldname: "confirm_msg", fieldtype: "HTML", options: '' },
-                    { fieldname: "wrapper", fieldtype: "HTML" }
-                ],
-                primary_action_label: "Tiếp tục",
-                primary_action: async () => {
-                    if (!d._confirmed) {
-                        d.get_field("confirm_msg").$wrapper.html(
-                            `<div style="padding:10px; background:#fff3cd; border:1px solid #ffeeba; margin-bottom:10px;">
-                                Bạn có chắc chắn chốt sản lượng đã nhập bên dưới không? Vui lòng kiểm tra lại số lượng một lần nữa trước khi bấm <b>Xác nhận</b>
-                            </div>`
-                        )
-                        d.get_field("confirm_msg").wrapper.style.display = ""
-                        d._confirmed = true;
-
-                        d.set_primary_action("Xác nhận", async () => {
-
-                            await frappe.xcall("tahp.doc_events.job_card.job_card.save_operation_qty", {
-                                job_card: frm.doc.name,
-                                items: tracker.data
-                            });
-
-                            await frappe.call({
-                                method: "tahp.doc_events.job_card.job_card.submit",
-                                args: { job_card: frm.doc.name }
-                            });
-
-                            d.hide();
-                        });
-                    }
-                }
+        const message = `Xác nhận hoàn thành LSX Công đoạn?`;
+        await new Promise((resolve, reject) => {
+            frappe.confirm(message, resolve, () => {
+                reject();
+                return;
             });
+        });
 
-            const $wrapper = d.get_field("wrapper").$wrapper;
-            d.get_field("confirm_msg").wrapper.style.display = "none"
-
-            frm.events.define_table(
-                frm, $wrapper, '',
-                columns = [
-                    { label: 'Tên thiết bị', fieldname: 'workstation', is_primary: true },
-                    { label: 'Sản lượng', fieldname: 'qty', is_value: true },
-                    { label: 'Đơn vị', fieldname: 'uom', is_unit: true },
-                ],
-                data = frm.doc.custom_workstation_table.map(w => ({
-                    workstation: w.workstation,
-                    qty: 0,
-                    uom: "Tấn"
-                })),
-                edittable = false,
-                action = null,
-                action_param = null,
-                focus = false,
-                tracker = tracker
-            );
-
-            d.show();
-        } else {
-            const message = `Xác nhận hoàn thành LSX Công đoạn?`;
-            await new Promise((resolve, reject) => {
-                frappe.confirm(message, resolve, () => {
-                    reject();
-                    return;
-                });
-            });
-
-            await frappe.call({
-                method: "tahp.doc_events.job_card.job_card.submit",
-                args: { job_card: frm.doc.name }
-            });
-        }
+        await frappe.call({
+            method: "tahp.doc_events.job_card.job_card.submit",
+            args: { job_card: frm.doc.name }
+        });
     },
 
     transfer_job_card: async function(frm) {
@@ -1186,13 +1122,16 @@ frappe.ui.form.on('Job Card', {
                                             ${row.employee}: ${row.employee_name}
                                         </td>
                                         <td style="text-align:center;">
-                                            <button 
+                                            ${team.length > 1 
+                                            ? 
+                                            `<button 
                                                 class="btn btn-xs btn-danger" 
                                                 data-idx="${i}"
                                                 style="padding:5px 10px;"
                                             >
                                                 Xóa
-                                            </button>
+                                            </button>`
+                                            : ""}
                                         </td>
                                     </tr>
                                     `
@@ -1300,13 +1239,16 @@ frappe.ui.form.on('Job Card', {
                                     ${row.employee}: ${row.employee_name}
                                 </td>
                                 <td style="text-align:center;">
-                                    <button 
+                                    ${team.length > 1 
+                                    ? 
+                                    `<button 
                                         class="btn btn-xs btn-danger" 
                                         data-idx="${i}"
                                         style="padding:5px 10px;"
                                     >
                                         Xóa
-                                    </button>
+                                    </button>`
+                                    : ""}
                                 </td>
                             </tr>
                             `

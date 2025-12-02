@@ -5,7 +5,7 @@ from frappe.utils import now_datetime, get_datetime, flt
 @frappe.whitelist()
 def get_consumed_produced_items(work_order):
     doc = frappe.get_doc("Work Order", work_order)
-    result = {"required": [], "produced": []}
+    result = {"required": [], "produced": [], "workstation": [], "job_card": None}
     for item in doc.required_items:
         result["required"].append({
             "item_code": item.item_code,
@@ -32,29 +32,26 @@ def get_consumed_produced_items(work_order):
                         item["actual_qty"] += row.qty
     
     routing = frappe.db.get_value("BOM", doc.bom_no, "routing")
-    routing_doc = frappe.get_doc("Routing", routing)
-    flag = False
-    operation = None
-    for row in routing_doc.operations:
-        if row.custom_is_finished_operation:
-            flag = True
-            operation = row.operation
-            break
+    if routing:
+        routing_doc = frappe.get_doc("Routing", routing)
+        for row in routing_doc.operations:
+            if row.custom_is_finished_operation:
+                job_card_doc = frappe.get_doc("Job Card", {"work_order": work_order, "operation": row.operation, "docstatus": 1})
+                result["job_card"] = job_card_doc.name
+                length = len(job_card_doc.custom_workstation_table)
+                for item in job_card_doc.custom_workstation_table:
+                    result["workstation"].append({
+                        "workstation": item.workstation,
+                        "qty": doc.qty / 4,
+                        "uom": doc.stock_uom,
+                    })
 
-    job_card = frappe.db.get_all("Job Card", {"work_order": work_order, "operation": operation, "docstatus": 1}, pluck="name", limit_page_length=1)
-    jc_qty = 0
-    if job_card:
-        job_card_doc = frappe.get_doc("Job Card", job_card[0])
-        for item in job_card_doc.custom_workstation_table:
-            jc_qty += float(item.qty)
-
-    result_qty = doc.qty if not flag else jc_qty
     result["produced"].append({
             "item_code": doc.production_item,
             "item_name": doc.item_name,
             "stock_uom": doc.stock_uom,
             "standard_qty": doc.qty,
-            "actual_qty": result_qty,
+            "actual_qty": doc.qty,
             "warehouse": doc.fg_warehouse,
             "posting_date": now_datetime(),
             "type_posting": "Thành phẩm",
@@ -91,9 +88,10 @@ def get_consumed_produced_items(work_order):
     return result
 
 @frappe.whitelist()
-def process_consumed_produced_items(work_order, required, produced, requireds_reason=None, finished_reason=None):
+def process_consumed_produced_items(work_order, required, produced, requireds_reason=None, finished_reason=None, workstation_data=None, job_card= None):
     if isinstance(required, str): required = json.loads(required)
     if isinstance(produced, str): produced = json.loads(produced)
+    if workstation_data and isinstance(workstation_data, str):  workstation_data = json.loads(workstation_data)
     wo_doc = frappe.get_doc("Work Order", work_order)
 
     for item_list in [required, produced]:
@@ -133,6 +131,14 @@ def process_consumed_produced_items(work_order, required, produced, requireds_re
         wo_doc.db_set("custom_finished_reason", finished_reason)
     wo_doc.db_set("status", "Completed")
     wo_doc.save(ignore_permissions=True)
+
+    if workstation_data and job_card:
+        job_card_doc = frappe.get_doc("Job Card", job_card)
+        for row in job_card_doc.custom_workstation_table:
+            for item in workstation_data:
+                if row.workstation == item.get("workstation"):
+                    row.qty = flt(item.get("qty"))
+        job_card_doc.save(ignore_permissions=True)
 
     noti_shift_handover(wo_doc)
     noti_foreman(wo_doc)
