@@ -50,27 +50,6 @@ frappe.ui.form.on("Work Order Finished Item", {
             size: "small",
             fields: [
                 {
-                    fieldname: "attribute",
-                    fieldtype: "Link",
-                    options: "Item Attribute",
-                    default: "Đặc tính",
-                    label: "Tìm các mặt hàng dựa theo điểm chung",
-                    change: async () => {
-                        d.fields_dict.items.df.data = []
-                        let res = await frappe.xcall("tahp.tahp.doctype.work_order_finished_item.work_order_finished_item.get_finished_items", {item_code: frm.doc.item_code, qty: frm.doc.actual_qty, attribute: d.get_value("attribute")})
-                        if (res && res.length) {
-                            d.fields_dict.items.df.data = res.map(r => ({
-                                item_code: r.item_code,
-                                item_name: r.item_name,
-                                qty: r.qty
-                            }));
-                            d.fields_dict.items.grid.refresh();
-                        }
-                        d.wrapper.find('.row-check').hide()
-                        cleanerTable(d)     
-                    }
-                },
-                {
                     fieldname: "stock_uom",
                     fieldtype: "Data",
                     default: stock_uom.message.stock_uom,
@@ -93,9 +72,12 @@ frappe.ui.form.on("Work Order Finished Item", {
             primary_action: async () => {
                 const items = d.get_value("items")
                 const totalQty = items.reduce((sum, row) => {
-                    return sum + (parseFloat(row.qty) || 0)
-                }, 0)
-                if (totalQty != frm.doc.actual_qty) frappe.throw("Tổng sản lượng điền không được khác so với sản lượng đã chốt trước đó")
+                    const qty = parseFloat(row.qty);
+                    return Number.isFinite(qty) ? sum + qty : sum;
+                }, 0);
+                console.log(totalQty)
+                console.log(frm.doc.actual_qty)
+                if (totalQty !== frm.doc.actual_qty) frappe.throw("Tổng sản lượng điền không được khác so với sản lượng đã chốt trước đó")
 
                 await frappe.xcall("tahp.tahp.doctype.work_order_finished_item.work_order_finished_item.process_finished_items", {doc_name: frm.doc.name, items: d.get_value("items")})
                 frappe.msgprint("Cập nhật thành phẩm thành công")
@@ -103,15 +85,19 @@ frappe.ui.form.on("Work Order Finished Item", {
             }
         })
 
-        let res = await frappe.xcall("tahp.tahp.doctype.work_order_finished_item.work_order_finished_item.get_finished_items", {item_code: frm.doc.item_code, qty: frm.doc.actual_qty, attribute: d.get_value("attribute")})
+        let res = await frappe.xcall("tahp.tahp.doctype.work_order_finished_item.work_order_finished_item.get_finished_items", {item_code: frm.doc.item_code, qty: frm.doc.actual_qty})
         d.fields_dict.items.df.data = []
         if (res && res.length) {
-            d.fields_dict.items.df.data = res.map(r => ({
+            const grid = d.fields_dict.items.grid;
+
+            grid.df.data = res.map(r => ({
                 item_code: r.item_code,
                 item_name: r.item_name,
                 qty: r.qty
             }));
-            d.fields_dict.items.grid.refresh();
+
+            grid.data = grid.df.data;
+            grid.refresh();
         }
         d.wrapper.find('.row-check').hide();
         cleanerTable(d)
