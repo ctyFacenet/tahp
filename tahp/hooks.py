@@ -59,6 +59,7 @@ app_include_js = [
     "/assets/tahp/js/custom_utils/primary_action.js",
     "/assets/tahp/js/custom_utils/checkbox_toggle.js",
     "/assets/tahp/js/custom_utils/dynamic_filters.js",
+    "/assets/tahp/js/custom_utils/detail_reason_dialog.js",
     "https://cdn.jsdelivr.net/npm/chart.js",
     "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2",
     "tahp.bundle.js"

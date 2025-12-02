@@ -342,5 +342,4 @@ def bom_overall(main, from_date, to_date):
                 result[date_key][ri.item_code]["work_order_norm"].append(wo.name)
 
     sorted_result = dict(sorted(result.items()))
-    print(sorted_result)
     return sorted_result

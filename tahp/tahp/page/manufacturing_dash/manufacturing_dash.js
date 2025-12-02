@@ -239,7 +239,6 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         updateCard("sub", response.overall && response.overall.sub);
         
         if (response.category_overall) {
-            console.log(response.category_overall)
             const cat = response.category_overall;
             const catLabels = Object.keys(cat); // các hệ
             const allItems = new Set();
@@ -368,8 +367,9 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                             const index = elements[0].index;
                             const workOrders = workOrdersMap[index].workOrders;
                             if (workOrders.length > 0) {
-                                const url = `/app/work-order?name=["in",${JSON.stringify(workOrders)}]`;
-                                window.open(url, '_blank');
+                                // const url = `/app/work-order?name=["in",${JSON.stringify(workOrders)}]`;
+                                // window.open(url, '_blank');
+                                frappe.custom_utils_detail_reason(workOrders)
                             }
                         }
                     }
@@ -709,8 +709,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                             }
 
                             if (wo_list.length > 0) {
-                                const url = `/app/work-order?name=["in",${JSON.stringify(wo_list)}]`;
-                                window.open(url, '_blank');
+                                frappe.custom_utils_detail_reason(wo_list)
                             } else {
                                 frappe.msgprint("Không có LSX ca nào trong danh sách này.");
                             }
@@ -823,8 +822,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
                                     : (dayData.work_order_norm || []);
 
                                 if (wo_list.length > 0) {
-                                    const url = `/app/work-order?name=["in",${JSON.stringify(wo_list)}]`;
-                                    window.open(url, '_blank');
+                                    frappe.custom_utils_detail_reason(wo_list)
                                 } else {
                                     frappe.msgprint("Không có LSX nào trong danh sách này.");
                                 }

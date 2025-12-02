@@ -14,6 +14,7 @@
   "item_name",
   "posting_date",
   "amended_from",
+  "stock_uom",
   "column_break_wxbu",
   "standard_qty",
   "actual_qty",
@@ -144,6 +145,15 @@
    "label": "K\u1ebft qu\u1ea3 \u0111o \u0111\u1ea1c th\u00e0nh ph\u1ea9m th\u1eadt s\u1ef1",
    "options": "Work Order Finished Child",
    "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fetch_from": "item_code.purchase_uom",
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "label": "\u0110\u01a1n v\u1ecb",
+   "options": "UOM",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -151,7 +161,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-28 10:36:42.180215",
+ "modified": "2025-12-02 14:39:41.778891",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Work Order Finished Item",
