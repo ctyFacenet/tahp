@@ -221,7 +221,7 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
 
         # Format date for detail button
         date_str = completion_date.strftime('%Y-%m-%d') if completion_date else ''
-        detail_button = f'''<button class="btn btn-xs" onclick="frappe.query_reports['Material Consumption'].open_detail_dialog('{wo_name}')" style="background:#e8f4fd;color:#2490ef;border:1px solid #c8e1f8;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;"><i class="fa fa-eye"></i> Xem</button>''' if wo_name else ''
+        detail_button = f'''<button class="btn btn-xs" onclick="frappe.query_reports['Material Consumption'].open_detail_dialog('{wo_name}', '{date_str}')" style="background:#e8f4fd;color:#2490ef;border:1px solid #c8e1f8;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;"><i class="fa fa-eye"></i> Xem</button>''' if wo_name else ''
 
         row = {
             "serial_no": index + 1,

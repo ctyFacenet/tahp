@@ -70,10 +70,10 @@ frappe.query_reports["Material Consumption"] = {
         return default_formatter(value, row, column, data);
     },
 
-    "open_detail_dialog": function(workOrderName) {
-        // Call detail reason dialog with work order
+    "open_detail_dialog": function(workOrderName, dateStr) {
+        // Call detail reason dialog with work order and date
         if (typeof frappe.custom_utils_detail_reason === 'function') {
-            frappe.custom_utils_detail_reason([workOrderName], null, null);
+            frappe.custom_utils_detail_reason([workOrderName], dateStr || null, dateStr || null);
         } else {
             frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
         }
