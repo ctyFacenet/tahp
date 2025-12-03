@@ -40,6 +40,8 @@ frappe.custom_utils_detail_reason = (work_orders = null, from_date = null, to_da
         results.forEach((wo, idx) => {
             const collapseId = `collapse${idx}`;
             const isFirst = idx === 0;
+            const should_required = wo.requireds.find(row => row.standard_qty < row.actual_qty)
+            const should_production = wo.production.find(row => !row.scrap && row.standard_qty > row.actual_qty)
             
             html += `
                 <div class="card" style="margin-bottom: 25px">
@@ -56,21 +58,22 @@ frappe.custom_utils_detail_reason = (work_orders = null, from_date = null, to_da
 
                     <div class="card-body">
 
-                       <!-- Lý do thành phẩm -->
-                        <div class="mb-4" >
-                            <label class="form-label">Lý do sản lượng thành phẩm chênh lệch</label>
-                            <div class="p-2 bg-light border rounded">
-                                ${wo.finished_reason || '<em class="text-muted">Chưa có thông tin</em>'}
-                            </div>
-                        </div>
-
-                        <!-- Lý do nguyên liệu -->
+                        ${should_required ? `
                         <div class="mb-4">
-                            <label class="form-label">Lý do sản lượng nguyên liệu chênh lệch</label>
+                            <label class="form-label">Lý do sử dụng nguyên liệu nhiều hơn định mức?</label>
                             <div class="p-2 bg-light border rounded">
                                 ${wo.required_reason || '<em class="text-muted">Chưa có thông tin</em>'}
                             </div>
-                        </div>
+                        </div>       
+                        `: ``}
+
+                        ${should_production ? `
+                        <div class="mb-4" >
+                            <label class="form-label">Lý do sản lượng thành phẩm ít hơn định mức?</label>
+                            <div class="p-2 bg-light border rounded">
+                                ${wo.finished_reason || '<em class="text-muted">Chưa có thông tin</em>'}
+                            </div>
+                        </div>`: ``}
 
                         <!-- Đầu vào tiêu hao -->
                         <div class="table-responsive mb-4">
@@ -155,7 +158,7 @@ frappe.custom_utils_detail_reason = (work_orders = null, from_date = null, to_da
 
                                 ${wo.shift_handover.notes_2 ? `
                                     <div class="mb-4">
-                                        <label class="form-label">Phản ánh, đánh giá từ Quản đốc</label>
+                                        <label class="form-label">Phản ánh, đánh giá từ trưởng ca</label>
                                         <div class="p-2 bg-light border rounded">
                                             ${wo.shift_handover.notes_2}
                                         </div>
@@ -164,7 +167,7 @@ frappe.custom_utils_detail_reason = (work_orders = null, from_date = null, to_da
 
                                 ${wo.shift_handover.notes_3 ? `
                                     <div class="mb-4">
-                                        <label class="form-label">Phản ánh, đánh giá từ Trưởng ca</label>
+                                        <label class="form-label">Phản ánh, đánh giá từ Quản đốc</label>
                                         <div class="p-2 bg-light border rounded">
                                             ${wo.shift_handover.notes_3}
                                         </div>

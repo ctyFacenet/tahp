@@ -44,7 +44,8 @@ def get_detail_reason(work_orders=None, from_date=None, to_date=None):
                     "item_name": f_doc.item_name,
                     "standard_qty": f_doc.standard_qty,
                     "actual_qty": f_doc.actual_qty,
-                    "stock_uom": stock_uom
+                    "stock_uom": stock_uom,
+                    "scrap": True if f_doc.type_posting == "Phụ phẩm" else False
                 })
             elif f_doc.type_posting == "Thành phẩm sau QC":
                 for item in f_doc.items:
