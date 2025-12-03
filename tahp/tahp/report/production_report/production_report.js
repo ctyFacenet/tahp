@@ -56,12 +56,9 @@ frappe.query_reports["Production Report"] = {
     },
     
     "open_detail_dialog": function(fromDate, toDate) {
-        console.log('open_detail_dialog called:', fromDate, toDate);
         if (typeof frappe.custom_utils_detail_reason === 'function') {
-            console.log('Calling frappe.custom_utils_detail_reason');
             frappe.custom_utils_detail_reason(null, fromDate, toDate);
         } else {
-            console.error('frappe.custom_utils_detail_reason is not a function');
             frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
         }
     },
@@ -181,9 +178,7 @@ frappe.query_reports["Production Report"] = {
             const $btn = $(this);
             const fromDate = $btn.attr('data-from');
             const toDate = $btn.attr('data-to');
-            
-            console.log('Detail button clicked:', fromDate, toDate);
-            
+                        
             // Call detail reason dialog with work_orders=null, from_date=date, to_date=date
             if (typeof frappe.custom_utils_detail_reason === 'function') {
                 frappe.custom_utils_detail_reason(null, fromDate, toDate);
