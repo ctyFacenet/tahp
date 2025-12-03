@@ -777,20 +777,27 @@ def get_quantity():
     }
 
 @frappe.whitelist()
-def set_quantity(finished, required_items):
+def set_quantity(finished, required_items=None):
     ts = frappe.get_single("Tracking Setting")
-    if isinstance(required_items, str): required_items = json.loads(required_items)
 
-    if finished != ts.finished:
+    # Cập nhật finished nếu khác
+    if finished and finished != ts.finished:
         ts.finished = finished
 
-    ts.required_items = []
+    # Nếu required_items là string thì parse JSON
+    if isinstance(required_items, str):
+        required_items = json.loads(required_items)
 
-    for row in required_items:
-        ts.append("required_items", {
-            "item_code": row.get("item_code"),
-            "item_name": row.get("item_name"),
-            "percentage": row.get("percentage")
-        })
+    # Nếu không có required_items hoặc rỗng, xóa hết
+    if not required_items:
+        ts.required_items = []
+    else:
+        ts.required_items = []
+        for row in required_items:
+            ts.append("required_items", {
+                "item_code": row.get("item_code"),
+                "item_name": row.get("item_name"),
+                "percentage": row.get("percentage")
+            })
 
     ts.save()

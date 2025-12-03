@@ -208,7 +208,7 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
                     label: "Sản lượng thực tế / kế hoạch (%)",
                     fieldname: "finished",
                     fieldtype: "Int",
-                    default: quantity.finished
+                    default: quantity.finished || 50,
                 },
                 {
                     label: "Tiêu hao thực tế / kế hoạch theo mặt hàng",
@@ -223,14 +223,13 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
                             fieldtype: "Link",
                             options: "Item",
                             in_list_view: true,
-                            reqd: 1
                         },
                         {
                             label: "% Chênh lệnh",
                             fieldname: "percentage",
                             fieldtype: "Int",
                             in_list_view: true,
-                            reqd: 1
+                            default: 150
                         }
                     ],
                     data: quantity.required_items || []
@@ -255,7 +254,7 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
                     "tahp.tahp.page.tracking_production.tracking_production.set_quantity",
                     {
                         finished: values.finished,
-                        required_items: values.required_items
+                        required_items: values.required_items || []
                     }
                 );
                 dialog.hide();

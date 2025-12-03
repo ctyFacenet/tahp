@@ -156,35 +156,36 @@ def process_consumed_produced_items(work_order, required, produced, requireds_re
 def noti_chief(wo_doc, required, produced):
     ts = frappe.get_single("Tracking Setting")
     result = []
-    for item in produced:
-        if item.get("scrap") == True: continue
-        actual_qty = flt(item.get("actual_qty"))
-        standard_qty = flt(item.get("standard_qty"))
-        if actual_qty != 0 and standard_qty != 0:
-            percentage = int((actual_qty / standard_qty) * 100)
-            if percentage <= ts.finished:
-                result.append(f"Sản lượng {item.get('item_name')} chỉ đạt <strong>{percentage}%</strong> so với kế hoạch ({actual_qty}/{standard_qty}).")
+    if ts.finished:
+        for item in produced:
+            if item.get("scrap") == True: continue
+            actual_qty = flt(item.get("actual_qty"))
+            standard_qty = flt(item.get("standard_qty"))
+            if actual_qty != 0 and standard_qty != 0:
+                percentage = int((actual_qty / standard_qty) * 100)
+                if percentage <= ts.finished:
+                    result.append(f"Sản lượng {item.get('item_name')} chỉ đạt <strong>{percentage}%</strong> so với kế hoạch ({actual_qty}/{standard_qty}).")
     
-    for item in required:
-        actual_qty = flt(item.get("actual_qty"))
-        standard_qty = flt(item.get("standard_qty"))
-        if actual_qty != 0 and standard_qty != 0:
-            percentage = int((actual_qty / standard_qty) * 100)
-            print(percentage)
-            for row in ts.required_items:
-                if row.item_code == item.get('item_code') and percentage >= row.percentage:
-                    result.append(f"Tiêu hao {row.item_name} lên tới <strong>{percentage}%</strong> so với định mức ({actual_qty}/{standard_qty}).")
+    if ts.required_items:
+        for item in required:
+            actual_qty = flt(item.get("actual_qty"))
+            standard_qty = flt(item.get("standard_qty"))
+            if actual_qty != 0 and standard_qty != 0:
+                percentage = int((actual_qty / standard_qty) * 100)
+                print(percentage)
+                for row in ts.required_items:
+                    if row.item_code == item.get('item_code') and percentage >= row.percentage:
+                        result.append(f"Tiêu hao {row.item_name} lên tới <strong>{percentage}%</strong> so với định mức ({actual_qty}/{standard_qty}).")
             
     if len(result):
         result.insert(0, f"Cảnh báo LSX Ca <strong>{wo_doc.name}</strong>.")
-
-    content = "<br>".join(result)
-    wwo_notify(
-        role = "Giám đốc",
-        subject = content,
-        document_type="Work Order",
-        document_name=wo_doc.name,
-    )
+        content = "<br>".join(result)
+        wwo_notify(
+            role = "Giám đốc",
+            subject = content,
+            document_type="Work Order",
+            document_name=wo_doc.name,
+        )
 
 def update_wwo(wo_doc):
     if not wo_doc.custom_plan: return
