@@ -290,7 +290,23 @@ def set_workstations(job_card, workstations):
                 ws_status = "Sẵn sàng"
             doc.append("custom_workstation_table", {"workstation": ws["workstation"], "status": ws_status})
             doc.append("custom_workstations", {"workstation": ws["workstation"], "status": ws_status, "from_time": from_time})
+
+    shift_handover = frappe.db.get_all("Shift Handover", filters={"work_order": doc.work_order}, pluck="name", limit=1)
+    if shift_handover:
+        workstation = frappe.get_doc("Workstation", doc.workstation)
+        if workstation.custom_is_parent:
+            child = frappe.db.get_all("Workstation", filters={"custom_parent": doc.workstation}, pluck="name")
+            w_temp = [w.workstation for w in doc.custom_workstation_table]
+            outlier = [w for w in child if w not in w_temp]
+            sh_doc = frappe.get_doc("Shift Handover", shift_handover[0])
+            for row in sh_doc.table[:]:
+                if row.caption in outlier:
+                    sh_doc.remove(row)
+
+            sh_doc.save(ignore_permissions=True)
+
     doc.save(ignore_permissions=True)
+
     set_configs(job_card)
 
 @frappe.whitelist()
