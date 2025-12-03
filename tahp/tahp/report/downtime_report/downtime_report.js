@@ -63,7 +63,7 @@ frappe.query_reports["Downtime Report"] = {
             "fieldname": "from_date",
             "label": "Từ ngày",
             "fieldtype": "Date",
-            "default": frappe.datetime.add_days(frappe.datetime.get_today(), -7),
+            "default": frappe.datetime.add_days(frappe.datetime.get_today(), -30),
             "on_change": function() {
                 if (!frappe.query_reports["Downtime Report"]._initialized) return;
                 if (frappe.query_reports["Downtime Report"]._isSettingFilterFromChart) return;
@@ -122,6 +122,28 @@ frappe.query_reports["Downtime Report"] = {
             hidden: 1
         }
     ],
+    "formatter": function(value, row, column, data, default_formatter) {
+        if(column.fieldname == "total_duration" && value) {
+            let totalSeconds = value;
+
+            let day = Math.floor(totalSeconds/86400);
+            let hours = Math.floor((totalSeconds % 85400)/3600);
+            let minutes = Math.floor((totalSeconds%3600)/60);
+            let seconds = Math.floor(totalSeconds%60);
+
+            let result = [];
+            if (day > 0) result.push(`${day} ngày`);
+            if (hours > 0) result.push(`${hours} giờ`);
+            if (minutes > 0) result.push(`${minutes} phút`);
+            if (seconds > 0) result.push(`${seconds} giây`);
+
+            value = result.join(" ");
+            return value;
+
+            
+        }
+         return default_formatter(value, row, column, data);
+    },
 
     refresh_charts: function() {
         const currentReport = frappe.query_report;
