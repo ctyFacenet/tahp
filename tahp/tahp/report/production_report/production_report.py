@@ -185,7 +185,7 @@ def get_data(work_orders, columns, filters=None):
             "date": date_str
         }
 
-    def build_nested_hierarchy(dates, levels):
+    def build_nested_hierarchy(dates, levels, reverse=False):
         """Build nested hierarchy based on specified levels"""
         from collections import OrderedDict
         
@@ -212,7 +212,31 @@ def get_data(work_orders, columns, filters=None):
                 else:
                     current = current[key]["children"]
         
+        # If reverse, reverse the order of hierarchy and dates within each group
+        if reverse:
+            hierarchy = reverse_hierarchy(hierarchy)
+        
         return hierarchy
+
+    def reverse_hierarchy(hierarchy):
+        """Recursively reverse the order of hierarchy"""
+        from collections import OrderedDict
+        
+        reversed_hierarchy = OrderedDict()
+        for key in reversed(list(hierarchy.keys())):
+            node = hierarchy[key]
+            reversed_node = {
+                "label": node["label"],
+                "children": None,
+                "dates": None
+            }
+            if node.get("children"):
+                reversed_node["children"] = reverse_hierarchy(node["children"])
+            if node.get("dates"):
+                # Reverse dates within the group (newest first)
+                reversed_node["dates"] = list(reversed(node["dates"]))
+            reversed_hierarchy[key] = reversed_node
+        return reversed_hierarchy
 
     def process_hierarchy(hierarchy, level, product_fieldnames, data_by_date, dataset, total_summary):
         """Recursively process hierarchy and build dataset rows"""
@@ -333,7 +357,8 @@ def get_data(work_orders, columns, filters=None):
             # Default: use month → week
             levels = ["month", "week"]
         
-        hierarchy = build_nested_hierarchy(sorted_dates, levels)
+        # Build hierarchy with reverse=True to show newest dates first in table
+        hierarchy = build_nested_hierarchy(sorted_dates, levels, reverse=True)
         process_hierarchy(hierarchy, 0, product_fieldnames, data_by_date, dataset, total_summary)
 
     # Add total row

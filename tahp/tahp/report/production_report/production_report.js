@@ -76,9 +76,7 @@ frappe.query_reports["Production Report"] = {
         // Track previous filter values
         let previous_values = {
             from_date: report.get_filter_value("from_date"),
-            to_date: report.get_filter_value("to_date"),
-            month: report.get_filter_value("month"),
-            year: report.get_filter_value("year")
+            to_date: report.get_filter_value("to_date")
         };
 
         // Handle filter clearing
@@ -100,9 +98,6 @@ frappe.query_reports["Production Report"] = {
     // Attach handlers to filter inputs
     report.page.fields_dict.from_date.$input.on('change', () => on_date_cleared_handler("from_date"));
     report.page.fields_dict.to_date.$input.on('change', () => on_date_cleared_handler("to_date"));
-    // Month & year filters
-    if (report.page.fields_dict.month) report.page.fields_dict.month.$input.on('change', () => on_date_cleared_handler("month"));
-    if (report.page.fields_dict.year) report.page.fields_dict.year.$input.on('change', () => on_date_cleared_handler("year"));
 
         // Enforce column widths after datatable render so server `width` values are respected
         frappe.query_reports["Production Report"].after_datatable_render = function(datatable) {
@@ -1014,20 +1009,12 @@ frappe.query_reports["Production Report"] = {
     },
 
     "handle_date_range_change": function() {
-        // Clear month filter when date range is selected
+        // Update group_by filter options when date range changes
         const from_date = frappe.query_report.get_filter_value("from_date");
         const to_date = frappe.query_report.get_filter_value("to_date");
 
         // Update group_by filter options
         this.update_group_by_options();
-
-        if (from_date || to_date) {
-            // Clear month filter if user selects explicit dates
-            const month_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("month");
-            if (month_filter) {
-                month_filter.set_value("");
-            }
-        }
 
         frappe.query_report.refresh();
         setTimeout(() => {
@@ -1069,32 +1056,6 @@ frappe.query_reports["Production Report"] = {
             if (!options.includes(currentValue)) {
                 groupByFilter.set_value(options[0]);
             }
-        }
-    },
-
-    "handle_month_year_change": function() {
-        const month_value = frappe.query_report.get_filter_value("month");
-        const year_value = frappe.query_report.get_filter_value("year");
-        
-        if (month_value) {
-            // Clear explicit date filters (material_consumption UX)
-            const from_date_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("from_date");
-            const to_date_filter = frappe.query_report.get_filter && frappe.query_report.get_filter("to_date");
-            if (from_date_filter) {
-                from_date_filter.set_value("");
-            }
-            if (to_date_filter) {
-                to_date_filter.set_value("");
-            }
-            frappe.show_alert({
-                message: __(`Đã chọn tháng ${month_value}/${year_value}`),
-                indicator: 'green'
-            }, 5);
-            // Re-render components after refresh
-            frappe.query_report.refresh();
-            setTimeout(() => {
-                this.render_components();
-            }, 500);
         }
     }
 };

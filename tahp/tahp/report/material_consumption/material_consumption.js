@@ -59,7 +59,24 @@ frappe.query_reports["Material Consumption"] = {
     original_columns: null,
 
     get_datatable_options(options) {
-        return { ...options, freezeIndex: 4};
+        return { ...options, freezeIndex: 5};
+    },
+
+    "formatter": function(value, row, column, data, default_formatter) {
+        // For HTML columns, return value as-is (don't escape)
+        if (column.fieldtype === "HTML" && value) {
+            return value;
+        }
+        return default_formatter(value, row, column, data);
+    },
+
+    "open_detail_dialog": function(workOrderName, dateStr) {
+        // Call detail reason dialog with work order and date
+        if (typeof frappe.custom_utils_detail_reason === 'function') {
+            frappe.custom_utils_detail_reason([workOrderName], dateStr || null, dateStr || null);
+        } else {
+            frappe.msgprint(__('Chức năng chi tiết chưa được tải. Vui lòng tải lại trang.'));
+        }
     },
     
     "onload": function(report) {

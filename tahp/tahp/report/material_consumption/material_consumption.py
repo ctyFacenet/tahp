@@ -219,9 +219,14 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
         actual_per_ton = (actual_material_qty / produced_qty) if produced_qty else 0
         planned_per_ton = (planned_material_qty / planned_prod_qty) if planned_prod_qty else 0
 
+        # Format date for detail button
+        date_str = completion_date.strftime('%Y-%m-%d') if completion_date else ''
+        detail_button = f'''<button class="btn btn-xs" onclick="frappe.query_reports['Material Consumption'].open_detail_dialog('{wo_name}', '{date_str}')" style="background:#e8f4fd;color:#2490ef;border:1px solid #c8e1f8;padding:4px 12px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;"><i class="fa fa-eye"></i> Xem</button>''' if wo_name else ''
+
         row = {
             "serial_no": index + 1,
             "consumption_date": completion_date,
+            "detail_button": detail_button,
             "work_order": wo_name,
             "material": f'<a href="/app/item/{material_code}">{material_name}</a>',
             "material_name": material_name, 
@@ -255,9 +260,10 @@ def get_detailed_data(work_orders, wo_list, prod_item_list, filters):
         dataset.append(row)
         index += 1
 
+    # Sort by date descending (newest first), then by material name ascending
     dataset.sort(
         key=lambda x: (
-            getdate(x["consumption_date"]) if x.get("consumption_date") else getdate(nowdate()),
+            -(getdate(x["consumption_date"]).toordinal() if x.get("consumption_date") else getdate(nowdate()).toordinal()),
             x["material_name"],
         )
     )
@@ -280,6 +286,7 @@ def get_columns(filters):
     else:
         columns = [
             {"label": _("Ngày hoàn thành"), "fieldname": "consumption_date", "fieldtype": "Date", "width": 120},
+            {"label": _("Chi tiết"), "fieldname": "detail_button", "fieldtype": "HTML", "width": 100, "align": "center"},
             {"label": _("Work Order"), "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order", "width": 150},
             {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
             {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
