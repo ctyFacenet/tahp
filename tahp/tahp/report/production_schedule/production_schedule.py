@@ -409,8 +409,8 @@ def get_data(planned_data, columns):
                 break
         wwo_with_dates.append((wwo_name, start_date))
     
-    # Sort by start_date (None dates will be at the end)
-    wwo_with_dates.sort(key=lambda x: x[1] if x[1] else datetime.max)
+    # Sort by start_date descending (newest first, None dates will be at the end)
+    wwo_with_dates.sort(key=lambda x: x[1] if x[1] else datetime.min, reverse=True)
     
     for wwo_name, start_date in wwo_with_dates:
         wwo_info = planned_data[wwo_name]

@@ -445,7 +445,7 @@ frappe.query_reports["Production Schedule"] = {
     "draw_daily_production_chart": function(wwo_data, container) {
         // Use the order from backend data instead of sorting by name
         const data_rows = frappe.query_report.data;
-        const wwo_names = [];
+        let wwo_names = [];
         
         // Extract wwo names in the order they appear in the data
         for (let row of data_rows) {
@@ -453,6 +453,10 @@ frappe.query_reports["Production Schedule"] = {
                 wwo_names.push(row.wwo_name);
             }
         }
+        
+        // Reverse the order for chart (oldest first, newest last)
+        // Because backend returns newest first for table display
+        wwo_names = wwo_names.reverse();
         
         if (wwo_names.length === 0) return;
 
@@ -462,16 +466,43 @@ frappe.query_reports["Production Schedule"] = {
             existing_chart.destroy();
         }
 
-        const num_lsx = wwo_names.length;
+        const num_items = wwo_names.length;
         const is_mobile = window.innerWidth < 768;
         const is_tablet = window.innerWidth >= 768 && window.innerWidth < 1024;
         
-        let bar_width_per_lsx = is_mobile ? 60 : is_tablet ? 80 : 100;
-        let canvas_width = num_lsx * bar_width_per_lsx;
+        // Get container width for responsive sizing
+        const containerWidth = container.width() || (is_mobile ? 300 : is_tablet ? 500 : 700);
+
+        // Calculate bar width based on number of items and container
+        let min_bar_width = is_mobile ? 60 : is_tablet ? 80 : 100;
+        let max_bar_width = is_mobile ? 150 : is_tablet ? 200 : 250;
+        
+        // Calculate optimal bar width
+        let bar_width_per_item = Math.max(min_bar_width, Math.min(max_bar_width, Math.floor(containerWidth / num_items)));
+        
+        // Calculate canvas dimensions
+        let canvas_width = num_items * bar_width_per_item;
         let canvas_height = is_mobile ? 250 : is_tablet ? 300 : 350;
         
-        // Đảm bảo width tối thiểu, nhưng không giới hạn max để có thể scroll
-        if (canvas_width < 300) canvas_width = 300;
+        // Ensure minimum width but also respect container width for few items
+        const min_canvas_width = 300;
+        if (canvas_width < min_canvas_width) {
+            canvas_width = min_canvas_width;
+            bar_width_per_item = Math.floor(canvas_width / num_items);
+        }
+        
+        // For few items, expand chart to fill container width
+        // This makes bars appear centered with proper spacing
+        const needsScroll = canvas_width > containerWidth - 30;
+        if (!needsScroll) {
+            // Use full container width, Chart.js will center the bars automatically
+            canvas_width = containerWidth - 30;
+        }
+        
+        // Chart container style
+        const chartContainerStyle = needsScroll
+            ? `position: relative; height: ${canvas_height}px; width: ${canvas_width}px; flex-shrink: 0;`
+            : `position: relative; height: ${canvas_height}px; width: 100%;`;
 
         // Xóa wrapper cũ trước khi tạo mới để không bị trùng lặp
         container.find('.chart-wrapper').remove();
@@ -483,16 +514,11 @@ frappe.query_reports["Production Schedule"] = {
             margin-top: 15px;
             width: 100%;
         ">
-            <div style="
-                overflow-x: auto;
+            <div class="chart-scroll-area" style="
+                overflow-x: ${needsScroll ? 'auto' : 'hidden'};
                 overflow-y: hidden;
             ">
-                <div class="chart-container" style="
-                    position: relative; 
-                    height: ${canvas_height}px;
-                    width: ${canvas_width}px;
-                    min-width: ${canvas_width}px;
-                ">
+                <div class="chart-container" style="${chartContainerStyle}">
                     <canvas id="week-plan-chart" style="cursor: pointer;"></canvas>
                 </div>
             </div>
@@ -534,8 +560,33 @@ frappe.query_reports["Production Schedule"] = {
         const padded_max_y = max_y_value > 0 ? max_y_value * 1.2 : 10;
         const padded_max_y2 = max_y2_value > 0 ? max_y2_value * 1.2 : 10;
 
+        // Calculate bar thickness based on number of items
+        // Fewer items = wider bars to fill space nicely
+        let barPercentage, categoryPercentage;
+        if (num_items <= 2) {
+            barPercentage = 0.6;
+            categoryPercentage = 0.5;
+        } else if (num_items <= 4) {
+            barPercentage = 0.7;
+            categoryPercentage = 0.6;
+        } else {
+            barPercentage = 0.8;
+            categoryPercentage = 0.7;
+        }
+
 		const datasets = [
-			{ label: 'Thực tế (Thạch cao)', data: othersActual, backgroundColor: 'rgba(14, 165, 233, 0.5)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 2, stack: 'Others', type: 'bar', order: 1 },
+			{ 
+				label: 'Thực tế (Thạch cao)', 
+				data: othersActual, 
+				backgroundColor: 'rgba(14, 165, 233, 0.5)', 
+				borderColor: 'rgba(14, 165, 233, 1)', 
+				borderWidth: 2, 
+				stack: 'Others', 
+				type: 'bar', 
+				order: 1,
+				barPercentage: barPercentage,
+				categoryPercentage: categoryPercentage
+			},
 			{ 
 				label: 'Kế hoạch (Thạch cao)', 
 				data: othersPlanned.map((p,i)=> Math.max(0, p - othersActual[i])), 
@@ -546,7 +597,9 @@ frappe.query_reports["Production Schedule"] = {
 				type: 'bar', 
 				order: 1,
 				// Lưu giá trị kế hoạch gốc để hiển thị trong tooltip
-				originalPlanned: othersPlanned
+				originalPlanned: othersPlanned,
+				barPercentage: barPercentage,
+				categoryPercentage: categoryPercentage
 			},
 			{ label: 'Kế hoạch (P2O5)', data: p2o5Planned, borderColor: 'rgba(108, 117, 125, 0.8)', backgroundColor: 'rgba(108, 117, 125, 0.0)', borderWidth: 2, fill: false, tension: 0.2, pointRadius: 4, pointHoverRadius: 6, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 1, spanGaps: true },
 			{ label: 'Thực tế (P2O5)', data: p2o5Actual, borderColor: 'rgba(220, 38, 127, 1)', backgroundColor: 'rgba(220, 38, 127, 0.0)', borderWidth: 4, fill: false, tension: 0.2, pointRadius: 6, pointHoverRadius: 8, type: 'line', yAxisID: 'y2', xAxisID: 'x', order: 0, spanGaps: true }
@@ -716,9 +769,10 @@ frappe.query_reports["Production Schedule"] = {
 							align: 'center',
 							crossAlign: 'center',
 							font: {
-								size: is_mobile ? 8 : 9
+								size: num_items <= 5 ? 12 : num_items <= 10 ? 10 : 9,
+								weight: num_items <= 5 ? 'bold' : 'normal'
 							},
-							padding: 5,
+							padding: 8,
 							callback: function(value, index, values) {
 								// Chart.js sometimes passes numeric indices as `value`.
 								// Map numeric values to the actual label string from chart data.
