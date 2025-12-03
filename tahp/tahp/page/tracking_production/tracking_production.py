@@ -758,3 +758,39 @@ def set_warning(warning_minute):
     ts = frappe.get_single("Tracking Setting")
     ts.warning_minute = int(warning_minute)
     ts.save()
+
+@frappe.whitelist()
+def get_quantity():
+    ts = frappe.get_single("Tracking Setting")
+
+    required_items = []
+    for row in ts.required_items:
+        required_items.append({
+            "item_code": row.item_code,
+            "item_name": row.item_name,
+            "percentage": row.percentage
+        })
+
+    return {
+        "finished": ts.finished or 50,
+        "required_items": required_items
+    }
+
+@frappe.whitelist()
+def set_quantity(finished, required_items):
+    ts = frappe.get_single("Tracking Setting")
+    if isinstance(required_items, str): required_items = json.loads(required_items)
+
+    if finished != ts.finished:
+        ts.finished = finished
+
+    ts.required_items = []
+
+    for row in required_items:
+        ts.append("required_items", {
+            "item_code": row.get("item_code"),
+            "item_name": row.get("item_name"),
+            "percentage": row.get("percentage")
+        })
+
+    ts.save()

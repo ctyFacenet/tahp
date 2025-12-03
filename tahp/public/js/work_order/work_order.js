@@ -358,7 +358,7 @@ async function complete_wo(frm) {
                 frappe.msgprint({
                     title: "LSX Ca đã hoàn thành!",
                     indicator: "green",
-                    message: "Trước khi kết thúc ca, vui lòng hoàn thành và bàn giao biên bản giao ca",
+                    message: "Bạn đã hoàn thành LSX Ca này. Trước khi kết thúc ca, vui lòng hoàn thành và bàn giao biên bản giao ca",
                     primary_action: {
                         label: "Mở biên bản giao ca",
                         action: () => {

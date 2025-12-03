@@ -16,6 +16,10 @@
   "eighth_step",
   "ninth_step",
   "tenth_step",
+  "section_break_ijwu",
+  "finished",
+  "column_break_mqdx",
+  "required_items",
   "section_break_upnn",
   "warning_minute"
  ],
@@ -93,13 +97,33 @@
    "fieldname": "warning_minute",
    "fieldtype": "Data",
    "label": "Th\u1eddi gian c\u1ea3nh b\u00e1o"
+  },
+  {
+   "fieldname": "section_break_ijwu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_mqdx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "required_items",
+   "fieldtype": "Table",
+   "label": "C\u1ea3nh b\u00e1o cho ti\u00eau hao",
+   "options": "Tracking Setting Required Item"
+  },
+  {
+   "default": "50",
+   "fieldname": "finished",
+   "fieldtype": "Int",
+   "label": "C\u1ea3nh b\u00e1o khi th\u00e0nh ph\u1ea9m \u00edt h\u01a1n \u0111\u1ecbnh m\u1ee9c"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-11-19 10:10:32.336294",
+ "modified": "2025-12-03 11:16:10.322572",
  "modified_by": "Administrator",
  "module": "Tahp",
  "name": "Tracking Setting",
