@@ -1,11 +1,16 @@
 import frappe
 import json
 from frappe.utils import now_datetime, get_datetime, flt
+from tahp.tahp.doctype.custom_planner.custom_planner import wwo_notify
 
 @frappe.whitelist()
 def get_consumed_produced_items(work_order):
     doc = frappe.get_doc("Work Order", work_order)
-    result = {"required": [], "produced": [], "workstation": [], "job_card": None}
+    result = {"required": [], "produced": [], "workstation": [], "job_card": None, "shift_handover": None}
+    shift_handover = frappe.db.get_all("Shift Handover", filters={"work_order": work_order}, limit=1, pluck="name")
+    if shift_handover:
+        result["shift_handover"] = shift_handover[0]
+
     for item in doc.required_items:
         result["required"].append({
             "item_code": item.item_code,
@@ -36,15 +41,17 @@ def get_consumed_produced_items(work_order):
         routing_doc = frappe.get_doc("Routing", routing)
         for row in routing_doc.operations:
             if row.custom_is_finished_operation:
-                job_card_doc = frappe.get_doc("Job Card", {"work_order": work_order, "operation": row.operation, "docstatus": 1})
-                result["job_card"] = job_card_doc.name
-                length = len(job_card_doc.custom_workstation_table)
-                for item in job_card_doc.custom_workstation_table:
-                    result["workstation"].append({
-                        "workstation": item.workstation,
-                        "qty": doc.qty / length,
-                        "uom": doc.stock_uom,
-                    })
+                job_card = frappe.db.get_all("Job Card", {"work_order": work_order, "operation": row.operation, "docstatus": 1}, limit=1, pluck="name")
+                if job_card:
+                    job_card_doc = frappe.get_doc("Job Card", job_card)
+                    result["job_card"] = job_card_doc.name
+                    length = len(job_card_doc.custom_workstation_table)
+                    for item in job_card_doc.custom_workstation_table:
+                        result["workstation"].append({
+                            "workstation": item.workstation,
+                            "qty": doc.qty / length,
+                            "uom": doc.stock_uom,
+                        })
 
     result["produced"].append({
             "item_code": doc.production_item,
@@ -142,8 +149,42 @@ def process_consumed_produced_items(work_order, required, produced, requireds_re
 
     noti_shift_handover(wo_doc)
     noti_foreman(wo_doc)
+    noti_chief(wo_doc, required, produced)
     update_wwo(wo_doc)
     return
+
+def noti_chief(wo_doc, required, produced):
+    ts = frappe.get_single("Tracking Setting")
+    result = []
+    for item in produced:
+        if item.get("scrap") == True: continue
+        actual_qty = flt(item.get("actual_qty"))
+        standard_qty = flt(item.get("standard_qty"))
+        if actual_qty != 0 and standard_qty != 0:
+            percentage = int((actual_qty / standard_qty) * 100)
+            if percentage <= ts.finished:
+                result.append(f"Sản lượng {item.get('item_name')} chỉ đạt <strong>{percentage}%</strong> so với kế hoạch ({actual_qty}/{standard_qty}).")
+    
+    for item in required:
+        actual_qty = flt(item.get("actual_qty"))
+        standard_qty = flt(item.get("standard_qty"))
+        if actual_qty != 0 and standard_qty != 0:
+            percentage = int((actual_qty / standard_qty) * 100)
+            print(percentage)
+            for row in ts.required_items:
+                if row.item_code == item.get('item_code') and percentage >= row.percentage:
+                    result.append(f"Tiêu hao {row.item_name} lên tới <strong>{percentage}%</strong> so với định mức ({actual_qty}/{standard_qty}).")
+            
+    if len(result):
+        result.insert(0, f"Cảnh báo LSX Ca <strong>{wo_doc.name}</strong>.")
+
+    content = "<br>".join(result)
+    wwo_notify(
+        role = "Giám đốc",
+        subject = content,
+        document_type="Work Order",
+        document_name=wo_doc.name,
+    )
 
 def update_wwo(wo_doc):
     if not wo_doc.custom_plan: return
@@ -226,7 +267,6 @@ def noti_shift_handover(doc):
         'Shift Handover',
         filters={'work_order': doc.name},
         fields=['name'],
-        order_by='creation desc',
         limit=1
     )
 

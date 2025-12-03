@@ -504,11 +504,12 @@ async function open_create_shift_dialog(frm) {
                         dialog.set_value('bom', row.bom);
                         dialog.set_value('item', row.item);
                         dialog.set_value('qty', remaining_qty);
-                        dialog.set_value('note', '');
+                        dialog.set_value('default_note', row.note || "");
                         dialog.set_value('planned_start_time', row.planned_start_time);
                         dialog.set_value('produced_qty', row.got_qty || 0);
                         dialog.set_value('planned_qty', row.pl_qty || 0);
                         dialog.set_value('uom', row.uom);
+                        dialog.set_value('note', '')
                     }
                 }
             },
@@ -529,7 +530,7 @@ async function open_create_shift_dialog(frm) {
             { fieldname: 'shift_leader', label: 'Trưởng ca', fieldtype: 'Link', options: 'Employee', reqd: 1 },
             
             { fieldname: 'col_break_2', fieldtype: 'Column Break' },
-            { fieldname: 'default_note', label: 'Ghi chú từ LSX Tuần', fieldtype: 'Small Text', default: frm.doc.note, read_only: 1 },
+            { fieldname: 'default_note', label: 'Ghi chú từ LSX Tuần', fieldtype: 'Small Text', read_only: 1 },
             { fieldname: 'note', label: 'Viết ghi chú cho công nhân', fieldtype: 'Text'},
         ],
         primary_action_label: 'Đồng ý',

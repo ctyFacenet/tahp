@@ -27,6 +27,18 @@ frappe.query_reports["Workstation Status Report"] = {
     formatter: function (value, row, column, data, default_formatter) {
         value = default_formatter(value, row, column, data);
 
+        if (column.fieldname === "modified" && data.modified) {
+            let modified_date = moment(data.modified, "DD-MM-YYYY HH:mm");
+            let now = moment();
+            let diff_days = now.startOf('day').diff(modified_date.startOf('day'), "days");
+            
+            if (diff_days > 1) {
+                value = `<span style="color: orange;">${value}</span>`;
+            }
+            
+            return value;
+        }
+
         if (column.fieldname === "status") {
             let base_style = `
                 padding-inline: 10px;

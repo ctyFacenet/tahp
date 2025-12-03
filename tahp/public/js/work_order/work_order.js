@@ -268,6 +268,7 @@ async function complete_wo(frm) {
     let finishedsRawData
     let workstationRawData
     let jobcard
+    let shiftHandover
 
     if (res.message === false) {
         const filters = { work_order: frm.doc.name, docstatus: 0 };
@@ -350,10 +351,24 @@ async function complete_wo(frm) {
 
             frm.reload_doc()
             d.hide();
-            frappe.show_alert({indicator: "green", message: "LSX Ca đã hoàn thành"})
-            
             const $wrapper = $(frm.fields_dict.custom_complete_wo.wrapper);
             $wrapper.empty();
+
+            if (shiftHandover) {
+                frappe.msgprint({
+                    title: "LSX Ca đã hoàn thành!",
+                    indicator: "green",
+                    message: "Bạn đã hoàn thành LSX Ca này. Trước khi kết thúc ca, vui lòng hoàn thành và bàn giao biên bản giao ca",
+                    primary_action: {
+                        label: "Mở biên bản giao ca",
+                        action: () => {
+                            frappe.set_route("Form", "Shift Handover", shiftHandover);
+                        }
+                    }
+                });
+            } else {
+                frappe.show_alert({indicator: "green", message: "LSX Ca đã hoàn thành"})
+            }
         }
     });
 
@@ -370,12 +385,13 @@ async function complete_wo(frm) {
     $thirdWrapper.css({'margin-top': '20px'})
 
     let response = await frappe.call({method: "tahp.doc_events.work_order.work_order_utils.get_consumed_produced_items", args: {work_order: frm.doc.name}})
-
+    
     // Dữ liệu khác nhau
     requiredsRawData = response.message.required
     finishedsRawData = response.message.produced
     workstationRawData = response.message.workstation
     jobcard = response.message.job_card
+    shiftHandover = response.message.shift_handover
 
     let rawWarehouse = await frappe.db.get_list('Warehouse')
     let warehouse = rawWarehouse.map(w => w.name)
@@ -649,7 +665,6 @@ async function define_table(frm, $wrapper, title, columns, data, titleColor = nu
     middleLabels.forEach(lbl => $middleHeader.append(`<div class="wo-header-cell">${lbl}</div>`));
     $rightHeader.append(`<div class="wo-header-cell">${valueLabel}</div>`);
 
-    console.log(middleLabels)
     if (middleLabels.length > 0) $mobileHeader.append($leftHeader, $middleHeader, $rightHeader)
     else $mobileHeader.append($leftHeader, $rightHeader)
     $mobileWrapper.append($mobileHeader);

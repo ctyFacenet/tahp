@@ -177,6 +177,7 @@ def handle_approve(planner, post, comment=None):
                     "bom": item.bom,
                     "planned_start_time": item.start_date,
                     "planned_end_time": item.end_date,
+                    "note": item.note if item.note else ""
                 })
                 if item.note: notes.append(f"- Ghi chú {item.item_name}: {item.note}")
 
@@ -221,7 +222,6 @@ def wwo_notify(role, subject, document_type, document_name, comment=None):
         }).insert(ignore_permissions=True)
 
     if comment:
-        print('here')
         doc = frappe.get_doc(document_type, document_name)
         doc.add_comment("Comment", f"{role}: {comment}")
 

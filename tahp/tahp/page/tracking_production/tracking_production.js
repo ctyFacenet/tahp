@@ -195,8 +195,80 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
         dialog.show();
     }
 
+    this.render_quantity_dialog = async () => {
+
+        const quantity = await frappe.xcall(
+            "tahp.tahp.page.tracking_production.tracking_production.get_quantity"
+        );
+
+        const dialog = new frappe.ui.Dialog({
+            title: "Cài đặt điều kiện cảnh báo",
+            fields: [
+                {
+                    label: "Sản lượng thực tế / kế hoạch (%)",
+                    fieldname: "finished",
+                    fieldtype: "Int",
+                    default: quantity.finished
+                },
+                {
+                    label: "Tiêu hao thực tế / kế hoạch theo mặt hàng",
+                    fieldname: "required_items",
+                    fieldtype: "Table",
+                    cannot_add_rows: false,
+                    in_place_edit: true,
+                    fields: [
+                        {
+                            label: "Mặt hàng",
+                            fieldname: "item_code",
+                            fieldtype: "Link",
+                            options: "Item",
+                            in_list_view: true,
+                            reqd: 1
+                        },
+                        {
+                            label: "% Chênh lệnh",
+                            fieldname: "percentage",
+                            fieldtype: "Int",
+                            in_list_view: true,
+                            reqd: 1
+                        }
+                    ],
+                    data: quantity.required_items || []
+                }
+            ],
+            primary_action_label: "Lưu",
+            primary_action: async (values) => {
+                if (values.required_items && values.required_items.length > 0) {
+                    for (let row of values.required_items) {
+                        if (row.percentage < 100) {
+                            frappe.msgprint({
+                                title: "Lỗi dữ liệu",
+                                indicator: "red",
+                                message: `Giá trị % tại bản ghi <strong>${row.item_name || "(chưa chọn)"}</strong> phải ≥ 100%`
+                            });
+                            return;
+                        }
+                    }
+                }
+
+                await frappe.xcall(
+                    "tahp.tahp.page.tracking_production.tracking_production.set_quantity",
+                    {
+                        finished: values.finished,
+                        required_items: values.required_items
+                    }
+                );
+                dialog.hide();
+                frappe.show_alert({indicator: "green", message: "Cập nhật thành công"})
+            }
+        });
+
+        dialog.show();
+    }
+
     page.add_button("Cài đặt deadline", () => me.render_deadline_dialog());
     page.add_button("Cài đặt đánh giá thời gian", () => me.render_warning_dialog());
+    page.add_button("Cài đặt điều kiện cảnh báo", () => me.render_quantity_dialog());
 
 };
 
