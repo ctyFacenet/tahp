@@ -42,7 +42,7 @@ def get_consumed_produced_items(work_order):
                 for item in job_card_doc.custom_workstation_table:
                     result["workstation"].append({
                         "workstation": item.workstation,
-                        "qty": doc.qty / 4,
+                        "qty": doc.qty / length,
                         "uom": doc.stock_uom,
                     })
 
