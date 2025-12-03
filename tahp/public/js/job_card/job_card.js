@@ -900,18 +900,15 @@ frappe.ui.form.on('Job Card', {
             }
         }
 
-        const message = `Xác nhận hoàn thành LSX Công đoạn?`;
-        await new Promise((resolve, reject) => {
-            frappe.confirm(message, resolve, () => {
-                reject();
-                return;
-            });
-        });
-
-        await frappe.call({
-            method: "tahp.doc_events.job_card.job_card.submit",
-            args: { job_card: frm.doc.name }
-        });
+        frappe.confirm(
+            "Xác nhận hoàn thành LSX Công đoạn?",
+            () => {
+                frappe.call({
+                    method: "tahp.doc_events.job_card.job_card.submit",
+                    args: { job_card: frm.doc.name }
+                });
+            }
+        );
     },
 
     transfer_job_card: async function(frm) {

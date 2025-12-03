@@ -271,6 +271,8 @@ def get_workstations(job_card):
             "status": "Sẵn sàng"
         })
 
+    result.sort(key=lambda x: x["workstation"])
+
     return result
 
 @frappe.whitelist()

@@ -5,7 +5,11 @@ from frappe.utils import now_datetime, get_datetime, flt
 @frappe.whitelist()
 def get_consumed_produced_items(work_order):
     doc = frappe.get_doc("Work Order", work_order)
-    result = {"required": [], "produced": [], "workstation": [], "job_card": None}
+    result = {"required": [], "produced": [], "workstation": [], "job_card": None, "shift_handover": None}
+    shift_handover = frappe.db.get_all("Shift Handover", filters={"work_order": work_order}, limit=1, pluck="name")
+    if shift_handover:
+        result["shift_handover"] = shift_handover[0]
+
     for item in doc.required_items:
         result["required"].append({
             "item_code": item.item_code,
@@ -226,7 +230,6 @@ def noti_shift_handover(doc):
         'Shift Handover',
         filters={'work_order': doc.name},
         fields=['name'],
-        order_by='creation desc',
         limit=1
     )
 
