@@ -57,9 +57,10 @@ frappe.query_reports["Production Variance Trace Report"] = {
 
 	"formatter": function(value, row, column, data, default_formatter) {
 		// For HTML columns, return value as-is (don't escape)
-		if (column.fieldtype === "HTML" && value) {
-			return value;
+		if (column.fieldname == "work_order" && value) {
+			return `<strong>${value}</strong>`;
 		}
+
 		// For Data columns with HTML content
 		if (column.fieldtype === "Data" && value && typeof value === 'string' && value.includes('<')) {
 			return value;

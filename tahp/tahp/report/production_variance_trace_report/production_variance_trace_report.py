@@ -22,7 +22,7 @@ def execute(filters=None):
 		{"label": "SL cần SX", "fieldname": "planned_qty", "fieldtype": "Data", "width": 130, "align": "right"},
 		{"label": "Thành phẩm thực tế", "fieldname": "actual_item", "fieldtype": "Data", "width": 250},
 		{"label": "SL thực tế", "fieldname": "actual_qty", "fieldtype": "Data", "width": 130, "align": "right"},
-		{"label": "Đơn vị", "fieldname": "uom", "fieldtype": "Data", "width": 100, "align": "right"},
+		{"label": "Đơn vị", "fieldname": "uom", "fieldtype": "Data", "width": 100, "align": "center"},
 	]
 	data = []
 
@@ -84,20 +84,7 @@ def execute(filters=None):
 
 		# Nếu chỉ có 1 thành phẩm thực tế VÀ trùng với thành phẩm gốc, hiển thị trực tiếp
 		if len(items_nonzero) == 1 and items_nonzero[0].item_code == wo.production_item:
-			single_item = items_nonzero[0]
-			item_display = single_item.get("item_name") or single_item.item_code
-			row = {
-				"production_date": wo.planned_start_date,
-				"work_order": rec.work_order,
-				"shift_leader": wo.custom_shift_leader,
-				"original_item": original_item_name,
-				"planned_qty": f"{wo.qty:,.0f}" if wo.qty else "",
-				"actual_item": item_display,
-				"actual_qty": single_item.qty,
-				"uom": single_item.get("stock_uom") or original_uom,
-				"indent": 0,
-			}
-			data.append(row)
+			continue
 		else:
 			# Tìm item trùng với thành phẩm gốc
 			matching_item = None
@@ -147,7 +134,7 @@ def execute(filters=None):
 					"shift_leader": "",
 					"original_item": "",
 					"planned_qty": "",
-					"actual_item": f"&nbsp;&nbsp;└ {item_display}",
+					"actual_item": f"{item_display}",
 					"actual_qty": item.qty,
 					"uom": item.get("stock_uom") or "",
 					"indent": 1,

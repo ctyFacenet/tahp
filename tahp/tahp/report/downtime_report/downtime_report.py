@@ -63,13 +63,13 @@ def execute(filters=None):
         {"label": "Tên thiết bị", "fieldname": "equipment_name", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 200},
         {"label": "Cụm máy", "fieldname": "machine_group", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 180},
         {"label": "Hệ", "fieldname": "category", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 150},
-        {"label": "Ca", "fieldname": "shift_code", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 190},
+        {"label": "Ca", "fieldname": "shift_code", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 250},
         {"label": "Ngày", "fieldname": "date", "fieldtype": "Date", 'dropdown': False, 'sortable': False, "width": 120},
         {"label": "Bắt đầu dừng", "fieldname": "start_time", "fieldtype": "Time", 'dropdown': False, 'sortable': False, "width": 120},
         {"label": "Kết thúc dừng", "fieldname": "end_time", "fieldtype": "Time", 'dropdown': False, 'sortable': False, "width": 120},
-        {"label": "Tổng thời gian", "fieldname": "total_duration", "fieldtype": "Duration", 'dropdown': False, 'sortable': False, "width": 150},
+        {"label": "Tổng thời gian", "fieldname": "total_duration", "fieldtype": "Duration", 'dropdown': False, 'sortable': False, "width": 250},
         {"label": "Nhóm nguyên nhân", "fieldname": "reason_group", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 180},
-        {"label": "Nguyên nhân", "fieldname": "reason_detail", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 200},
+        {"label": "Nguyên nhân", "fieldname": "reason_detail", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 300},
         {"label": "Người ghi nhận", "fieldname": "recorder", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 150},
     ]
 
