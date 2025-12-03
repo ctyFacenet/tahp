@@ -227,7 +227,7 @@
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-10-10 22:46:43.259787",
+  "modified": "2025-12-03 17:16:53.086299",
   "name": "Phát triển công nghệ",
   "role_profile": "Phát triển công nghệ",
   "roles": [
@@ -266,19 +266,13 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Employee"
-   },
-   {
-    "parent": "Phát triển công nghệ",
-    "parentfield": "roles",
-    "parenttype": "Role Profile",
-    "role": "Quản đốc"
    }
   ]
  },
  {
   "docstatus": 0,
   "doctype": "Role Profile",
-  "modified": "2025-11-26 11:56:43.417679",
+  "modified": "2025-12-03 17:16:49.470638",
   "name": "Giám đốc",
   "role_profile": "Giám đốc",
   "roles": [
@@ -563,12 +557,6 @@
     "parentfield": "roles",
     "parenttype": "Role Profile",
     "role": "Workspace Manager"
-   },
-   {
-    "parent": "Giám đốc",
-    "parentfield": "roles",
-    "parenttype": "Role Profile",
-    "role": "Quản đốc"
    },
    {
     "parent": "Giám đốc",
