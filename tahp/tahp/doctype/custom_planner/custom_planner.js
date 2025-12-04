@@ -455,6 +455,7 @@ frappe.ui.form.on("Custom Planner", {
                 });
 
                 temp.refresh();
+                if (f.fieldname == "qty") $(temp.$input).css("font-size", "1.2rem");
                 if (item && item[f.fieldname] != null) {
                     if (f.fieldtype === 'Float') {
                         temp.$input.val(Number(item[f.fieldname]));
