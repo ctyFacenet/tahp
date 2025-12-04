@@ -222,6 +222,7 @@ frappe.query_reports["Production Report"] = {
                     .chart-section {
                         width: 100% !important;
                         min-width: auto !important;
+                        margin-top: 15px;
                     }
                     
                     .progress-grid {
@@ -385,10 +386,10 @@ frappe.query_reports["Production Report"] = {
             });
         });
 
-        // Return both categories
+        // Return both categories (Thạch cao first)
         return [
-            { name: 'P2O5', ...p2o5 },
-            { name: 'Thạch cao', ...others }
+            { name: 'Thạch cao', ...others },
+            { name: 'P2O5', ...p2o5 }
         ];
     },
 
@@ -420,8 +421,7 @@ frappe.query_reports["Production Report"] = {
                     border: 1px solid #e0e0e0; 
                     border-radius: 10px; 
                     padding: 15px; 
-                    box-shadow: 0 3px 5px rgba(0,0,0,0.06);
-                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                    transition: transform 0.2s ease;
                     min-height: 110px;
                     display: flex;
                     flex-direction: column;
@@ -483,8 +483,8 @@ frappe.query_reports["Production Report"] = {
             
             // Add hover effect
             card.hover(
-                function() { $(this).css('transform', 'translateY(-2px)').css('box-shadow', '0 8px 15px rgba(0,0,0,0.12)'); },
-                function() { $(this).css('transform', 'translateY(0)').css('box-shadow', '0 4px 6px rgba(0,0,0,0.07)'); }
+                function() { $(this).css('transform', 'translateY(-2px)'); },
+                function() { $(this).css('transform', 'translateY(0)'); }
             );
             
             gridContainer.append(card);
@@ -707,9 +707,8 @@ frappe.query_reports["Production Report"] = {
         const chartWrapper = $(`<div class="chart-wrapper" style="
             border-radius: 12px;
             background: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border: 1px solid #e0e0e0;
             padding: 15px;
-            margin-top: 15px;
         ">
             <div class="chart-scroll-area" style="
                 overflow-x: ${needsScroll ? 'auto' : 'hidden'};
@@ -728,7 +727,7 @@ frappe.query_reports["Production Report"] = {
                 text-align: center;
                 width: 100%;
             ">
-                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Orders.</em>
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Nhấn vào cột để xem chi tiết LSX Ca.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
