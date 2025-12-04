@@ -280,8 +280,8 @@ def get_columns(filters):
         columns = [
             {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
             {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
-            {"label": _("Tổng Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150},
-            {"label": _("Tổng Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150},
+            {"label": _("Tổng Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150, "precision": 2},
+            {"label": _("Tổng Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150, "precision": 2},
         ]
     else:
         columns = [
@@ -290,8 +290,8 @@ def get_columns(filters):
             {"label": _("Work Order"), "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order", "width": 150},
             {"label": _("Nguyên liệu"), "fieldname": "material", "fieldtype": "HTML", "width": 200},
             {"label": _("Đơn vị"), "fieldname": "uom", "fieldtype": "Link", "options": "UOM", "width": 100},
-            {"label": _("SL Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150},
-            {"label": _("SL Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150},
+            {"label": _("SL Thực tế"), "fieldname": "total_actual_qty", "fieldtype": "Float", "width": 150, "precision": 2},
+            {"label": _("SL Định mức"), "fieldname": "total_planned_qty", "fieldtype": "Float", "width": 150, "precision": 2},
         ]
 
     work_orders = get_work_orders(filters)
@@ -315,6 +315,7 @@ def get_columns(filters):
                 "fieldtype": "Float",
                 "width": width,
                 "parent": item_name,
+                "precision": 2,
             })
             
             columns.append({
@@ -322,7 +323,8 @@ def get_columns(filters):
                 "fieldname": scrubbed_name + "_planned_per_ton",
                 "fieldtype": "Float",
                 "width": width,
-                "parent": item_name
+                "parent": item_name,
+                "precision": 2,
             })
             
             # Add hidden columns for chart data
