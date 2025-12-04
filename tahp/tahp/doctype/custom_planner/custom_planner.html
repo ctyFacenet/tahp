@@ -72,6 +72,8 @@
                                                     {% endif%}
                                                 </div>
                                                 <div class="planner-bom-materials d-none d-md-block mt-2" style="color: grey; font-size: 10px;"></div>
+                                            {% elif field == "qty" %}
+                                                <span style="font-size: 1.2rem;">{{value}}</span>
                                             {% else %}
                                                 {{value}}
                                             {% endif %}
