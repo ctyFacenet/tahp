@@ -294,7 +294,7 @@ async function execute_summary(report) {
             html += `</tr>`;
         });
 
-        html += `</tbody></table>*Dữ liệu được cập nhật theo ca gần nhất</div>`;
+        html += `</tbody></table>*Dữ liệu được cập nhật theo ca gần nhất. Thiết bị lâu không sử dụng sẽ được đánh màu vàng</div>`;
         return html;
     }
 

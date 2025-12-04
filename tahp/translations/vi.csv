@@ -14046,14 +14046,14 @@ Operation Tracker Inspection, Phiếu đo định kỳ
 Operation Tracker Evaluation, Khuyến nghị theo kết quả đo
 BOM Custom Search, Tìm kiếm BOM
 Downtime Report, Báo cáo dừng máy
-Production Order Weekly Report, Báo cáo tiến độ LSX
+Production Order Weekly Report, Tiến độ thực hiện LSX cụ thể
 Problem Reason, Lý do hỏng máy
-Production Report, Báo cáo sản lượng Thạch cao & P2O5
-Workstation Status Report, Báo cáo trạng thái thiết bị
-Material Consumption, Báo cáo tiêu hao nguyên liệu theo LSX Ca
-Production Schedule, Báo cáo tiến độ sản xuất theo LSX
-Manufacturing Dashboard, Báo cáo sản lượng theo phân loại
-Manufacturing dashboard, Báo cáo sản lượng theo phân loại
+Production Report, Theo dõi sản lượng theo ngày
+Workstation Status Report, Trạng thái thiết bị
+Material Consumption, Tiêu hao nguyên liệu toàn bộ LSX Ca
+Production Schedule, Theo dõi sản lượng toàn bộ LSX
+Manufacturing Dashboard, Tổng quan sản xuất theo phân loại
+Manufacturing dashboard, Tổng quan sản xuất theo phân loại
 Custom Invoice, Hóa đơn
 Custom Invoice Allocation, Phiếu nhập xuất có hóa đơn
 Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho

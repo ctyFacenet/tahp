@@ -25,8 +25,6 @@ frappe.query_reports["Production Order Weekly Report"] = {
     ],
 
     onload: async function(report) {
-        report.page.set_title("Báo cáo tiến độ Lệnh sản xuất tuần");
-
         const r = await frappe.call({
             method: "tahp.tahp.report.production_order_weekly_report.production_order_weekly_report.get_ww_orders"
         });

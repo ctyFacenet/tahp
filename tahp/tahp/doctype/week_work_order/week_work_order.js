@@ -705,6 +705,14 @@ async function update_quantity(frm) {
     table.refresh();
     table.grid.display_status = "Read"
     table.grid.wrapper.find('.grid-add-row, .grid-remove-rows, .row-check').hide();
+    
+    frm.add_custom_button("Xem báo cáo tiến độ", () => {
+        frappe.set_route(
+            "query-report",
+            "Production Order Weekly Report",
+            { ww_order: frm.doc.name }
+        );
+    });
 }
 
 async function stop_wwo(frm) {

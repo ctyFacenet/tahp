@@ -31,12 +31,12 @@ def execute(filters=None):
     columns = [
         {"label": "Mặt hàng", "fieldname": "item", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 200},
         {"label": "ĐVT", "fieldname": "unit", "fieldtype": "Data", 'dropdown': False, 'sortable': False, "width": 80},
-        {"label": "Thực tế", "fieldname": "actual", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
-        {"label": "Kế hoạch", "fieldname": "planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "Thực tế", "fieldname": "actual", "fieldtype": "Float", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "Kế hoạch", "fieldname": "planned", "fieldtype": "Float", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "Chênh lệch", "fieldname": "variance", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "%Thực tế/Kế hoạch", "fieldname": "percent_actual", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
-        {"label": "Lũy kế thực tế", "fieldname": "cumulative_actual", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
-        {"label": "Kế hoạch tuần", "fieldname": "cumulative_planned", "fieldtype": "Int", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "Lũy kế thực tế", "fieldname": "cumulative_actual", "fieldtype": "Float", 'dropdown': False, 'sortable': False, "width": 130},
+        {"label": "Kế hoạch tuần", "fieldname": "cumulative_planned", "fieldtype": "Float", 'dropdown': False, 'sortable': False, "width": 130},
         {"label": "%Hoàn thành", "fieldname": "percent_cumulative", "fieldtype": "Percent", 'dropdown': False, 'sortable': False, "width": 180},
     ]
     data = []
