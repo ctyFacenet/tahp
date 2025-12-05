@@ -509,9 +509,8 @@ frappe.query_reports["Production Schedule"] = {
         const chartWrapper = $(`<div class="chart-wrapper" style="
             border-radius: 12px;
             background: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border: 1px solid #e0e0e0;
             padding: 15px;
-            margin-top: 15px;
             width: 100%;
         ">
             <div class="chart-scroll-area" style="
@@ -530,7 +529,7 @@ frappe.query_reports["Production Schedule"] = {
                 color: #6c757d;
                 text-align: left;
             ">
-                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Click vào cột để xem chi tiết Work Order.</em>
+                <em>% trong biểu đồ là so sánh kế hoạch và thực tế của thạch cao. Nhấn vào cột để xem chi tiết LSX.</em>
             </div>
         </div>`);
         container.append(chartWrapper);
