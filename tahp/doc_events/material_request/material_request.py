@@ -40,3 +40,30 @@ def get_approved_week_work_orders():
             })
     
     return result
+
+@frappe.whitelist()
+def get_supplier_item_rate(item_code):
+    """
+    Lấy đơn giá và xuất xứ từ Supplier Item Rate cho mã mặt hàng
+    """
+    if not item_code:
+        return {}
+    
+    # Lấy giá từ Supplier Item Rate
+    supplier_item_rate = frappe.get_all(
+        'Supplier Item Rate',
+        filters={
+            'item_code': item_code
+        },
+        fields=['rate', 'origin'],
+        order_by='modified desc',
+        limit=1
+    )
+    
+    if supplier_item_rate:
+        return {
+            'rate': supplier_item_rate[0].get('rate', 0),
+            'origin': supplier_item_rate[0].get('origin', '')
+        }
+    
+    return {'rate': 0, 'origin': ''}
