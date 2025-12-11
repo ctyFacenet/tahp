@@ -239,7 +239,7 @@ frappe.ui.form.on('Material Request', {
                                                     if (existingItemsMap[item_code]) {
                                                         // Item đã tồn tại - cộng dồn số lượng
                                                         let existingRow = existingItemsMap[item_code].row;
-                                                        existingRow.custom_expected_qty = (existingRow.custom_expected_qty || 0) + qty_to_add;
+                                                        existingRow.qty = (existingRow.qty || 0) + qty_to_add;
                                                         existingRow.stock_qty = (existingRow.stock_qty || 0) + stock_qty_to_add;
                                                     } else {
                                                         // Item mới - thêm dòng mới
@@ -251,7 +251,7 @@ frappe.ui.form.on('Material Request', {
                                                       
                                                         row.item_name = bom_item.item_name;
                                                         row.description = bom_item.description;
-                                                        row.custom_expected_qty = qty_to_add;
+                                                        row.qty = qty_to_add;
                                                         row.stock_qty = stock_qty_to_add;
                                                         row.uom = bom_item.uom;
                                                         row.stock_uom = bom_item.stock_uom;
@@ -276,6 +276,7 @@ frappe.ui.form.on('Material Request', {
                                 frm.dirty();
                                 frm.refresh_field('items');
                                 frm.fields_dict.items.grid.refresh();
+                                add_total_row(frm);
 
                                 let finalItemCount = Object.keys(existingItemsMap).length;
                                 frappe.show_alert({
@@ -575,3 +576,71 @@ frappe.ui.form.on('Material Request', {
         }
     }
 });
+function add_total_row(frm) {
+    
+    setTimeout(() => {
+        // Tìm grid-body
+        let $gridBody = frm.fields_dict.items.$wrapper.find('.grid-body');
+        console.log('$gridBody found:', $gridBody.length);
+        
+        // Xóa hàng tổng cộng cũ nếu có
+        $gridBody.find('.total-row').remove();
+        
+        // Tính tổng số lượng cột Qty
+        let totalQty = 0;
+        
+        if (frm.doc.items) {
+            frm.doc.items.forEach(item => {
+                totalQty += (item.qty || 0);
+            });
+        }
+        
+        console.log('totalQty:', totalQty);
+        
+        // Clone một row thật để giữ nguyên width của từng cột
+        let $templateRow = $gridBody.find('.grid-row').first();
+        let $totalRow = $templateRow.clone();
+        
+        $totalRow.removeClass('grid-row').addClass('total-row');
+        $totalRow.css({
+            'background-color': '#f8f9fa',
+            'font-weight': 'bold',
+            'border-top': '2px solid #d1d8dd'
+        });
+        
+        // Xóa tất cả nội dung các cột
+        $totalRow.find('.col').each(function(index) {
+            let $col = $(this);
+            $col.empty();
+            $col.find('*').remove();
+            
+            // Tìm fieldname
+            let fieldname = $col.attr('data-fieldname');
+            
+            if (fieldname === 'qty') {
+                $col.text(totalQty.toFixed(2));
+                $col.css({
+                    'text-align': 'right',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'justify-content': 'flex-end',
+                    'padding': '10px 8px'
+                });
+            } else if (index === 2) {
+                // Hiển thị "TỔNG CỘNG:" ở cột thứ 2 (giữa 3 cột đầu)
+                $col.text('TỔNG CỘNG:');
+                $col.css({
+                    'text-align': 'center',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'justify-content': 'center',
+                    'font-weight': 'bold',
+                    'padding': '10px 0'
+                });
+            }
+        });
+        
+        $gridBody.append($totalRow);
+        console.log('Đã append totalRow vào grid-body');
+    }, 500);
+}

@@ -1,6 +1,9 @@
 frappe.listview_settings['Material Request'] = {
     has_indicator_for_draft: true,
+    hide_name_column: true,
     add_fields: ["workflow_state", "custom_request_code", "custom_request_type", "custom_priority", "custom_department", "custom_request_reason"],
+    
+    
     
     get_indicator: function (doc) {
         const state = doc.workflow_state || "Nháp";
