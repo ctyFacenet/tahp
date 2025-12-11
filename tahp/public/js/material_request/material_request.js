@@ -78,7 +78,7 @@ frappe.ui.form.on('Material Request', {
             frm.fields_dict['items'].grid.add_custom_button(__('Chọn mặt hàng từ BOM'), function () {
             // Tạo dialog
             let currentYear = new Date().getFullYear();
-            // build year options: currentYear-1 .. currentYear+1
+           
             let yearOptions = [];
             for (let y = currentYear - 1; y <= currentYear + 1; y++) {
                 yearOptions.push(String(y));
@@ -272,6 +272,20 @@ frappe.ui.form.on('Material Request', {
                             });
 
                             Promise.all(promises).then(() => {
+                                // Xóa các dòng trống (không có item_code)
+                                let itemsToRemove = [];
+                                frm.doc.items.forEach((item, index) => {
+                                    if (!item.item_code) {
+                                        itemsToRemove.push(item);
+                                    }
+                                });
+                                
+                                itemsToRemove.forEach(item => {
+                                    let row_to_remove = frm.fields_dict.items.grid.grid_rows_by_docname[item.name];
+                                    if (row_to_remove) {
+                                        row_to_remove.remove();
+                                    }
+                                });
                               
                                 frm.dirty();
                                 frm.refresh_field('items');
@@ -314,56 +328,55 @@ frappe.ui.form.on('Material Request', {
 
                        
                         (function buildYearOptionsFromData() {
-                            try {
-                                let yearsSet = new Set();
-                                let hasNoDate = false;
-                                stored_results.forEach((result) => {
-                                    let dateStr = null;
-                                    if (result.items && result.items.length) {
-                                        let times = result.items.map(it => it.planned_start_time).filter(Boolean);
-                                        if (times.length > 0) {
-                                            let dates = times.map(t => new Date(t)).filter(d => !isNaN(d.getTime()));
-                                            dates.sort((a, b) => a - b);
-                                            if (dates.length > 0) {
-                                                let earliest = dates[0];
-                                                dateStr = earliest.toISOString().split('T')[0];
-                                            }
+                            
+                            
+                            let yearsSet = new Set();
+                            let hasNoDate = false;
+                            stored_results.forEach((result) => {
+                                let dateStr = null;
+                                if (result.items && result.items.length) {
+                                    let times = result.items.map(it => it.planned_start_time).filter(Boolean);
+                                    if (times.length > 0) {
+                                        let dates = times.map(t => new Date(t)).filter(d => !isNaN(d.getTime()));
+                                        dates.sort((a, b) => a - b);
+                                        if (dates.length > 0) {
+                                            let earliest = dates[0];
+                                            dateStr = earliest.toISOString().split('T')[0];
                                         }
                                     }
-                                    if (!dateStr && result.planned_start_time) {
-                                        dateStr = ('' + result.planned_start_time).split('T')[0];
-                                    }
-                                    if (!dateStr) {
-                                        hasNoDate = true;
-                                    } else {
-                                        let y = dateStr.split('-')[0];
-                                        if (y) yearsSet.add(y);
-                                    }
-                                });
-
-                                let years = Array.from(yearsSet).map(y => String(y)).sort((a, b) => b.localeCompare(a));
-
-                                
-                                let optionsHTML = [];
-                                years.forEach(y => { optionsHTML.push(`<option value="${y}">${y}</option>`); });
-                                if (hasNoDate) {
-                                    optionsHTML.push(`<option value="0000">Không có ngày</option>`);
                                 }
-
-                               
-                                if (optionsHTML.length === 0) {
-                                    let cy = String(new Date().getFullYear());
-                                    optionsHTML.push(`<option value="${cy}">${cy}</option>`);
+                                if (!dateStr && result.planned_start_time) {
+                                    dateStr = ('' + result.planned_start_time).split('T')[0];
                                 }
-
-                                
-                                if (d.fields_dict && d.fields_dict.year_filter && d.fields_dict.year_filter.$input) {
-                                    d.fields_dict.year_filter.$input.html(optionsHTML.join('\n'));
+                                if (!dateStr) {
+                                    hasNoDate = true;
+                                } else {
+                                    let y = dateStr.split('-')[0];
+                                    if (y) yearsSet.add(y);
                                 }
-                            } catch (e) {
-                                
-                                console.error('buildYearOptionsFromData error', e);
+                            });
+
+                            let years = Array.from(yearsSet).map(y => String(y)).sort((a, b) => b.localeCompare(a));
+
+                            
+                            let optionsHTML = [];
+                            years.forEach(y => { optionsHTML.push(`<option value="${y}">${y}</option>`); });
+                            if (hasNoDate) {
+                                optionsHTML.push(`<option value="0000">Không có ngày</option>`);
                             }
+
+                            
+                            if (optionsHTML.length === 0) {
+                                let cy = String(new Date().getFullYear());
+                                optionsHTML.push(`<option value="${cy}">${cy}</option>`);
+                            }
+
+                            
+                            if (d.fields_dict && d.fields_dict.year_filter && d.fields_dict.year_filter.$input) {
+                                d.fields_dict.year_filter.$input.html(optionsHTML.join('\n'));
+                            }
+                            
+                            
                         })();
 
                         const renderForYear = (year) => {
@@ -581,24 +594,35 @@ function add_total_row(frm) {
     setTimeout(() => {
         // Tìm grid-body
         let $gridBody = frm.fields_dict.items.$wrapper.find('.grid-body');
-        console.log('$gridBody found:', $gridBody.length);
+        
         
         // Xóa hàng tổng cộng cũ nếu có
         $gridBody.find('.total-row').remove();
         
-        // Tính tổng số lượng cột Qty
-        let totalQty = 0;
-        
-        if (frm.doc.items) {
-            frm.doc.items.forEach(item => {
-                totalQty += (item.qty || 0);
-            });
+        // Kiểm tra xem còn items không
+        if (!frm.doc.items || frm.doc.items.length === 0) {
+           
+            return;
         }
         
-        console.log('totalQty:', totalQty);
+        // Tính tổng số lượng cột Qty và custom_estimated_amount
+        let totalQty = 0;
+        let totalEstimatedAmount = 0;
         
-        // Clone một row thật để giữ nguyên width của từng cột
+        frm.doc.items.forEach(item => {
+            totalQty += (item.qty || 0);
+            totalEstimatedAmount += (item.custom_estimated_amount || 0);
+        });
+        
+      
+        
+        // Kiểm tra xem có grid-row không
         let $templateRow = $gridBody.find('.grid-row').first();
+        if ($templateRow.length === 0) {
+            
+            return;
+        }
+        
         let $totalRow = $templateRow.clone();
         
         $totalRow.removeClass('grid-row').addClass('total-row');
@@ -626,8 +650,17 @@ function add_total_row(frm) {
                     'justify-content': 'flex-end',
                     'padding': '10px 8px'
                 });
+            } else if (fieldname === 'custom_estimated_amount') {
+                $col.text(totalEstimatedAmount.toFixed(2));
+                $col.css({
+                    'text-align': 'right',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'justify-content': 'flex-end',
+                    'padding': '10px 8px'
+                });
             } else if (index === 2) {
-                // Hiển thị "TỔNG CỘNG:" ở cột thứ 2 (giữa 3 cột đầu)
+               
                 $col.text('TỔNG CỘNG:');
                 $col.css({
                     'text-align': 'center',
@@ -641,6 +674,72 @@ function add_total_row(frm) {
         });
         
         $gridBody.append($totalRow);
-        console.log('Đã append totalRow vào grid-body');
+        
     }, 500);
+}
+
+// Event khi thay đổi Material Request Item
+frappe.ui.form.on('Material Request Item', {
+    items_add: function(frm, cdt, cdn) {
+       
+        add_total_row(frm);
+    },
+    
+    items_remove: function(frm, cdt, cdn) {
+       
+        add_total_row(frm);
+    },
+    
+    qty: function(frm, cdt, cdn) {
+        add_total_row(frm);
+    },
+    
+    item_code: async function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        if (!row.item_code) return;
+        
+        
+        const response = await frappe.call({
+            method: 'tahp.doc_events.material_request.material_request.get_supplier_item_rate',
+            args: {
+                item_code: row.item_code
+            }
+        });
+        
+        if (response.message) {
+            const data = response.message;
+            // Điền đơn giá dự kiến
+            frappe.model.set_value(cdt, cdn, 'custom_estimated_rate', data.rate || 0);
+            // Điền xuất xứ nếu có field
+            if (data.origin) {
+                frappe.model.set_value(cdt, cdn, 'custom_origin', data.origin);
+            }
+        }
+        
+        add_total_row(frm);
+    },
+
+    custom_actual_qty_v1: function(frm, cdt, cdn) {
+        calculate_estimated_amount(frm, cdt, cdn);
+        add_total_row(frm);
+    },
+
+    custom_estimated_rate: function(frm, cdt, cdn) {
+        calculate_estimated_amount(frm, cdt, cdn);
+        add_total_row(frm);
+    },
+
+    custom_estimated_amount: function(frm, cdt, cdn) {
+        add_total_row(frm);
+    }
+});
+
+function calculate_estimated_amount(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    
+    let actual_qty = row.custom_actual_qty_v1 || 0;
+    let estimated_rate = row.custom_estimated_rate || 0;
+    let estimated_amount = actual_qty * estimated_rate;
+    
+    frappe.model.set_value(cdt, cdn, 'custom_estimated_amount', estimated_amount);
 }
