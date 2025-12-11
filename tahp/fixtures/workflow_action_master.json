@@ -2,6 +2,13 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
+  "modified": "2025-12-11 01:07:40.390097",
+  "name": "Gửi trưởng BP",
+  "workflow_action_name": "Gửi trưởng BP"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
   "modified": "2025-09-15 11:50:15.847947",
   "name": "Không chọn",
   "workflow_action_name": "Không chọn"
@@ -72,13 +79,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-15 08:50:24.379301",
-  "name": "Gửi thủ kho",
-  "workflow_action_name": "Gửi thủ kho"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-15 11:46:06.495481",
   "name": "Chọn",
   "workflow_action_name": "Chọn"
@@ -89,13 +89,6 @@
   "modified": "2025-10-08 15:48:03.884722",
   "name": "Gửi Kế toán",
   "workflow_action_name": "Gửi Kế toán"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
-  "modified": "2025-09-18 12:35:54.969203",
-  "name": "Từ chối",
-  "workflow_action_name": "Từ chối"
  },
  {
   "docstatus": 0,
@@ -135,13 +128,6 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-07 17:33:01.412193",
-  "name": "Gửi GĐ",
-  "workflow_action_name": "Gửi GĐ"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow Action Master",
   "modified": "2025-09-07 17:32:54.383149",
   "name": "Trả về KHSX",
   "workflow_action_name": "Trả về KHSX"
@@ -163,6 +149,20 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
+  "modified": "2025-09-15 08:55:05.159246",
+  "name": "Duyệt",
+  "workflow_action_name": "Duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-15 08:50:24.379301",
+  "name": "Gửi thủ kho",
+  "workflow_action_name": "Gửi thủ kho"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
   "modified": "2025-09-07 17:32:48.039604",
   "name": "Gửi KHSX",
   "workflow_action_name": "Gửi KHSX"
@@ -170,8 +170,15 @@
  {
   "docstatus": 0,
   "doctype": "Workflow Action Master",
-  "modified": "2025-09-15 08:55:05.159246",
-  "name": "Duyệt",
-  "workflow_action_name": "Duyệt"
+  "modified": "2025-09-18 12:35:54.969203",
+  "name": "Từ chối",
+  "workflow_action_name": "Từ chối"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2025-09-07 17:33:01.412193",
+  "name": "Gửi GĐ",
+  "workflow_action_name": "Gửi GĐ"
  }
 ]
