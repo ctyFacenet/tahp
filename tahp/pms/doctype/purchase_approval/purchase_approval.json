@@ -289,7 +289,8 @@
   },
   {
    "fieldname": "section_break_khsi",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fieldname": "items",
@@ -300,7 +301,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-11 10:13:01.602884",
+ "modified": "2025-12-11 15:22:36.972926",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Purchase Approval",

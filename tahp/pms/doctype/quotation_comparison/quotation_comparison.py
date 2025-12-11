@@ -172,7 +172,6 @@ def add_request(names, comparison):
     
     comparison_doc.save(ignore_permissions=True)      
 
-
             
 
             
