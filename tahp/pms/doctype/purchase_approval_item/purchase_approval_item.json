@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-10 23:31:34.603583",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "stock_uom",
+  "origin",
+  "column_break_ccst",
+  "qty",
+  "actual_qty",
+  "stock_qty",
+  "average_rate",
+  "column_break_wvuk",
+  "rate",
+  "tax",
+  "total",
+  "delivery_date",
+  "column_break_vgjl",
+  "note"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "T\u00ean m\u1eb7t h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "fieldname": "stock_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Xu\u1ea5t x\u1ee9",
+   "options": "Custom Origin",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ccst",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL y\u00eau c\u1ea7u",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actual_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SL mua"
+  },
+  {
+   "fieldname": "stock_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "T\u1ed3n kho",
+   "read_only": 1
+  },
+  {
+   "fieldname": "average_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n gi\u00e1 b\u00ecnh qu\u00e2n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_wvuk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n gi\u00e1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Thu\u1ebf",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ti\u1ec1n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vgjl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Ghi ch\u00fa"
+  },
+  {
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y h\u00e0ng v\u1ec1 y\u00eau c\u1ea7u",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-11 00:49:46.081479",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Purchase Approval Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

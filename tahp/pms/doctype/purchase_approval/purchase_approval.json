@@ -1,0 +1,326 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-10 09:09:19.533970",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "quotation_comparison",
+  "material_request",
+  "column_break_mrbg",
+  "supplier",
+  "posting_date",
+  "column_break_oxou",
+  "employee",
+  "employee_name",
+  "section_break_rwyy",
+  "recommend_reason",
+  "section_break_vdyg",
+  "wrapper",
+  "section_break_khsi",
+  "items",
+  "\u0111i\u1ec1u_kho\u1ea3n_thanh_to\u00e1n_section",
+  "payment_method",
+  "column_break_blfh",
+  "payment_note",
+  "column_break_npgy",
+  "\u0111i\u1ec1u_kho\u1ea3n_giao_h\u00e0ng_section",
+  "delivery_address",
+  "column_break_wrss",
+  "delivery_note",
+  "column_break_shqk",
+  "delivery_amount_note",
+  "\u0111i\u1ec1u_kho\u1ea3n_chi\u1ebft_kh\u1ea5u_th\u01b0\u01a1ng_m\u1ea1i_section",
+  "discount_note",
+  "column_break_qeqq",
+  "special_offer",
+  "column_break_rsmq",
+  "\u0111i\u1ec1u_kho\u1ea3n_b\u1ea3o_h\u00e0nh_section",
+  "warranty",
+  "column_break_dayj",
+  "after_sale_service",
+  "column_break_fxnr",
+  "th\u00f4ng_tin_thanh_to\u00e1n_section",
+  "column_break_aely",
+  "column_break_qjcg",
+  "total_row",
+  "discount_amount",
+  "delivery_amount",
+  "vat",
+  "vat_amount",
+  "total_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "quotation_comparison",
+   "fieldtype": "Link",
+   "label": "M\u00e3 so s\u00e1nh b\u00e1o gi\u00e1",
+   "options": "Quotation Comparison",
+   "read_only": 1
+  },
+  {
+   "fieldname": "material_request",
+   "fieldtype": "Table MultiSelect",
+   "label": "Y\u00eau c\u1ea7u mua h\u00e0ng",
+   "options": "Quotation Comparison MR",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mrbg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Datetime",
+   "label": "Ng\u00e0y t\u1ea1o",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_oxou",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "M\u00e3 nh\u00e2n vi\u00ean t\u1ea1o",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_rwyy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "recommend_reason",
+   "fieldtype": "Small Text",
+   "label": "L\u00fd do ch\u1ecdn nh\u00e0 cung c\u1ea5p"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "T\u00ean nh\u00e2n vi\u00ean",
+   "read_only": 1
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_thanh_to\u00e1n_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n thanh to\u00e1n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Select",
+   "label": "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n",
+   "options": "Chuy\u1ec3n kho\u1ea3n\nTi\u1ec1n m\u1eb7t",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_blfh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_note",
+   "fieldtype": "Link",
+   "label": "Th\u1eddi h\u1ea1n thanh to\u00e1n",
+   "options": "Custom Payment Note",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_npgy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_giao_h\u00e0ng_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n giao h\u00e0ng",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_address",
+   "fieldtype": "Link",
+   "label": "\u0110\u1ecba ch\u1ec9 giao h\u00e0ng",
+   "options": "Custom Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_wrss",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delivery_note",
+   "fieldtype": "Link",
+   "label": "Th\u1eddi gian giao h\u00e0ng",
+   "options": "Custom Delivery Note",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_shqk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delivery_amount_note",
+   "fieldtype": "Link",
+   "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
+   "options": "Custom Delivery Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_chi\u1ebft_kh\u1ea5u_th\u01b0\u01a1ng_m\u1ea1i_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n chi\u1ebft kh\u1ea5u th\u01b0\u01a1ng m\u1ea1i",
+   "read_only": 1
+  },
+  {
+   "fieldname": "discount_note",
+   "fieldtype": "Data",
+   "label": "Gi\u1ea3m gi\u00e1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_qeqq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "special_offer",
+   "fieldtype": "Data",
+   "label": "Khuy\u1ebfn m\u1ea1i",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rsmq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_b\u1ea3o_h\u00e0nh_section",
+   "fieldtype": "Section Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warranty",
+   "fieldtype": "Link",
+   "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
+   "options": "Custom Warranty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dayj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "after_sale_service",
+   "fieldtype": "Link",
+   "label": "C\u00e1c d\u1ecbch v\u1ee5 sau b\u00e1n h\u00e0ng",
+   "options": "Custom After Sale Service",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fxnr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "th\u00f4ng_tin_thanh_to\u00e1n_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u00f4ng tin thanh to\u00e1n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_aely",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_qjcg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_row",
+   "fieldtype": "Float",
+   "label": "T\u1ed5ng ti\u1ec1n s\u1ea3n ph\u1ea9m",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "discount_amount",
+   "fieldtype": "Float",
+   "label": "Gi\u1ea3m gi\u00e1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_amount",
+   "fieldtype": "Float",
+   "label": "Ph\u00ed v\u1eadn chuy\u1ec3n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vat",
+   "fieldtype": "Float",
+   "label": "% Thu\u1ebf VAT",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "label": "Thu\u1ebf th\u00e0nh ti\u1ec1n",
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "total_amount",
+   "fieldtype": "Float",
+   "label": "T\u1ed5ng ti\u1ec1n thanh to\u00e1n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_vdyg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "wrapper",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "section_break_khsi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "Purchase Approval Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-11 10:13:01.602884",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Purchase Approval",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

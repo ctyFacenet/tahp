@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-08 20:25:00.564795",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "item_group",
+  "rate",
+  "supplier",
+  "origin",
+  "tax"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng",
+   "options": "Item"
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "T\u00ean m\u1eb7t h\u00e0ng"
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Nh\u00f3m m\u1eb7t h\u00e0ng",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "\u0110\u01a1n gi\u00e1"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Xu\u1ea5t x\u1ee9",
+   "options": "Custom Origin"
+  },
+  {
+   "fieldname": "tax",
+   "fieldtype": "Float",
+   "label": "Thu\u1ebf"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-11 08:18:23.157866",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Supplier Item Rate",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,122 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-08 14:59:44.443985",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "recommend_reason",
+  "wrapper",
+  "section_break_gfxj",
+  "material_request",
+  "items",
+  "supplier",
+  "specification",
+  "mapping",
+  "qa_master",
+  "section_break_emlm",
+  "recommend_supplier",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "material_request",
+   "fieldtype": "Table MultiSelect",
+   "label": "Y\u00eau c\u1ea7u mua h\u00e0ng",
+   "options": "Quotation Comparison MR"
+  },
+  {
+   "fieldname": "section_break_gfxj",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "wrapper",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "D\u1eef li\u1ec7u m\u1eb7t h\u00e0ng",
+   "options": "Quotation Comparison Item"
+  },
+  {
+   "fieldname": "section_break_emlm",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "recommend_supplier",
+   "fieldtype": "Link",
+   "label": "\u0110\u1ec1 xu\u1ea5t nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier"
+  },
+  {
+   "depends_on": "recommend_supplier",
+   "fieldname": "recommend_reason",
+   "fieldtype": "Small Text",
+   "label": "L\u00fd do \u0111\u1ec1 xu\u1ea5t nh\u00e0 cung c\u1ea5p",
+   "mandatory_depends_on": "eval: doc.recommend_supplier && doc.recommend_supplier != \"\"\n",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Table",
+   "label": "D\u1eef li\u1ec7u nh\u00e0 cung c\u1ea5p",
+   "options": "Quotation Comparison Supplier"
+  },
+  {
+   "fieldname": "specification",
+   "fieldtype": "Table",
+   "label": "D\u1eef li\u1ec7u ki\u1ec3m tra ch\u1ea5t l\u01b0\u1ee3ng",
+   "options": "Quotation Comparison QA"
+  },
+  {
+   "fieldname": "mapping",
+   "fieldtype": "Table",
+   "label": "D\u1eef li\u1ec7u n\u1ed1i",
+   "options": "Quotation Comparison Mapping"
+  },
+  {
+   "fieldname": "qa_master",
+   "fieldtype": "Table",
+   "options": "Quotation Comparison QA Master"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Quotation Comparison",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-10 14:38:15.435348",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Quotation Comparison",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

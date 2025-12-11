@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:delivery_amount_note",
+ "creation": "2025-12-10 01:20:35.148335",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "delivery_amount_note"
+ ],
+ "fields": [
+  {
+   "fieldname": "delivery_amount_note",
+   "fieldtype": "Data",
+   "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
+   "length": 512,
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-10 01:21:27.830854",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Custom Delivery Cost",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
