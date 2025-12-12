@@ -1,41 +1,43 @@
 frappe.listview_settings['Material Request'] = {
+
     has_indicator_for_draft: true,
-    add_fields: ["workflow_state", "custom_request_code", "custom_request_type", "custom_priority", "custom_department", "custom_request_reason"],
-    
+    hide_name_column: true,
+
+    add_fields: [
+        "workflow_state",
+        "custom_request_code",
+        "custom_request_type",
+        "custom_priority",
+        "custom_department",
+        "custom_request_reason",
+        "custom_current_status"
+    ],
+
     get_indicator: function (doc) {
-        const state = doc.workflow_state || "Nháp";
-        
-        if (doc.docstatus === 0) {
-            if (doc.workflow_state === "Nháp" || !doc.workflow_state) {
-                return ["Nháp", "gray", `workflow_state,=,Nháp`];
-            } else if (doc.workflow_state === "Đợi KHSX duyệt") {
-                return ["Đợi KHSX duyệt", "orange", `workflow_state,=,Đợi KHSX duyệt`];
-            } else if (doc.workflow_state === "Đợi TPBT duyệt") {
-                return ["Đợi TPBT duyệt", "yellow", `workflow_state,=,Đợi TPBT duyệt`];
-            } else if (doc.workflow_state === "Đợi thủ kho duyệt") {
-                return ["Đợi thủ kho duyệt", "purple", `workflow_state,=,Đợi thủ kho duyệt`];
-            } else if (doc.workflow_state === "Chờ GĐ duyệt") {
-                return ["Chờ GĐ duyệt", "blue", `workflow_state,=,Chờ GĐ duyệt`];
+        if (doc.custom_current_status) {
+
+            if (doc.custom_current_status === "Đã tạo báo giá") {
+                return ["Đã tạo báo giá", "orange", "custom_current_status,=,Đã tạo báo giá"];
+
+            } else if (doc.custom_current_status === "Đã tạo trình duyệt mua hàng") {
+                return ["Đã tạo trình duyệt mua hàng", "green", "custom_current_status,=,Đã tạo trình duyệt mua hàng"];
+
+            } else if (doc.custom_current_status === "Đã tạo đơn hàng") {
+                return ["Đã tạo đơn hàng", "blue", "custom_current_status,=,Đã tạo đơn hàng"];
+
+            } else if (doc.custom_current_status === "Đã nhận hàng") {
+                return ["Đã nhận hàng", "purple", "custom_current_status,=,Đã nhận hàng"];
             }
-        } else if (doc.docstatus === 1) {
-            if (doc.workflow_state === "Duyệt xong") {
-                return ["Duyệt xong", "green", `workflow_state,=,Duyệt xong`];
-            } else if (doc.workflow_state === "Đã tạo đơn hàng") {
-                return ["Đã tạo đơn hàng", "green", `workflow_state,=,Đã tạo đơn hàng`];
-            }
-        } else if (doc.docstatus === 2) {
-            return ["Đã hủy bỏ", "red", `docstatus,=,2`];
         }
-        
-    
-        return [state, "gray", `workflow_state,=,${state}`];
     },
-    
+
     formatters: {
-        custom_request_code: function(value) {
+
+        custom_request_code: function (value) {
             return value || "";
         },
-        custom_request_type: function(value) {
+
+        custom_request_type: function (value) {
             if (value === "Nguyên liệu sản xuất") {
                 return `<span class="indicator-pill green" style="font-size: 11px;">${value}</span>`;
             } else if (value === "Vật tư bảo trì") {
@@ -47,9 +49,10 @@ frappe.listview_settings['Material Request'] = {
             }
             return value || "";
         },
-        custom_priority: function(value) {
+
+        custom_priority: function (value) {
             if (value === "Rất khẩn cấp") {
-                return `<span class="indicator-pill red" style="font-size: 11px;">Rất Khẩn cấp</span>`;
+                return `<span class="indicator-pill red" style="font-size: 11px;">Rất khẩn cấp</span>`;
             } else if (value === "Khẩn cấp") {
                 return `<span class="indicator-pill orange" style="font-size: 11px;">Khẩn cấp</span>`;
             } else if (value === "Bình thường") {
@@ -57,10 +60,12 @@ frappe.listview_settings['Material Request'] = {
             }
             return value || "";
         },
-        custom_department: function(value) {
+
+        custom_department: function (value) {
             return value || "";
         },
-        custom_request_reason: function(value) {
+
+        custom_request_reason: function (value) {
             return value || "";
         }
     }
