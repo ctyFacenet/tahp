@@ -3,6 +3,15 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2025-12-11 01:06:58.849058",
+  "name": "Đã được trưởng BP duyệt",
+  "style": "",
+  "workflow_state_name": "Đã được trưởng BP duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-09-15 11:44:47.323583",
   "name": "Gửi KDTM",
   "style": "",
@@ -138,42 +147,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-09-15 08:38:38.131193",
-  "name": "Đợi KHSX duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi KHSX duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-15 08:47:09.606235",
-  "name": "Đợi TPBT duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi TPBT duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-15 09:45:56.855590",
-  "name": "Chờ GĐ duyệt",
-  "style": "",
-  "workflow_state_name": "Chờ GĐ duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-09-15 08:50:39.941349",
-  "name": "Đợi thủ kho duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi thủ kho duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2025-10-08 15:53:23.707881",
   "name": "Đợi kế toán duyệt",
   "style": "Info",
@@ -205,24 +178,6 @@
   "name": "Đã được PTCN duyệt",
   "style": "Info",
   "workflow_state_name": "Đã được PTCN duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
-  "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
-  "modified": "2025-08-21 17:00:25.464673",
-  "name": "Nháp",
-  "style": "",
-  "workflow_state_name": "Nháp"
  },
  {
   "docstatus": 0,
@@ -273,9 +228,72 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2025-09-15 08:47:09.606235",
+  "name": "Đợi TPBT duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi TPBT duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 09:45:56.855590",
+  "name": "Chờ GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Chờ GĐ duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 08:38:38.131193",
+  "name": "Đợi KHSX duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi KHSX duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-09-15 08:50:39.941349",
+  "name": "Đợi thủ kho duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi thủ kho duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-09-07 19:30:40.758642",
   "name": "Duyệt xong",
   "style": "Success",
   "workflow_state_name": "Duyệt xong"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
+  "style": "",
+  "workflow_state_name": "Nháp"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-11 01:06:46.228026",
+  "name": "Đợi trưởng BP duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi trưởng BP duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi GĐ duyệt"
  }
 ]

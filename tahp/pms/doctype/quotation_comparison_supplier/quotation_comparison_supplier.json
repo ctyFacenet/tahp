@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-08 15:37:42.186161",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "delivery_amount",
+  "discount_amount",
+  "vat_amount",
+  "payment_method",
+  "payment_note",
+  "delivery_note",
+  "delivery_address",
+  "delivery_amount_note",
+  "discount_note",
+  "special_offer",
+  "warranty",
+  "after_sale_service"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "delivery_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Ph\u00ed v\u1eadn chuy\u1ec3n"
+  },
+  {
+   "fieldname": "discount_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Gi\u1ea3m gi\u00e1"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "VAT"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Select",
+   "label": "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n",
+   "options": "Chuy\u1ec3n kho\u1ea3n\nTi\u1ec1n m\u1eb7t"
+  },
+  {
+   "fieldname": "payment_note",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Th\u1eddi h\u1ea1n thanh to\u00e1n",
+   "options": "Custom Payment Note"
+  },
+  {
+   "fieldname": "delivery_note",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Th\u1eddi gian giao h\u00e0ng",
+   "options": "Custom Delivery Note"
+  },
+  {
+   "fieldname": "delivery_address",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0110\u1ecba ch\u1ec9 giao h\u00e0ng",
+   "options": "Custom Address"
+  },
+  {
+   "fieldname": "delivery_amount_note",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
+   "options": "Custom Delivery Cost"
+  },
+  {
+   "default": "Kh\u00f4ng",
+   "fieldname": "special_offer",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Khuy\u1ebfn m\u1ea1i"
+  },
+  {
+   "fieldname": "warranty",
+   "fieldtype": "Link",
+   "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
+   "options": "Custom Warranty"
+  },
+  {
+   "fieldname": "after_sale_service",
+   "fieldtype": "Link",
+   "label": "H\u1eadu m\u00e3i",
+   "options": "Custom After Sale Service"
+  },
+  {
+   "default": "Kh\u00f4ng",
+   "fieldname": "discount_note",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Gi\u1ea3m gi\u00e1"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-10 01:40:27.229054",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Quotation Comparison Supplier",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
