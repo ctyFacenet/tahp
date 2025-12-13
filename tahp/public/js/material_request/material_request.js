@@ -1,3 +1,24 @@
+// Custom formatter cho field Production Targets - chuyển text thành links
+frappe.form.formatters.production_targets_formatter = function(value) {
+    if (!value) return '';
+    
+    // Tách theo dấu phẩy hoặc xuống dòng
+    let targets = value.split(/[,\n]/).map(t => t.trim()).filter(t => t);
+    
+    if (targets.length === 0) return '';
+    
+    // Tạo HTML links - mỗi link xuống 1 dòng
+    let html = '<div style="line-height: 1.8;">';
+    html += targets.map(target => {
+        return `<a href="/app/production-target/${encodeURIComponent(target)}" target="_blank" style="display: block; margin-bottom: 2px;">
+            <i class="fa fa-external-link" style="margin-right: 5px;"></i>${target}
+        </a>`;
+    }).join('');
+    html += '</div>';
+    
+    return html;
+};
+
 frappe.ui.form.on('Material Request', {
     refresh: function (frm) {
         // Filter custom_department để chỉ hiển thị phòng ban có đuôi -TAHP
@@ -62,24 +83,42 @@ frappe.ui.form.on('Material Request', {
             });
             
         }
-        // Thêm 2 nút khi ở trạng thái "Duyệt xong"
+        
         if (frm.doc.workflow_state === 'Duyệt xong') {
-            // frm.add_custom_button(__('Tạo trình duyệt mua hàng'), function() {
-            //     frappe.new_doc('Request for Quotation');
-            // });
-            
             frm.add_custom_button(__('Tạo So sánh báo giá'), async function() {
                 await create_comparison(frm)
             });
+        }
+        
+        // Show/hide field custom_production_targets dựa vào custom_request_type
+        if (frm.fields_dict.custom_production_targets) {
+            if (frm.doc.custom_request_type === 'Nguyên liệu sản xuất') {
+                // Chỉ hiện khi có data
+                if (frm.doc.custom_production_targets && frm.doc.custom_production_targets.trim()) {
+                    frm.set_df_property('custom_production_targets', 'hidden', 0);
+                    // Render links nếu có data
+                    render_production_target_links(frm);
+                } else {
+                    frm.set_df_property('custom_production_targets', 'hidden', 1);
+                }
+            } else {
+                frm.set_df_property('custom_production_targets', 'hidden', 1);
+            }
         }
     
         // Xóa nút cũ 
         frm.fields_dict['items'].grid.clear_custom_buttons();
         
-        
+        // Chỉ hiển thị các nút khi chưa duyệt xong
         if (frm.doc.workflow_state !== 'Duyệt xong') {
+            // Thêm nút chọn từ Production Target nếu là Nguyên liệu sản xuất
+            if (frm.doc.custom_request_type === 'Nguyên liệu sản xuất') {
+                frm.fields_dict['items'].grid.add_custom_button(__('Chọn từ Chỉ tiêu sản xuất'), function () {
+                    show_production_target_popup(frm);
+                });
+            }
+            
             frm.fields_dict['items'].grid.add_custom_button(__('Chọn mặt hàng từ BOM'), function () {
-            // Tạo dialog
             let currentYear = new Date().getFullYear();
 
             let d = new frappe.ui.Dialog({
@@ -174,7 +213,7 @@ frappe.ui.form.on('Material Request', {
                         size: 'large',
                         primary_action_label: __('OK'),
                         primary_action: function () {
-                            // Lấy số lượng đã chỉnh sửa từ popup
+                           
                             let finalBomList = [];
                             confirmDialog.$wrapper.find('.bom-qty-input').each(function () {
                                 let bomName = $(this).attr('data-bom');
@@ -217,87 +256,85 @@ frappe.ui.form.on('Material Request', {
                                 });
                             }
 
-                            // Lấy chi tiết từng BOM và thêm/cộng dồn vào bảng
-                            let promises = finalBomList.map(bomItem => {
-                                return new Promise((resolve) => {
-                                    frappe.call({
-                                        method: 'frappe.client.get',
-                                        args: {
-                                            doctype: 'BOM',
-                                            name: bomItem.bom
-                                        },
-                                        callback: function (bom_res) {
-                                            if (bom_res.message && bom_res.message.items) {
-                                                // Xử lý từng item từ BOM
-                                                bom_res.message.items.forEach(function (bom_item) {
-                                                    let item_code = bom_item.item_code;
-                                                    let qty_to_add = (bom_item.qty || 0) * bomItem.qty;
-                                                    let stock_qty_to_add = (bom_item.stock_qty || 0) * bomItem.qty;
+                            // Lấy tất cả BOM items 
+                            frappe.call({
+                                method: 'tahp.doc_events.material_request.material_request.get_bom_items_batch',
+                                args: {
+                                    bom_list: finalBomList
+                                },
+                                callback: function(r) {
+                                    if (!r.message) return;
+                                    
+                                    let bom_data = r.message;
+                                    
+                                    // Xử lý items từ tất cả BOMs
+                                    finalBomList.forEach(bomItem => {
+                                        let bom_info = bom_data[bomItem.bom];
+                                        if (!bom_info || !bom_info.items) return;
+                                        
+                                        bom_info.items.forEach(function (bom_item) {
+                                            let item_code = bom_item.item_code;
+                                            let qty_to_add = (bom_item.qty || 0) * bomItem.qty;
+                                            let stock_qty_to_add = (bom_item.stock_qty || 0) * bomItem.qty;
 
-                                                    if (existingItemsMap[item_code]) {
-                                                        // Item đã tồn tại - cộng dồn số lượng
-                                                        let existingRow = existingItemsMap[item_code].row;
-                                                        existingRow.qty = (existingRow.qty || 0) + qty_to_add;
-                                                        existingRow.stock_qty = (existingRow.stock_qty || 0) + stock_qty_to_add;
-                                                    } else {
-                                                        // Item mới - thêm dòng mới
-                                                        let row = frm.add_child('items');
-                                                        
-                                                      
-                                                        frappe.model.set_value(row.doctype, row.name, 'item_code', item_code);
-                                                        
-                                                      
-                                                        row.item_name = bom_item.item_name;
-                                                        row.description = bom_item.description;
-                                                        row.qty = qty_to_add;
-                                                        row.stock_qty = stock_qty_to_add;
-                                                        row.uom = bom_item.uom;
-                                                        row.stock_uom = bom_item.stock_uom;
-                                                        row.warehouse = bom_item.source_warehouse;
+                                            if (existingItemsMap[item_code]) {
+                                                // Item đã tồn tại - cộng dồn số lượng
+                                                let existingRow = existingItemsMap[item_code].row;
+                                                existingRow.qty = (existingRow.qty || 0) + qty_to_add;
+                                                existingRow.stock_qty = (existingRow.stock_qty || 0) + stock_qty_to_add;
+                                            } else {
+                                                // Item mới - thêm dòng mới
+                                                let row = frm.add_child('items');
+                                                
+                                                // Set item_code
+                                                frappe.model.set_value(row.doctype, row.name, 'item_code', item_code);
+                                                
+                                                // Set các field khác
+                                                row.item_name = bom_item.item_name;
+                                                row.description = bom_item.description;
+                                                row.qty = qty_to_add;
+                                                row.stock_qty = stock_qty_to_add;
+                                                row.uom = bom_item.uom;
+                                                row.stock_uom = bom_item.stock_uom;
+                                                row.warehouse = bom_item.source_warehouse;
 
-                                                     
-                                                        existingItemsMap[item_code] = {
-                                                            row: row,
-                                                            index: frm.doc.items.length - 1
-                                                        };
-                                                    }
-                                                });
+                                                existingItemsMap[item_code] = {
+                                                    row: row,
+                                                    index: frm.doc.items.length - 1
+                                                };
                                             }
-                                            resolve();
+                                        });
+                                    });
+                                    
+                                    // Xóa các dòng trống (không có item_code)
+                                    let itemsToRemove = [];
+                                    frm.doc.items.forEach((item, index) => {
+                                        if (!item.item_code) {
+                                            itemsToRemove.push(item);
                                         }
                                     });
-                                });
-                            });
+                                    
+                                    itemsToRemove.forEach(item => {
+                                        let row_to_remove = frm.fields_dict.items.grid.grid_rows_by_docname[item.name];
+                                        if (row_to_remove) {
+                                            row_to_remove.remove();
+                                        }
+                                    });
+                                  
+                                    frm.dirty();
+                                    frm.refresh_field('items');
+                                    frm.fields_dict.items.grid.refresh();
+                                    add_total_row(frm);
 
-                            Promise.all(promises).then(() => {
-                                // Xóa các dòng trống (không có item_code)
-                                let itemsToRemove = [];
-                                frm.doc.items.forEach((item, index) => {
-                                    if (!item.item_code) {
-                                        itemsToRemove.push(item);
-                                    }
-                                });
-                                
-                                itemsToRemove.forEach(item => {
-                                    let row_to_remove = frm.fields_dict.items.grid.grid_rows_by_docname[item.name];
-                                    if (row_to_remove) {
-                                        row_to_remove.remove();
-                                    }
-                                });
-                              
-                                frm.dirty();
-                                frm.refresh_field('items');
-                                frm.fields_dict.items.grid.refresh();
-                                add_total_row(frm);
+                                    let finalItemCount = Object.keys(existingItemsMap).length;
+                                    frappe.show_alert({
+                                        message: __('Đã thêm/cập nhật {0} items từ {1} BOM', [finalItemCount, finalBomList.length]),
+                                        indicator: 'green'
+                                    }, 3);
 
-                                let finalItemCount = Object.keys(existingItemsMap).length;
-                                frappe.show_alert({
-                                    message: __('Đã thêm/cập nhật {0} items từ {1} BOM', [finalItemCount, finalBomList.length]),
-                                    indicator: 'green'
-                                }, 3);
-
-                                confirmDialog.hide();
-                                d.hide();
+                                    confirmDialog.hide();
+                                    d.hide();
+                                }
                             });
                         }
                     });
@@ -466,7 +503,7 @@ frappe.ui.form.on('Material Request', {
 
                             monthKeys.forEach(monthKey => {
                                 let monthGroup = groups[monthKey];
-                                html += `<tr class="month-row"><td style="width:40px; text-align:center;"><i class="fa fa-chevron-right month-toggle" data-month="${monthKey}" style="cursor:pointer;color:#333"></i></td><td colspan="3" style="background:#efefef;font-weight:600;">${monthGroup.label}</td></tr>`;
+                                html += `<tr class="month-row"><td style="width:40px; text-align:center;"><i class="fa fa-chevron-right month-toggle" data-month="${monthKey}" style="cursor:pointer;color:#333"></i></td><td colspan="3" style="background:#e8f4f8;font-weight:600;">${monthGroup.label}</td></tr>`;
 
                                 let weekKeys = Object.keys(monthGroup.weeks).map(k => parseInt(k, 10)).sort((a, b) => a - b);
                                 weekKeys.forEach(weekIndex => {
@@ -589,8 +626,81 @@ frappe.ui.form.on('Material Request', {
             d.show();
         });
         }
+    },
+    
+    custom_request_type: function(frm) {
+        // Cập nhật nút khi thay đổi loại yêu cầu
+        frm.fields_dict['items'].grid.clear_custom_buttons();
+        
+        // Show/hide field custom_production_targets
+        if (frm.fields_dict.custom_production_targets) {
+            if (frm.doc.custom_request_type === 'Nguyên liệu sản xuất') {
+                if (frm.doc.custom_production_targets && frm.doc.custom_production_targets.trim()) {
+                    frm.set_df_property('custom_production_targets', 'hidden', 0);
+                    render_production_target_links(frm);
+                } else {
+                    frm.set_df_property('custom_production_targets', 'hidden', 1);
+                }
+            } else {
+                frm.set_df_property('custom_production_targets', 'hidden', 1);
+            }
+        }
+        
+        // Chỉ hiển thị nút khi chưa duyệt xong
+        if (frm.doc.workflow_state !== 'Duyệt xong') {
+            if (frm.doc.custom_request_type === 'Nguyên liệu sản xuất') {
+                frm.fields_dict['items'].grid.add_custom_button(__('Chọn từ Chỉ tiêu sản xuất'), function () {
+                    show_production_target_popup(frm);
+                });
+                
+                // Tự động mở popup khi chọn "Nguyên liệu sản xuất"
+                setTimeout(() => {
+                    show_production_target_popup(frm);
+                }, 300);
+            }
+            
+            frm.fields_dict['items'].grid.add_custom_button(__('Chọn mặt hàng từ BOM'), function () {
+                
+            });
+        }
+    },
+    
+    custom_production_targets: function(frm) {
+        // Show/hide và render field
+        if (frm.fields_dict.custom_production_targets) {
+            if (frm.doc.custom_request_type === 'Nguyên liệu sản xuất' && 
+                frm.doc.custom_production_targets && 
+                frm.doc.custom_production_targets.trim()) {
+                // Có data → hiện và render
+                frm.set_df_property('custom_production_targets', 'hidden', 0);
+                render_production_target_links(frm);
+            } else {
+                // Không có data → ẩn
+                frm.set_df_property('custom_production_targets', 'hidden', 1);
+            }
+        }
     }
 });
+
+function render_production_target_links(frm) {
+    if (!frm.fields_dict.custom_production_targets) return;
+    
+    let $field = frm.fields_dict.custom_production_targets.$wrapper;
+    let value = frm.doc.custom_production_targets;
+    
+    if (value && frm.doc.custom_request_type === 'Nguyên liệu sản xuất') {
+        // Render links thay vì text thuần
+        let formatted_html = frappe.form.formatters.production_targets_formatter(value);
+        
+        // Thay thế nội dung field bằng HTML links (xuống dòng)
+        $field.find('.control-value').html(formatted_html);
+        
+        // Ẩn input, chỉ hiện HTML
+        $field.find('.control-input').hide();
+        $field.find('.control-value').show();
+    }
+}
+
 function add_total_row(frm) {
     
     setTimeout(() => {
@@ -683,14 +793,13 @@ frappe.ui.form.on('Material Request Item', {
         let row = locals[cdt][cdn];
         if (!row.item_code) return;
         
-        // Lấy tồn kho hiện tại (Hiếu)
+        // Lấy tồn kho hiện tại
         let res = await frappe.xcall("erpnext.stock.utils.get_latest_stock_qty", {
             item_code: row.item_code
         });
         if (res) {
             frappe.model.set_value(row.doctype, row.name, "custom_current_stock", res);
         }
-        //////////
         
         // Lấy đơn giá và xuất xứ
         const response = await frappe.call({
@@ -704,7 +813,7 @@ frappe.ui.form.on('Material Request Item', {
             const data = response.message;
             // Điền đơn giá dự kiến
             frappe.model.set_value(cdt, cdn, 'custom_estimated_rate', data.rate || 0);
-            // Điền xuất xứ nếu có field
+            // Điền xuất xứ 
             if (data.origin) {
                 frappe.model.set_value(cdt, cdn, 'custom_origin', data.origin);
             }
@@ -767,3 +876,303 @@ async function create_comparison(frm) {
 
     frappe.set_route("Form", "Quotation Comparison", doc.name);
 }
+
+function show_production_target_popup(frm) {
+    // Gọi API backend để lấy Production Target kèm BOM
+    frappe.call({
+        method: 'tahp.doc_events.material_request.material_request.get_production_targets_with_boms',
+        callback: function(r) {
+            if (!r.message || r.message.length === 0) {
+                frappe.msgprint(__('Không tìm thấy Chỉ tiêu sản xuất nào'));
+                return;
+            }
+            
+            let production_targets = r.message;
+            
+            // Tạo dialog
+            let d = new frappe.ui.Dialog({
+                title: __('Chọn từ Chỉ tiêu sản xuất'),
+                fields: [
+                    {
+                        fieldname: 'target_html',
+                        fieldtype: 'HTML'
+                    }
+                ],
+                size: 'large',
+                primary_action_label: __('Xác nhận'),
+                primary_action: function() {
+                    let selected_items = [];
+                    let has_error = false;
+                    let error_message = '';
+                    
+                    d.$wrapper.find('.item-checkbox:checked').each(function() {
+                        if (has_error) return;
+                        
+                        let item_code = $(this).data('item-code');
+                        let qty = parseFloat($(this).data('qty')) || 0;
+                        
+                       
+                        let boms = [];
+                        try {
+                            let bomsData = $(this).attr('data-boms');
+                            if (bomsData) {
+                                boms = JSON.parse(bomsData);
+                            }
+                        } catch (e) {
+                            boms = [];
+                        }
+                        
+                        let selected_bom = null;
+                        if (boms.length > 1) {
+                            // Lấy giá trị từ select trong cùng row với checkbox này
+                            let $row = $(this).closest('tr');
+                            let $select = $row.find('.bom-select');
+                            selected_bom = $select.val();
+                            
+                            if (!selected_bom) {
+                                error_message = __('Vui lòng chọn BOM cho mặt hàng {0}', [item_code]);
+                                has_error = true;
+                                return;
+                            }
+                        } else if (boms.length === 1) {
+                            selected_bom = boms[0];
+                        }
+                        
+                        if (selected_bom) {
+                            selected_items.push({
+                                bom: selected_bom,
+                                qty: qty
+                            });
+                        }
+                    });
+                    
+                    if (has_error) {
+                        frappe.msgprint(error_message);
+                        return;
+                    }
+                    
+                    if (selected_items.length === 0) {
+                        frappe.msgprint(__('Vui lòng chọn ít nhất một mặt hàng'));
+                        return;
+                    }
+                    
+                   
+                    if (frm.doc.items && frm.doc.items.length === 1) {
+                        const first = frm.doc.items[0];
+                        if (!first.item_code && !first.item_name && !first.description && !first.qty) {
+                            frm.clear_table('items');
+                            frm.refresh_field('items');
+                        }
+                    }
+                    
+                   
+                    let existingItemsMap = {};
+                    if (frm.doc.items) {
+                        frm.doc.items.forEach((row, idx) => {
+                            if (row.item_code) {
+                                existingItemsMap[row.item_code] = {
+                                    row: row,
+                                    index: idx
+                                };
+                            }
+                        });
+                    }
+                    
+                    // Lấy tất cả BOM items 
+                    frappe.call({
+                        method: 'tahp.doc_events.material_request.material_request.get_bom_items_batch',
+                        args: {
+                            bom_list: selected_items
+                        },
+                        callback: function(r) {
+                            if (!r.message) return;
+                            
+                            let bom_data = r.message;
+                            
+                            // Xử lý items từ tất cả BOMs
+                            selected_items.forEach(bomItem => {
+                                let bom_info = bom_data[bomItem.bom];
+                                if (!bom_info || !bom_info.items) return;
+                                
+                                bom_info.items.forEach(function (bom_item) {
+                                    let item_code = bom_item.item_code;
+                                    let qty_to_add = (bom_item.qty || 0) * bomItem.qty;
+                                    let stock_qty_to_add = (bom_item.stock_qty || 0) * bomItem.qty;
+
+                                    if (existingItemsMap[item_code]) {
+                                        // Item đã tồn tại - cộng dồn số lượng
+                                        let existingRow = existingItemsMap[item_code].row;
+                                        existingRow.qty = (existingRow.qty || 0) + qty_to_add;
+                                        existingRow.stock_qty = (existingRow.stock_qty || 0) + stock_qty_to_add;
+                                    } else {
+                                       
+                                        let row = frm.add_child('items');
+                                        
+                                        // Set item_code
+                                        frappe.model.set_value(row.doctype, row.name, 'item_code', item_code);
+                                        
+                                       
+                                        row.item_name = bom_item.item_name;
+                                        row.description = bom_item.description;
+                                        row.qty = qty_to_add;
+                                        row.stock_qty = stock_qty_to_add;
+                                        row.uom = bom_item.uom;
+                                        row.stock_uom = bom_item.stock_uom;
+                                        row.warehouse = bom_item.source_warehouse;
+                                        
+                                        existingItemsMap[item_code] = {
+                                            row: row,
+                                            index: frm.doc.items.length - 1
+                                        };
+                                    }
+                                });
+                            });
+                            
+                            // Xóa các dòng trống (không có item_code)
+                            let itemsToRemove = [];
+                            frm.doc.items.forEach((item, index) => {
+                                if (!item.item_code) {
+                                    itemsToRemove.push(item);
+                                }
+                            });
+                            
+                            itemsToRemove.forEach(item => {
+                                let row_to_remove = frm.fields_dict.items.grid.grid_rows_by_docname[item.name];
+                                if (row_to_remove) {
+                                    row_to_remove.remove();
+                                }
+                            });
+                            
+                            frm.dirty();
+                            frm.refresh_field('items');
+                            frm.fields_dict.items.grid.refresh();
+                            add_total_row(frm);
+                            
+                            let finalItemCount = Object.keys(existingItemsMap).length;
+                            frappe.show_alert({
+                                message: __('Đã thêm/cập nhật {0} nguyên liệu', [finalItemCount]),
+                                indicator: 'green'
+                            }, 3);
+                            
+                            // Lưu danh sách Production Targets đã chọn
+                            let selected_target_names = [];
+                            d.$wrapper.find('.item-checkbox:checked').each(function() {
+                                let target_name = $(this).data('target-name');
+                                if (target_name && !selected_target_names.includes(target_name)) {
+                                    selected_target_names.push(target_name);
+                                }
+                            });
+                            
+                            if (selected_target_names.length > 0) {
+                                // Lấy giá trị cũ (nếu có)
+                                let existing_targets = [];
+                                if (frm.doc.custom_production_targets) {
+                                    existing_targets = frm.doc.custom_production_targets.split('\n').filter(t => t.trim());
+                                }
+                                
+                                // Merge với target mới (loại bỏ trùng lặp)
+                                selected_target_names.forEach(target => {
+                                    if (!existing_targets.includes(target)) {
+                                        existing_targets.push(target);
+                                    }
+                                });
+                                
+                                let targets_text = existing_targets.join('\n');
+                                frm.set_value('custom_production_targets', targets_text);
+                                
+                                // Trigger render ngay sau khi set value
+                                setTimeout(() => {
+                                    render_production_target_links(frm);
+                                }, 100);
+                            }
+                            
+                            d.hide();
+                        }
+                    });
+                }
+            });
+            
+            // Build HTML table
+            let html = '<table class="table table-bordered" style="font-size: 13px;">';
+            html += '<thead><tr style="background-color: #f5f5f5;">';
+            html += '<th style="width: 40px;"></th>';
+            html += '<th style="width: 60px;">STT</th>';
+            html += '<th>NVL theo tháng</th>';
+            html += '<th style="width: 200px;">BOM</th>';
+            html += '<th style="width: 120px; text-align: center;">Số lượng</th>';
+            html += '<th style="width: 80px; text-align: center;">Chọn</th>';
+            html += '</tr></thead><tbody>';
+            
+            let stt = 1;
+            
+          
+            production_targets.forEach(target => {
+               
+                let period = `${frappe.datetime.str_to_user(target.from_date)} đến ${frappe.datetime.str_to_user(target.to_date)}`;
+                html += `<tr class="target-header" data-target="${target.name}">`;
+                html += `<td style="text-align: center;"><i class="fa fa-chevron-right target-toggle" data-target="${target.name}" style="cursor:pointer;color:#333"></i></td>`;
+                html += `<td colspan="5" style="background:#e8f4f8;font-weight:600;">${target.name} (${period})</td>`;
+                html += `</tr>`;
+                
+                // Thêm items
+                target.items.forEach(item => {
+                    let bom_options = '';
+                    if (item.boms && item.boms.length > 0) {
+                        if (item.boms.length === 1) {
+                            bom_options = item.boms[0];
+                        } else {
+                            bom_options = `<select class="form-control bom-select" data-item="${item.item_code}" style="font-size: 12px;">`;
+                            bom_options += `<option value="">-- Chọn BOM --</option>`;
+                            item.boms.forEach(bom => {
+                                bom_options += `<option value="${bom}">${bom}</option>`;
+                            });
+                            bom_options += `</select>`;
+                        }
+                    } else {
+                        bom_options = '<span class="text-muted">Không có BOM</span>';
+                    }
+                    
+                    html += `<tr class="target-item-row" data-target="${target.name}">`;
+                    html += `<td></td>`;
+                    html += `<td style="text-align: center;">${stt}</td>`;
+                    html += `<td>${item.item_code} - ${item.item_name || ''}</td>`;
+                    html += `<td>${bom_options}</td>`;
+                    html += `<td style="text-align: center;">${item.qty || 0}</td>`;
+                    html += `<td style="text-align: center;">`;
+                    html += `<input type="checkbox" class="item-checkbox" `;
+                    html += `data-item-code="${item.item_code}" `;
+                    html += `data-item-name="${item.item_name || ''}" `;
+                    html += `data-target-name="${target.name}" `;
+                    html += `data-boms='${JSON.stringify(item.boms || [])}' `;
+                    html += `data-qty="${item.qty || 0}">`;
+                    html += `</td>`;
+                    html += `</tr>`;
+                    stt++;
+                });
+            });
+            
+            html += '</tbody></table>';
+            d.fields_dict.target_html.$wrapper.html(html);
+            
+          
+            d.$wrapper.find('.target-item-row').hide();
+            
+           
+            d.$wrapper.find('.target-toggle').on('click', function() {
+                let targetName = $(this).attr('data-target');
+                let $icon = $(this);
+                let $rows = d.$wrapper.find(`.target-item-row[data-target="${targetName}"]`);
+                
+                $rows.toggle();
+                if ($rows.is(':visible')) {
+                    $icon.removeClass('fa-chevron-right').addClass('fa-chevron-down');
+                } else {
+                    $icon.removeClass('fa-chevron-down').addClass('fa-chevron-right');
+                }
+            });
+            
+            d.show();
+        }
+    });
+}
+

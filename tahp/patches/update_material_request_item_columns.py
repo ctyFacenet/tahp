@@ -5,7 +5,6 @@ def execute():
     
     doc = frappe.get_doc('DocType', 'Material Request Item')
     
-    # Fields to be visible with columns=1
     visible_fields = {
         'item_code': 1,
         'item_name': 1,
@@ -24,7 +23,7 @@ def execute():
             field.columns = visible_fields[field.fieldname]
             field.in_list_view = 1
         else:
-            # Hide other fields from list view
+           
             field.in_list_view = 0
     
     doc.save()
