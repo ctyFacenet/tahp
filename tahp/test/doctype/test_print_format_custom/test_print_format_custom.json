@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-13 08:32:46.595733",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "material_code",
+  "description",
+  "origin",
+  "uom",
+  "column_break_bmcn",
+  "stock_quantity",
+  "requested_quantity",
+  "unit_price",
+  "total_amount",
+  "feedback",
+  "column_break_wqol",
+  "estimated_delivery_date",
+  "usage_purpose",
+  "using_unit",
+  "operator",
+  "created_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_bmcn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "material_code",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "M\u00e3 v\u1eadt t\u01b0"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "N\u1ed9i dung"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Xu\u1ea5t x\u1ee9"
+  },
+  {
+   "fieldname": "stock_quantity",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "T\u1ed3n kho"
+  },
+  {
+   "fieldname": "column_break_wqol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requested_quantity",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ed1 l\u01b0\u1ee3ng y\u00eau c\u1ea7u"
+  },
+  {
+   "fieldname": "unit_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n gi\u00e1"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ti\u1ec1n"
+  },
+  {
+   "fieldname": "estimated_delivery_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y h\u00e0ng v\u1ec1 d\u1ef1 ki\u1ebfn"
+  },
+  {
+   "fieldname": "using_unit",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb s\u1eed d\u1ee5ng"
+  },
+  {
+   "fieldname": "usage_purpose",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "M\u1ee5c \u0111\u00edch s\u1eed d\u1ee5ng"
+  },
+  {
+   "fieldname": "operator",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Ng\u01b0\u1eddi th\u1ef1c hi\u1ec7n"
+  },
+  {
+   "default": "Kh\u00f4ng c\u00f3 g\u00ec c\u1ea3...",
+   "fieldname": "feedback",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Ph\u1ea3n h\u1ed3i c\u1ee7a kh\u00e1ch"
+  },
+  {
+   "fieldname": "created_by",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Ng\u01b0\u1eddi t\u1ea1o"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-13 14:20:16.773539",
+ "modified_by": "Administrator",
+ "module": "TEST",
+ "name": "Test print format custom",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

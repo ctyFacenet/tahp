@@ -4,6 +4,7 @@ app_publisher = "FaceNet"
 app_description = "FaceNet FISM"
 app_email = "contact@facenet.vn"
 app_license = "mit"
+app_logo_url = "/assets/tahp/images/logo_fn.png"
 
 # Apps
 # ------------------
@@ -83,6 +84,10 @@ web_include_css = [
 ]
 # web_include_js = "/assets/tahp/js/tahp.js"
 
+website_context = {
+  "favicon": "/assets/tahp/images/logo_fn.png",
+	"splash_image": "/assets/tahp/images/logo_fn.png",
+}
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "tahp/public/scss/website"
 
