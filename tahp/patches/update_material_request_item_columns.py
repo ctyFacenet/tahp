@@ -1,7 +1,7 @@
 import frappe
-
+"""Set Material Request Item có 10 cột  """
 def execute():
-    """Update Material Request Item columns to display 10 fields with equal width"""
+    
     
     doc = frappe.get_doc('DocType', 'Material Request Item')
     
@@ -29,4 +29,4 @@ def execute():
     
     doc.save()
     
-    print("Updated Material Request Item columns successfully")
+    

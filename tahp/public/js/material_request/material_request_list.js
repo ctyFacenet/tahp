@@ -10,7 +10,8 @@ frappe.listview_settings['Material Request'] = {
         "custom_priority",
         "custom_department",
         "custom_request_reason",
-        "custom_current_status"
+        "custom_current_status",
+        "custom_total_estimated_amount"
     ],
 
     get_indicator: function (doc) {
@@ -67,6 +68,13 @@ frappe.listview_settings['Material Request'] = {
 
         custom_request_reason: function (value) {
             return value || "";
+        },
+
+        custom_total_estimated_amount: function (value) {
+            if (value) {
+                return `<span style="font-weight: 600; color: #2490ef;">${format_currency(value, frappe.defaults.get_default("currency") || "VND")}</span>`;
+            }
+            return "";
         }
     }
 };

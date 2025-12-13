@@ -1,5 +1,16 @@
 import frappe
 
+def validate(doc, method):
+    """
+    Tính tổng thành tiền dự kiến từ Material Request Items
+    """
+    total = 0
+    for item in doc.items:
+        if item.custom_estimated_amount:
+            total += item.custom_estimated_amount
+    
+    doc.custom_total_estimated_amount = total
+
 @frappe.whitelist()
 def get_approved_week_work_orders():
     """

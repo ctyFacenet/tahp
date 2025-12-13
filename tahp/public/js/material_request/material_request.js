@@ -1,6 +1,14 @@
 frappe.ui.form.on('Material Request', {
     refresh: function (frm) {
-       
+        // Filter custom_department để chỉ hiển thị phòng ban có đuôi -TAHP
+        frm.set_query('custom_department', function() {
+            return {
+                filters: [
+                    ['Department', 'name', 'like', '%- TAHP']
+                ]
+            };
+        });
+        
         if (frm.is_new() && !frm.doc.custom_request_code) {
             frappe.call({
                 method: 'frappe.client.get_list',
@@ -495,7 +503,7 @@ frappe.ui.form.on('Material Request', {
                                         html += `<tr class="bom-row group-row" data-month="${monthKey}" data-week="${weekIndex}" data-bom="${bomName}">
                                             <td></td>
                                             <td style="padding-left: 40px; color: #666;">${bomName}</td>
-                                            <td style="text-align: center;">${Math.round(finalQty)}</td>
+                                            <td style="text-align: center;">${finalQty}</td>
                                             <td style="text-align: center;"><input type="checkbox" class="bom-checkbox" id="${bom_id}" data-bom="${bomName}"></td>
                                         </tr>`;
                                         
@@ -608,6 +616,9 @@ function add_total_row(frm) {
             totalEstimatedAmount += (item.custom_estimated_amount || 0);
         });
         
+        // Cập nhật field custom_total_estimated_amount
+        frm.set_value('custom_total_estimated_amount', totalEstimatedAmount);
+        
       
         
         // Kiểm tra xem có grid-row không
@@ -636,22 +647,14 @@ function add_total_row(frm) {
             let fieldname = $col.attr('data-fieldname');
             
             if (fieldname === 'qty') {
-                $col.text(totalQty.toFixed(2));
-                $col.css('text-align', 'right');
+                // Tạo cấu trúc giống input field của Frappe
+                $col.html(`<div class="static-area ellipsis" style="text-align: right; padding: 10px;">${totalQty.toFixed(2)}</div>`);
             } else if (fieldname === 'custom_estimated_amount') {
-                $col.text(totalEstimatedAmount.toFixed(2));
-                $col.css('text-align', 'right');
-            } else if (index === 2) {
-               
-                $col.text('TỔNG CỘNG:');
-                $col.css({
-                    'text-align': 'center',
-                    'display': 'flex',
-                    'align-items': 'center',
-                    'justify-content': 'center',
-                    'font-weight': 'bold',
-                    'padding': '10px 0'
-                });
+                // Lấy từ field custom_total_estimated_amount
+                let displayTotal = (frm.doc.custom_total_estimated_amount || 0).toFixed(2);
+                $col.html(`<div class="static-area ellipsis" style="text-align: right; padding: 10px;">${displayTotal}</div>`);
+            } else if (fieldname === 'item_code') {
+                $col.html(`<div class="static-area ellipsis" style="text-align: center; font-weight: bold; padding: 10px 8px;">TỔNG CỘNG:</div>`);
             }
         });
         
@@ -723,3 +726,4 @@ function calculate_estimated_amount(frm, cdt, cdn) {
     
     frappe.model.set_value(cdt, cdn, 'custom_estimated_amount', estimated_amount);
 }
+//ok v_1ok_v1eqe
