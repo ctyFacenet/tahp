@@ -314,8 +314,8 @@ Production Plan Sub-assembly Item,Bán thành phẩm trong kế hoạch sản xu
 Production Plan Item,Mặt hàng trong kế hoạch sản xuất
 Production Plan,Kế hoạch sản xuất
 Sales Order Item,Mặt hàng trong đơn bán hàng
-Material Request Item,Mặt hàng trong yêu cầu nguyên liệu
-Material Request,Yêu cầu nguyên liệu
+Material Request Item,Mặt hàng trong yêu cầu vật tư
+Material Request,Yêu cầu vật tư
 Item Description,Mô tả mặt hàng
 More Info,Thông tin thêm
 Total Operating Cost,Tổng chi phí vận hành
@@ -14070,3 +14070,4 @@ Custom Address, Địa chỉ
 Custom After Sale Service, Dịch vụ hậu mãi
 Custom Warranty, Điều khoản bảo hành
 Custom Origin, Xuất xứ
+Production Target, Chỉ tiêu sản xuất

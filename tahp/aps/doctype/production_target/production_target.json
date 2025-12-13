@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:CHITIEU.{MM}.{YY}.{###}",
+ "creation": "2025-12-13 08:47:19.001049",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "column_break_nhgq",
+  "to_date",
+  "column_break_mwzo",
+  "per_completed",
+  "section_break_rmjp",
+  "reason",
+  "items",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "T\u1eeb ng\u00e0y",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_nhgq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_mwzo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "per_completed",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Ph\u1ea7n tr\u0103m ho\u00e0n th\u00e0nh",
+   "read_only": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u0110\u1ebfn ng\u00e0y",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_rmjp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "M\u00f4 t\u1ea3 k\u1ebf ho\u1ea1ch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Danh s\u00e1ch th\u00e0nh ph\u1ea9m",
+   "options": "Production Target Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Production Target",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-13 09:35:24.619882",
+ "modified_by": "Administrator",
+ "module": "APS",
+ "name": "Production Target",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
