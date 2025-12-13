@@ -110,6 +110,7 @@ doctype_js = {
     "Workstation": "/public/js/workstation/workstation.js",
     "Supplier": "/public/js/supplier/supplier.js",
     "Material Request": "/public/js/material_request/material_request.js",
+    "Purchase Order": "./public/js/purchase_order/purchase_order.js"
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}

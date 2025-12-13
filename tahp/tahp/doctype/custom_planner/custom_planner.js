@@ -8,7 +8,7 @@ frappe.ui.form.on("Custom Planner", {
                 frm.set_value("code_name", response)
                 frm.refresh_field("code_name")
             }
-            await frm.events.apply_new_post(frm)
+            if (!frm.doc.posts && !frm.doc.items) await frm.events.apply_new_post(frm)
         }
         await frm.events.define_trigger(frm)
         frm.toggle_display("posts", false)
