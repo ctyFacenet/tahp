@@ -57,7 +57,15 @@
 
       <!-- Body cells -->
       <template #bodyCell="{ column, record, index }">
-        <template v-if="record.isSpec">
+        <template v-if="column.key === 'tax'">
+          <div v-if="!isSubmitted">
+            <div :data-ref="`cell_tax_${record.key}`"></div>
+          </div>
+          <div v-else>
+            {{ record.tax }}%
+          </div>
+        </template>
+        <template v-else-if="record.isSpec">
           <!-- For spec rows - giữ nguyên -->
           <template v-if="column.key === 'quality'">
             <div class="tw-flex tw-items-center tw-gap-2">
@@ -216,6 +224,7 @@ const base_columns = [
   { title: "Tên vật tư", key: "item_name", dataIndex: "item_name", width: 120, customCell: (record) => getCustomCell(record, 'item_name') },
   { title: "ĐVT", key: "stock_uom", dataIndex: "stock_uom", width: 50, align: "center", customCell: (record) => getCustomCell(record, 'stock_uom') },
   { title: "Số lượng YC", key: "qty", dataIndex: "qty", width: 50, align: "center", customCell: (record) => getCustomCell(record, 'qty') },
+  { title: "Thuế", key: "tax", dataIndex: "tax", width: 50, align: "center", customCell: (record) => getCustomCell(record, 'tax') },
   { title: "Chất lượng", key: "quality", dataIndex: "quality", width: 150, align: "center", customCell: (record) => getCustomCell(record, 'quality') }
 ];
 
@@ -236,12 +245,12 @@ const getCustomCell = (record, columnKey) => {
     if (columnKey === 'stt') {
       return { colSpan: 6, class: 'total-row' };
     } 
-    if (['item_code', 'item_name', 'stock_uom', 'qty', 'quality'].includes(columnKey)) {
+    if (['item_code', 'item_name', 'stock_uom', 'qty', 'quality', 'tax'].includes(columnKey)) {
       return { colSpan: 0 };
     }
   }
 
-  if (record.rowSpan > 1 && ['stt', 'item_code', 'item_name', 'stock_uom', 'qty'].includes(columnKey)) {
+  if (record.rowSpan > 1 && ['stt', 'item_code', 'item_name', 'stock_uom', 'qty', 'tax'].includes(columnKey)) {
     return { rowSpan: record.rowSpan };
   }
 
@@ -292,20 +301,6 @@ const columns = computed(() => {
           dataIndex: `rate_${k}`,
           width: 120,
           align: "right",
-          className: hitClass,
-          customCell: (record) => {
-            if (record.isSpec || record.isTotalRow || record.isEmptyRow) {
-              return { colSpan: 0 };
-            }
-            return {};
-          }
-        },
-        {
-          title: "Thuế",
-          key: `tax_${k}`,
-          dataIndex: `tax_${k}`,
-          width: 120,
-          align: "center",
           className: hitClass,
           customCell: (record) => {
             if (record.isSpec || record.isTotalRow || record.isEmptyRow) {
@@ -383,6 +378,7 @@ const dataSource = computed(() => {
       item_name: item.item_name,
       stock_uom: item.stock_uom,
       qty: item.qty,
+      tax: item.tax || 0,
       quality: qualities,
       rowSpan: rowSpan,
       itemIndex: itemCounter
@@ -401,7 +397,6 @@ const dataSource = computed(() => {
 
       row[`origin_${k}`] = mapping?.origin || "";
       row[`rate_${k}`] = mapping?.rate || 0;
-      row[`tax_${k}`] = mapping?.tax || 0;
       
       const statusMap = {};
       supSpecs.forEach(s => {
@@ -449,7 +444,8 @@ suppliers.value.forEach(sup => {
   const totalBase = supplierMappings.reduce((acc, m) => {
     const item = props.frm.doc.items.find(i => i.item_code === m.item_code);
     const qty = item?.qty || 0;
-    const rateWithTax = (m.rate || 0) * (1 + (m.tax || 0) / 100);
+    const tax = item?.tax || 0;
+    const rateWithTax = (m.rate || 0) * (1 + tax / 100);
     return acc + rateWithTax * qty;
   }, 0);
   const vatAmount = supplierData.vat_amount || 0;
@@ -645,7 +641,7 @@ const calculateTotal = (record, columnKey) => {
   if (record.isSpec) return '';
   const k = columnKey.replace("total_", "");
   const rate = record[`rate_${k}`] || 0;
-  const tax = record[`tax_${k}`] || 0;
+  const tax = record.tax || 0;
   return (rate * (1 + tax / 100)).toLocaleString("vi-VN");
 };
 
@@ -778,11 +774,11 @@ const approve = async (supplierName) => {
           child.item_name = approvedItem?.item_name;
           child.stock_uom = approvedItem?.stock_uom;
           child.rate = row.rate || 0;
-          child.tax = row.tax || 0;
+          child.tax = approvedItem?.tax || 0;
           child.origin = row.origin;
           child.qty = qty;
           child.actual_qty = qty;
-          child.total = qty * row.rate * (1 + row.tax / 100);
+          child.total = qty * row.rate * (1 + (approvedItem?.tax || 0) / 100)
 
           if (approvedItem.delivery_date) child.delivery_date = approvedItem.delivery_date
 
@@ -958,7 +954,6 @@ const processAddSupplier = async (supplierName) => {
     r.supplier = supplierName;
     const lt = latest[item.item_code];
     r.rate = lt?.rate || 0;
-    r.tax = lt?.tax || 0;
     r.origin = lt?.origin || "";
   });
 
@@ -1119,6 +1114,7 @@ const createAllControls = () => {
       });
     }
     else {
+      createItemTaxControl(record, `tax_${record.key}`);
       suppliers.value.forEach((sup) => {
         const k = sup.supplier.replace(/\s+/g, "_");
         createOriginControl(record, k, `origin_${k}_${record.key}`);
@@ -1127,6 +1123,64 @@ const createAllControls = () => {
       });
     }
   });
+};
+
+const createItemTaxControl = (record, cellKey) => {
+  nextTick(() => {
+    const container = document.querySelector(`[data-ref="cell_${cellKey}"]`);
+    if (!container || container.dataset.controlInitialized) return;
+    
+    container.innerHTML = '';
+    container.dataset.controlInitialized = 'true';
+    
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 4px;';
+    
+    const inputDiv = document.createElement('div');
+    inputDiv.style.cssText = 'flex: 1;';
+    
+    const percentSpan = document.createElement('span');
+    percentSpan.textContent = '%';
+    percentSpan.style.cssText = 'font-weight: 500;';
+    
+    wrapper.appendChild(inputDiv);
+    wrapper.appendChild(percentSpan);
+    container.appendChild(wrapper);
+    
+    const control = frappe.ui.form.make_control({
+      df: {
+        fieldtype: 'Float',
+        fieldname: 'tax'
+      },
+      parent: inputDiv,
+      only_input: true,
+      frm: props.frm
+    });
+    
+    control.refresh();
+    control.$input.val(record.tax || 0);
+    control.$input.addClass('text-center');
+    
+    control.$input.on('input', async () => {
+      const value = control.get_value();
+      await updateItemTax(record.item_code, value);
+    });
+    
+    controlsMap.value[cellKey] = control;
+  });
+};
+
+// Thêm hàm update
+const updateItemTax = async (item_code, value) => {
+  const frm = props.frm;
+  const item = frm.doc.items.find(i => i.item_code === item_code);
+  
+  if (item) {
+    await frappe.model.set_value(item.doctype, item.name, 'tax', value);
+    frm.refresh_field('items');
+    frm.dirty();
+    specVersion.value++;
+  }
 };
 
 const createLinkControl = ({

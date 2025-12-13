@@ -6,11 +6,12 @@
  "engine": "InnoDB",
  "field_order": [
   "item_code",
-  "item_name",
-  "item_group",
-  "rate",
   "supplier",
+  "item_group",
   "origin",
+  "item_name",
+  "rate",
+  "previous_rate",
   "is_manual_price"
  ],
  "fields": [
@@ -57,12 +58,18 @@
    "fieldname": "is_manual_price",
    "fieldtype": "Check",
    "label": "T\u1ef1 khai"
+  },
+  {
+   "fieldname": "previous_rate",
+   "fieldtype": "Float",
+   "label": "\u0110\u01a1n gi\u00e1 c\u0169",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-13 08:12:34.939517",
+ "modified": "2025-12-13 10:39:48.341085",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Supplier Item Rate",
