@@ -1,10 +1,10 @@
 .form-control[data-fieldtype="Small Text"] {
-    min-height: 100px !important;
-    height: 100px !important;
+  min-height: 100px !important;
+  height: 100px !important;
 }
 
 textarea {
-    resize: none !important;
+  resize: none !important;
 }
 
 
@@ -13,9 +13,10 @@ textarea {
     width: 100%;
     min-width: unset;
   }
+
   .navbar-title,
   .dropdown-logout,
-  .workspace-navbar{
+  .workspace-navbar {
     display: none !important;
   }
 
@@ -24,24 +25,24 @@ textarea {
   }
 
   .search-bar {
-    display: none !important;    
+    display: none !important;
   }
 }
 
 @media (max-width: 767.98px) {
-    .dropdown-notifications .notifications-list {
-        max-height: 100vh;
-        min-width: 80vw;
-        width: calc(-60px + 90vw);
-        right: -68px;
-    }
+  .dropdown-notifications .notifications-list {
+    max-height: 100vh;
+    min-width: 80vw;
+    width: calc(-60px + 90vw);
+    right: -68px;
+  }
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .layout-side-section {
       display: none !important;
   }
-}
+} */
 
 .bs-popover-top {
   display: none !important;
@@ -55,13 +56,16 @@ textarea {
   flex: 1.2;
 }
 
-.list-row .level-left, .list-row-head .level-left {
-    flex: 4;
-    min-width: 90%;
+.list-row .level-left,
+.list-row-head .level-left {
+  flex: 4;
+  min-width: 90%;
 }
 
 @media (max-width: 768px) {
-  .list-row .level-left, .list-row-head .level-left {
+
+  .list-row .level-left,
+  .list-row-head .level-left {
     min-width: 60%;
   }
 
