@@ -11,7 +11,7 @@
   "rate",
   "supplier",
   "origin",
-  "tax"
+  "is_manual_price"
  ],
  "fields": [
   {
@@ -53,15 +53,16 @@
    "options": "Custom Origin"
   },
   {
-   "fieldname": "tax",
-   "fieldtype": "Float",
-   "label": "Thu\u1ebf"
+   "default": "0",
+   "fieldname": "is_manual_price",
+   "fieldtype": "Check",
+   "label": "T\u1ef1 khai"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-11 08:18:23.157866",
+ "modified": "2025-12-13 08:12:34.939517",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Supplier Item Rate",

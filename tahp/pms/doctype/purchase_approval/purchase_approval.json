@@ -119,9 +119,11 @@
   {
    "fieldname": "payment_method",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n",
    "options": "Chuy\u1ec3n kho\u1ea3n\nTi\u1ec1n m\u1eb7t",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_blfh",
@@ -130,9 +132,11 @@
   {
    "fieldname": "payment_note",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Th\u1eddi h\u1ea1n thanh to\u00e1n",
    "options": "Custom Payment Note",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_npgy",
@@ -147,9 +151,11 @@
   {
    "fieldname": "delivery_address",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "\u0110\u1ecba ch\u1ec9 giao h\u00e0ng",
    "options": "Custom Address",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_wrss",
@@ -158,9 +164,11 @@
   {
    "fieldname": "delivery_note",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Th\u1eddi gian giao h\u00e0ng",
    "options": "Custom Delivery Note",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_shqk",
@@ -171,7 +179,7 @@
    "fieldtype": "Link",
    "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
    "options": "Custom Delivery Cost",
-   "read_only": 1
+   "reqd": 1
   },
   {
    "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_chi\u1ebft_kh\u1ea5u_th\u01b0\u01a1ng_m\u1ea1i_section",
@@ -183,7 +191,8 @@
    "fieldname": "discount_note",
    "fieldtype": "Data",
    "label": "Gi\u1ea3m gi\u00e1",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_qeqq",
@@ -193,7 +202,8 @@
    "fieldname": "special_offer",
    "fieldtype": "Data",
    "label": "Khuy\u1ebfn m\u1ea1i",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_rsmq",
@@ -210,7 +220,8 @@
    "fieldtype": "Link",
    "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
    "options": "Custom Warranty",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_dayj",
@@ -221,7 +232,7 @@
    "fieldtype": "Link",
    "label": "C\u00e1c d\u1ecbch v\u1ee5 sau b\u00e1n h\u00e0ng",
    "options": "Custom After Sale Service",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "column_break_fxnr",
@@ -252,13 +263,14 @@
    "fieldname": "discount_amount",
    "fieldtype": "Float",
    "label": "Gi\u1ea3m gi\u00e1",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "delivery_amount",
    "fieldtype": "Float",
    "label": "Ph\u00ed v\u1eadn chuy\u1ec3n",
-   "read_only": 1
+   "read_only_depends_on": "quotation_comparison",
+   "reqd": 1
   },
   {
    "fieldname": "vat",
@@ -301,7 +313,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-11 15:22:36.972926",
+ "modified": "2025-12-12 11:05:52.610421",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Purchase Approval",

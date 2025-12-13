@@ -743,3 +743,34 @@ function calculate_estimated_amount(frm, cdt, cdn) {
     
     frappe.model.set_value(cdt, cdn, 'custom_estimated_amount', estimated_amount);
 }
+
+async function create_comparison(frm) {
+    const doc = frappe.model.get_new_doc("Quotation Comparison");
+
+    for (const row of frm.doc.items) {
+        const child = frappe.model.add_child(doc, "Quotation Comparison Item", "items");
+        child.item_code = row.item_code;
+        child.item_name = row.item_name;
+        child.stock_uom = row.stock_uom;
+        child.qty = row.qty;
+
+        // --- fetch QA group specs (async) ---
+        const records = await frappe.db.get_list("Quotation Comparison QA Group", {
+            filters: { item_code: row.item_code },
+            fields: ["specification"]
+        });
+
+        // --- add qa_master rows ---
+        records.forEach(rec => {
+            const c = frappe.model.add_child(doc, "Quotation Comparison QA Master", "qa_master");
+            c.item_code = row.item_code;
+            c.specification = rec.specification;
+        });
+
+    }
+
+    const child = frappe.model.add_child(doc, "Quotation Comparison MR", "material_request")
+    child.material_request = frm.doc.name
+
+    frappe.set_route("Form", "Quotation Comparison", doc.name);
+}

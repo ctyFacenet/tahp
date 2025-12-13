@@ -16,17 +16,17 @@ frappe.ui.form.on("Purchase Approval", {
 	},
 
     before_save(frm) {
-        const items = frm.doc.items || [];
+        // const items = frm.doc.items || [];
 
-        const missingItems = items
-            .filter(row => !row.delivery_date || row.delivery_date.trim() === "")
-            .map(row => row.item_name || row.item_code);
+        // const missingItems = items
+        //     .filter(row => !row.delivery_date || row.delivery_date.trim() === "")
+        //     .map(row => row.item_name || row.item_code);
 
-        if (missingItems.length > 0) {
-            frappe.throw(`
-                Tại mặt hàng <strong>${missingItems.join(", ")}</strong>, chưa điền Ngày giao hàng yêu cầu.
-            `);
-        }
+        // if (missingItems.length > 0) {
+        //     frappe.throw(`
+        //         Tại mặt hàng <strong>${missingItems.join(", ")}</strong>, chưa điền Ngày giao hàng yêu cầu.
+        //     `);
+        // }
     },
 
     after_workflow_action: async function(frm) {
