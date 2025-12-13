@@ -89,7 +89,7 @@ frappe.ui.form.on('Material Request', {
                         fieldname: 'year_filter',
                         fieldtype: 'Select',
                         label: __('Năm'),
-                        options: [], // Để trống, sẽ được build từ data thực tế
+                        options: [], 
                         default: ''
                     },
                     {
@@ -372,7 +372,7 @@ frappe.ui.form.on('Material Request', {
                             
                             if (d.fields_dict && d.fields_dict.year_filter && d.fields_dict.year_filter.$input) {
                                 d.fields_dict.year_filter.$input.html(optionsHTML.join('\n'));
-                                // Set giá trị mặc định là năm gần nhất (năm đầu tiên trong danh sách đã sort)
+                               
                                 if (years.length > 0) {
                                     d.fields_dict.year_filter.$input.val(years[0]);
                                 }
@@ -569,7 +569,7 @@ frappe.ui.form.on('Material Request', {
                             });
                         };
 
-                        // set up year filter handler and initial render
+                        
                         let defaultYear = (d.fields_dict.year_filter && d.fields_dict.year_filter.get_value) ? d.fields_dict.year_filter.get_value() : String(currentYear);
                         d.fields_dict.year_filter.$input.on('change', function () {
                             let val = d.fields_dict.year_filter.get_value ? d.fields_dict.year_filter.get_value() : d.fields_dict.year_filter.$input.val();
@@ -683,7 +683,16 @@ frappe.ui.form.on('Material Request Item', {
         let row = locals[cdt][cdn];
         if (!row.item_code) return;
         
+        // Lấy tồn kho hiện tại (Hiếu)
+        let res = await frappe.xcall("erpnext.stock.utils.get_latest_stock_qty", {
+            item_code: row.item_code
+        });
+        if (res) {
+            frappe.model.set_value(row.doctype, row.name, "custom_current_stock", res);
+        }
+        //////////
         
+        // Lấy đơn giá và xuất xứ
         const response = await frappe.call({
             method: 'tahp.doc_events.material_request.material_request.get_supplier_item_rate',
             args: {
@@ -701,6 +710,7 @@ frappe.ui.form.on('Material Request Item', {
             }
         }
         
+        frm.refresh_field("items");
         add_total_row(frm);
     },
 
@@ -726,4 +736,3 @@ function calculate_estimated_amount(frm, cdt, cdn) {
     
     frappe.model.set_value(cdt, cdn, 'custom_estimated_amount', estimated_amount);
 }
-//ok v_1ok_v1eqe
