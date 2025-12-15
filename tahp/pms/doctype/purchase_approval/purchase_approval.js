@@ -13,6 +13,12 @@ frappe.ui.form.on("Purchase Approval", {
             totalFieldName: "total", 
             showIndex: true
         })
+
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button("Tạo đơn đặt hàng", async () => {
+                let res = await frappe.xcall("tahp.pms.doctype.purchase_approval.purchase_approval.generate_po", {"docname": self.doc.name})
+            })
+        }
 	},
 
     before_save(frm) {
