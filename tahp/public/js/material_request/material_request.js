@@ -753,6 +753,7 @@ async function create_comparison(frm) {
         child.item_name = row.item_name;
         child.stock_uom = row.stock_uom;
         child.qty = row.qty;
+        child.delivery_date = row.custom_required_date
 
         // --- fetch QA group specs (async) ---
         const records = await frappe.db.get_list("Quotation Comparison QA Group", {
@@ -771,6 +772,5 @@ async function create_comparison(frm) {
 
     const child = frappe.model.add_child(doc, "Quotation Comparison MR", "material_request")
     child.material_request = frm.doc.name
-
     frappe.set_route("Form", "Quotation Comparison", doc.name);
 }

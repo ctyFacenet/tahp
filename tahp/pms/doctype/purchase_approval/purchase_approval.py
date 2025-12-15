@@ -5,6 +5,7 @@ import frappe
 from frappe.utils import today, getdate, formatdate
 from frappe.model.naming import make_autoname
 from frappe.model.document import Document
+from tahp.doc_events.purchase_order.purchase_order import generate_purchase_order
 # from tahp.tahp.doctype.custom_planner.custom_planner import wwo_notify
 
 
@@ -29,6 +30,7 @@ class PurchaseApproval(Document):
 			comparison.update_supplier_item_rate()
 
 	def on_submit(self):
+		
 		doc = frappe.new_doc("Purchase Order")
 		doc.supplier = self.supplier
 		doc.custom_employee = self.employee

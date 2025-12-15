@@ -254,20 +254,20 @@
   },
   {
    "fieldname": "total_row",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "T\u1ed5ng ti\u1ec1n s\u1ea3n ph\u1ea9m",
    "precision": "0",
    "read_only": 1
   },
   {
    "fieldname": "discount_amount",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Gi\u1ea3m gi\u00e1",
    "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "delivery_amount",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Ph\u00ed v\u1eadn chuy\u1ec3n",
    "read_only_depends_on": "quotation_comparison",
    "reqd": 1
@@ -280,14 +280,14 @@
   },
   {
    "fieldname": "vat_amount",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Thu\u1ebf th\u00e0nh ti\u1ec1n",
    "read_only": 1
   },
   {
    "bold": 1,
    "fieldname": "total_amount",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "T\u1ed5ng ti\u1ec1n thanh to\u00e1n",
    "read_only": 1
   },
@@ -301,8 +301,7 @@
   },
   {
    "fieldname": "section_break_khsi",
-   "fieldtype": "Section Break",
-   "hidden": 1
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "items",
@@ -313,7 +312,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-12 11:05:52.610421",
+ "modified": "2025-12-15 10:16:37.968021",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Purchase Approval",
