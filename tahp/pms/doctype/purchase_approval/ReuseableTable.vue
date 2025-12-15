@@ -6,6 +6,7 @@
       :bordered="true"
       :pagination="false"
       :loading="loading"
+      :scroll="{ x: 'max-content', y: 400 }"
     >
       <template #bodyCell="{ column, record, index }">
 
@@ -27,14 +28,12 @@
           <a-table-summary-row>
             <a-table-summary-cell 
               :col-span="totalColumnIndex" 
-              align="center"
               class="total-label-cell"
             >
               <strong>Tổng cộng</strong>
             </a-table-summary-cell>
             <a-table-summary-cell 
               :col-span="columns.length - totalColumnIndex"
-              align="left"
               class="total-value-cell"
             >
               <strong>{{ formattedTotal }}</strong>
@@ -48,7 +47,7 @@
 
 <script setup>
 import { ref, computed, nextTick, watch, onMounted } from "vue";
-
+const COLUMN_UNIT_PX = 60;
 const props = defineProps({
   frm: { type: Object, required: true },
   childTableName: { type: String, required: true },
@@ -93,7 +92,7 @@ const columns = computed(() => {
         key: field.fieldname,
         dataIndex: field.fieldname,
         align: getColumnAlign(field.fieldtype),
-        width: getColumnWidth(field.fieldtype),
+        width: getColumnWidth(field),
         fieldtype: field.fieldtype,
         read_only: field.read_only,
         options: field.options,
@@ -258,24 +257,14 @@ const styleControl = (control, fieldtype) => {
 
 // Align
 const getColumnAlign = (type) => {
-  if (["Float", "Int", "Currency"].includes(type)) return "center";
-  if (type === "Check") return "center";
+  if (["Float", "Int", "Currency", "Check"].includes(type)) return "center";
   return "left";
 };
 
 // Width
-const getColumnWidth = (type) => {
-  switch (type) {
-    case "Check": return 60;
-    case "Int":
-    case "Float":
-    case "Currency": return 120;
-    case "Date": return 120;
-    case "Datetime": return 180;
-    case "Link":
-    case "Select": return 160;
-    default: return 150;
-  }
+const getColumnWidth = (field) => {
+  const columns = field.columns || 1;
+  return Math.max(columns * COLUMN_UNIT_PX, 60);
 };
 
 // Init
@@ -308,5 +297,12 @@ const dataSource = tableData;
   background-color: #fafafa;
   font-weight: bold;
   font-size: 14px;
+}
+
+:deep(.ant-table-thead > tr > th) {
+  background-color: #e8e8e8 !important;
+  font-weight: 600;
+  color: #000;
+  text-align: center;
 }
 </style>

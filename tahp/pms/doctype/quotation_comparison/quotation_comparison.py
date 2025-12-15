@@ -16,6 +16,13 @@ class QuotationComparison(Document):
         serial = make_autoname(series_key + "###")[-3:]
         self.name = f"SSBG.{dd}.{mm}.{yy}.{serial}"
 
+    def before_insert(self):
+        if self.material_request:
+            for item in self.material_request:
+                doc = frappe.get_doc("Material Request", item.material_request)
+                doc.custom_current_status = "Đã tạo báo giá"
+                doc.save(ignore_permissions=True)
+
     def on_update(self):
         if self.items and not self.qa_master:
             for item in self.items:
@@ -162,6 +169,7 @@ def add_request(names, comparison):
             "qty": total_qty,
             "delivery_date": delivery_date
         })
+        print(comparison_doc.delivery_date)
 
     if comparison_doc.items and not comparison_doc.qa_master:
         for item in comparison_doc.items:
