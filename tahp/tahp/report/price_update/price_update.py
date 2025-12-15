@@ -6,12 +6,9 @@ import random
 import hashlib
 from datetime import datetime
 
-# Copyright (c) 2025, FaceNet and contributors
-# For license information, please see license.txt
-
 @frappe.whitelist()
 def get_multi_price_history(item_code, origins=None, suppliers=None, month=None, year=None):
-	"""Lấy lịch sử giá của một mặt hàng cho nhiều nhà cung cấp (multi-line chart) với filter tháng/năm"""
+	"""Get price history for an item for multiple suppliers (multi-line chart) with month/year filter"""
 	if isinstance(origins, str):
 		origins = json.loads(origins)
 	if isinstance(suppliers, str):
@@ -26,7 +23,7 @@ def get_multi_price_history(item_code, origins=None, suppliers=None, month=None,
 	if suppliers:
 		filters["supplier"] = ["in", suppliers]
 
-	# Lấy tất cả dữ liệu
+	# Get all data
 	history = frappe.get_all(
 		"Supplier Item Rate",
 		filters=filters,
@@ -34,7 +31,7 @@ def get_multi_price_history(item_code, origins=None, suppliers=None, month=None,
 		order_by="modified asc"
 	)
 
-	# Lọc theo tháng/năm nếu có
+	# Filter by month/year if provided
 	if month or year:
 		filtered_history = []
 		for row in history:
@@ -62,7 +59,7 @@ def get_multi_price_history(item_code, origins=None, suppliers=None, month=None,
 			"datasets": []
 		}
 
-	# Gom nhóm theo supplier/origin
+	# Group by supplier/origin
 	group_map = defaultdict(list)
 	all_dates = set()
 	
@@ -81,12 +78,12 @@ def get_multi_price_history(item_code, origins=None, suppliers=None, month=None,
 		})
 		all_dates.add(date_str)
 
-	# Sắp xếp ngày
+	# Sort dates
 	labels = sorted(list(all_dates))
 	datasets = []
 	
 	def color_for_key(key):
-		# Sinh màu cố định từ tên
+		# Generate fixed color from name
 		h = int(hashlib.md5(key.encode()).hexdigest(), 16)
 		random.seed(h)
 		return f"#{random.randint(0, 0xFFFFFF):06x}"
@@ -98,7 +95,7 @@ def get_multi_price_history(item_code, origins=None, suppliers=None, month=None,
 			# Nếu có nhiều giá cùng ngày, lấy giá cuối cùng
 			data_map[r['date']] = r['rate']
 		
-		# Tạo mảng data với None cho các ngày không có giá
+		# Create data array with None for dates without price
 		data = [data_map.get(date, None) for date in labels]
 		
 		datasets.append({
@@ -132,12 +129,12 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{
-			"label": _("Mã mặt hàng"),
+		{ "label": _("Mã mặt hàng"),
 			"fieldname": "item_code",
 			"fieldtype": "Link",
 			"options": "Item",
-			"width": 250
+			"width": 250,
+			"show_title": 0,
 		},
 		{
 			"label": _("Tên mặt hàng"),
@@ -235,19 +232,76 @@ def get_data(filters):
 		order_by="item_code, supplier, origin, modified desc"
 	)
 
-	# Lấy dữ liệu từ Purchase Order Items (đơn hàng thực tế)
-	purchase_orders = frappe.db.sql("""
-		SELECT 
-			poi.item_code,
-			po.supplier,
-			poi.rate,
-			po.transaction_date,
-			po.docstatus
-		FROM `tabPurchase Order Item` poi
-		INNER JOIN `tabPurchase Order` po ON poi.parent = po.name
-		WHERE po.docstatus = 1
-		ORDER BY po.transaction_date DESC
-	""", as_dict=1)
+	# Lấy dữ liệu từ Purchase Order custom_detail child table
+	# Tìm tên chính xác của child table
+	purchase_orders = []
+	try:
+		# Lấy metadata của Purchase Order để tìm tên child table
+		po_meta = frappe.get_meta("Purchase Order")
+		child_table_name = None
+		
+		# Tìm field custom_detail
+		for field in po_meta.fields:
+			if field.fieldname == "custom_detail" and field.fieldtype == "Table":
+				child_table_name = field.options
+				break
+		
+		if child_table_name:
+			# Kiểm tra xem bảng có tồn tại không
+			# Get data from Supplier Item Rate (manual price)
+			table_exists = frappe.db.sql(f"""
+				SELECT COUNT(*) as count 
+				FROM information_schema.tables 
+				WHERE table_schema = DATABASE() 
+				AND table_name = 'tab{child_table_name}'
+			""", as_dict=1)
+			
+			if table_exists and table_exists[0].get('count', 0) > 0:
+				# Query với tên bảng đúng - lấy PO gần nhất cho mỗi item/supplier/origin
+				purchase_orders = frappe.db.sql(f"""
+					SELECT 
+						cd.item_code,
+						cd.item_name,
+						cd.origin,
+						cd.rate,
+						cd.qty,
+						CASE 
+			# Get data from Purchase Order custom_detail child table
+			# Find the exact name of the child table
+							WHEN cd.qty > 0 THEN cd.rate / cd.qty
+							ELSE cd.rate
+						END as unit_rate,
+				# Get metadata of Purchase Order to find child table name
+						po.supplier,
+						po.transaction_date,
+						po.docstatus
+					FROM `tab{child_table_name}` cd
+				# Find field custom_detail
+					INNER JOIN `tabPurchase Order` po ON cd.parent = po.name
+					INNER JOIN (
+						SELECT 
+							cd2.item_code,
+							po2.supplier,
+							COALESCE(cd2.origin, 'Không xác định') as origin,
+							MAX(po2.transaction_date) as max_date
+					# Check if table exists
+						FROM `tab{child_table_name}` cd2
+						INNER JOIN `tabPurchase Order` po2 ON cd2.parent = po2.name
+						WHERE po2.docstatus = 1
+						GROUP BY cd2.item_code, po2.supplier, COALESCE(cd2.origin, 'Không xác định')
+					) latest ON 
+						cd.item_code = latest.item_code 
+						AND po.supplier = latest.supplier 
+						AND COALESCE(cd.origin, 'Không xác định') = latest.origin
+						AND po.transaction_date = latest.max_date
+						# Query with correct table name - get latest PO for each item/supplier/origin
+					WHERE po.docstatus = 1
+					ORDER BY po.transaction_date DESC
+				""", as_dict=1)
+			# If child table does not exist, skip purchase order data
+		# If custom_detail field not found, skip purchase order data
+	except Exception as e:
+		frappe.log_error(f"Error getting purchase orders: {str(e)}", "Price Update Report")
 
 	# Tạo cấu trúc dữ liệu
 	structured_data = build_structured_data(manual_prices)
@@ -274,19 +328,21 @@ def get_data(filters):
 				old_rate_display = format_currency(old_rate)
 				avg_rate_display = format_currency(avg_rate)
 				
-				# Lấy giá đơn hàng gần nhất
+				# Lấy giá đơn hàng gần nhất (khớp cả origin)
 				last_order_rate, last_order_date = get_last_purchase_order_price(
-					purchase_order_map, item_code, supplier
+					purchase_order_map, item_code, supplier, origin
 				)
 				
 				# Tạo HTML cho đơn giá gần đây với % thay đổi và nút sửa
 				recent_rate_html = format_recent_rate_with_change(
 					recent_rate, old_rate, item_code, supplier, origin
+			# Build data structure
 				)
 				
 				# Chỉ tạo nút UI cho hàng đầu tiên của mỗi item_code
 				ui_buttons = format_ui_buttons(item_code) if first_item_row else ""
 				
+			# Convert to report data
 				row = {
 					"item_code": item_code if first_item_row else "",
 					"item_name": prices[0][2] if first_item_row else "",
@@ -302,6 +358,7 @@ def get_data(filters):
 					"last_order_date": last_order_date,
 					"ui": ui_buttons,
 					"indent": 0 if first_item_row else 1
+						# Calculate values
 				}
 				
 				data.append(row)
@@ -312,16 +369,18 @@ def get_data(filters):
 
 
 def build_structured_data(manual_prices):
-	"""Xây dựng cấu trúc dữ liệu theo item_code -> supplier -> origin"""
+	"""Build data structure by item_code -> supplier -> origin"""
 	structured_data = {}
 	
 	for entry in manual_prices:
+						# Create HTML for recent price with % change and edit button
 		item_code = entry["item_code"]
 		supplier = entry["supplier"]
 		origin = entry["origin"] or "Không xác định"
 		
 		if item_code not in structured_data:
 			structured_data[item_code] = {}
+						# Only create UI button for first row of each item_code
 		
 		if supplier not in structured_data[item_code]:
 			structured_data[item_code][supplier] = {}
@@ -340,19 +399,28 @@ def build_structured_data(manual_prices):
 
 
 def build_purchase_order_map(purchase_orders):
-	"""Xây dựng map cho đơn hàng gần nhất theo item_code và supplier"""
+	"""Xây dựng map cho đơn hàng gần nhất theo item_code, supplier và origin"""
 	po_map = {}
 	
 	for po in purchase_orders:
-		key = (po["item_code"], po["supplier"])
+		# Match by item_code, supplier AND origin for accuracy
+		origin = po.get("origin") or "Không xác định"
+		key = (po["item_code"], po["supplier"], origin)
+		
+		# Use unit_rate (rate/qty) instead of rate
+		unit_rate = po.get("unit_rate", po.get("rate", 0))
+		transaction_date = po["transaction_date"]
+		
+		# SQL already filtered for latest PO, just add to map
+		# Still check for duplicates
 		if key not in po_map:
-			po_map[key] = (po["rate"], po["transaction_date"])
+			po_map[key] = (unit_rate, transaction_date)
 	
 	return po_map
 
 
 def calculate_average_rate(prices):
-	"""Tính giá trung bình"""
+	"""Calculate average price"""
 	if not prices:
 		return 0
 	total = sum(price[0] for price in prices)
@@ -360,30 +428,30 @@ def calculate_average_rate(prices):
 
 
 def get_most_recent_price(prices):
-	"""Lấy giá mới nhất"""
+	"""Get most recent price"""
 	if not prices:
 		return 0, None
 	return prices[0][0], prices[0][1]
 
 
 def get_second_most_recent_price(prices):
-	"""Lấy giá cũ (giá thứ 2 mới nhất)"""
+	"""Get second most recent price"""
 	if len(prices) < 2:
 		return 0, None
 	return prices[1][0], prices[1][1]
 
 
 def format_recent_rate_with_change(recent_rate, old_rate, item_code, supplier, origin):
-	"""Format đơn giá gần đây với % thay đổi và nút sửa"""
+	"""Format recent price with % change and edit button"""
 	if not recent_rate:
 		return ""
 	
-	# Escape quotes trong các tham số
+	# Escape quotes in parameters
 	item_code_safe = str(item_code).replace("'", "\\'")
 	supplier_safe = str(supplier).replace("'", "\\'")
 	origin_safe = str(origin).replace("'", "\\'")
 	
-	# Tính % thay đổi
+	# Calculate % change
 	change_html = ""
 	if old_rate and old_rate > 0:
 		change_percent = ((recent_rate - old_rate) / old_rate) * 100
@@ -392,7 +460,7 @@ def format_recent_rate_with_change(recent_rate, old_rate, item_code, supplier, o
 		elif change_percent < 0:
 			change_html = f'<span style="color: red; margin-left: 8px; font-weight: 600;">↓ {abs(change_percent):.1f}%</span>'
 	
-	# Tạo nút sửa
+	# Create edit button
 	edit_button = f'''
 		<button class="btn btn-xs btn-default" 
 			onclick="window.edit_price('{item_code_safe}', '{supplier_safe}', '{origin_safe}', {recent_rate})"
@@ -402,7 +470,7 @@ def format_recent_rate_with_change(recent_rate, old_rate, item_code, supplier, o
 		</button>
 	'''
 	
-	# Format giá
+	# Format price
 	formatted_rate = f"{recent_rate:,.0f}"
 
 	return (
@@ -414,7 +482,7 @@ def format_recent_rate_with_change(recent_rate, old_rate, item_code, supplier, o
 
 
 def format_ui_buttons(item_code):
-	"""Format các nút thêm và biểu đồ (chỉ cho item_code)"""
+	"""Format add and chart buttons (only for item_code)"""
 	# Escape quotes
 	item_code_safe = str(item_code).replace("'", "\\'")
 	
@@ -439,17 +507,22 @@ def format_ui_buttons(item_code):
 	return f'<div style="display: flex; align-items: center; gap: 4px;">{add_button}{chart_button}</div>'
 
 
-def get_last_purchase_order_price(po_map, item_code, supplier):
-	"""Lấy giá đơn hàng gần nhất"""
-	key = (item_code, supplier)
+def get_last_purchase_order_price(po_map, item_code, supplier, origin):
+	"""Get latest purchase order price (match origin)"""
+	# Normalize origin
+	origin_normalized = origin if origin != "Không xác định" else None
+	origin_key = origin_normalized or "Không xác định"
+	
+	key = (item_code, supplier, origin_key)
 	if key in po_map:
-		return po_map[key]
+		rate, date = po_map[key]
+		return format_currency(rate), date
 	return None, None
 
 
 @frappe.whitelist()
 def create_supplier_item_rate(supplier, item_code, rate, origin=None):
-	"""Tạo bản ghi giá mới cho nhà cung cấp"""
+	"""Create new price record for supplier"""
 	item = frappe.get_doc("Item", item_code)
 	
 	doc = frappe.new_doc("Supplier Item Rate")
@@ -468,13 +541,13 @@ def create_supplier_item_rate(supplier, item_code, rate, origin=None):
 
 @frappe.whitelist()
 def update_supplier_item_rate(item_code, supplier, origin, rate):
-	"""Cập nhật giá mới cho nhà cung cấp (tạo bản ghi mới)"""
+	"""Update new price for supplier (create new record)"""
 	return create_supplier_item_rate(supplier, item_code, rate, origin)
 
 
 @frappe.whitelist()
 def get_price_history(item_code, supplier, origin=None):
-	"""Lấy lịch sử giá của một mặt hàng từ nhà cung cấp"""
+	"""Get price history for an item from supplier"""
 	filters = {
 		"item_code": item_code,
 		"supplier": supplier,

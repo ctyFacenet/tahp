@@ -1,7 +1,0 @@
-{
-    "title": "Supplier Item Rate",
-    "route": "supplier-item-rate",
-    "description": "Bảng giá nhà cung cấp theo mặt hàng (manual)",
-    "icon": "octicon octicon-tag",
-    "order": 10
-}

@@ -12,6 +12,10 @@ if (typeof window.Chart === 'undefined') {
 
 frappe.query_reports["Price Update"] = {
 	filters: [],
+
+	get_datatable_options(options) {
+        return { ...options, freezeIndex: 3};
+    },
 	
 	onload: function(report) {
 		// Thêm nút "Tạo giá tự khai" vào header
