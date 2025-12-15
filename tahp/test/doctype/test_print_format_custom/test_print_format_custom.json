@@ -28,24 +28,28 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "ABCD_1",
    "fieldname": "material_code",
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "M\u00e3 v\u1eadt t\u01b0"
   },
   {
+   "default": "Kinh doanh n\u1ed9i b\u1ed9 ",
    "fieldname": "description",
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "N\u1ed9i dung"
   },
   {
+   "default": "kg",
    "fieldname": "uom",
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
   },
   {
+   "default": "Vi\u1ec7t Nam",
    "fieldname": "origin",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -86,6 +90,7 @@
    "label": "Ng\u00e0y h\u00e0ng v\u1ec1 d\u1ef1 ki\u1ebfn"
   },
   {
+   "default": "KTHK",
    "fieldname": "using_unit",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -98,6 +103,7 @@
    "label": "M\u1ee5c \u0111\u00edch s\u1eed d\u1ee5ng"
   },
   {
+   "default": "Ronaldo",
    "fieldname": "operator",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -120,7 +126,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-13 14:20:16.773539",
+ "modified": "2025-12-15 10:03:52.898389",
  "modified_by": "Administrator",
  "module": "TEST",
  "name": "Test print format custom",
