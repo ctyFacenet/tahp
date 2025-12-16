@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-16 08:38:33.143501",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name",
+  "uom",
+  "quantity",
+  "column_break_ggqu",
+  "unit_price",
+  "note",
+  "total_amount"
+ ],
+ "fields": [
+  {
+   "default": "\u00c1o l\u00f3t tr\u1ee5c b\u01a1m D55x5x50 (03 c\u00e1i/b\u1ed9).",
+   "fieldname": "item_name",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "T\u00ean h\u00e0ng ho\u00e1"
+  },
+  {
+   "default": "l\u00edt",
+   "fieldname": "uom",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
+  },
+  {
+   "fieldname": "column_break_ggqu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "S\u1ed1 l\u01b0\u1ee3ng"
+  },
+  {
+   "fieldname": "unit_price",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u0110\u01a1n gi\u00e1"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Th\u00e0nh ti\u1ec1n"
+  },
+  {
+   "default": "H\u00e0ng m\u1eabu m\u00e3 \u0111\u1eb9p...",
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Ghi ch\u00fa"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-16 10:57:47.914857",
+ "modified_by": "Administrator",
+ "module": "TEST",
+ "name": "Test print Purchase Order",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
