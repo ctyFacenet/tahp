@@ -5,7 +5,7 @@ frappe.pages["tracking-production"].on_page_load = function (wrapper) {
     
     const page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: "Theo dõi chu trình sản xuất",
+        title: "Tiến độ sản xuất",
         single_column: true
     });
 

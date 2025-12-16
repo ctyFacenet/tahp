@@ -3,6 +3,24 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2025-12-11 01:06:58.849058",
+  "name": "Đã được trưởng BP duyệt",
+  "style": "",
+  "workflow_state_name": "Đã được trưởng BP duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-11 01:06:46.228026",
+  "name": "Đợi trưởng BP duyệt",
+  "style": "",
+  "workflow_state_name": "Đợi trưởng BP duyệt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-09-15 11:44:47.323583",
   "name": "Gửi KDTM",
   "style": "",

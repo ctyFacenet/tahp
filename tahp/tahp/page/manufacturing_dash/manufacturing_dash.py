@@ -22,29 +22,45 @@ def execute(filters=None):
     num_days = (to_date - from_date).days + 1
     prev_from = from_date - timedelta(days=num_days)
     prev_to = from_date - timedelta(days=1)
-    result["overall"] = dict()
+    result["overall"] = {
+        "main": {
+            "qty": 0,
+            "produced_qty": 0,
+            "old_qty": 0,
+            "label": "",
+            "unit": ""
+        },
+        "sub": {
+            "qty": 0,
+            "produced_qty": 0,
+            "old_qty": 0,
+            "label": "",
+            "unit": ""
+        }
+    }
 
     if main_item:
         main_current = overall(main_item, from_date, to_date)
         main_prev = overall(main_item, prev_from, prev_to)
-        result["overall"]["main"] = {
+        result["overall"]["main"].update({
             "qty": main_current["qty"],
             "produced_qty": main_current["produced_qty"],
             "old_qty": main_prev["produced_qty"],
             "label": main_item.item_name,
             "unit": main_item.stock_uom
-        }
+        })
 
     if sub_item:
         sub_current = overall(sub_item, from_date, to_date)
         sub_prev = overall(sub_item, prev_from, prev_to)
-        result["overall"]["sub"] = {
+        result["overall"]["sub"].update({
             "qty": sub_current["qty"],
             "produced_qty": sub_current["produced_qty"],
             "old_qty": sub_prev["produced_qty"],
             "label": sub_item.item_name,
             "unit": sub_item.stock_uom
-        }
+        })
+
 
     # Category
     if main_item:
@@ -252,37 +268,55 @@ def manufacturing_overall(main, from_date, to_date, sub=None):
     })
 
     for wo in wo_list:
-        # Ngày ghi nhận = actual_start_date nếu có, ngược lại lấy planned_start_date
+        if wo.production_item not in main_items:
+            continue
+
         ref_date = wo.planned_start_date
         if not ref_date:
-            continue  # bỏ qua nếu không có ngày nào
+            continue
 
         ref_date = ref_date.date()
         if not (from_date <= ref_date <= to_date):
-            continue  # bỏ qua nếu ngoài khoảng thời gian
-
-        # Xác định loại item
-        if wo.production_item in main_items:
-            target = "main"
-        elif wo.production_item in sub_items:
-            target = "sub"
-        else:
             continue
 
-        # Ghi nhận kế hoạch (qty)
+        date_key = str(ref_date)
+
         planned_remaining = wo.get("qty", 0) - wo.get("produced_qty", 0)
         if planned_remaining > 0:
-            result[str(ref_date)][target]["qty"] += planned_remaining
-            result[str(ref_date)][target]["qty_wo"].append(wo.name)
+            result[date_key]["main"]["qty"] += planned_remaining
+            result[date_key]["main"]["qty_wo"].append(wo.name)
 
-        # Ghi nhận thực tế (produced_qty)
         produced = wo.get("produced_qty", 0)
         if produced > 0:
-            result[str(ref_date)][target]["produced_qty"] += produced
-            result[str(ref_date)][target]["produced_qty_wo"].append(wo.name)
+            result[date_key]["main"]["produced_qty"] += produced
+            result[date_key]["main"]["produced_qty_wo"].append(wo.name)
+
+    for wo in wo_list:
+        if wo.production_item not in sub_items:
+            continue
+
+        ref_date = wo.planned_start_date
+        if not ref_date:
+            continue
+
+        ref_date = ref_date.date()
+        if not (from_date <= ref_date <= to_date):
+            continue
+
+        date_key = str(ref_date)
+
+        planned_remaining = wo.get("qty", 0) - wo.get("produced_qty", 0)
+        if planned_remaining > 0:
+            result[date_key]["sub"]["qty"] += planned_remaining
+            result[date_key]["sub"]["qty_wo"].append(wo.name)
+
+        produced = wo.get("produced_qty", 0)
+        if produced > 0:
+            result[date_key]["sub"]["produced_qty"] += produced
+            result[date_key]["sub"]["produced_qty_wo"].append(wo.name)
 
 
-    # Sắp xếp theo ngày
+        # Sắp xếp theo ngày
     sorted_result = dict(sorted(result.items()))
     return sorted_result
 
