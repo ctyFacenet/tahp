@@ -238,6 +238,11 @@ override_doctype_class = {
 # }
 
 doc_events = {
+    "Material Request": {
+        "validate": [
+            "tahp.doc_events.material_request.material_request.validate"
+        ]
+    },
     "Quality Inspection Template": {
         "before_save": [
             "tahp.doc_events.quality_inspection_template.before_save.before_save"
