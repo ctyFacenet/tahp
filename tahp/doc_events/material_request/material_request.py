@@ -80,14 +80,26 @@ def get_supplier_item_rate(item_code):
     return {'rate': 0, 'origin': ''}
 
 @frappe.whitelist()
-def get_production_targets_with_boms():
+def get_production_targets_with_boms(target_names=None):
     """
     Lấy danh sách Production Target kèm items và BOM của mỗi item
+    target_names: Optional list of specific target names to fetch
     """
+    import json
+    
+    # Parse target_names if provided as JSON string
+    if target_names and isinstance(target_names, str):
+        target_names = json.loads(target_names)
+    
+    # Build filters
+    filters = {'docstatus': 1}
+    if target_names:
+        filters['name'] = ['in', target_names]
+    
     # Lấy Production Target đã submit
     targets = frappe.get_all(
         'Production Target',
-        filters={'docstatus': 1},
+        filters=filters,
         fields=['name', 'from_date', 'to_date', 'reason'],
         order_by='from_date desc'
     )
