@@ -1,6 +1,6 @@
 frappe.ui.form.on('Material Request', {
     refresh: function (frm) {
-
+        // console.log('Material Request form refreshed');
         // XÓA HÀNG TỔNG CŨ KHI REFRESH FORM
         if (frm.fields_dict.items && frm.fields_dict.items.$wrapper) {
             frm.fields_dict.items.$wrapper.find('.total-row').remove();

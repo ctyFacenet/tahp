@@ -2,7 +2,7 @@ import frappe
 
 def validate(doc, method):
     """
-    Tính tổng thành tiền dự kiến từ Material Request Items
+    Tính tổng tiền dự kiến từ Material Request Items
     """
     total = 0
     for item in doc.items:
