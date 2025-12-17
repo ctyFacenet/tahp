@@ -737,7 +737,7 @@ const approve = async (supplierName) => {
       const totalBase = supplierMappings.reduce((acc, m) => {
         const item = props.frm.doc.items.find(i => i.item_code === m.item_code);
         const qty = item?.qty || 0;
-        const rateWithTax = (m.rate || 0) * (1 + (m.tax || 0) / 100);
+        const rateWithTax = (m.rate || 0) * (1 + (item.tax || 0) / 100);
         return acc + rateWithTax * qty;
       }, 0);
       const vatAmount = approvedSupplier.vat_amount || 0;
@@ -762,7 +762,7 @@ const approve = async (supplierName) => {
       doc.total_row = totalBase
       doc.discount_amount = approvedSupplier.discount_amount
       doc.delivery_amount = approvedSupplier.delivery_amount
-      doc.vat = approvedSupplier.vat
+      doc.vat = vatAmount
       doc.vat_amount = totalBase * vatAmount / 100
       doc.total_amount = totalBase * (1 + vatAmount/100) + (approvedSupplier.delivery_amount || 0) - (approvedSupplier.discount_amount || 0)
       for (const row of supplierMappings) {
@@ -779,6 +779,8 @@ const approve = async (supplierName) => {
           child.qty = qty;
           child.actual_qty = qty;
           child.total = qty * row.rate * (1 + (approvedItem?.tax || 0) / 100)
+          let res = await frappe.xcall("erpnext.stock.utils.get_latest_stock_qty", {item_code: row.item_code})
+          if (res) child.available_qty = res
 
           if (approvedItem.delivery_date) child.delivery_date = approvedItem.delivery_date
 
