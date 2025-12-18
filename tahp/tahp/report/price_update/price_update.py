@@ -174,7 +174,8 @@ def get_columns():
 			"label": _("Tên mặt hàng"),
 			"fieldname": "item_name",
 			"fieldtype": "Data",
-			"width": 250
+			"width": 250,
+			"hidden": 1
 		},
 		{
 			"label": _("Nhóm mặt hàng"),

@@ -160,7 +160,7 @@ frappe.query_reports["Price Update"] = {
 		// Tạo dialog với filter
 		let chartDialog = new frappe.ui.Dialog({
 			title: `Biểu đồ Biến động giá - ${item_name}`,
-			size: 'extra-large',
+			size: 'large',
 			fields: [
 				{
 					fieldtype: 'Section Break',
@@ -227,12 +227,12 @@ frappe.query_reports["Price Update"] = {
 						}
 
 						chartDialog.fields_dict.chart_html.$wrapper.html(`
-							<div style="position: relative; height: 500px; width: 100%;">
-								<canvas id="price-chart-${item_code}"></canvas>
-							</div>
+						<div style="position: relative; height: 360px; width: 100%;">
+							<canvas id="price-chart-${item_code}"></canvas>
+						</div>
 						`);
 
-						setTimeout(() => {
+						const tryRender = (attempt = 0) => {
 							const $canvas = chartDialog.fields_dict.chart_html.$wrapper.find('canvas')[0];
 							if ($canvas) {
 								const ctx = $canvas.getContext('2d');
@@ -403,7 +403,8 @@ frappe.query_reports["Price Update"] = {
 									}
 								});
 							}
-						}, 100);
+						};
+						tryRender();
 					} else {
 						chartDialog.fields_dict.chart_html.$wrapper.html(
 							'<div style="padding: 60px; text-align: center; color: #888; font-size: 14px;">Không có dữ liệu lịch sử giá cho bộ lọc này</div>'
