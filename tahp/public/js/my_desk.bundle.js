@@ -11,4 +11,3 @@ import "./tahp/form/controls/attach.js";
 import "./tahp/list/list_view.js";
 import "./tahp/list/bulk_operations.js";
 import "./tahp/list/list_settings.js";
-import "./cleaner.js"

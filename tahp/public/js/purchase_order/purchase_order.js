@@ -1,15 +1,6 @@
 frappe.ui.form.on("Purchase Order", {
     refresh: function(frm) {
         frm.set_intro("")
-        const $wrapper = $(frm.fields_dict.custom_wrapper.wrapper);
-        $wrapper.empty();
-        const component = new tahp.ui.ReuseableTableComponent({
-            wrapper: $wrapper, 
-            frm: frm, 
-            childTableName: "custom_detail", 
-            totalFieldName: "total", 
-            showIndex: true
-        })
         setTimeout(() => {
             frm.remove_custom_button(__("Update Items"));
             frm.remove_custom_button("Hold", "Status");
@@ -19,11 +10,13 @@ frappe.ui.form.on("Purchase Order", {
             frm.remove_custom_button("Payment", "Create New");
             frm.remove_custom_button("Payment Request", "Create New");
         }, 50);
+
+        if (frm.doc.docstatus !== 1) return
         frm.add_custom_button("Chi tiết giao hàng", () => {}, "Cập nhật");
         frm.add_custom_button("Phiếu kiểm tra", () => {}, "Cập nhật");
         frm.add_custom_button("Thông tin thanh toán", () => {openPaymentDialog(frm)}, "Cập nhật");
         frm.page.set_inner_btn_group_as_primary(__("Cập nhật"));
-    }
+    },
 })
 
 
