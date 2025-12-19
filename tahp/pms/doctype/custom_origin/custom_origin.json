@@ -12,14 +12,16 @@
   {
    "fieldname": "origin_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Xu\u1ea5t x\u1ee9",
+   "reqd": 1,
    "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-09 09:53:40.863551",
+ "modified": "2025-12-18 11:42:49.453764",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom Origin",

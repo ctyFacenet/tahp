@@ -12,15 +12,17 @@
   {
    "fieldname": "delivery_amount_note",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
    "length": 512,
+   "reqd": 1,
    "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-10 01:21:27.830854",
+ "modified": "2025-12-18 11:42:57.295676",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom Delivery Cost",

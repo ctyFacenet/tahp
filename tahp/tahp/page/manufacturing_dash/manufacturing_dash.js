@@ -1,7 +1,7 @@
 frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
     const page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: 'Manufacturing Dashboard',
+        title: 'Kế hoạch và thực tế',
         single_column: true
     });
 
@@ -12,7 +12,7 @@ frappe.pages['manufacturing_dash'].on_page_load = function(wrapper) {
         bom: null
     };
 
-    page.set_title('Báo cáo sản lượng theo phân loại');
+    page.set_title('Kế hoạch và thực tế');
     // debounce control
     this.refreshTimeout = null;
 

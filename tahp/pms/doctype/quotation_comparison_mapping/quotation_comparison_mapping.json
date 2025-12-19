@@ -20,13 +20,6 @@
    "options": "Item"
   },
   {
-   "fieldname": "origin",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Xu\u1ea5t x\u1ee9",
-   "options": "Custom Origin"
-  },
-  {
    "fieldname": "rate",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -38,13 +31,20 @@
    "in_list_view": 1,
    "label": "M\u00e3 nh\u00e0 cung c\u1ea5p",
    "options": "Supplier"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Xu\u1ea5t x\u1ee9",
+   "options": "Brand"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-13 10:27:12.828544",
+ "modified": "2025-12-18 16:33:18.298724",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Quotation Comparison Mapping",

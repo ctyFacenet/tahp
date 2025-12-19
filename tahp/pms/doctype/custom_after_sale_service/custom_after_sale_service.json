@@ -12,14 +12,17 @@
   {
    "fieldname": "after_sale_service",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "D\u1ecbch v\u1ee5 sau b\u00e1n h\u00e0ng",
    "length": 512,
+   "reqd": 1,
    "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-10 01:35:49.627201",
+ "modified": "2025-12-18 11:43:54.550383",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom After Sale Service",
