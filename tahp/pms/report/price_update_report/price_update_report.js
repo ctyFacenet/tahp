@@ -10,7 +10,7 @@ if (typeof window.Chart === 'undefined') {
 	document.head.appendChild(script);
 }
 
-frappe.query_reports["Price Update"] = {
+frappe.query_reports["Price Update Report"] = {
 	filters: [],
 
 	get_datatable_options(options) {
@@ -18,19 +18,9 @@ frappe.query_reports["Price Update"] = {
     },
 	
 	onload: function(report) {
-		// Thêm nút "Tạo giá tự khai" vào header
-		const $btn = $(
-			'<button class="btn btn-primary" style="margin-left: 12px;">Tạo giá tự khai</button>'
-		);
-		$btn.on('click', function() {
-			frappe.query_reports["Price Update"].open_supplier_item_rate_dialog();
-		});
-		setTimeout(() => {
-			// Chỉ thêm nếu chưa có
-			if (!$('.report-btn-tao-gia-tu-khai').length) {
-				$('.page-head .page-actions').prepend($btn.addClass('report-btn-tao-gia-tu-khai'));
-			}
-		}, 300);
+		report.page.add_inner_button("Thêm giá mới", () => {
+			frappe.query_reports["Price Update Report"].open_supplier_item_rate_dialog();
+		}).addClass("btn-primary")
 		
 		// Đăng ký các hàm global để có thể gọi từ HTML buttons
 		window.edit_price = this.edit_price.bind(this);
@@ -70,7 +60,7 @@ frappe.query_reports["Price Update"] = {
 					fieldtype: 'Link',
 					label: 'Xuất xứ',
 					fieldname: 'origin',
-					options: 'Custom Origin',
+					options: 'Brand',
 					reqd: 1,
 					default: default_values.origin || ''
 				},
@@ -78,7 +68,7 @@ frappe.query_reports["Price Update"] = {
 			primary_action_label: 'Tạo',
 			primary_action(values) {
 				frappe.call({
-					method: 'tahp.tahp.report.price_update.price_update.create_supplier_item_rate',
+					method: 'tahp.pms.report.price_update_report.price_update_report.create_supplier_item_rate',
 					args: values,
 					callback: function(r) {
 						if (!r.exc) {
@@ -109,7 +99,7 @@ frappe.query_reports["Price Update"] = {
 		],
 		function(values) {
 			frappe.call({
-				method: 'tahp.tahp.report.price_update.price_update.update_supplier_item_rate',
+				method: 'tahp.pms.report.price_update_report.price_update_report.update_supplier_item_rate',
 				args: {
 					item_code: item_code,
 					supplier: supplier,
@@ -211,7 +201,7 @@ frappe.query_reports["Price Update"] = {
 
 		const loadChartData = (month, year) => {
 			frappe.call({
-				method: 'tahp.tahp.report.price_update.price_update.get_multi_price_history',
+				method: 'tahp.pms.report.price_update_report.price_update_report.get_multi_price_history',
 				args: {
 					item_code: item_code,
 					suppliers: JSON.stringify(suppliers),

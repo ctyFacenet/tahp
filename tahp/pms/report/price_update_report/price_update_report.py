@@ -181,7 +181,7 @@ def get_columns():
 			"label": _("Nhóm mặt hàng"),
 			"fieldname": "item_group",
 			"fieldtype": "Data",  # Đổi sang Data để hiển thị HTML
-			"width": 250
+			"width": 190
 		},
 		{
 			"label": _("Nhà cung cấp"),
@@ -193,27 +193,21 @@ def get_columns():
 		{
 			"label": _("Xuất xứ"),
 			"fieldname": "origin",
-			"fieldtype": "Data",
+			"fieldtype": "Link",
+			"options": "Brand",
 			"width": 120
 		},
 		{
 			"label": _("Đơn giá bình quân"),
 			"fieldname": "avg_rate",
 			"fieldtype": "Data",
-			"align": "right",
-			"width": 160
-		},
-		{
-			"label": _("Ngày cập nhật"),
-			"fieldname": "avg_date",
-			"fieldtype": "Date",
-			"width": 140
+			"width": 130
 		},
 		{
 			"label": _("Đơn giá cũ"),
 			"fieldname": "old_rate",
 			"fieldtype": "Data",
-			"width": 170
+			"width": 140
 		},
 		{
 			"label": _("Đơn giá gần đây"),
@@ -225,25 +219,25 @@ def get_columns():
 			"label": _("Ngày cập nhật"),
 			"fieldname": "recent_date",
 			"fieldtype": "Date",
-			"width": 140
+			"width": 120
 		},
 		{
 			"label": _("Đơn giá đơn hàng gần nhất"),
 			"fieldname": "last_order_rate",
 			"fieldtype": "Data",
-			"width": 200
+			"width": 120
 		},
 		{
 			"label": _("Ngày đơn hàng"),
 			"fieldname": "last_order_date",
 			"fieldtype": "Date",
-			"width": 140
+			"width": 120
 		},
 		{
 			"label": "",
 			"fieldname": "ui",
 			"fieldtype": "Data",
-			"width": 100,
+			"width": 90,
 			"align": "center",
 		}
 	]
