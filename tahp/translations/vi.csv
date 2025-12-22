@@ -14045,24 +14045,24 @@ Operation Tracker, Cấu hình đo định kỳ
 Operation Tracker Inspection, Phiếu đo định kỳ
 Operation Tracker Evaluation, Khuyến nghị theo kết quả đo
 BOM Custom Search, Tìm kiếm BOM
-Downtime Report, Báo cáo dừng máy
-Production Order Weekly Report, Báo cáo tiến độ LSX
+Downtime Report, Phân tích tình trạng dừng máy
+Production Order Weekly Report, Tiến độ thực hiện LSX
 Problem Reason, Lý do hỏng máy
-Production Report, Báo cáo sản lượng Thạch cao & P2O5
+Production Report, So sánh sản lượng theo thời gian
 Workstation Status Report, Báo cáo trạng thái thiết bị
-Material Consumption, Báo cáo tiêu hao nguyên liệu theo LSX Ca
-Production Schedule, Báo cáo tiến độ sản xuất theo LSX
-Manufacturing Dashboard, Báo cáo sản lượng theo phân loại
-Manufacturing dashboard, Báo cáo sản lượng theo phân loại
+Material Consumption, Tổng quan tiêu hao nguyên liệu
+Production Schedule, So sánh sản lượng theo LSX
+Manufacturing Dashboard, Kế hoạch và thực tế
+Manufacturing dashboard, Kế hoạch và thực tế
 Custom Invoice, Hóa đơn
 Custom Invoice Allocation, Phiếu nhập xuất có hóa đơn
 Custom Invoice Allocation Report, Bảng theo dõi nhập liệu kho
 Custom Invoice Summary, Phiếu tổng hợp nhập xuất có hóa đơn
 Work Order Finished Item, Kết quả LSX Ca
 Custom Planner, Kế hoạch sản xuất
-WWO Comment Report, Thống kê bình luận LSX
+WWO Comment Report, Thống kê góp ý
 Worker Productivity Report, Báo cáo năng suất nhân viên
-Production Variance Trace Report, Báo cáo LSX ca bất thường
+Production Variance Trace Report, Danh sách LSX ca bất thường
 Buying, Mua hàng
 Quotation Comparison, So sánh báo giá
 Purchase Approval, Trình duyệt mua hàng
@@ -14075,3 +14075,7 @@ Contact, Liên hệ
 Address, Địa chỉ
 Supplier Item Rate, Lịch sử đơn giá
 Company Name, Tên công ty
+Item Tax Template, Thuế mặt hàng
+Required By, Yêu cầu vào
+Purchase Order, Đơn đặt hàng
+Price Update Report, Bảng giá mặt hàng

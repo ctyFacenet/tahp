@@ -13,8 +13,7 @@ def cleanup_custom():
             dt = custom_data["doctype"]
             result[dt] = []
             for row in custom_data["custom_fields"]:
-                if row["fieldname"].startswith("custom"):
-                    result[dt].append(row["fieldname"])
+                result[dt].append(row["fieldname"])
     
     db_custom_fields = frappe.db.get_all(
         "Custom Field",

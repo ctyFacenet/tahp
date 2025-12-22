@@ -5,18 +5,16 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "quotation_comparison",
-  "material_request",
-  "column_break_mrbg",
   "supplier",
   "posting_date",
   "column_break_oxou",
   "employee",
   "employee_name",
+  "column_break_mrbg",
+  "quotation_comparison",
+  "material_request",
   "section_break_rwyy",
   "recommend_reason",
-  "section_break_vdyg",
-  "wrapper",
   "section_break_khsi",
   "items",
   "\u0111i\u1ec1u_kho\u1ea3n_thanh_to\u00e1n_section",
@@ -48,7 +46,8 @@
   "delivery_amount",
   "vat",
   "vat_amount",
-  "total_amount"
+  "total_amount",
+  "amended_from"
  ],
  "fields": [
   {
@@ -73,8 +72,7 @@
    "fieldname": "supplier",
    "fieldtype": "Link",
    "label": "Nh\u00e0 cung c\u1ea5p",
-   "options": "Supplier",
-   "read_only": 1
+   "options": "Supplier"
   },
   {
    "default": "Today",
@@ -99,6 +97,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "supplier",
    "fieldname": "recommend_reason",
    "fieldtype": "Small Text",
    "label": "L\u00fd do ch\u1ecdn nh\u00e0 cung c\u1ea5p"
@@ -145,15 +144,14 @@
   {
    "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_giao_h\u00e0ng_section",
    "fieldtype": "Section Break",
-   "label": "\u0110i\u1ec1u kho\u1ea3n giao h\u00e0ng",
-   "read_only": 1
+   "label": "\u0110i\u1ec1u kho\u1ea3n giao h\u00e0ng"
   },
   {
    "fieldname": "delivery_address",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "\u0110\u1ecba ch\u1ec9 giao h\u00e0ng",
-   "options": "Custom Address",
+   "options": "Address",
    "read_only_depends_on": "quotation_comparison",
    "reqd": 1
   },
@@ -191,8 +189,7 @@
    "fieldname": "discount_note",
    "fieldtype": "Data",
    "label": "Gi\u1ea3m gi\u00e1",
-   "read_only_depends_on": "quotation_comparison",
-   "reqd": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "column_break_qeqq",
@@ -202,8 +199,7 @@
    "fieldname": "special_offer",
    "fieldtype": "Data",
    "label": "Khuy\u1ebfn m\u1ea1i",
-   "read_only_depends_on": "quotation_comparison",
-   "reqd": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "column_break_rsmq",
@@ -220,8 +216,7 @@
    "fieldtype": "Link",
    "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
    "options": "Custom Warranty",
-   "read_only_depends_on": "quotation_comparison",
-   "reqd": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "column_break_dayj",
@@ -269,14 +264,12 @@
    "fieldname": "delivery_amount",
    "fieldtype": "Currency",
    "label": "Ph\u00ed v\u1eadn chuy\u1ec3n",
-   "read_only_depends_on": "quotation_comparison",
-   "reqd": 1
+   "read_only_depends_on": "quotation_comparison"
   },
   {
    "fieldname": "vat",
    "fieldtype": "Float",
-   "label": "% Thu\u1ebf VAT",
-   "read_only": 1
+   "label": "% Thu\u1ebf VAT"
   },
   {
    "fieldname": "vat_amount",
@@ -292,27 +285,33 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_vdyg",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "wrapper",
-   "fieldtype": "HTML"
-  },
-  {
    "fieldname": "section_break_khsi",
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "supplier",
    "fieldname": "items",
    "fieldtype": "Table",
-   "options": "Purchase Approval Item"
+   "label": "Danh s\u00e1ch m\u1eb7t h\u00e0ng",
+   "options": "Purchase Approval Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Purchase Approval",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-12-15 10:16:37.968021",
+ "modified": "2025-12-19 11:28:13.710283",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Purchase Approval",

@@ -10,23 +10,17 @@ if (typeof window.Chart === 'undefined') {
 	document.head.appendChild(script);
 }
 
-frappe.query_reports["Price Update"] = {
+frappe.query_reports["Price Update Report"] = {
 	filters: [],
+
+	get_datatable_options(options) {
+        return { ...options, freezeIndex: 3};
+    },
 	
 	onload: function(report) {
-		// Thêm nút "Tạo giá tự khai" vào header
-		const $btn = $(
-			'<button class="btn btn-primary" style="margin-left: 12px;">Tạo giá tự khai</button>'
-		);
-		$btn.on('click', function() {
-			frappe.query_reports["Price Update"].open_supplier_item_rate_dialog();
-		});
-		setTimeout(() => {
-			// Chỉ thêm nếu chưa có
-			if (!$('.report-btn-tao-gia-tu-khai').length) {
-				$('.page-head .page-actions').prepend($btn.addClass('report-btn-tao-gia-tu-khai'));
-			}
-		}, 300);
+		report.page.add_inner_button("Thêm giá mới", () => {
+			frappe.query_reports["Price Update Report"].open_supplier_item_rate_dialog();
+		}).addClass("btn-primary")
 		
 		// Đăng ký các hàm global để có thể gọi từ HTML buttons
 		window.edit_price = this.edit_price.bind(this);
@@ -66,7 +60,7 @@ frappe.query_reports["Price Update"] = {
 					fieldtype: 'Link',
 					label: 'Xuất xứ',
 					fieldname: 'origin',
-					options: 'Custom Origin',
+					options: 'Brand',
 					reqd: 1,
 					default: default_values.origin || ''
 				},
@@ -74,7 +68,7 @@ frappe.query_reports["Price Update"] = {
 			primary_action_label: 'Tạo',
 			primary_action(values) {
 				frappe.call({
-					method: 'tahp.tahp.report.price_update.price_update.create_supplier_item_rate',
+					method: 'tahp.pms.report.price_update_report.price_update_report.create_supplier_item_rate',
 					args: values,
 					callback: function(r) {
 						if (!r.exc) {
@@ -105,7 +99,7 @@ frappe.query_reports["Price Update"] = {
 		],
 		function(values) {
 			frappe.call({
-				method: 'tahp.tahp.report.price_update.price_update.update_supplier_item_rate',
+				method: 'tahp.pms.report.price_update_report.price_update_report.update_supplier_item_rate',
 				args: {
 					item_code: item_code,
 					supplier: supplier,
@@ -156,7 +150,7 @@ frappe.query_reports["Price Update"] = {
 		// Tạo dialog với filter
 		let chartDialog = new frappe.ui.Dialog({
 			title: `Biểu đồ Biến động giá - ${item_name}`,
-			size: 'extra-large',
+			size: 'large',
 			fields: [
 				{
 					fieldtype: 'Section Break',
@@ -207,7 +201,7 @@ frappe.query_reports["Price Update"] = {
 
 		const loadChartData = (month, year) => {
 			frappe.call({
-				method: 'tahp.tahp.report.price_update.price_update.get_multi_price_history',
+				method: 'tahp.pms.report.price_update_report.price_update_report.get_multi_price_history',
 				args: {
 					item_code: item_code,
 					suppliers: JSON.stringify(suppliers),
@@ -223,12 +217,12 @@ frappe.query_reports["Price Update"] = {
 						}
 
 						chartDialog.fields_dict.chart_html.$wrapper.html(`
-							<div style="position: relative; height: 500px; width: 100%;">
-								<canvas id="price-chart-${item_code}"></canvas>
-							</div>
+						<div style="position: relative; height: 360px; width: 100%;">
+							<canvas id="price-chart-${item_code}"></canvas>
+						</div>
 						`);
 
-						setTimeout(() => {
+						const tryRender = (attempt = 0) => {
 							const $canvas = chartDialog.fields_dict.chart_html.$wrapper.find('canvas')[0];
 							if ($canvas) {
 								const ctx = $canvas.getContext('2d');
@@ -245,6 +239,10 @@ frappe.query_reports["Price Update"] = {
 									'#9A60B4', // Tím
 								];
 								
+								// Kiểm tra kích thước màn hình
+								const isMobile = window.innerWidth < 768;
+								const isSmallMobile = window.innerWidth < 480;
+								
 								currentChart = new Chart(ctx, {
 									type: 'line',
 									data: {
@@ -258,14 +256,14 @@ frappe.query_reports["Price Update"] = {
 											data: ds.values,
 											borderColor: colors[idx % colors.length],
 											backgroundColor: colors[idx % colors.length] + '20',
-											pointRadius: 5,
-											pointHoverRadius: 7,
+											pointRadius: isMobile ? 3 : 5,
+											pointHoverRadius: isMobile ? 5 : 7,
 											pointBackgroundColor: colors[idx % colors.length],
 											pointBorderColor: '#fff',
-											pointBorderWidth: 2,
+											pointBorderWidth: isMobile ? 1 : 2,
 											fill: false,
 											tension: 0.4,
-											borderWidth: 2
+											borderWidth: isMobile ? 1.5 : 2
 										}))
 									},
 									options: {
@@ -273,10 +271,10 @@ frappe.query_reports["Price Update"] = {
 										maintainAspectRatio: false,
 										layout: {
 											padding: {
-												left: 20,
-												right: 20,
-												top: 20,
-												bottom: 10
+												left: isMobile ? 10 : 20,
+												right: isMobile ? 10 : 20,
+												top: isMobile ? 15 : 20,
+												bottom: isMobile ? 20 : 30
 											}
 										},
 										interaction: {
@@ -288,10 +286,10 @@ frappe.query_reports["Price Update"] = {
 												display: true, 
 												position: 'bottom',
 												labels: {
-													boxWidth: 15,
-													padding: 15,
+													boxWidth: isMobile ? 12 : 15,
+													padding: isMobile ? 10 : 15,
 													font: {
-														size: 12
+														size: isSmallMobile ? 10 : (isMobile ? 11 : 12)
 													},
 													usePointStyle: true,
 													pointStyle: 'circle'
@@ -302,13 +300,13 @@ frappe.query_reports["Price Update"] = {
 											},
 											tooltip: {
 												backgroundColor: 'rgba(0, 0, 0, 0.8)',
-												padding: 12,
+												padding: isMobile ? 8 : 12,
 												titleFont: {
-													size: 13,
+													size: isMobile ? 11 : 13,
 													weight: 'bold'
 												},
 												bodyFont: {
-													size: 12
+													size: isMobile ? 10 : 12
 												},
 												callbacks: {
 													label: function(context) {
@@ -330,18 +328,33 @@ frappe.query_reports["Price Update"] = {
 													display: true, 
 													text: 'Đơn giá (VNĐ)',
 													font: {
-														size: 13,
+														size: isSmallMobile ? 11 : (isMobile ? 12 : 13),
 														weight: 'bold'
+													},
+													padding: {
+														bottom: isMobile ? 8 : 12
 													}
 												},
 												ticks: {
 													callback: function(value) {
+														// Format ngắn gọn hơn trên mobile
+														if (isMobile) {
+															const millions = value / 1000000;
+															if (millions >= 1) {
+																return millions.toFixed(1) + 'M';
+															}
+															const thousands = value / 1000;
+															if (thousands >= 1) {
+																return thousands.toFixed(0) + 'K';
+															}
+														}
 														return new Intl.NumberFormat('vi-VN').format(value);
 													},
 													font: {
-														size: 11
+														size: isSmallMobile ? 9 : (isMobile ? 10 : 11)
 													},
-													padding: 10
+													padding: isMobile ? 6 : 10,
+													maxTicksLimit: isMobile ? 6 : 8
 												},
 												grid: {
 													color: 'rgba(0, 0, 0, 0.05)',
@@ -353,16 +366,23 @@ frappe.query_reports["Price Update"] = {
 													display: true, 
 													text: 'Ngày',
 													font: {
-														size: 13,
+														size: isSmallMobile ? 11 : (isMobile ? 12 : 13),
 														weight: 'bold'
+													},
+													padding: {
+														top: isMobile ? 12 : 18
 													}
 												},
 												ticks: {
 													maxRotation: 0,
 													minRotation: 0,
 													font: {
-														size: 11
-													}
+														size: isSmallMobile ? 9 : (isMobile ? 10 : 11)
+													},
+													padding: isMobile ? 8 : 12,
+													maxTicksLimit: isSmallMobile ? 6 : (isMobile ? 8 : 12),
+													autoSkip: true,
+													autoSkipPadding: isMobile ? 15 : 10
 												},
 												grid: {
 													display: false,
@@ -373,7 +393,8 @@ frappe.query_reports["Price Update"] = {
 									}
 								});
 							}
-						}, 100);
+						};
+						tryRender();
 					} else {
 						chartDialog.fields_dict.chart_html.$wrapper.html(
 							'<div style="padding: 60px; text-align: center; color: #888; font-size: 14px;">Không có dữ liệu lịch sử giá cho bộ lọc này</div>'

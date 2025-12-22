@@ -525,7 +525,7 @@ const rowsConfig = [
     stt: '2. Địa điểm giao hàng', 
     type: 'delivery_address', 
     fieldname: 'delivery_address', 
-    doctype: 'Custom Address', 
+    doctype: 'Address', 
     isNotBold: true, 
     special: true
   },
@@ -775,7 +775,7 @@ const approve = async (supplierName) => {
           child.stock_uom = approvedItem?.stock_uom;
           child.rate = row.rate || 0;
           child.tax = approvedItem?.tax || 0;
-          child.origin = row.origin;
+          child.brand = row.origin;
           child.qty = qty;
           child.actual_qty = qty;
           child.total = qty * row.rate * (1 + (approvedItem?.tax || 0) / 100)
@@ -1234,6 +1234,7 @@ const createLinkControl = ({
       },
       parent: linkDiv,
       only_input: true,
+      render_input: true,
       frm
     });
 
@@ -1243,7 +1244,7 @@ const createLinkControl = ({
     control.$input.css({"text-align": "center"})
 
     // Khi chọn giá trị
-    control.$input.on('awesomplete-selectcomplete', async () => {
+    control.$input.on('awesomplete-selectcomplete', async (e) => {
       const value = control.get_value();
       const supplierRow = frm.doc[childTable].find(r => r.supplier.replace(/\s+/g, "_") === supplierKey);
       if (!supplierRow) {
@@ -1257,47 +1258,77 @@ const createLinkControl = ({
     });
 
     // Khi nhấn dấu +
-    plusDiv.onclick = () => {
-      frappe.prompt(
-        [
-          {
-            fieldtype: 'Data',
-            fieldname: `${fieldname}`,
-            label,
-            reqd: 1
-          }
-        ],
-        async (values) => {
-          try {
-            const newDoc = await frappe.xcall('frappe.client.insert', {
-              doc: {
-                doctype,
-                [`${fieldname}`]: values[`${fieldname}`]
-              }
-            });
+    plusDiv.onclick = async () => {
+        await frappe.model.with_doctype(doctype);
+        const prompt_fields = await get_prompt_fields(doctype);
 
-            control.$input.val(newDoc.name);
-            control.set_value(newDoc.name);
+        frappe.prompt(
+            prompt_fields,
+            async (values) => {
+                try {
+                    const newDoc = await frappe.xcall('frappe.client.insert', {
+                        doc: {
+                            doctype,
+                            ...values
+                        }
+                    });
 
-            // Cập nhật vào supplier
-            const supplierRow = frm.doc[childTable].find(r => r.supplier.replace(/\s+/g, "_") === supplierKey);
-            if (supplierRow) {
-              supplierRow[fieldname] = newDoc.name;
-              frm.refresh_field(childTable);
-            }
-            frm.dirty()
-            frappe.show_alert({ message: `${label} mới đã tạo`, indicator: 'green' });
-          } catch (err) {
-            frappe.msgprint({ title: 'Lỗi', message: err.message, indicator: 'red' });
-          }
-        },
-        `Tạo ${label} mới`
-      );
+                    control.$input.val(newDoc.name);
+                    control.set_value(newDoc.name);
+
+                    // Cập nhật vào child table
+                    const supplierRow = frm.doc[childTable]
+                        .find(r => r.supplier.replace(/\s+/g, "_") === supplierKey);
+
+                    if (supplierRow) {
+                        supplierRow[fieldname] = newDoc.name;
+                        frm.refresh_field(childTable);
+                    }
+
+                    frm.dirty();
+                } catch (err) {
+                    frappe.msgprint({
+                        title: 'Lỗi',
+                        message: err.message,
+                        indicator: 'red'
+                    });
+                }
+            },
+            `Tạo ${label} mới`
+        );
     };
 
     controlsMap.value[cellKey] = control;
   });
 };
+
+const FORCE_REQUIRED_FIELDS = ["address_title"];
+
+const get_prompt_fields = async function (doctype) {
+    const meta = await frappe.get_meta(doctype);
+
+    return meta.fields
+        .filter(df =>
+            (
+                df.reqd ||
+                FORCE_REQUIRED_FIELDS.includes(df.fieldname)
+            ) &&
+            !df.read_only &&
+            !df.hidden &&
+            !df.no_copy &&
+            !["Section Break", "Column Break", "Tab Break"].includes(df.fieldtype)
+        )
+        .map(df => ({
+            fieldtype: df.fieldtype,
+            fieldname: df.fieldname,
+            label: __(df.label),
+            options: df.options,
+            default: df.default,
+            reqd: FORCE_REQUIRED_FIELDS.includes(df.fieldname) ? 1 : df.reqd
+        }));
+};
+
+
 
 const createSmallTextControl = ({
   record,
@@ -1578,7 +1609,7 @@ const createOriginControl = (record, supplierKey, cellKey) => {
     const control = frappe.ui.form.make_control({
       df: {
         fieldtype: 'Link',
-        options: 'Custom Origin',
+        options: 'Brand',
         fieldname: 'origin',
         only_select: true
       },
@@ -1611,7 +1642,7 @@ const createOriginControl = (record, supplierKey, cellKey) => {
               'frappe.client.insert',
               {
                 doc: {
-                  doctype: 'Custom Origin',
+                  doctype: 'Brand',
                   origin_name: values.origin_name
                 }
               }

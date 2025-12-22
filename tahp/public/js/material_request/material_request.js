@@ -69,6 +69,15 @@ frappe.ui.form.on('Material Request', {
         }
         
         if (frm.doc.workflow_state === 'Duyệt xong') {
+<<<<<<< HEAD
+=======
+            if (frm.doc.custom_current_status === "Đã tạo trình duyệt mua hàng") return
+            frm.add_custom_button(__('Tạo trình duyệt mua hàng'), async function() {
+                await create_approval(frm)
+            });
+
+            if (frm.doc.custom_current_status === "Đã tạo báo giá") return
+>>>>>>> dev
             frm.add_custom_button(__('Tạo So sánh báo giá'), async function() {
                 await create_comparison(frm)
             });
@@ -1035,6 +1044,7 @@ async function create_comparison(frm) {
     frappe.set_route("Form", "Quotation Comparison", doc.name);
 }
 
+<<<<<<< HEAD
 
 // Hàm xóa items khi bỏ chọn production target
 function delete_production_target_items_batch(frm, pairs_to_delete) {
@@ -1649,4 +1659,57 @@ function setup_dialog_events(frm, d) {
             $icon.removeClass('fa-chevron-down').addClass('fa-chevron-right');
         }
     });
+=======
+async function create_approval(frm) {
+    const dialog = new frappe.ui.Dialog({
+        title: "Chọn nhà cung cấp",
+        fields: [
+            {
+                label: "Supplier",
+                fieldname: "supplier",
+                fieldtype: "Link",
+                options: "Supplier",
+                reqd: 1
+            },
+            {
+                label: "Lý do chọn nhà cung cấp",
+                fieldname: "recommend_reason",
+                fieldtype: "Small Text",
+                reqd: 1
+            }
+        ],
+        primary_action_label: "Tạo Purchase Approval",
+        primary_action(values) {
+            dialog.hide();
+
+            // ====== TẠO DOCUMENT SAU KHI ĐÃ NHẬP ======
+            const doc = frappe.model.get_new_doc("Purchase Approval");
+
+            doc.supplier = values.supplier;
+            doc.recommend_reason = values.recommend_reason;
+
+            for (const row of frm.doc.items) {
+                const child = frappe.model.add_child(
+                    doc,
+                    "Purchase Approval Item",
+                    "items"
+                );
+
+                child.item_code = row.item_code;
+                child.item_name = row.item_name;
+                child.stock_uom = row.stock_uom;
+                child.qty = row.qty;
+                child.actual_qty = row.qty;
+                child.delivery_date = row.schedule_date;
+                child.rate = row.rate;
+                child.brand = row.custom_origin;
+                child.note = row.description;
+            }
+
+            frappe.set_route("Form", "Purchase Approval", doc.name);
+        }
+    });
+
+    dialog.show();
+>>>>>>> dev
 }

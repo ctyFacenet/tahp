@@ -1,0 +1,110 @@
+[
+ {
+  "company": "Trường An",
+  "department_name": "Kinh doanh thương mại",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:23:31.860752",
+  "name": "Kinh doanh thương mại - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Kế toán tài chính",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:23:37.861480",
+  "name": "Kế toán tài chính - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Phát triển công nghệ",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:23:52.374299",
+  "name": "Phát triển công nghệ - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "KCS",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:24:02.429917",
+  "name": "KCS - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Bảo trì",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:24:07.787511",
+  "name": "Bảo trì - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Hành chính nhân sự",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:24:12.571485",
+  "name": "Hành chính nhân sự - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Kho",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:24:16.465331",
+  "name": "Kho - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ },
+ {
+  "company": null,
+  "department_name": "All Departments",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 1,
+  "modified": "2025-08-07 22:05:36.797001",
+  "name": "All Departments",
+  "old_parent": null,
+  "parent_department": ""
+ },
+ {
+  "company": "Trường An",
+  "department_name": "Kế hoạch sản xuất",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Department",
+  "is_group": 0,
+  "modified": "2025-12-11 15:23:43.455781",
+  "name": "Kế hoạch sản xuất - TAHP",
+  "old_parent": "All Departments",
+  "parent_department": "All Departments"
+ }
+]
