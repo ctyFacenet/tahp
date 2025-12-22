@@ -20,7 +20,15 @@
   "usage_purpose",
   "using_unit",
   "operator",
-  "created_by"
+  "created_by",
+  "column_break_dslm",
+  "requester",
+  "department",
+  "request_reason",
+  "attach_drawing",
+  "attach_diagram",
+  "attach_image",
+  "attach_other"
  ],
  "fields": [
   {
@@ -121,12 +129,55 @@
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Ng\u01b0\u1eddi t\u1ea1o"
+  },
+  {
+   "fieldname": "column_break_dslm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requester",
+   "fieldtype": "Small Text",
+   "label": "Ng\u01b0\u1eddi \u0111\u1ec1 ngh\u1ecb"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Small Text",
+   "label": "B\u1ed9 ph\u1eadn"
+  },
+  {
+   "fieldname": "request_reason",
+   "fieldtype": "Small Text",
+   "label": "L\u00fd do \u0111\u1ec1 ngh\u1ecb"
+  },
+  {
+   "default": "0",
+   "fieldname": "attach_drawing",
+   "fieldtype": "Check",
+   "label": "B\u1ea3n v\u1ebd"
+  },
+  {
+   "default": "0",
+   "fieldname": "attach_diagram",
+   "fieldtype": "Check",
+   "label": "S\u01a1 \u0111\u1ed3"
+  },
+  {
+   "default": "0",
+   "fieldname": "attach_image",
+   "fieldtype": "Check",
+   "label": "H\u00ecnh \u1ea3nh"
+  },
+  {
+   "default": "0",
+   "fieldname": "attach_other",
+   "fieldtype": "Check",
+   "label": "Kh\u00e1c"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-15 10:03:52.898389",
+ "modified": "2025-12-22 09:27:10.380568",
  "modified_by": "Administrator",
  "module": "TEST",
  "name": "Test print format custom",
