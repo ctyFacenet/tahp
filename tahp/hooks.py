@@ -19,7 +19,6 @@ fixtures = [
     {"doctype": "System Settings"},
     {"doctype": "Custom HTML Block"},
     {"doctype": "Role Profile"},
-    {"doctype": "Department"},
 ]
 
 # required_apps = []
