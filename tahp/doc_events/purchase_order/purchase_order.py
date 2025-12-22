@@ -196,3 +196,31 @@ def get_or_create_shipping_account(company):
     return acc.name
 
 
+@frappe.whitelist()
+def get_purchase_receipts(purchase_order):
+    prs = frappe.get_all(
+        "Purchase Receipt",
+        filters={"purchase_order": purchase_order},
+        fields=["name", "posting_date", "status"]
+    )
+
+    result = []
+    for pr in prs:
+        doc = frappe.get_doc("Purchase Receipt", pr.name)
+        result.append({
+            "name": doc.name,
+            "items": [
+                {
+                    "item_code": i.item_code,
+                    "item_name": i.item_name,
+                    "qty": i.received_qty,
+                    "received_qty": i.received_qty,
+                    "rejected_qty": i.rejected_qty,
+                    "uom": i.uom
+                }
+                for i in doc.items
+            ],
+            "status": pr.status
+        })
+
+    return result

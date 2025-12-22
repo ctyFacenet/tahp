@@ -1,22 +1,126 @@
 frappe.ui.form.on("Purchase Order", {
     refresh: function(frm) {
         frm.set_intro("")
-        setTimeout(() => {
-            frm.remove_custom_button(__("Update Items"));
-            frm.remove_custom_button("Hold", "Status");
-            frm.remove_custom_button("Close", "Status");
-            frm.remove_custom_button("Purchase Receipt", "Create New");
-            frm.remove_custom_button("Purchase Invoice", "Create New");
-            frm.remove_custom_button("Payment", "Create New");
-            frm.remove_custom_button("Payment Request", "Create New");
-        }, 50);
+        // setTimeout(() => {
+        //     frm.remove_custom_button(__("Update Items"));
+        //     frm.remove_custom_button("Hold", "Status");
+        //     frm.remove_custom_button("Close", "Status");
+        //     frm.remove_custom_button("Purchase Receipt", "Create New");
+        //     frm.remove_custom_button("Purchase Invoice", "Create New");
+        //     frm.remove_custom_button("Payment", "Create New");
+        //     frm.remove_custom_button("Payment Request", "Create New");
+        // }, 50);
 
         if (frm.doc.docstatus !== 1) return
-        frm.add_custom_button("Chi tiết giao hàng", () => {}, "Cập nhật");
+        frm.add_custom_button("Chi tiết giao hàng", async () => frm.events.purchase_receipt_dialog(frm), "Cập nhật");
         frm.add_custom_button("Phiếu kiểm tra", () => {}, "Cập nhật");
         frm.add_custom_button("Thông tin thanh toán", () => {openPaymentDialog(frm)}, "Cập nhật");
         frm.page.set_inner_btn_group_as_primary(__("Cập nhật"));
     },
+
+    purchase_receipt_dialog: async function (frm) {
+        const data = await frappe.xcall(
+            "tahp.doc_events.purchase_order.purchase_order.get_purchase_receipts",
+            { purchase_order: frm.doc.name }
+        ) || [];
+
+        let table_html = `
+            <table class="table table-bordered">
+                <thead style="background:#eef2f6; font-weight:600">
+                    <tr>
+                        <th>Mã PR</th>
+                        <th>Ngày nhận dự kiến</th>
+                        <th>Ngày nhận thực tế</th>
+                        <th style="width:160px">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.forEach(pr => {
+            table_html += `
+                <tr style="background:#f9fafb">
+                    <td><b>${pr.name}</b></td>
+                    <td>${frappe.datetime.str_to_user(pr.custom_schedule_date)}</td>
+                    <td>${frappe.datetime.str_to_user(pr.custom_actual_date)}</td>
+                    <td>${__(pr.status)}</td>
+                </tr>
+
+                <tr>
+                    <td colspan="4" style="padding-left:30px;padding-block:0;padding-right:0;">
+                        <table class="table table-sm" style="margin:0;margin-bottom:25px;">
+                            <thead>
+                                <tr>
+                                    <th>Mã hàng</th>
+                                    <th>Tên hàng</th>
+                                    <th>SL nhận</th>
+                                    <th>SL đạt</th>
+                                    <th>SL không đạt</th>
+                                    <th>ĐVT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            (pr.items || []).forEach(item => {
+                table_html += `
+                    <tr>
+                        <td>${item.item_code}</td>
+                        <td>${item.item_name}</td>
+                        <td>${item.qty || 0}</td>
+                        <td>${item.received_qty || 0}</td>
+                        <td>${item.rejected_qty || 0}</td>
+                        <td>${item.uom}</td>
+                    </tr>
+                `;
+            });
+
+            table_html += `
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            `;
+        });
+
+        table_html += `
+                </tbody>
+            </table>
+        `;
+
+        const dialog = new frappe.ui.Dialog({
+            title: "Danh sách Phiếu nhập kho (Purchase Receipt)",
+            size: "large",
+            fields: [
+                {
+                    fieldname: "pr_table",
+                    fieldtype: "HTML",
+                    options: table_html
+                },
+                {
+                    fieldname: "create_plan_btn",
+                    fieldtype: "HTML",
+                    options: `
+                        <div style="text-align:right; margin-top:10px">
+                            <button class="btn btn-primary" id="create-delivery-plan">
+                                Tạo kế hoạch giao hàng
+                            </button>
+                        </div>
+                    `
+                }
+            ]
+        });
+
+        dialog.show();
+
+        dialog.$wrapper.on("click", "#create-delivery-plan", async () => {
+            frappe.model.open_mapped_doc({
+                method: "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt",
+                frm: cur_frm,
+                freeze_message: __("Creating Purchase Receipt ..."),
+            });
+        });
+    }
 })
 
 
