@@ -6,7 +6,7 @@ frappe.ui.form.on("Custom Budget", {
         if (frm.doc.docstatus === 1) {
             frm.add_custom_button('Điều chỉnh ngân sách', function() {
                 show_addjust_budget_dialog(frm);
-            });
+            }).addClass("btn-primary");
         }
 	},
 });
@@ -60,14 +60,14 @@ function show_addjust_budget_dialog(frm) {
                 default: frm.doc.initial_budget,
             },
             {
-                fieldname: 'planned_spend',
+                fieldname: 'planned_amount',
                 label: __('Dự kiến chi tiêu'),
                 fieldtype: 'Currency',
                 read_only: 1,
                 default: frm.doc.planned_amount
             },
             {
-                fieldname: 'spent',
+                fieldname: 'actual_amount',
                 label: __('Đã chi tiêu'),
                 fieldtype: 'Currency',
                 read_only: 1,
@@ -113,28 +113,31 @@ function show_addjust_budget_dialog(frm) {
 function update_budget_calculations(dialog, frm) {
     const adjust_type = dialog.get_value('adjust');
     const adjust_amount = dialog.get_value('amount') || 0;
-    
+
     const initial_budget = frm.doc.initial_budget || 0;
     const planned_amount = frm.doc.planned_amount || 0;
+    const actual_amount = frm.doc.actual_amount || 0;
     const increased_amount = frm.doc.increased_amount || 0;
-    
-    let new_planned_spend = planned_amount;
+
+    let new_planned_amount = planned_amount;
+    let new_actual_amount = actual_amount;
     let new_increased_amount = increased_amount;
-    let new_planned_total = 0;
-    
-    if (adjust_type === 'Chi tiêu bên ngoài') {
-        new_planned_spend += adjust_amount;
-        new_planned_total = initial_budget + increased_amount - adjust_amount;
-    } else if (adjust_type === 'Tăng ngân sách') {
-        new_increased_amount = increased_amount + adjust_amount;
-        new_planned_total = initial_budget + new_increased_amount;
-    }
-    
-    dialog.set_value('planned_spend', new_planned_spend);
+
+    if (adjust_type === 'Chi tiêu bên ngoài') new_actual_amount += adjust_amount;
+    else if (adjust_type === 'Tăng ngân sách') new_increased_amount += adjust_amount;
+
+    const total_budget = initial_budget + new_increased_amount;
+    const planned_total = total_budget - new_planned_amount - new_actual_amount;
+    const actual_total = total_budget - new_actual_amount;
+
+    dialog.set_value('planned_amount', new_planned_amount);
+    dialog.set_value('actual_amount', new_actual_amount);
     dialog.set_value('increased_amount', new_increased_amount);
-    dialog.set_value('planned_total', new_planned_total);
-    dialog.set_value('spent', new_planned_spend);
+
+    dialog.set_value('planned_total', planned_total);
+    dialog.set_value('actual_total', actual_total);
 }
+
 
 async function handle_budget_adjustment(frm, values, dialog) {
     const adjust_amount = values.amount;
@@ -144,33 +147,23 @@ async function handle_budget_adjustment(frm, values, dialog) {
         return;
     }
     
-    dialog.get_primary_btn().prop('disabled', true);
-    
     const adjustment_type = (values.adjust === 'Chi tiêu bên ngoài') ? 'Giảm' : 'Tăng';
     
-    try {
-        const response = await frappe.call({
-            method: 'tahp.pms.doctype.custom_budget.custom_budget.process_budget_adjustment',
-            args: {
-                budget_name: frm.doc.name,
-                adjustment_type: adjustment_type,
-                adjust_amount: adjust_amount
-            }
-        });
-        
-        if (response.message && response.message.success) {
-            await frm.reload_doc();
-            dialog.hide();
-            
-            frappe.show_alert({
-                message: __('Điều chỉnh ngân sách thành công. Adjustment ID: {0}', 
-                           [response.message.adjustment_id]),
-                indicator: 'green'
-            }, 5);
+    const response = await frappe.call({
+        method: 'tahp.pms.doctype.custom_budget.custom_budget.process_budget_adjustment',
+        args: {
+            budget_name: frm.doc.name,
+            adjustment_type: adjustment_type,
+            adjust_amount: adjust_amount,
+            account: frm.doc.account
         }
-    } catch (error) {
-        console.error('Budget adjustment error:', error);
-        frappe.msgprint(__('Có lỗi xảy ra khi điều chỉnh ngân sách'));
-        dialog.get_primary_btn().prop('disabled', false);
+    });
+    
+    if (response.message && response.message.success) {
+        dialog.hide();
+        frappe.show_alert({
+            message: __('Điều chỉnh ngân sách thành công'),
+            indicator: 'green'
+        });
     }
 }
