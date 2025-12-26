@@ -224,7 +224,8 @@ override_doctype_class = {
     "Job Card": "tahp.overrides.job_card.JobCard",
     "Work Order": "tahp.overrides.work_order.WorkOrder",
     "Address": "tahp.overrides.address.Address",
-    "Purchase Order": "tahp.overrides.purchase_order.PurchaseOrder"
+    "Purchase Order": "tahp.overrides.purchase_order.PurchaseOrder",
+    "Department": "tahp.overrides.department.CustomDepartment"
 }
 
 # Document Events
