@@ -109,7 +109,7 @@ doctype_js = {
     "Employee": "/public/js/employee/employee.js",
     "Workstation": "/public/js/workstation/workstation.js",
     "Supplier": "/public/js/supplier/supplier.js",
-    "Material Request": "/public/js/material_request/material_request.js",
+    "Material Request": "/public/js/pms/material_request/material_request.js",
     "Purchase Order": "./public/js/purchase_order/purchase_order.js"
 }
 
@@ -121,7 +121,7 @@ doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
     "Work Order": ["public/js/work_order/work_order_list.js"],
-    "Material Request": ["public/js/material_request/material_request_list.js"]
+    "Material Request": ["public/js/pms/material_request/material_request_list.js"]
 }
 
 # doctype_js = {
@@ -291,6 +291,11 @@ doc_events = {
             "tahp.doc_events.job_card.on_submit.on_submit"
         ]
     },
+    "Department": {
+        "after_insert": [
+            "tahp.pms.doc_events.department.after_insert.after_insert"
+        ]
+    }
 }
 
 # doc_events = {

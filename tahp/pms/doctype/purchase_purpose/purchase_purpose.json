@@ -30,7 +30,7 @@
  "modified": "2025-12-26 08:46:20.791302",
  "modified_by": "Administrator",
  "module": "PMS",
- "name": "Purpose of Purchase",
+ "name": "Purchase Purpose",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
