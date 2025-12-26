@@ -1,36 +1,37 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:MDSD.{####}",
- "creation": "2025-12-26 08:25:40.201185",
+ "autoname": "format:MDSD.{DD}.{MM}.{YY}.{###}",
+ "creation": "2025-12-26 17:09:12.857757",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "purpose",
-  "account"
+  "item_code",
+  "purchase_purpose"
  ],
  "fields": [
   {
-   "fieldname": "purpose",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "M\u1ee5c \u0111\u00edch s\u1eed d\u1ee5ng"
-  },
-  {
-   "fieldname": "account",
+   "fieldname": "item_code",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "T\u00e0i kho\u1ea3n",
-   "options": "Account"
+   "label": "M\u00e3 m\u1eb7t h\u00e0ng",
+   "options": "Item"
+  },
+  {
+   "fieldname": "purchase_purpose",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "M\u1ee5c \u0111\u00edch s\u1eed d\u1ee5ng",
+   "options": "Purchase Purpose"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-26 17:17:06.915267",
+ "modified": "2025-12-26 17:10:32.920931",
  "modified_by": "Administrator",
  "module": "PMS",
- "name": "Purchase Purpose",
+ "name": "Purchase Purpose Mapping",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
@@ -59,12 +60,9 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "purpose"
+ "states": []
 }

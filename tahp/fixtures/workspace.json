@@ -3254,7 +3254,7 @@
     "is_query_report": 0,
     "label": "Mục đích sử dụng",
     "link_count": 0,
-    "link_to": "Purpose of Purchase",
+    "link_to": "Purchase Purpose",
     "link_type": "DocType",
     "onboard": 0,
     "only_for": null,
