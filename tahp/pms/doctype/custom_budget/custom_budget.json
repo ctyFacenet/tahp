@@ -64,6 +64,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "planned_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -71,6 +72,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "actual_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -78,6 +80,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "increased_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -89,6 +92,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_planned_amount",
    "fieldtype": "Currency",
    "is_virtual": 1,
@@ -96,6 +100,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_actual_amount",
    "fieldtype": "Currency",
    "is_virtual": 1,
@@ -117,7 +122,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-26 14:15:55.761838",
+ "modified": "2025-12-26 16:57:57.731026",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom Budget",
