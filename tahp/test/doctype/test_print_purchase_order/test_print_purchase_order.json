@@ -5,89 +5,38 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "item_name",
-  "uom",
-  "quantity",
-  "column_break_ggqu",
-  "unit_price",
-  "note",
-  "total_amount",
-  "column_break_xliw",
-  "decision_number",
+  "danh_s\u00e1ch_h\u00e0ng_ho\u00e1_section",
+  "items",
   "company",
   "supplier"
  ],
  "fields": [
   {
-   "default": "\u00c1o l\u00f3t tr\u1ee5c b\u01a1m D55x5x50 (03 c\u00e1i/b\u1ed9).",
-   "fieldname": "item_name",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "T\u00ean h\u00e0ng ho\u00e1"
+   "fieldname": "danh_s\u00e1ch_h\u00e0ng_ho\u00e1_section",
+   "fieldtype": "Section Break",
+   "label": "Danh s\u00e1ch h\u00e0ng ho\u00e1"
   },
   {
-   "default": "l\u00edt",
-   "fieldname": "uom",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "\u0110\u01a1n v\u1ecb t\u00ednh"
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "H\u00e0ng ho\u00e1",
+   "options": "Test print PO item"
   },
   {
-   "fieldname": "column_break_ggqu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "quantity",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "S\u1ed1 l\u01b0\u1ee3ng"
-  },
-  {
-   "fieldname": "unit_price",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "\u0110\u01a1n gi\u00e1"
-  },
-  {
-   "fieldname": "total_amount",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Th\u00e0nh ti\u1ec1n"
-  },
-  {
-   "default": "H\u00e0ng m\u1eabu m\u00e3 \u0111\u1eb9p...",
-   "fieldname": "note",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "Ghi ch\u00fa"
-  },
-  {
-   "fieldname": "column_break_xliw",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0803/2025/\u0110\u0110H/TAHP-XH",
-   "fieldname": "decision_number",
-   "fieldtype": "Small Text",
-   "label": "S\u1ed1 hi\u1ec7u"
-  },
-  {
-   "default": "C\u00d4NG TY C\u1ed4 PH\u1ea6N \u0110\u1ea6U T\u01af TR\u01af\u1edcNG AN H\u1ea2I PH\u00d2NG",
    "fieldname": "company",
    "fieldtype": "Small Text",
-   "label": "B\u00ean mua (B\u00ean A)"
+   "label": "T\u00ean c\u00f4ng ty A"
   },
   {
-   "default": "C\u00d4NG TY TNHH NGHI\u00caN C\u1ee8U V\u00c0 PH\u00c1T TRI\u1ec2N \u1ee8NG D\u1ee4NG C\u00d4NG NGH\u1ec6 B\u00c1CH KHOA",
    "fieldname": "supplier",
    "fieldtype": "Small Text",
-   "label": "B\u00ean b\u00e1n (B\u00ean B)"
+   "label": "T\u00ean c\u00f4ng ty B"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-22 09:56:39.686540",
+ "modified": "2025-12-25 15:44:00.718240",
  "modified_by": "Administrator",
  "module": "TEST",
  "name": "Test print Purchase Order",
