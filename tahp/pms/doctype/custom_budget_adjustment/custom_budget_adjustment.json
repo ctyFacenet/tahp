@@ -14,7 +14,8 @@
   "link_name",
   "column_break_adyf",
   "account",
-  "amount"
+  "amount",
+  "adjustment_type"
  ],
  "fields": [
   {
@@ -74,14 +75,22 @@
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "S\u1ed1 ti\u1ec1n bi\u1ebfn \u0111\u1ed9ng"
+   "label": "S\u1ed1 ti\u1ec1n bi\u1ebfn \u0111\u1ed9ng",
+   "non_negative": 1
+  },
+  {
+   "default": "Gi\u1ea3m",
+   "fieldname": "adjustment_type",
+   "fieldtype": "Select",
+   "label": "Lo\u1ea1i bi\u1ebfn \u0111\u1ed9ng",
+   "options": "T\u0103ng\nGi\u1ea3m"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-26 08:44:00.905996",
+ "modified": "2025-12-26 14:25:13.470309",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom Budget Adjustment",

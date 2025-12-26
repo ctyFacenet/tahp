@@ -37,9 +37,10 @@
   },
   {
    "fieldname": "effective_month",
-   "fieldtype": "Int",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Th\u00e1ng hi\u1ec7u l\u1ef1c"
+   "label": "Th\u00e1ng hi\u1ec7u l\u1ef1c",
+   "options": "\nTh\u00e1ng 1\nTh\u00e1ng 2\nTh\u00e1ng 3\nTh\u00e1ng 4\nTh\u00e1ng 5\nTh\u00e1ng 6\nTh\u00e1ng 7\nTh\u00e1ng 8\nTh\u00e1ng 9\nTh\u00e1ng 10\nTh\u00e1ng 11\nTh\u00e1ng 12"
   },
   {
    "fieldname": "column_break_ofka",
@@ -66,19 +67,22 @@
    "fieldname": "planned_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "D\u1ef1 ki\u1ebfn chi ti\u00eau"
+   "label": "D\u1ef1 ki\u1ebfn chi ti\u00eau",
+   "read_only": 1
   },
   {
    "fieldname": "actual_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Th\u1ef1c t\u1ebf chi ti\u00eau"
+   "label": "Th\u1ef1c t\u1ebf chi ti\u00eau",
+   "read_only": 1
   },
   {
    "fieldname": "increased_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "\u0110\u00e3 \u0111\u01b0\u1ee3c c\u1ea5p th\u00eam"
+   "label": "\u0110\u00e3 \u0111\u01b0\u1ee3c c\u1ea5p th\u00eam",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_gxob",
@@ -88,13 +92,15 @@
    "fieldname": "total_planned_amount",
    "fieldtype": "Currency",
    "is_virtual": 1,
-   "label": "Ng\u00e2n s\u00e1ch d\u1ef1 ki\u1ebfn c\u00f2n l\u1ea1i"
+   "label": "Ng\u00e2n s\u00e1ch d\u1ef1 ki\u1ebfn c\u00f2n l\u1ea1i",
+   "read_only": 1
   },
   {
    "fieldname": "total_actual_amount",
    "fieldtype": "Currency",
    "is_virtual": 1,
-   "label": "Ng\u00e2n s\u00e1ch th\u1ef1c t\u1ebf c\u00f2n l\u1ea1i"
+   "label": "Ng\u00e2n s\u00e1ch th\u1ef1c t\u1ebf c\u00f2n l\u1ea1i",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -111,7 +117,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-26 08:37:41.494320",
+ "modified": "2025-12-26 14:15:55.761838",
  "modified_by": "Administrator",
  "module": "PMS",
  "name": "Custom Budget",
