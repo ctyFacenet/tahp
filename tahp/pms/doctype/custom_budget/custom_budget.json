@@ -1,0 +1,153 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:NS.{DD}.{MM}.{YY}.{###}",
+ "creation": "2025-12-26 08:23:35.091863",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "cost_center",
+  "effective_year",
+  "effective_month",
+  "column_break_ofka",
+  "account",
+  "initial_budget",
+  "section_break_bmxi",
+  "planned_amount",
+  "actual_amount",
+  "increased_amount",
+  "column_break_gxob",
+  "total_planned_amount",
+  "total_actual_amount",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "T\u00ean B\u1ed9 ph\u1eadn qu\u1ea3n l\u00fd chi ph\u00ed",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "effective_year",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "N\u0103m hi\u1ec7u l\u1ef1c"
+  },
+  {
+   "fieldname": "effective_month",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Th\u00e1ng hi\u1ec7u l\u1ef1c"
+  },
+  {
+   "fieldname": "column_break_ofka",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "T\u00e0i kho\u1ea3n",
+   "options": "Account"
+  },
+  {
+   "fieldname": "initial_budget",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Ng\u00e2n s\u00e1ch ban \u0111\u1ea7u"
+  },
+  {
+   "fieldname": "section_break_bmxi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "planned_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "D\u1ef1 ki\u1ebfn chi ti\u00eau"
+  },
+  {
+   "fieldname": "actual_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Th\u1ef1c t\u1ebf chi ti\u00eau"
+  },
+  {
+   "fieldname": "increased_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "\u0110\u00e3 \u0111\u01b0\u1ee3c c\u1ea5p th\u00eam"
+  },
+  {
+   "fieldname": "column_break_gxob",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_planned_amount",
+   "fieldtype": "Currency",
+   "is_virtual": 1,
+   "label": "Ng\u00e2n s\u00e1ch d\u1ef1 ki\u1ebfn c\u00f2n l\u1ea1i"
+  },
+  {
+   "fieldname": "total_actual_amount",
+   "fieldtype": "Currency",
+   "is_virtual": 1,
+   "label": "Ng\u00e2n s\u00e1ch th\u1ef1c t\u1ebf c\u00f2n l\u1ea1i"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Custom Budget",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-26 08:37:41.494320",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Custom Budget",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "cost_center"
+}

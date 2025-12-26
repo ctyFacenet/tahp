@@ -1,0 +1,171 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{supplier}.{###}",
+ "creation": "2025-12-26 08:49:23.583886",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "th\u00f4ng_tin_chung_section",
+  "supplier",
+  "column_break_cuom",
+  "from_date",
+  "th\u00f4ng_tin_\u0111i\u1ec1u_kho\u1ea3n_section",
+  "\u0111i\u1ec1u_kho\u1ea3n_thanh_to\u00e1n_column",
+  "payment_type",
+  "pyament_note",
+  "column_break_amsf",
+  "address",
+  "delivery_cost",
+  "delivery_note",
+  "\u0111i\u1ec1u_kho\u1ea3n_chi\u1ebft_kh\u1ea5u_th\u01b0\u01a1ng_m\u1ea1i_column",
+  "discount",
+  "promotion",
+  "column_break_hhdx",
+  "warranty",
+  "after_sale_service"
+ ],
+ "fields": [
+  {
+   "fieldname": "th\u00f4ng_tin_chung_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u00f4ng tin chung"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Nh\u00e0 cung c\u1ea5p",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "column_break_cuom",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Ng\u00e0y b\u1eaft \u0111\u1ea7u hi\u1ec7u l\u1ef1c"
+  },
+  {
+   "fieldname": "th\u00f4ng_tin_\u0111i\u1ec1u_kho\u1ea3n_section",
+   "fieldtype": "Section Break",
+   "label": "Th\u00f4ng tin \u0111i\u1ec1u kho\u1ea3n"
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "label": "Ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n",
+   "options": "Ti\u1ec1n m\u1eb7t\nChuy\u1ec3n kho\u1ea3n"
+  },
+  {
+   "fieldname": "pyament_note",
+   "fieldtype": "Link",
+   "label": "Th\u1eddi h\u1ea1n thanh to\u00e1n",
+   "options": "Custom Payment Note"
+  },
+  {
+   "fieldname": "column_break_amsf",
+   "fieldtype": "Column Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n giao h\u00e0ng"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Link",
+   "label": "\u0110\u1ecba \u0111i\u1ec3m giao h\u00e0ng",
+   "options": "Address"
+  },
+  {
+   "fieldname": "delivery_cost",
+   "fieldtype": "Link",
+   "label": "Chi ph\u00ed v\u1eadn chuy\u1ec3n",
+   "options": "Custom Delivery Cost"
+  },
+  {
+   "fieldname": "delivery_note",
+   "fieldtype": "Link",
+   "label": "Th\u1eddi gian giao h\u00e0ng",
+   "options": "Custom Delivery Note"
+  },
+  {
+   "fieldname": "column_break_hhdx",
+   "fieldtype": "Column Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh & h\u1eadu m\u00e3i (n\u1ebfu c\u00f3)"
+  },
+  {
+   "fieldname": "warranty",
+   "fieldtype": "Link",
+   "label": "\u0110i\u1ec1u kho\u1ea3n b\u1ea3o h\u00e0nh",
+   "options": "Custom Warranty"
+  },
+  {
+   "fieldname": "after_sale_service",
+   "fieldtype": "Link",
+   "label": "D\u1ecbch v\u1ee5 h\u1eadu m\u00e3i",
+   "options": "Custom Warranty"
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_thanh_to\u00e1n_column",
+   "fieldtype": "Column Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n thanh to\u00e1n"
+  },
+  {
+   "fieldname": "\u0111i\u1ec1u_kho\u1ea3n_chi\u1ebft_kh\u1ea5u_th\u01b0\u01a1ng_m\u1ea1i_column",
+   "fieldtype": "Column Break",
+   "label": "\u0110i\u1ec1u kho\u1ea3n chi\u1ebft kh\u1ea5u th\u01b0\u01a1ng m\u1ea1i"
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Link",
+   "label": "Th\u00f4ng tin gi\u1ea3m gi\u00e1",
+   "options": "Discount Information"
+  },
+  {
+   "fieldname": "promotion",
+   "fieldtype": "Link",
+   "label": "Th\u00f4ng tin khuy\u1ebfn m\u1ea1i",
+   "options": "Discount Information"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-26 09:05:52.392034",
+ "modified_by": "Administrator",
+ "module": "PMS",
+ "name": "Supplier Contract",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
