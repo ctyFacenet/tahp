@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:PO-{YYYY}-{MM}-{#####}",
  "creation": "2025-12-16 08:38:33.143501",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -36,10 +37,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-25 15:44:00.718240",
+ "modified": "2025-12-26 14:41:17.720776",
  "modified_by": "Administrator",
  "module": "TEST",
  "name": "Test print Purchase Order",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
