@@ -109,7 +109,10 @@ doctype_js = {
     "Employee": "/public/js/employee/employee.js",
     "Workstation": "/public/js/workstation/workstation.js",
     "Supplier": "/public/js/supplier/supplier.js",
-    "Material Request": "/public/js/pms/material_request/material_request.js",
+    "Material Request": [
+        "/public/js/pms/material_request/material_request.js",
+        "/public/js/pms/material_request/material_request_button.js"
+    ],
     "Purchase Order": "./public/js/purchase_order/purchase_order.js"
 }
 
