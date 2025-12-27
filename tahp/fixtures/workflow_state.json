@@ -282,18 +282,18 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:25.464673",
-  "name": "Nháp",
+  "modified": "2025-08-21 17:00:56.976970",
+  "name": "Đợi GĐ duyệt",
   "style": "",
-  "workflow_state_name": "Nháp"
+  "workflow_state_name": "Đợi GĐ duyệt"
  },
  {
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2025-08-21 17:00:56.976970",
-  "name": "Đợi GĐ duyệt",
+  "modified": "2025-08-21 17:00:25.464673",
+  "name": "Nháp",
   "style": "",
-  "workflow_state_name": "Đợi GĐ duyệt"
+  "workflow_state_name": "Nháp"
  }
 ]

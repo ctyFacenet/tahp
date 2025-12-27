@@ -55,7 +55,7 @@
   "max_report_rows": 100000,
   "max_signups_allowed_per_hour": 0,
   "minimum_password_score": "2",
-  "modified": "2025-12-26 17:06:43.937316",
+  "modified": "2025-12-26 23:38:08.342511",
   "name": "System Settings",
   "number_format": "#,###.##",
   "otp_issuer_name": "Frappe Framework",
