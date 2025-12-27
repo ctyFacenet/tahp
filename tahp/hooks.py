@@ -299,6 +299,9 @@ doc_events = {
     "Material Request": {
         "on_submit": [
             "tahp.pms.doc_events.material_request.on_submit.on_submit"
+        ],
+        "after_insert": [
+            "tahp.pms.doc_events.material_request.after_insert.after_insert"
         ]
     }
 }

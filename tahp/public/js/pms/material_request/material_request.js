@@ -21,6 +21,7 @@ frappe.ui.form.on("Material Request Item", {
     item_code: async function(frm, cdt, cdn) {
         let row = locals[cdt][cdn]
         if (!row.item_code) return
+        frappe.model.set_value(cdt, cdn, "bom_no", null)
         let res = await frappe.xcall("tahp.pms.doc_events.utils.autofill_item_rate", {item_code: row.item_code})
         if (!res) return
         frappe.model.set_value(cdt, cdn, {

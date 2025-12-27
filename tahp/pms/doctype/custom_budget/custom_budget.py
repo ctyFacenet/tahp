@@ -7,11 +7,11 @@ from frappe.model.document import Document
 class CustomBudget(Document):
 	@property
 	def total_planned_amount(self):
-		return self.initial_budget + self.increased_amount - self.planned_amount - self.actual_amount
+		return self.initial_budget + (self.increased_amount or 0) - (self.planned_amount or 0) - (self.actual_amount or 0)
 	
 	@property
 	def total_actual_amount(self):
-		return self.initial_budget + self.increased_amount - self.actual_amount
+		return self.initial_budget + (self.increased_amount or 0) - (self.actual_amount or 0)
 	  
 
 @frappe.whitelist()
