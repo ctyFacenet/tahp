@@ -344,9 +344,9 @@ scheduler_events = {
         "* * * * *": [
             "tahp.tahp.doctype.operation_tracker_inspection.operation_tracker_inspection.add_inspection"
         ],
-        "0 1 * * *": [
-            "tahp.utils.cron_backup.cron_backup"
-        ]
+        # "0 1 * * *": [
+        #     "tahp.utils.cron_backup.cron_backup"
+        # ]
     },
 }
 
