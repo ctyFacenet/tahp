@@ -124,7 +124,7 @@ doctype_list_js = {
     "Workstation": ["public/js/workstation/workstation_list.js"],
     "Stock Entry": ["public/js/stock_entry/stock_entry_list.js"],
     "Work Order": ["public/js/work_order/work_order_list.js"],
-    "Material Request": ["public/js/pms/material_request/material_request_list.js"]
+    # "Material Request": ["public/js/pms/material_request/material_request_list.js"]
 }
 
 # doctype_js = {
